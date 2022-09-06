@@ -66,7 +66,4 @@ node_modules/
 .env
 .gradle
 .idea
-index.js
-index.js.map
-index.meta.js
-functions/index
+functions

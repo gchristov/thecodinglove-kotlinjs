@@ -4,9 +4,6 @@ plugins {
     kotlin("js") version "1.7.10"
 }
 
-group = "me.georgi"
-version = "1.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }
@@ -18,13 +15,11 @@ dependencies {
 kotlin {
     js {
         binaries.executable()
-        nodejs {
-
-        }
+        nodejs()
     }
 }
 
-tasks.withType<Kotlin2JsCompile>() {
+tasks.withType<Kotlin2JsCompile> {
     kotlinOptions {
         moduleKind = "commonjs"
         outputFile = "$projectDir/functions/index.js"
