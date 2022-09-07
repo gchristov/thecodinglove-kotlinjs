@@ -3,7 +3,7 @@ external var exports: dynamic
 
 fun main(args: Array<String>) {
     val fireFunctions = require("firebase-functions")
-    exports.myTestFun = fireFunctions.https.onRequest { request , response ->
+    expots.myTestFun = fireFunctions.https.onRequest { request , response ->
         response.send("Hello from Kotlin JS!")
     }
 }
