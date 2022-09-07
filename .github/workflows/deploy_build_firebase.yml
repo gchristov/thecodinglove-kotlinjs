@@ -5,33 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  jsBuild:
-    runs-on: ubuntu-20.04
-    concurrency:
-      group: ${{ github.ref }}_jsBuild
-      cancel-in-progress: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
-      - name: KMP cache
-        uses: actions/cache@v2
-        id: konan-js-build
-        with:
-          path: '~/.konan/**'
-          key: konan-js-build
-      - name: Compile Javascript app
-        run: set -o pipefail && bash ./deploy/build.sh functions
-      - name: Build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: Javascript build
-          path: |
-            functions/**
-
   jsDeploy:
-    needs: jsBuild
     runs-on: ubuntu-20.04
     concurrency:
       group: ${{ github.ref }}_jsDeploy
@@ -47,20 +21,24 @@ jobs:
         with:
           path: '~/.konan/**'
           key: konan-js-deploy
-      - name: Restore artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: Build artifacts
+      - name: Compile Javascript app
+        run: set -o pipefail && bash ./deploy/build.sh functions
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
           args: deploy --only functions
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-      - name: Deploy artifacts
+      - name: Save artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: Firebase deploy
+          name: Javascript deploy
           path: |
+            functions/index/**
+            functions/index.js
+            functions/index.js.map
+            functions/index.meta.js
+            functions/package.json
+            functions/package-lock.json
             firebase-debug.log*
-            firebase-debug.*.log*
+            firebase-debug.*.log
