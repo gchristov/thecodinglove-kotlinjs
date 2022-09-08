@@ -26,5 +26,4 @@ Before|After
 
 ---
 
-[Our testing guide](https://github.com/gchristov/newsfeed-kmm#-tests)
-[Writing Kotlin Multiplatform tests](https://kotlinlang.org/docs/multiplatform-run-tests.html)
+[Writing Kotlin Multiplatform tests](https://kotlinlang.org/docs/js-running-tests.html)
