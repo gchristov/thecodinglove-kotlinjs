@@ -1,12 +1,12 @@
-*Feel free to delete irrelevant sections or add new ones as you see fit.*
+<!-- Feel free to delete irrelevant sections or add new ones as you see fit. -->
 
 ## What does this pull request change?
 
-*Describe your proposed changes, including any necessary context.*
+<!-- Describe your proposed changes, including any necessary context. -->
 
 ## Demo
 
-*Optional but helps to have a quick visual, if any.*
+<!-- Optional but helps to have a quick visual, if any. -->
 
 Before|After
 -|-
@@ -14,7 +14,7 @@ Before|After
 
 ## Screenshots
 
-*Optional but helps to have a quick visual, if any.*
+<!-- Optional but helps to have a quick visual, if any. -->
 
 Before|After
 -|-
@@ -22,7 +22,7 @@ Before|After
 
 ## How is this change tested?
 
-*How did you ensure your code works? e.g. unit tests, UI tests, manually*
+<!-- How did you ensure your code works? e.g. unit tests, UI tests, manually. -->
 
 ---
 
