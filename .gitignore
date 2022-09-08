@@ -66,4 +66,5 @@ node_modules/
 .env
 .gradle
 .idea
-functions
+functions/index.js
+functions/package-lock.json
