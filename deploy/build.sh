@@ -1,6 +1,6 @@
 # Builds Javascript code to a specific folder and installs dependencies
 set -e
 ./gradlew assemble
-cp package.json "$1/package.json"
-cp package-lock.json "$1/package-lock.json"
 cd "$1" && npm install && cd ..
+cp build/js/packages/thecodinglove-kmp-appJs/kotlin/thecodinglove-kmp-appJs.js "$1/index.js"
+cp -r build/js/packages/. "$1/node_modules"
