@@ -7,7 +7,7 @@ class MessengerTest {
     @Test
     fun testGreet() {
         assertEquals(
-            expected = "Hello from multi-module Kotlin JS! Nested modules: ModuleA + ModuleB!",
+            expected = "Helloo from multi-module Kotlin JS! Nested modules: ModuleA + ModuleB!",
             actual = Messenger().message()
         )
     }
