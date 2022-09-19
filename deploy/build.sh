@@ -2,4 +2,5 @@
 set -e
 ./gradlew assemble
 cd "$1" && npm install && cd ..
+cp -r build/js/packages/thecodinglove-kmp-appJs/kotlin/. "$1"
 cp build/js/packages/thecodinglove-kmp-appJs/kotlin/thecodinglove-kmp-appJs.js "$1/index.js"

@@ -66,5 +66,8 @@ node_modules/
 .env
 .gradle
 .idea
-functions/index.js
-functions/package-lock.json
+
+# Firebase
+functions/*
+!functions/package.json
+!functions/package-lock.json
