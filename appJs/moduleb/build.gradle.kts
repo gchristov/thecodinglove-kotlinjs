@@ -7,3 +7,7 @@ kotlin {
         nodejs()
     }
 }
+
+dependencies {
+    testImplementation(kotlin("test"))
+}
