@@ -61,13 +61,13 @@ jobs:
           path: '~/.konan/**'
           key: konan-js-test
       - name: Javascript tests
-        run: set -o pipefail && ./gradlew --continue test && cd appJs/appJs/build/test-results/nodeTest && ls -a
+        run: set -o pipefail && ./gradlew --continue nodeTest
       # Always run this job even if the previous steps fail to collect all test reports
       - name: Generate Javascript test report
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
-          report_paths: 'appJs/**/build/test-results/nodeTest/TEST-*.xml'
+          report_paths: 'appJs/**/build/test-results/**/TEST-*.xml'
           check_name: 'kmpTestResults'
       # Always run this job even if the previous steps fail to collect all artifacts
       - name: Save artifacts
@@ -75,4 +75,4 @@ jobs:
         if: always()
         with:
           name: Javascript test results
-          path: 'appJs/**/build/test-results/nodeTest/TEST-*.xml'
+          path: 'appJs/**/build/test-results/**/TEST-*.xml'
