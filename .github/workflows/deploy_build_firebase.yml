@@ -34,11 +34,7 @@ jobs:
         with:
           name: Javascript deploy
           path: |
-            functions/index/**
-            functions/index.js
-            functions/index.js.map
-            functions/index.meta.js
-            functions/package.json
-            functions/package-lock.json
+            functions/*.js
+            functions/*.json
             firebase-debug.log*
             firebase-debug.*.log
