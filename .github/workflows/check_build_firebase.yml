@@ -31,7 +31,7 @@ jobs:
             functions/*.js
             functions/*.json
 
-  jsTest:
+  jsTest2:
     runs-on: ubuntu-20.04
     concurrency:
       group: ${{ github.ref }}_jsTest
@@ -39,14 +39,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-#      - name: Gradle cache
-#        uses: gradle/gradle-build-action@v2
-#      - name: KMP cache
-#        uses: actions/cache@v2
-#        id: konan-js-test
-#        with:
-#          path: '~/.konan/**'
-#          key: konan-js-test
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v2
+      - name: KMP cache
+        uses: actions/cache@v2
+        id: konan-js-test
+        with:
+          path: '~/.konan/**'
+          key: konan-js-test
       - name: Javascript tests
         run: set -o pipefail && ./gradlew --continue test
       # Always run this job even if the previous steps fail to collect all test reports
