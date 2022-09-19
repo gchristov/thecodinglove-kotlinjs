@@ -62,4 +62,4 @@ jobs:
         if: always()
         with:
           name: Javascript test results
-          path: 'appJs/**/build/test-results/**/TEST-*.xml'
+          path: 'appJs/**/build/test-results/nodeTest/TEST-*.xml'
