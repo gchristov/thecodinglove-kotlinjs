@@ -1,5 +1,5 @@
 plugins {
-    kotlin("js") version "1.7.10"
+    kotlin("js") version "1.7.20-RC"
 }
 
 kotlin {
@@ -15,4 +15,8 @@ kotlin {
             }
         }
     }
+}
+
+dependencies {
+    testImplementation(kotlin("test"))
 }
