@@ -68,7 +68,7 @@ jobs:
         if: always()
         with:
           report_paths: 'appJs/**/build/test-results/**/TEST-*.xml'
-          check_name: 'kmpTestResults'
+          check_name: 'jsTestResults'
       # Always run this job even if the previous steps fail to collect all artifacts
       - name: Save artifacts
         uses: actions/upload-artifact@v3
