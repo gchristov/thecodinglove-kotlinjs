@@ -10,7 +10,7 @@ kotlin {
     sourceSets {
         val main by getting {
             dependencies {
-                implementation(project(":moduleb"))
+                implementation(projects.moduleb)
             }
         }
     }

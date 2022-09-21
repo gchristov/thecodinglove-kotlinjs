@@ -11,7 +11,7 @@ kotlin {
     sourceSets {
         val main by getting {
             dependencies {
-                implementation(project(":modulea"))
+                implementation(projects.modulea)
             }
         }
     }
