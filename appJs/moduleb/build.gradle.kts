@@ -9,6 +9,5 @@ kotlin {
 }
 
 dependencies {
-    implementation("org.kodein.di:kodein-di:7.9.0")
     testImplementation(kotlin("test"))
 }

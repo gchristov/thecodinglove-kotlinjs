@@ -7,9 +7,16 @@ kotlin {
         binaries.executable()
         nodejs()
     }
+
+    sourceSets {
+        val main by getting {
+            dependencies {
+                implementation(projects.modulea)
+            }
+        }
+    }
 }
 
 dependencies {
-    implementation(projects.modulea)
     testImplementation(kotlin("test"))
 }

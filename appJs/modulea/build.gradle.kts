@@ -6,9 +6,16 @@ kotlin {
     js(IR) {
         nodejs()
     }
+
+    sourceSets {
+        val main by getting {
+            dependencies {
+                implementation(projects.moduleb)
+            }
+        }
+    }
 }
 
 dependencies {
-    implementation(projects.moduleb)
     testImplementation(kotlin("test"))
 }
