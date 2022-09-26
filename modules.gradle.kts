@@ -1,13 +1,15 @@
 /**
+ * Prefix KMP modules with 'kmp-'.
  * Suffix Gradle plugin modules with '-plugins'.
  */
 val projects = listOf(
+    "kmp-module-b",
     "appJs",
-    "modulea",
-    "moduleb",
+    "module-a",
 )
 /**
- * Javscript modules are under the 'appJs' directory.
+ * Javascript modules are under the 'appJs' directory.
+ * KMP modules are under the 'kmp' directory.
  */
 projects.forEach { project ->
     if (project.isGradlePlugin()) {
@@ -18,7 +20,7 @@ projects.forEach { project ->
     }
 }
 
-fun String.projectRoot() = "appJs"
+fun String.projectRoot() = if (startsWith("kmp-")) "kmp" else "appJs"
 
 fun String.projectDir() = "${projectRoot()}/$this"
 

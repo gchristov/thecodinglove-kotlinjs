@@ -4,14 +4,13 @@ plugins {
 
 kotlin {
     js(IR) {
-        binaries.executable()
         nodejs()
     }
 
     sourceSets {
         val main by getting {
             dependencies {
-                implementation(projects.moduleA)
+                implementation(projects.kmpModuleB)
             }
         }
     }
