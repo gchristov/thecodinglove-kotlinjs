@@ -3,6 +3,7 @@
  * Suffix Gradle plugin modules with '-plugins'.
  */
 val projects = listOf(
+    "kmp-gradle-plugins",
     "kmp-module-b",
     "appJs",
     "module-a",

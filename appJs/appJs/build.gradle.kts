@@ -1,5 +1,5 @@
 plugins {
-    kotlin("js") version "1.7.20-RC"
+    id("kmp-platform-plugin")
 }
 
 kotlin {
