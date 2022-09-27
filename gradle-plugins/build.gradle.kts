@@ -3,9 +3,13 @@ plugins {
 }
 
 gradlePlugin {
-    plugins.register("javascript-platform-plugin") {
-        id = "javascript-platform-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.JavascriptPlatformPlugin"
+    plugins.register("javascript-application-plugin") {
+        id = "javascript-application-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.JavascriptApplicationPlugin"
+    }
+    plugins.register("javascript-library-plugin") {
+        id = "javascript-library-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.JavascriptLibraryPlugin"
     }
 }
 

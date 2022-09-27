@@ -1,12 +1,8 @@
 plugins {
-    id("javascript-platform-plugin")
+    id("javascript-library-plugin")
 }
 
 kotlin {
-    js(IR) {
-        nodejs()
-    }
-
     sourceSets {
         val main by getting {
             dependencies {

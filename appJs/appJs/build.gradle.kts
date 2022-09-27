@@ -1,13 +1,8 @@
 plugins {
-    id("javascript-platform-plugin")
+    id("javascript-application-plugin")
 }
 
 kotlin {
-    js(IR) {
-        binaries.executable()
-        nodejs()
-    }
-
     sourceSets {
         val main by getting {
             dependencies {

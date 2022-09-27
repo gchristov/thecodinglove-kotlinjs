@@ -2,18 +2,38 @@ package com.gchristov.thecodinglove.gradleplugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsProjectExtension
 
-/**
- * Plugin containing common setup for the Javascript Library plugins. Should be inherited by
- * all other plugins and specifically applied to common modules exposed through [JsModulePlugin],
- * to avoid circular dependencies.
- */
-open class JavascriptPlatformPlugin : Plugin<Project> {
+@Suppress("unused")
+class JavascriptApplicationPlugin : JavascriptPlatformPlugin() {
     override fun apply(target: Project) {
-        target.configureMultiplatform()
+        super.apply(target)
+        target.configureJavascriptApplication()
     }
 }
 
-private fun Project.configureMultiplatform() {
+@Suppress("unused")
+class JavascriptLibraryPlugin : JavascriptPlatformPlugin()
+
+abstract class JavascriptPlatformPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        target.configureJavascript()
+    }
+}
+
+private fun Project.configureJavascript() {
     plugins.apply("org.jetbrains.kotlin.js")
+    extensions.configure(KotlinJsProjectExtension::class.java) {
+        js(IR) {
+            nodejs()
+        }
+    }
+}
+
+private fun Project.configureJavascriptApplication() {
+    extensions.configure(KotlinJsProjectExtension::class.java) {
+        js(IR) {
+            binaries.executable()
+        }
+    }
 }

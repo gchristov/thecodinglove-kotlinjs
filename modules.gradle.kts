@@ -14,7 +14,6 @@ val projects = listOf(
  */
 projects.forEach { project ->
     if (project.isGradlePlugin()) {
-        println(project.projectDir())
         includeBuild(project.projectDir())
     } else {
         include(":$project")

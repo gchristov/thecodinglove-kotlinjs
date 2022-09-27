@@ -1,11 +1,5 @@
 plugins {
-    id("javascript-platform-plugin")
-}
-
-kotlin {
-    js(IR) {
-        nodejs()
-    }
+    id("javascript-library-plugin")
 }
 
 dependencies {
