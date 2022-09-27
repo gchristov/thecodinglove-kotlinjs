@@ -1,12 +1,12 @@
 plugins {
-    id("javascript-application-plugin")
+    id("javascript-library-plugin")
 }
 
 kotlin {
     sourceSets {
         val main by getting {
             dependencies {
-                implementation(projects.moduleA)
+                implementation(projects.kmpModuleB)
             }
         }
     }

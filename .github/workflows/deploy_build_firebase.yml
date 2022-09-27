@@ -75,7 +75,7 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
-          report_paths: 'appJs/**/build/test-results/**/TEST-*.xml'
+          report_paths: '**/build/test-results/**/TEST-*.xml'
           check_name: 'jsTestResults'
       # Always run this job even if the previous steps fail to collect all artifacts
       - name: Save artifacts
@@ -83,4 +83,4 @@ jobs:
         if: always()
         with:
           name: Javascript test results
-          path: 'appJs/**/build/test-results/**/TEST-*.xml'
+          path: '**/build/test-results/**/TEST-*.xml'
