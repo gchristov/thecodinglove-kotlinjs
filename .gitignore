@@ -56,7 +56,6 @@ node_modules/
 .idea
 
 # Firebase
-functions/*
 .firebase/
 firebase-debug.log*
 firebase-debug.*.log*
