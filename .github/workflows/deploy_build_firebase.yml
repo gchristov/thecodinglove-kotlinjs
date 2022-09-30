@@ -42,8 +42,10 @@ jobs:
         with:
           name: Javascript deploy
           path: |
-            functions/*.js
-            functions/*.json
+            functions/packages/*
+            functions/packages_imported/*
+            functions/package.json
+            functions/yarn.lock
             firebase-debug.log*
             firebase-debug.*.log
 

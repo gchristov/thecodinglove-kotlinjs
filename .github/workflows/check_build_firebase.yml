@@ -36,8 +36,10 @@ jobs:
         with:
           name: Javascript build
           path: |
-            functions/*.js
-            functions/*.json
+            functions/packages/*
+            functions/packages_imported/*
+            functions/package.json
+            functions/yarn.lock
 
   jsTest:
     runs-on: ubuntu-20.04
