@@ -36,7 +36,9 @@ jobs:
         with:
           name: Javascript build
           path: |
-            build/production/*
+            build/production/*.json
+            build/production/*.ts
+            build/production/*.map
 
   jsTest:
     runs-on: ubuntu-20.04

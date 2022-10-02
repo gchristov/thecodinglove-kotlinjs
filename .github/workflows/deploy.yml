@@ -42,7 +42,9 @@ jobs:
         with:
           name: Javascript deploy
           path: |
-            build/production/*
+            build/production/*.json
+            build/production/*.ts
+            build/production/*.map
             firebase-debug.log*
             firebase-debug.*.log
 
