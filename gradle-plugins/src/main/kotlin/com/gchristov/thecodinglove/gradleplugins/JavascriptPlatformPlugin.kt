@@ -34,9 +34,10 @@ private fun Project.configureJavascript() {
 }
 
 private fun Project.configureJavascriptApplication() {
+    plugins.apply("dev.petuska.npm.publish")
     extensions.configure(KotlinJsProjectExtension::class.java) {
         js(IR) {
-            binaries.executable()
+            binaries.library()
         }
     }
 }

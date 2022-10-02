@@ -30,16 +30,13 @@ jobs:
           path: '~/.konan/**'
           key: konan-js-build
       - name: Compile Javascript app
-        run: set -o pipefail && bash ./deploy/build.sh
+        run: set -o pipefail && bash ./scripts/build.sh
       - name: Save artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Javascript build
           path: |
-            functions/packages/*
-            functions/packages_imported/*
-            functions/package.json
-            functions/yarn.lock
+            build/production/*
 
   jsTest:
     runs-on: ubuntu-20.04
