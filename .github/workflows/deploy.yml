@@ -30,7 +30,7 @@ jobs:
           path: '~/.konan/**'
           key: konan-js-deploy
       - name: Compile Javascript app
-        run: set -o pipefail && bash ./deploy/build.sh
+        run: set -o pipefail && bash ./scripts/build.sh
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
@@ -42,10 +42,7 @@ jobs:
         with:
           name: Javascript deploy
           path: |
-            functions/packages/*
-            functions/packages_imported/*
-            functions/package.json
-            functions/yarn.lock
+            build/production/*
             firebase-debug.log*
             firebase-debug.*.log
 

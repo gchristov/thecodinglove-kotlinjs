@@ -6,7 +6,7 @@
       "firebase-debug.log",
       "firebase-debug.*.log"
     ],
-    "source": "build/js",
+    "source": "build/production",
     "runtime": "nodejs16"
   }
 }

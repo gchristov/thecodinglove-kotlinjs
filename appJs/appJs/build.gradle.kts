@@ -3,20 +3,12 @@ plugins {
 }
 
 kotlin {
-    js(IR) {
-        compilations["main"].packageJson {
-            customField(
-                "dependencies", mapOf(
-                    "firebase" to "9.10.0",
-                    "firebase-admin" to "11.0.1",
-                    "firebase-functions" to "3.24.0",
-                )
-            )
-        }
-    }
     sourceSets {
         val main by getting {
             dependencies {
+                implementation(npm("firebase", "9.10.0"))
+                implementation(npm("firebase-admin", "11.0.1"))
+                implementation(npm("firebase-functions", "3.24.0"))
                 implementation(projects.moduleA)
             }
         }
