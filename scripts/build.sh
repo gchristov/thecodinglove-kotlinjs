@@ -2,3 +2,4 @@
 set -e
 ./gradlew assemble
 cp -R appJs/appJs/build/productionLibrary/. "build/production"
+cd build/production && npm install && cd ..
