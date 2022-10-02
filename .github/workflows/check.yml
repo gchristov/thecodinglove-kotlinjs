@@ -38,6 +38,7 @@ jobs:
           path: |
             build/production/*.json
             build/production/*.ts
+            build/production/*.js
             build/production/*.map
 
   jsTest:
