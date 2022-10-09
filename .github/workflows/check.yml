@@ -63,7 +63,7 @@ jobs:
           path: '~/.konan/**'
           key: konan-js-test
       - name: Javascript tests
-        run: set -o pipefail && ./gradlew --continue nodeTest
+        run: set -o pipefail && ./gradlew --continue jsNodeTest
       # Always run this job even if the previous steps fail to collect all test reports
       - name: Generate Javascript test report
         uses: mikepenz/action-junit-report@v3
