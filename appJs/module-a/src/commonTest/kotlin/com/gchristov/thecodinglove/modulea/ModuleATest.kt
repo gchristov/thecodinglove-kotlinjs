@@ -7,7 +7,7 @@ class ModuleATest {
     @Test
     fun testGreet() {
         assertEquals(
-            expected = "ModuleA + KmpModuleB",
+            expected = "ModuleA + KmpModuleB123",
             actual = ModuleA().name()
         )
     }
