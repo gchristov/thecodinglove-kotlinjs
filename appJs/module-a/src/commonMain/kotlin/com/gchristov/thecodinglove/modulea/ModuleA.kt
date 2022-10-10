@@ -8,6 +8,6 @@ class ModuleA {
     fun name(): String {
         val express = require("express")
         val expressApp = express()
-        return "ModuleA$expressApp + ${KmpModuleB().name()}"
+        return "ModuleA${expressApp::class.simpleName} + ${KmpModuleB().name()}"
     }
 }
