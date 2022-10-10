@@ -24,7 +24,7 @@ jobs:
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
       - name: KMP cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: konan-js-deploy
         with:
           path: '~/.konan/**'
@@ -65,7 +65,7 @@ jobs:
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
       - name: KMP cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: konan-js-test
         with:
           path: '~/.konan/**'
