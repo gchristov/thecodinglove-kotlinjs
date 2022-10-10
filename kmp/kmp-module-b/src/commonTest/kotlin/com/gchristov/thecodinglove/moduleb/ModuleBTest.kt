@@ -8,7 +8,7 @@ class ModuleBTest {
     @Test
     fun testGreet() {
         assertEquals(
-            expected = "KmpModuleB",
+            expected = "KmpModuleB123",
             actual = KmpModuleB().name()
         )
     }
