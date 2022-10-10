@@ -4,7 +4,7 @@ plugins {
 
 kotlin {
     sourceSets {
-        val main by getting {
+        val commonMain by getting {
             dependencies {
                 implementation(projects.kmpModuleB)
             }

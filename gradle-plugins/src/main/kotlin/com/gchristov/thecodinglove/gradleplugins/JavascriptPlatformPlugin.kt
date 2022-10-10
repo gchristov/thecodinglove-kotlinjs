@@ -2,9 +2,7 @@ package com.gchristov.thecodinglove.gradleplugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.kotlin
-import org.jetbrains.kotlin.gradle.dsl.KotlinJsProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 @Suppress("unused")
 class JavascriptApplicationPlugin : JavascriptPlatformPlugin() {
@@ -25,8 +23,8 @@ abstract class JavascriptPlatformPlugin : Plugin<Project> {
 }
 
 private fun Project.configureJavascript() {
-    plugins.apply("org.jetbrains.kotlin.js")
-    extensions.configure(KotlinJsProjectExtension::class.java) {
+    plugins.apply("org.jetbrains.kotlin.multiplatform")
+    extensions.configure(KotlinMultiplatformExtension::class.java) {
         js(IR) {
             nodejs()
         }
@@ -35,7 +33,7 @@ private fun Project.configureJavascript() {
 
 private fun Project.configureJavascriptApplication() {
     plugins.apply("dev.petuska.npm.publish")
-    extensions.configure(KotlinJsProjectExtension::class.java) {
+    extensions.configure(KotlinMultiplatformExtension::class.java) {
         js(IR) {
             binaries.library()
         }
@@ -43,10 +41,9 @@ private fun Project.configureJavascriptApplication() {
 }
 
 private fun Project.configureTests() {
-    // Add dependencies after plugins are set to avoid missing "implementation" errors
-    afterEvaluate {
-        dependencies {
-            add("testImplementation", kotlin("test"))
+    extensions.configure(KotlinMultiplatformExtension::class.java) {
+        sourceSets.maybeCreate("commonMain").dependencies {
+            implementation(kotlin("test"))
         }
     }
 }

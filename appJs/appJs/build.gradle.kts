@@ -4,7 +4,7 @@ plugins {
 
 kotlin {
     sourceSets {
-        val main by getting {
+        val commonMain by getting {
             dependencies {
                 implementation(npm("firebase", "9.10.0"))
                 implementation(npm("firebase-admin", "11.0.1"))
