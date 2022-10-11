@@ -1,13 +1,15 @@
 package com.gchristov.thecodinglove
 
 import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.logging.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 external fun require(module:String) : dynamic
 external var exports: dynamic
@@ -17,17 +19,19 @@ fun main(args: Array<String>) {
     exports.myTestFun = fireFunctions.https.onRequest { request, response ->
         val client = provideHttpClient()
         GlobalScope.launch {
-            val userResponse = client.get<Response>("https://reqres.in/api/users")
+            val userResponse: Response = client.get("https://reqres.in/api/users").body()
             response.send(Messenger().message() + ", " + userResponse.page)
         }
     }
 }
 
 private fun provideHttpClient() = HttpClient {
-    install(JsonFeature) {
-        serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
-            ignoreUnknownKeys = true
-        })
+    install(ContentNegotiation) {
+        json(
+            Json {
+                ignoreUnknownKeys = true
+            }
+        )
     }
     install(Logging) {
         logger = Logger.SIMPLE

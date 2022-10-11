@@ -53,13 +53,11 @@ private fun Project.configureNetwork() {
     plugins.apply("org.jetbrains.kotlin.plugin.serialization")
     extensions.configure(KotlinMultiplatformExtension::class.java) {
         sourceSets.maybeCreate("commonMain").dependencies {
-            implementation(Deps.Ktor.clientCore)
-            implementation(Deps.Ktor.clientSerialization)
-            implementation(Deps.Ktor.clientLogging)
-            implementation(Deps.Ktor.logbackClassic)
-        }
-        sourceSets.maybeCreate("jsMain").dependencies {
-            implementation(Deps.Ktor.clientJavascript)
+            implementation(Deps.Ktor.client)
+            implementation(Deps.Ktor.contentNegotiation)
+            implementation(Deps.Ktor.serialisation)
+            implementation(Deps.Ktor.logging)
+            implementation(Deps.Ktor.logback)
         }
     }
 }
