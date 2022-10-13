@@ -34,12 +34,12 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
         run: |
-          echo FIREBASE_API_KEY="$FIREBASE_API_KEY" >> ./local.properties
-          echo FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN" >> ./local.properties
-          echo FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" >> ./local.properties
-          echo FIREBASE_STORAGE_BUCKET="$FIREBASE_STORAGE_BUCKET" >> ./local.properties
-          echo FIREBASE_GCM_SENDER_ID="$FIREBASE_GCM_SENDER_ID" }} >> ./local.properties
-          echo FIREBASE_APPLICATION_ID="$FIREBASE_APPLICATION_ID" >> ./local.properties
+          echo FIREBASE_API_KEY="$FIREBASE_API_KEY" > ./local.properties
+          echo FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN" > ./local.properties
+          echo FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" > ./local.properties
+          echo FIREBASE_STORAGE_BUCKET="$FIREBASE_STORAGE_BUCKET" > ./local.properties
+          echo FIREBASE_GCM_SENDER_ID="$FIREBASE_GCM_SENDER_ID" }} > ./local.properties
+          echo FIREBASE_APPLICATION_ID="$FIREBASE_APPLICATION_ID" > ./local.properties
           cat ./local.properties
           set -o pipefail && bash ./scripts/build.sh
       - name: Save artifacts
