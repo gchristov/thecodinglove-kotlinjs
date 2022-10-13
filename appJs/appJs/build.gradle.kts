@@ -61,7 +61,6 @@ buildkonfig {
 
 fun getApiKey(key: String): String {
     val propFile = rootProject.file("./local.properties")
-    println(propFile.exists())
     val properties = Properties()
     properties.load(FileInputStream(propFile))
     return properties.getProperty(key)
