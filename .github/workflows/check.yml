@@ -30,7 +30,7 @@ jobs:
           path: '~/.konan/**'
           key: konan-js-build
       - name: Compile Javascript app
-      - uses: oNaiPs/secrets-to-env-action@v1
+        uses: oNaiPs/secrets-to-env-action@v1
         with:
           secrets: ${{ toJSON(secrets) }}
         run: |
