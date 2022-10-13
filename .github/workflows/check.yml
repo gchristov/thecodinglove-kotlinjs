@@ -29,10 +29,11 @@ jobs:
         with:
           path: '~/.konan/**'
           key: konan-js-build
-      - name: Compile Javascript app
+      - name: Export variables
         uses: oNaiPs/secrets-to-env-action@v1
         with:
           secrets: ${{ toJSON(secrets) }}
+      - name: Compile Javascript app
         run: |
           echo FIREBASE_API_KEY="$FIREBASE_API_KEY" > ./local.properties
           echo FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN" > ./local.properties
