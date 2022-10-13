@@ -9,4 +9,9 @@ class Deps {
         const val logging = "io.ktor:ktor-client-logging:$ktorVersion"
         const val logback = "ch.qos.logback:logback-classic:1.2.10"
     }
+
+    object Firebase {
+        private const val firebaseVersion = "1.6.2"
+        const val firestore = "dev.gitlive:firebase-firestore:$firebaseVersion"
+    }
 }
