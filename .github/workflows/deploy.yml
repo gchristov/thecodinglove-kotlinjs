@@ -100,6 +100,4 @@ jobs:
         if: always()
         with:
           name: Javascript test results
-          path: |
-            '**/build/test-results/**/TEST-*.xml'
-            local.properties
+          path: '**/build/test-results/**/TEST-*.xml'
