@@ -31,10 +31,10 @@ jobs:
           key: konan-js-build
       - name: Compile Javascript app
         run: |
-          echo ${{ secrets.FIREBASE_PROJECT_ID }}
+          echo FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} > ./local.properties
+          cat ./local.properties
           echo FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} > ./local.properties
           echo FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }} > ./local.properties
-          echo FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} > ./local.properties
           echo FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }} > ./local.properties
           echo FIREBASE_GCM_SENDER_ID=${{ secrets.FIREBASE_GCM_SENDER_ID }} > ./local.properties
           echo FIREBASE_APPLICATION_ID=${{ secrets.FIREBASE_APPLICATION_ID }} > ./local.properties
