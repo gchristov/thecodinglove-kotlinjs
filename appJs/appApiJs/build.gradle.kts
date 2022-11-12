@@ -5,8 +5,8 @@ import java.io.FileInputStream
 val packageId = "com.gchristov.thecodinglove"
 
 plugins {
-    id("javascript-application-plugin")
-    id("config-plugin")
+    id("javascript-node-library-plugin")
+    id("build-config-plugin")
 }
 
 kotlin {
