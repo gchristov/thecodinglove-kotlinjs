@@ -43,10 +43,11 @@ jobs:
         with:
           name: Javascript build
           path: |
-            build/production/*.json
-            build/production/*.ts
-            build/production/*.js
-            build/production/*.map
+            build/productionApi/*.json
+            build/productionApi/*.ts
+            build/productionApi/*.js
+            build/productionApi/*.map
+            build/productionHtml
             local.properties
 
   jsTest:

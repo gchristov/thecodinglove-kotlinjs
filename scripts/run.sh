@@ -1,4 +1,4 @@
-# Builds and runs the project locally with the Firebase Emulator
+# Builds and runs the API project locally with the Firebase Emulator
 set -e
 sh ./scripts/build.sh
 firebase serve

@@ -41,7 +41,7 @@ jobs:
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --only functions
+          args: deploy
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
       - name: Save artifacts
@@ -49,10 +49,11 @@ jobs:
         with:
           name: Javascript deploy
           path: |
-            build/production/*.json
-            build/production/*.ts
-            build/production/*.js
-            build/production/*.map
+            build/productionApi/*.json
+            build/productionApi/*.ts
+            build/productionApi/*.js
+            build/productionApi/*.map
+            build/productionHtml
             firebase-debug.log*
             firebase-debug.*.log
             local.properties

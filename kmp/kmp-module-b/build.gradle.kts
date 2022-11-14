@@ -1,5 +1,5 @@
 plugins {
-    id("javascript-library-plugin")
+    id("javascript-node-plugin")
 }
 
 kotlin {
