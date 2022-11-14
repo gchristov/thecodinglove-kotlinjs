@@ -41,7 +41,7 @@ jobs:
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --only functions
+          args: deploy
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
       - name: Save artifacts

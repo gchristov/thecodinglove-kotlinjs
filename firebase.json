@@ -8,5 +8,8 @@
     ],
     "source": "build/productionApi",
     "runtime": "nodejs16"
+  },
+  "hosting": {
+    "public": "build/productionHtml"
   }
 }
