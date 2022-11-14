@@ -1,6 +1,12 @@
 package com.gchristov.thecodinglove.gradleplugins
 
+@Suppress("unused")
 class Deps {
+    object Kodein {
+        private const val kodeinVersion = "7.15.0"
+        const val di = "org.kodein.di:kodein-di:$kodeinVersion"
+    }
+
     object Ktor {
         private const val ktorVersion = "2.1.2"
         const val client = "io.ktor:ktor-client-core:$ktorVersion"

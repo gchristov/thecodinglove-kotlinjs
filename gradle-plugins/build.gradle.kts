@@ -3,19 +3,24 @@ plugins {
 }
 
 gradlePlugin {
-    plugins.register("javascript-node-library-plugin") {
-        id = "javascript-node-library-plugin"
-        implementationClass =
-            "com.gchristov.thecodinglove.gradleplugins.JavascriptNodeLibraryPlugin"
-    }
-    plugins.register("javascript-node-plugin") {
-        id = "javascript-node-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.JavascriptNodePlugin"
-    }
     plugins.register("javascript-browser-executable-plugin") {
         id = "javascript-browser-executable-plugin"
         implementationClass =
             "com.gchristov.thecodinglove.gradleplugins.JavascriptBrowserExecutablePlugin"
+    }
+    plugins.register("javascript-node-executable-plugin") {
+        id = "javascript-node-executable-plugin"
+        implementationClass =
+            "com.gchristov.thecodinglove.gradleplugins.JavascriptNodeExecutablePlugin"
+    }
+    plugins.register("javascript-node-platform-plugin") {
+        id = "javascript-node-platform-plugin"
+        implementationClass =
+            "com.gchristov.thecodinglove.gradleplugins.JavascriptNodePlatformPlugin"
+    }
+    plugins.register("javascript-node-module-plugin") {
+        id = "javascript-node-module-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.JavascriptNodeModulePlugin"
     }
     plugins.register("build-config-plugin") {
         id = "build-config-plugin"
