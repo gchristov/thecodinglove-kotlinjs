@@ -36,10 +36,9 @@ open class JavascriptNodeModulePlugin : JavascriptNodeTargetPlugin() {
         target.plugins.apply("org.jetbrains.kotlin.plugin.serialization")
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
             sourceSets.maybeCreate("commonMain").dependencies {
-                // TODO: Move this to a better location
-                implementation(kotlin("test"))
                 implementation(project(":kmp-common-kotlin"))
                 implementation(project(":kmp-common-di"))
+                implementation(project(":kmp-common-test"))
             }
         }
     }
