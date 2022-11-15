@@ -1,7 +1,8 @@
 package com.gchristov.thecodinglove
 
-import com.gchristov.thecodinglove.modulea.ModuleA
+import com.gchristov.thecodinglove.modulea.AModule
 
 class Messenger {
-    fun message() = "Hello from multi-module Kotlin JS! Nested modules: ${ModuleA().name()}!"
+    fun message() =
+        "Hello from multi-module Kotlin JS! Nested modules: ${AModule.injectModuleA().name()}!"
 }

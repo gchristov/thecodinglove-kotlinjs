@@ -1,13 +1,3 @@
 plugins {
-    id("javascript-node-plugin")
-}
-
-kotlin {
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation("org.kodein.di:kodein-di:7.15.0")
-            }
-        }
-    }
+    id("javascript-node-module-plugin")
 }

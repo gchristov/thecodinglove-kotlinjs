@@ -9,7 +9,7 @@ class ModuleBTest {
     fun testGreet() {
         assertEquals(
             expected = "KmpModuleB123",
-            actual = KmpModuleB().name()
+            actual = KmpModuleB(value = 123).name()
         )
     }
 }

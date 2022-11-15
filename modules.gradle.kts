@@ -3,10 +3,14 @@
  * Suffix Gradle plugin modules with '-plugins'.
  */
 val projects = listOf(
+    "kmp-common-di",
+    "kmp-common-firebase",
+    "kmp-common-kotlin",
+    "kmp-common-network",
+    "kmp-gradle-plugins",
     "kmp-module-b",
     "appApiJs",
     "appHtmlJs",
-    "gradle-plugins",
     "module-a",
 )
 /**
@@ -22,7 +26,7 @@ projects.forEach { project ->
     }
 }
 
-fun String.projectRoot() = if (isGradlePlugin()) "" else if (startsWith("kmp-")) "kmp" else "appJs"
+fun String.projectRoot() = if (startsWith("kmp-")) "kmp" else "appJs"
 
 fun String.projectDir() = if (projectRoot().isEmpty()) "$this" else "${projectRoot()}/$this"
 
