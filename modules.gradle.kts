@@ -4,6 +4,7 @@
  */
 val projects = listOf(
     "kmp-common-di",
+    "kmp-common-firebase",
     "kmp-gradle-plugins",
     "kmp-module-b",
     "appApiJs",

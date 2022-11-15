@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove
 
+import com.gchristov.thecodinglove.kmpcommonfirebase.CommonFirebaseModule
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.firestore.firestore
@@ -25,8 +26,7 @@ fun main(args: Array<String>) {
             val userResponse: Response = client.get("https://reqres.in/api/users").body()
 
             println("About to test Firestore")
-            val firebase = provideFirebaseApp()
-            val firestore = Firebase.firestore(firebase)
+            val firestore = CommonFirebaseModule.injectFirestore()
             val document = firestore.document("preferences/user1").get()
             val count = document.get<Int>("count")
             println("Got Firestore document: exists=${document.exists}, count=$count")

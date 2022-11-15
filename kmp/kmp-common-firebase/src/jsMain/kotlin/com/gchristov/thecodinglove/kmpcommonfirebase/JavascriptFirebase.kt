@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove
+package com.gchristov.thecodinglove.kmpcommonfirebase
 
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp

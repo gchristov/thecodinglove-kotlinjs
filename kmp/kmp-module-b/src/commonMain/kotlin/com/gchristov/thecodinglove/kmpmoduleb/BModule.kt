@@ -13,8 +13,6 @@ object BModule : DiModule() {
             bindProvider { KmpModuleB(value = 123) }
         }
     }
-
-    fun injectKmpModuleB(): KmpModuleB = inject()
 }
 
 data class KmpModuleB(private val value: Int) {
