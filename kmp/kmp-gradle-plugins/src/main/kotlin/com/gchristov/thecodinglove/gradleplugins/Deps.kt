@@ -28,4 +28,8 @@ class Deps {
         private const val firebaseVersion = "1.6.2"
         const val firestore = "dev.gitlive:firebase-firestore:$firebaseVersion"
     }
+
+    object Tests {
+        const val test = "test"
+    }
 }
