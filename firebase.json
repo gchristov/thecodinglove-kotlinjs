@@ -10,6 +10,12 @@
     "runtime": "nodejs16"
   },
   "hosting": {
-    "public": "build/productionHtml"
+    "public": "build/productionHtml",
+    "rewrites": [
+      {
+        "source": "/api/test",
+        "function": "myTestFun"
+      }
+    ]
   }
 }
