@@ -7,6 +7,14 @@ class Deps {
         const val di = "org.kodein.di:kodein-di:$kodeinVersion"
     }
 
+    object Kotlin {
+        private const val coroutinesVersion = "1.6.0"
+
+        // "-native-mt" is required here, otherwise iOS fails with runtime exception
+        const val coroutinesCore =
+            "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion-native-mt"
+    }
+
     object Ktor {
         private const val ktorVersion = "2.1.2"
         const val client = "io.ktor:ktor-client-core:$ktorVersion"

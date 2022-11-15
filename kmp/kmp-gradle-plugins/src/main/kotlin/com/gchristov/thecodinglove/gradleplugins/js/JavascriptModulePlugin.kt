@@ -38,6 +38,7 @@ open class JavascriptNodeModulePlugin : JavascriptNodeTargetPlugin() {
             sourceSets.maybeCreate("commonMain").dependencies {
                 // TODO: Move this to a better location
                 implementation(kotlin("test"))
+                implementation(project(":kmp-common-kotlin"))
                 implementation(project(":kmp-common-di"))
             }
         }

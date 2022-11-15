@@ -5,6 +5,7 @@
 val projects = listOf(
     "kmp-common-di",
     "kmp-common-firebase",
+    "kmp-common-kotlin",
     "kmp-common-network",
     "kmp-gradle-plugins",
     "kmp-module-b",
