@@ -5,7 +5,7 @@ import java.io.FileInputStream
 val packageId = "com.gchristov.thecodinglove"
 
 plugins {
-    id("javascript-node-executable-plugin")
+    id("javascript-node-library-plugin")
     id("build-config-plugin")
 }
 

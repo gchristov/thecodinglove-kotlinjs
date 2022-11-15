@@ -4,12 +4,11 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 @Suppress("unused")
-class JavascriptBrowserExecutablePlugin : KmpPlatformPlugin() {
+open class JavascriptBrowserTargetPlugin : KmpPlatformPlugin() {
     override fun apply(target: Project) {
         super.apply(target)
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
             js(IR) {
-                binaries.executable()
                 browser {
                     commonWebpackConfig {
                         cssSupport.enabled = true
@@ -21,20 +20,7 @@ class JavascriptBrowserExecutablePlugin : KmpPlatformPlugin() {
 }
 
 @Suppress("unused")
-class JavascriptNodeExecutablePlugin : JavascriptNodeModulePlugin() {
-    override fun apply(target: Project) {
-        super.apply(target)
-        target.plugins.apply("dev.petuska.npm.publish")
-        target.extensions.configure(KotlinMultiplatformExtension::class.java) {
-            js(IR) {
-                binaries.library()
-            }
-        }
-    }
-}
-
-@Suppress("unused")
-open class JavascriptNodePlatformPlugin : KmpPlatformPlugin() {
+open class JavascriptNodeTargetPlugin : KmpPlatformPlugin() {
     override fun apply(target: Project) {
         super.apply(target)
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {

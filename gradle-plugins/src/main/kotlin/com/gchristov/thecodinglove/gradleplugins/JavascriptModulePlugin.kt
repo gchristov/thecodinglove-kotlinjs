@@ -4,7 +4,32 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 @Suppress("unused")
-open class JavascriptNodeModulePlugin : JavascriptNodePlatformPlugin() {
+class JavascriptNodeLibraryPlugin : JavascriptNodeModulePlugin() {
+    override fun apply(target: Project) {
+        super.apply(target)
+        target.plugins.apply("dev.petuska.npm.publish")
+        target.extensions.configure(KotlinMultiplatformExtension::class.java) {
+            js(IR) {
+                binaries.library()
+            }
+        }
+    }
+}
+
+@Suppress("unused")
+class JavascriptBrowserExecutablePlugin : JavascriptBrowserTargetPlugin() {
+    override fun apply(target: Project) {
+        super.apply(target)
+        target.extensions.configure(KotlinMultiplatformExtension::class.java) {
+            js(IR) {
+                binaries.executable()
+            }
+        }
+    }
+}
+
+@Suppress("unused")
+open class JavascriptNodeModulePlugin : JavascriptNodeTargetPlugin() {
     override fun apply(target: Project) {
         super.apply(target)
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
