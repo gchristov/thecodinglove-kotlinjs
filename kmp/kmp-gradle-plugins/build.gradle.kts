@@ -6,20 +6,22 @@ gradlePlugin {
     plugins.register("javascript-browser-executable-plugin") {
         id = "javascript-browser-executable-plugin"
         implementationClass =
-            "com.gchristov.thecodinglove.gradleplugins.JavascriptBrowserExecutablePlugin"
+            "com.gchristov.thecodinglove.gradleplugins.js.JavascriptBrowserExecutablePlugin"
     }
     plugins.register("javascript-node-library-plugin") {
         id = "javascript-node-library-plugin"
         implementationClass =
-            "com.gchristov.thecodinglove.gradleplugins.JavascriptNodeLibraryPlugin"
+            "com.gchristov.thecodinglove.gradleplugins.js.JavascriptNodeLibraryPlugin"
     }
     plugins.register("javascript-node-target-plugin") {
         id = "javascript-node-target-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.JavascriptNodeTargetPlugin"
+        implementationClass =
+            "com.gchristov.thecodinglove.gradleplugins.js.JavascriptNodeTargetPlugin"
     }
     plugins.register("javascript-node-module-plugin") {
         id = "javascript-node-module-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.JavascriptNodeModulePlugin"
+        implementationClass =
+            "com.gchristov.thecodinglove.gradleplugins.js.JavascriptNodeModulePlugin"
     }
     plugins.register("build-config-plugin") {
         id = "build-config-plugin"
