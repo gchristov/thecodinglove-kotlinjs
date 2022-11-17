@@ -30,12 +30,12 @@ fun main(args: Array<String>) {
 
             println("About to test html parser")
             val parsed = htmlParser.parse("<body><p><a>title</a></p></body>")
-            println(parsed.firstChild.tagName)
-            println(parsed.firstChild.firstChild.tagName)
-            println(parsed.firstChild.firstChild.firstChild.tagName)
-            println(parsed.firstChild.firstChild.firstChild.text)
+            val fT = parsed.firstChild.tagName
+            val sT = parsed.firstChild.firstChild.tagName
+            val tT = parsed.firstChild.firstChild.firstChild.tagName
+            val text = parsed.firstChild.firstChild.firstChild.text
 
-            response.send(Messenger().message() + ", " + userResponse.page + ", " + count)
+            response.send(Messenger().message() + ", " + userResponse.page + ", " + count + fT + sT + tT + text)
         }
     }
 }
