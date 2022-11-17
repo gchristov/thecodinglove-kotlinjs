@@ -13,6 +13,7 @@ external var exports: dynamic
 
 fun main(args: Array<String>) {
     val fireFunctions = require("firebase-functions")
+    val htmlParser = require("node-html-parser")
     exports.myTestFun = fireFunctions.https.onRequest { request, response ->
         val client = CommonNetworkModule.injectHttpClient()
         GlobalScope.launch {
@@ -27,7 +28,14 @@ fun main(args: Array<String>) {
             batch.set(firestore.document("preferences/user1"), Count(count + 1))
             batch.commit()
 
-            response.send(Messenger().message() + ", " + userResponse.page + ", " + count)
+            println("About to test html parser")
+            val parsed = htmlParser.parse("<body><p><a>title</a></p></body>")
+            val fT = parsed.firstChild.tagName
+            val sT = parsed.firstChild.firstChild.tagName
+            val tT = parsed.firstChild.firstChild.firstChild.tagName
+            val text = parsed.firstChild.firstChild.firstChild.text
+
+            response.send(Messenger().message() + ", " + userResponse.page + ", " + count + fT + sT + tT + text)
         }
     }
 }
