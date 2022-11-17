@@ -10,13 +10,13 @@ kotlin {
             dependencies {
                 // TODO: These should not be directly accessed
                 implementation(projects.kmpCommonFirebase)
+                implementation(projects.kmpHtmlparser)
                 implementation(projects.kmpCommonNetwork)
                 implementation(projects.moduleA)
                 // Needed to get the Firebase deployment to work
                 implementation(npm(Deps.Firebase.firebase.name, Deps.Firebase.firebase.version))
                 implementation(npm(Deps.Firebase.admin.name, Deps.Firebase.admin.version))
                 implementation(npm(Deps.Firebase.functions.name, Deps.Firebase.functions.version))
-                implementation(npm("node-html-parser", "6.1.4"))
             }
         }
     }

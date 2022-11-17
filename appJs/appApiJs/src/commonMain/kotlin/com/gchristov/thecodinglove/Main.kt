@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove
 
 import com.gchristov.thecodinglove.kmpcommonfirebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.kmpcommonfirebase.CommonNetworkModule
+import com.gchristov.thecodinglove.kmphtmlparser.HtmlParserModule
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.GlobalScope
@@ -13,7 +14,6 @@ external var exports: dynamic
 
 fun main(args: Array<String>) {
     val fireFunctions = require("firebase-functions")
-    val htmlParser = require("node-html-parser")
     exports.myTestFun = fireFunctions.https.onRequest { request, response ->
         val client = CommonNetworkModule.injectHttpClient()
         GlobalScope.launch {
@@ -29,13 +29,9 @@ fun main(args: Array<String>) {
             batch.commit()
 
             println("About to test html parser")
-            val parsed = htmlParser.parse("<body><p><a>title</a></p></body>")
-            val fT = parsed.firstChild.tagName
-            val sT = parsed.firstChild.firstChild.tagName
-            val tT = parsed.firstChild.firstChild.firstChild.tagName
-            val text = parsed.firstChild.firstChild.firstChild.text
+            val parser = HtmlParserModule.injectHtmlParser()
 
-            response.send(Messenger().message() + ", " + userResponse.page + ", " + count + fT + sT + tT + text)
+            response.send(Messenger().message() + ", " + userResponse.page + ", " + count + parser.parse())
         }
     }
 }
