@@ -9,6 +9,7 @@ val projects = listOf(
     "kmp-common-network",
     "kmp-common-test",
     "kmp-gradle-plugins",
+    "kmp-htmlparser",
     "kmp-module-b",
     "appApiJs",
     "appHtmlJs",
