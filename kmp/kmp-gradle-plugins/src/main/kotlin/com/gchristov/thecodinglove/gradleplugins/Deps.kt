@@ -34,6 +34,7 @@ class Deps {
 
     object Node {
         val htmlParser = NpmDependency("node-html-parser", "6.1.4")
+        val express = NpmDependency("express", "4.18.2")
     }
 
     object Tests {
