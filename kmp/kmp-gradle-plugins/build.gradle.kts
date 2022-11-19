@@ -3,29 +3,27 @@ plugins {
 }
 
 gradlePlugin {
+    plugins.register("kmp-platform-plugin") {
+        id = "kmp-platform-plugin"
+        implementationClass = "com.gchristov.thecodinglove.kmpgradleplugins.KmpPlatformPlugin"
+    }
+    plugins.register("kmp-module-plugin") {
+        id = "kmp-module-plugin"
+        implementationClass = "com.gchristov.thecodinglove.kmpgradleplugins.KmpModulePlugin"
+    }
     plugins.register("javascript-browser-executable-plugin") {
         id = "javascript-browser-executable-plugin"
         implementationClass =
-            "com.gchristov.thecodinglove.gradleplugins.js.JavascriptBrowserExecutablePlugin"
+            "com.gchristov.thecodinglove.kmpgradleplugins.JavascriptBrowserExecutablePlugin"
     }
-    plugins.register("javascript-node-library-plugin") {
-        id = "javascript-node-library-plugin"
+    plugins.register("javascript-node-executable-plugin") {
+        id = "javascript-node-executable-plugin"
         implementationClass =
-            "com.gchristov.thecodinglove.gradleplugins.js.JavascriptNodeLibraryPlugin"
-    }
-    plugins.register("javascript-node-target-plugin") {
-        id = "javascript-node-target-plugin"
-        implementationClass =
-            "com.gchristov.thecodinglove.gradleplugins.js.JavascriptNodeTargetPlugin"
-    }
-    plugins.register("javascript-node-module-plugin") {
-        id = "javascript-node-module-plugin"
-        implementationClass =
-            "com.gchristov.thecodinglove.gradleplugins.js.JavascriptNodeModulePlugin"
+            "com.gchristov.thecodinglove.kmpgradleplugins.JavascriptNodeExecutablePlugin"
     }
     plugins.register("build-config-plugin") {
         id = "build-config-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.BuildConfigPlugin"
+        implementationClass = "com.gchristov.thecodinglove.kmpgradleplugins.BuildConfigPlugin"
     }
 }
 

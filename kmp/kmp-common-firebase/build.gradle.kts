@@ -1,11 +1,12 @@
-import com.gchristov.thecodinglove.gradleplugins.Deps
-import java.util.Properties
+
+import com.gchristov.thecodinglove.kmpgradleplugins.Deps
 import java.io.FileInputStream
+import java.util.*
 
 val packageId = "com.gchristov.thecodinglove.kmpcommonfirebase"
 
 plugins {
-    id("javascript-node-module-plugin")
+    id("kmp-module-plugin")
     id("build-config-plugin")
 }
 

@@ -1,5 +1,5 @@
 plugins {
-    id("javascript-node-module-plugin")
+    id("kmp-module-plugin")
 }
 
 kotlin {

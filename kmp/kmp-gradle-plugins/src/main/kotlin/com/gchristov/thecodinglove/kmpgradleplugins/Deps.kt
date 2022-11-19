@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.gradleplugins
+package com.gchristov.thecodinglove.kmpgradleplugins
 
 @Suppress("unused")
 class Deps {

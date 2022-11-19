@@ -1,7 +1,9 @@
-import com.gchristov.thecodinglove.gradleplugins.Deps
+import com.gchristov.thecodinglove.kmpgradleplugins.Deps
 
 plugins {
-    id("javascript-node-library-plugin")
+    id("javascript-node-executable-plugin")
+    // TODO: This shouldn't be needed here
+    id("kmp-module-plugin")
 }
 
 kotlin {
