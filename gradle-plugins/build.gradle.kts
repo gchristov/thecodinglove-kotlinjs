@@ -11,6 +11,10 @@ gradlePlugin {
         id = "kmp-module-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.kmp.KmpModulePlugin"
     }
+    plugins.register("kmp-data-plugin") {
+        id = "kmp-data-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.kmp.KmpDataPlugin"
+    }
     plugins.register("build-config-plugin") {
         id = "build-config-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.BuildConfigPlugin"
