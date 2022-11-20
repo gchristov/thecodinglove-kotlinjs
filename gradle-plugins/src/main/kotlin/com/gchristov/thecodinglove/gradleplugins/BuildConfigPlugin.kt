@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.kmpgradleplugins
+package com.gchristov.thecodinglove.gradleplugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project

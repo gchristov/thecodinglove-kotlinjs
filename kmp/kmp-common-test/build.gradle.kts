@@ -1,4 +1,4 @@
-import com.gchristov.thecodinglove.kmpgradleplugins.Deps
+import com.gchristov.thecodinglove.gradleplugins.Deps
 
 plugins {
     id("kmp-platform-plugin")

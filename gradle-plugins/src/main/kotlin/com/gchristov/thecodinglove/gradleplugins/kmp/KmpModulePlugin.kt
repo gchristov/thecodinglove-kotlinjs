@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.kmpgradleplugins
+package com.gchristov.thecodinglove.gradleplugins.kmp
 
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension

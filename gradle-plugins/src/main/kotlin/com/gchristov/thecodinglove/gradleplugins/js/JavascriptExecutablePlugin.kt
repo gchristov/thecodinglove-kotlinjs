@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.kmpgradleplugins
+package com.gchristov.thecodinglove.gradleplugins.js
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -29,18 +29,6 @@ class JavascriptNodeExecutablePlugin : Plugin<Project> {
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
             js(IR) {
                 binaries.library()
-                nodejs()
-            }
-        }
-    }
-}
-
-@Suppress("unused")
-abstract class KmpPlatformPlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        target.plugins.apply("org.jetbrains.kotlin.multiplatform")
-        target.extensions.configure(KotlinMultiplatformExtension::class.java) {
-            js(IR) {
                 nodejs()
             }
         }

@@ -8,11 +8,11 @@ val projects = listOf(
     "kmp-common-kotlin",
     "kmp-common-network",
     "kmp-common-test",
-    "kmp-gradle-plugins",
     "kmp-htmlparser",
     "kmp-module-b",
     "appApiJs",
     "appHtmlJs",
+    "gradle-plugins",
     "module-a",
 )
 /**
@@ -28,7 +28,7 @@ projects.forEach { project ->
     }
 }
 
-fun String.projectRoot() = if (startsWith("kmp-")) "kmp" else "appJs"
+fun String.projectRoot() = if (startsWith("kmp-")) "kmp" else if (isGradlePlugin()) "" else "appJs"
 
 fun String.projectDir() = if (projectRoot().isEmpty()) "$this" else "${projectRoot()}/$this"
 

@@ -1,5 +1,5 @@
 
-import com.gchristov.thecodinglove.kmpgradleplugins.Deps
+import com.gchristov.thecodinglove.gradleplugins.Deps
 import java.io.FileInputStream
 import java.util.*
 
