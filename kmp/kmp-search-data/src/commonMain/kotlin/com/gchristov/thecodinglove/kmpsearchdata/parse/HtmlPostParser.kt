@@ -6,14 +6,19 @@ external fun require(module:String) : dynamic
 
 class HtmlPostParser : PostParser {
     override fun parse(): String {
-        return " Results=${parse(TestHtml)}"
+        val htmlParser = require("node-html-parser")
+        val root = htmlParser.parse(TestHtml)
+        val totalResults = parseTotalResults(root)
+        return " total=$totalResults"
     }
 
     override fun parse(content: String): List<Post> {
-        val htmlParser = require("node-html-parser")
-        val parsed = htmlParser.parse(content)
-        val posts = mutableListOf<Post>()
-        return posts
+        TODO("Not yet implemented")
+    }
+
+    private fun parseTotalResults(root: dynamic): dynamic {
+        val totalResults = root.querySelectorAll(".results-number")[0].text
+        return totalResults
     }
 }
 
