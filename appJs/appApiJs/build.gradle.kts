@@ -12,7 +12,7 @@ kotlin {
             dependencies {
                 // TODO: Use feature modules here when ready
                 implementation(projects.kmpCommonFirebase)
-                implementation(projects.kmpHtmlparser)
+                implementation(projects.kmpSearchData)
                 implementation(projects.moduleA)
                 // Ideally these would be linked from corresponding submodules but that is currently
                 // not supported out of the box or through the npm-publish plugin and causes "module

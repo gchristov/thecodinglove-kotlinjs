@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove
 
 import com.gchristov.thecodinglove.kmpcommonfirebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.kmpcommonfirebase.CommonNetworkModule
-import com.gchristov.thecodinglove.kmphtmlparser.HtmlParserModule
+import com.gchristov.thecodinglove.kmpsearchdata.SearchDataModule
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.GlobalScope
@@ -29,7 +29,7 @@ fun main(args: Array<String>) {
             batch.commit()
 
             println("About to test html parser")
-            val parser = HtmlParserModule.injectHtmlParser()
+            val parser = SearchDataModule.injectPostParser()
 
             response.send(Messenger().message() + ", " + userResponse.page + ", " + count + parser.parse())
         }
