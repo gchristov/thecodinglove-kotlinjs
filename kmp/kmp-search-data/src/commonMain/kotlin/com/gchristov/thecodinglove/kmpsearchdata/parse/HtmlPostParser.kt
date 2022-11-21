@@ -9,7 +9,8 @@ class HtmlPostParser : PostParser {
         val htmlParser = require("node-html-parser")
         val root = htmlParser.parse(TestHtml)
         val totalResults = parseTotalResults(root)
-        return " total=$totalResults"
+        val posts = parsePosts(root)
+        return " total=$totalResults posts=$posts"
     }
 
     override fun parse(content: String): List<Post> {
@@ -17,8 +18,13 @@ class HtmlPostParser : PostParser {
     }
 
     private fun parseTotalResults(root: dynamic): dynamic {
-        val totalResults = root.querySelectorAll(".results-number")[0].text
+        val totalResults = root.querySelectorAll("span[class='results-number']")[0].text
         return totalResults
+    }
+
+    private fun parsePosts(root: dynamic): dynamic {
+        val postNodes = root.querySelectorAll("article[class*='index-blog-post']")
+        return postNodes.length
     }
 }
 
