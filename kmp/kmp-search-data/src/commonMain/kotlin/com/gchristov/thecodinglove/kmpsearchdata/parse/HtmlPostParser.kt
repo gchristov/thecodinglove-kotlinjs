@@ -12,7 +12,8 @@ class HtmlPostParser : PostParser {
         val posts = parsePosts(root)
         val titles = parsePostTitles(root)
         val links = parsePostLinks(root)
-        return " total=$totalResults posts=$posts titles=$titles links=$links"
+        val content = parsePostContent(root)
+        return " total=$totalResults posts=$posts titles=$titles links=$links content=$content"
     }
 
     override fun parse(content: String): List<Post> {
@@ -49,6 +50,31 @@ class HtmlPostParser : PostParser {
             titles.add(link.getAttribute("href") as String)
         }
         return titles
+    }
+
+    private fun parsePostContent(root: dynamic): List<String> {
+        val contents = mutableListOf<String>()
+        val postNodes = root.querySelectorAll("article[class*='index-blog-post']")
+        val len = postNodes.length as Int
+        for (i in 0 until len) {
+            val paragraph = postNodes[i].querySelector("div[class*='blog-post-content']").querySelector("p")
+            val videoSource = paragraph.querySelector("video")
+            if (videoSource != null) {
+                val obj = videoSource.querySelector("object")
+                if (obj != null) {
+                    contents.add(obj.getAttribute("data") as String)
+                }
+            }
+            val imageSource = paragraph.querySelector("img")
+            if (imageSource != null) {
+                var src = imageSource.getAttribute("data-src")
+                if (src == null) {
+                    src = imageSource.getAttribute("src")
+                }
+                contents.add(src.text as String)
+            }
+        }
+        return contents
     }
 }
 
