@@ -1,7 +1,7 @@
 import com.gchristov.thecodinglove.gradleplugins.Deps
 
 plugins {
-    id("javascript-node-module-plugin")
+    id("kmp-module-plugin")
 }
 
 kotlin {

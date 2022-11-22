@@ -1,5 +1,5 @@
 plugins {
-    id("javascript-node-module-plugin")
+    id("kmp-module-plugin")
 }
 
 kotlin {
@@ -7,7 +7,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.kmpModuleB)
-                implementation(npm("express", "4.18.2"))
             }
         }
     }

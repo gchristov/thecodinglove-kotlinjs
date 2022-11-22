@@ -1,20 +1,28 @@
+import com.gchristov.thecodinglove.gradleplugins.Deps
+
 plugins {
-    id("javascript-node-library-plugin")
+    id("javascript-node-executable-plugin")
+    // TODO: This shouldn't be needed here
+    id("kmp-data-plugin")
 }
 
 kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                // TODO: These should not be directly accessed
+                // TODO: Use feature modules here when ready
                 implementation(projects.kmpCommonFirebase)
-                implementation(projects.kmpCommonNetwork)
+                implementation(projects.kmpSearchData)
                 implementation(projects.moduleA)
-                // Needed to get the Firebase deployment to work
-                implementation(npm("firebase", "9.10.0"))
-                implementation(npm("firebase-admin", "11.0.1"))
-                implementation(npm("firebase-functions", "3.24.0"))
-                implementation(npm("node-html-parser", "6.1.4"))
+                // Ideally these would be linked from corresponding submodules but that is currently
+                // not supported out of the box or through the npm-publish plugin and causes "module
+                // not found" errors. As a workaround, all NPM dependencies will be listed here,
+                // making them available to all submodules.
+                implementation(npm(Deps.Firebase.firebase.name, Deps.Firebase.firebase.version))
+                implementation(npm(Deps.Firebase.admin.name, Deps.Firebase.admin.version))
+                implementation(npm(Deps.Firebase.functions.name, Deps.Firebase.functions.version))
+                implementation(npm(Deps.Node.htmlParser.name, Deps.Node.htmlParser.version))
+                implementation(npm(Deps.Node.express.name, Deps.Node.express.version))
             }
         }
     }
