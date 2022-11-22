@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove
 import com.gchristov.thecodinglove.kmpcommonfirebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.kmpcommonfirebase.CommonNetworkModule
 import com.gchristov.thecodinglove.kmpsearchdata.SearchDataModule
+import com.gchristov.thecodinglove.kmpsearchdata.parse.TestHtml
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.GlobalScope
@@ -30,8 +31,11 @@ fun main(args: Array<String>) {
 
             println("About to test html parser")
             val parser = SearchDataModule.injectPostParser()
+            val totalCount = parser.parseResultsCount(TestHtml)
+            val results = parser.parseResults(TestHtml)
+            val parseResult = " count=$totalCount posts=$results"
 
-            response.send(Messenger().message() + ", " + userResponse.page + ", " + count + parser.parse())
+            response.send(Messenger().message() + ", " + userResponse.page + ", " + count + parseResult)
         }
     }
 }

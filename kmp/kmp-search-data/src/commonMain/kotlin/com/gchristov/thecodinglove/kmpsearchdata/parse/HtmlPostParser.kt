@@ -1,84 +1,78 @@
 package com.gchristov.thecodinglove.kmpsearchdata.parse
 
 import com.gchristov.thecodinglove.kmpsearchdata.Post
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 
-external fun require(module:String) : dynamic
+external fun require(module: String): dynamic
 
-class HtmlPostParser : PostParser {
-    override fun parse(): String {
+internal class HtmlPostParser(private val dispatcher: CoroutineDispatcher) : PostParser {
+    override suspend fun parseResultsCount(content: String): Int = withContext(dispatcher) {
+        val root = acquireRootNode(content)
+        val resultsCountNode = root.querySelectorAll("span[class='results-number']")[0]
+        (resultsCountNode.text as String).toInt()
+    }
+
+    override suspend fun parseResults(content: String): List<Post> = withContext(dispatcher) {
+        val posts = mutableListOf<Post>()
+        val root = acquireRootNode(content)
+        val postNodes = root.querySelectorAll("article[class*='index-blog-post']")
+        val numPosts = postNodes.length as Int
+        for (i in 0 until numPosts) {
+            val post = postNodes[i]
+            val postTitle = parsePostTitle(post)
+            val postUrl = parsePostUrl(post)
+            val postImageUrl = parsePostImageUrl(post)
+            if (postTitle != null && postUrl != null && postImageUrl != null) {
+                posts.add(
+                    Post(
+                        title = postTitle,
+                        url = postUrl,
+                        imageUrl = postImageUrl
+                    )
+                )
+            }
+        }
+        posts
+    }
+
+    private suspend fun acquireRootNode(content: String): dynamic = withContext(dispatcher) {
         val htmlParser = require("node-html-parser")
-        val root = htmlParser.parse(TestHtml)
-        val totalResults = parseTotalResults(root)
-        val posts = parsePosts(root)
-        val titles = parsePostTitles(root)
-        val links = parsePostLinks(root)
-        val content = parsePostContent(root)
-        return " total=$totalResults posts=$posts titles=$titles links=$links content=$content"
+        htmlParser.parse(content)
     }
 
-    override fun parse(content: String): List<Post> {
-        TODO("Not yet implemented")
+    private fun parsePostTitle(post: dynamic): String? {
+        val anchor = post.querySelector("h1").querySelector("a")
+        return anchor.text as? String
     }
 
-    private fun parseTotalResults(root: dynamic): dynamic {
-        val totalResults = root.querySelectorAll("span[class='results-number']")[0].text
-        return totalResults
+    private fun parsePostUrl(post: dynamic): String? {
+        val anchor = post.querySelector("h1").querySelector("a")
+        return anchor.getAttribute("href") as? String
     }
 
-    private fun parsePosts(root: dynamic): dynamic {
-        val postNodes = root.querySelectorAll("article[class*='index-blog-post']")
-        return postNodes.length
-    }
-
-    private fun parsePostTitles(root: dynamic): List<String> {
-        val titles = mutableListOf<String>()
-        val postNodes = root.querySelectorAll("article[class*='index-blog-post']")
-        val len = postNodes.length as Int
-        for (i in 0 until len) {
-            val link = postNodes[i].querySelector("h1").querySelector("a")
-            titles.add(link.text as String)
-        }
-        return titles
-    }
-
-    private fun parsePostLinks(root: dynamic): List<String> {
-        val titles = mutableListOf<String>()
-        val postNodes = root.querySelectorAll("article[class*='index-blog-post']")
-        val len = postNodes.length as Int
-        for (i in 0 until len) {
-            val link = postNodes[i].querySelector("h1").querySelector("a")
-            titles.add(link.getAttribute("href") as String)
-        }
-        return titles
-    }
-
-    private fun parsePostContent(root: dynamic): List<String> {
-        val contents = mutableListOf<String>()
-        val postNodes = root.querySelectorAll("article[class*='index-blog-post']")
-        val len = postNodes.length as Int
-        for (i in 0 until len) {
-            val paragraph = postNodes[i].querySelector("div[class*='blog-post-content']").querySelector("p")
-            val videoSource = paragraph.querySelector("video")
-            if (videoSource != null) {
-                val obj = videoSource.querySelector("object")
-                if (obj != null) {
-                    contents.add(obj.getAttribute("data") as String)
-                }
-            }
-            val imageSource = paragraph.querySelector("img")
-            if (imageSource != null) {
-                var src = imageSource.getAttribute("data-src")
-                if (src == null) {
-                    src = imageSource.getAttribute("src")
-                }
-                contents.add(src.text as String)
+    private fun parsePostImageUrl(post: dynamic): String? {
+        val paragraph = post.querySelector("div[class*='blog-post-content']").querySelector("p")
+        val videoSource = paragraph.querySelector("video")
+        if (videoSource != null) {
+            val obj = videoSource.querySelector("object")
+            if (obj != null) {
+                return obj.getAttribute("data") as? String
             }
         }
-        return contents
+        val imageSource = paragraph.querySelector("img")
+        if (imageSource != null) {
+            var src = imageSource.getAttribute("data-src")
+            if (src == null) {
+                src = imageSource.getAttribute("src")
+            }
+            return src as? String
+        }
+        return null
     }
 }
 
-private val TestHtml = """
+val TestHtml = """
     <!doctype html><html
     lang=en><head><style>img.lazy{min-height:1px}</style><link
     rel=preload href=https://thecodinglove.com/wp-content/plugins/w3-total-cache/pub/js/lazyload.min.js as=script><meta
@@ -376,11 +370,7 @@ private val TestHtml = """
     fill-rule=evenodd d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"/></svg>
     <span
     class=post-author>The Coding Love</span> commited on 13 Oct 2022</div><div
-    class=blog-post-content><p><video
-    autoplay loop muted playsinline><source
-    src=https://thecodinglove.com/content/047/CWRslSm.webm type=video/webm><source
-    src=https://thecodinglove.com/content/047/CWRslSm.mp4 type=video/mp4><object
-    data=https://thecodinglove.com/content/047/CWRslSm.gif type=image/gif></object></video></p></div><div
+    class=blog-post-content><p><img data-src=https://thecodinglove.com/content/047/CWRslSm.gif></img></p></div><div
     class=social-share><a
     href="https://www.facebook.com/sharer/sharer.php?u=https://thecodinglove.com/when-my-code-goes-into-testing-phase" class="js-social-share social-btn" target=_blank>
     <button
@@ -425,11 +415,7 @@ private val TestHtml = """
     fill-rule=evenodd d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"/></svg>
     <span
     class=post-author>The Coding Love</span> commited on 7 Oct 2022</div><div
-    class=blog-post-content><p><video
-    autoplay loop muted playsinline><source
-    src=https://thecodinglove.com/content/047/sh8qjSF.webm type=video/webm><source
-    src=https://thecodinglove.com/content/047/sh8qjSF.mp4 type=video/mp4><object
-    data=https://thecodinglove.com/content/047/sh8qjSF.gif type=image/gif></object></video></p></div><div
+    class=blog-post-content><p><img src=https://thecodinglove.com/content/047/sh8qjSF.gif></img></p></div><div
     class=social-share><a
     href="https://www.facebook.com/sharer/sharer.php?u=https://thecodinglove.com/when-qa-starts-testing-my-code" class="js-social-share social-btn" target=_blank>
     <button

@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.kmpsearchdata.parse
 import com.gchristov.thecodinglove.kmpsearchdata.Post
 
 interface PostParser {
-    fun parse(): String
-    fun parse(content: String): List<Post>
+    suspend fun parseResultsCount(content: String): Int
+
+    suspend fun parseResults(content: String): List<Post>
 }

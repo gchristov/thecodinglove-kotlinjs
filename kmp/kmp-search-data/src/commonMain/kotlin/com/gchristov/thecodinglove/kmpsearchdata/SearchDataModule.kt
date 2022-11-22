@@ -4,6 +4,7 @@ import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.kmpcommondi.inject
 import com.gchristov.thecodinglove.kmpsearchdata.parse.HtmlPostParser
 import com.gchristov.thecodinglove.kmpsearchdata.parse.PostParser
+import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 
@@ -18,5 +19,5 @@ object SearchDataModule : DiModule() {
 
     fun injectPostParser(): PostParser = inject()
 
-    private fun providePostParser(): PostParser = HtmlPostParser()
+    private fun providePostParser(): PostParser = HtmlPostParser(dispatcher = Dispatchers.Default)
 }
