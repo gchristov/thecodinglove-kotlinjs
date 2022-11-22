@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.gradleplugins.kmp
 
+import com.gchristov.thecodinglove.gradleplugins.Deps
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
@@ -12,6 +13,9 @@ open class KmpModulePlugin : KmpPlatformPlugin() {
                 implementation(project(":kmp-common-kotlin"))
                 implementation(project(":kmp-common-di"))
                 implementation(project(":kmp-common-test"))
+            }
+            sourceSets.maybeCreate("commonTest").dependencies {
+                implementation(Deps.Tests.coroutinesTest)
             }
         }
     }

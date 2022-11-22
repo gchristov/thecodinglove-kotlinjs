@@ -8,6 +8,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(Deps.Kotlin.coroutinesCore)
                 implementation(kotlin(Deps.Tests.test))
             }
         }

@@ -38,7 +38,13 @@ class Deps {
     }
 
     object Tests {
+        private const val coroutinesVersion = "1.6.4"
+
+        // TODO: Define actual dependency so to not use kotlin()
         const val test = "test"
+        // TODO: Move to Kotlin above
+        const val coroutinesTest =
+            "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
     }
 }
 
