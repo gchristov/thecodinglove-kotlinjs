@@ -9,10 +9,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
-external fun require(module:String) : dynamic
-external var exports: dynamic
+private external fun require(module:String) : dynamic
+private external var exports: dynamic
 
-fun main(args: Array<String>) {
+internal actual fun serveApi(args: Array<String>) {
     val fireFunctions = require("firebase-functions")
     exports.myTestFun = fireFunctions.https.onRequest { request, response ->
         val client = CommonNetworkModule.injectHttpClient()
