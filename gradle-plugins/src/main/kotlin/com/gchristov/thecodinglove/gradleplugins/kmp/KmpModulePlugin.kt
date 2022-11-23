@@ -15,7 +15,7 @@ open class KmpModulePlugin : KmpPlatformPlugin() {
                 implementation(project(":kmp-common-test"))
             }
             sourceSets.maybeCreate("commonTest").dependencies {
-                implementation(Deps.Tests.coroutinesTest)
+                implementation(Deps.Kotlin.coroutinesTest)
             }
         }
     }

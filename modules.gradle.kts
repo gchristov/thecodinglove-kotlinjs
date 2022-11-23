@@ -8,13 +8,11 @@ val projects = listOf(
     "kmp-common-kotlin",
     "kmp-common-network",
     "kmp-common-test",
-    "kmp-module-b",
     "kmp-search-data",
     "kmp-search-testfixtures",
     "appApiJs",
     "appHtmlJs",
     "gradle-plugins",
-    "module-a",
 )
 /**
  * Javascript modules are under the 'appJs' directory.
