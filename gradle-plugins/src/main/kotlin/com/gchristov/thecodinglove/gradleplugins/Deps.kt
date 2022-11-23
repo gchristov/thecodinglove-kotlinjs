@@ -16,11 +16,15 @@ class Deps {
     }
 
     object Kotlin {
-        private const val coroutinesVersion = "1.6.0"
+        private const val coroutinesCoreVersion = "1.6.0"
+        private const val coroutinesTestVersion = "1.6.4"
 
         // "-native-mt" is required here, otherwise iOS fails with runtime exception
         const val coroutinesCore =
-            "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion-native-mt"
+            "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesCoreVersion-native-mt"
+        const val coroutinesTest =
+            "org.jetbrains.kotlinx:kotlinx-coroutines-test:${coroutinesTestVersion}"
+        const val test = "org.jetbrains.kotlin:kotlin-test"
     }
 
     object Ktor {
@@ -35,16 +39,6 @@ class Deps {
     object Node {
         val htmlParser = NpmDependency("node-html-parser", "6.1.4")
         val express = NpmDependency("express", "4.18.2")
-    }
-
-    object Tests {
-        private const val coroutinesVersion = "1.6.4"
-
-        // TODO: Define actual dependency so to not use kotlin()
-        const val test = "test"
-        // TODO: Move to Kotlin above
-        const val coroutinesTest =
-            "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
     }
 }
 

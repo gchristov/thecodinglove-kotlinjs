@@ -9,7 +9,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(Deps.Kotlin.coroutinesCore)
-                implementation(kotlin(Deps.Tests.test))
+                api(Deps.Kotlin.test)
             }
         }
     }
