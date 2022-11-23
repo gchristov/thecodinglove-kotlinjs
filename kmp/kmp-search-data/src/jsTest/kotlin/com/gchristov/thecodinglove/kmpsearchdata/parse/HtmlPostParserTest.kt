@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.kmpsearchdata.parse
 
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.kmpsearchdata.HtmlPostParser
 import com.gchristov.thecodinglove.kmpsearchdata.Post
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.HtmlPostCreator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,7 +69,8 @@ private val ActualPostList = listOf(
         title = "When my code goes into testing phase",
         url = "https://thecodinglove.com/when-my-code-goes-into-testing-phase",
         imageUrl = "https://thecodinglove.com/content/047/CWRslSm.gif"
-    ), Post(
+    ),
+    Post(
         title = "When QA starts testing my code",
         url = "https://thecodinglove.com/when-qa-starts-testing-my-code",
         imageUrl = "https://thecodinglove.com/content/047/sh8qjSF.gif"

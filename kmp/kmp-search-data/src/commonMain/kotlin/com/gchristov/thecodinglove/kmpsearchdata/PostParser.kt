@@ -1,6 +1,4 @@
-package com.gchristov.thecodinglove.kmpsearchdata.parse
-
-import com.gchristov.thecodinglove.kmpsearchdata.Post
+package com.gchristov.thecodinglove.kmpsearchdata
 
 interface PostParser {
     suspend fun parseTotalPosts(content: String): Int

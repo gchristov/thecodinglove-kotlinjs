@@ -32,9 +32,9 @@ fun main(args: Array<String>) {
             val parser = SearchDataModule.injectPostParser()
             val totalCount = parser.parseTotalPosts(TestHtml)
             val results = parser.parsePosts(TestHtml)
-            val parseResult = " count=$totalCount posts=$results"
+            val parseResult = " parseCount=$totalCount parsePosts=$results"
 
-            response.send(Messenger().message() + ", " + userResponse.page + ", " + count + parseResult)
+            response.send("{networkResponsePage=${userResponse.page}, invocationsCount=$count, $parseResult}")
         }
     }
 }

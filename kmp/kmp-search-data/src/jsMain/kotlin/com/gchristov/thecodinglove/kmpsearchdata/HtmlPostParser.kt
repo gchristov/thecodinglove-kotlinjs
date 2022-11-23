@@ -1,6 +1,5 @@
-package com.gchristov.thecodinglove.kmpsearchdata.parse
+package com.gchristov.thecodinglove.kmpsearchdata
 
-import com.gchristov.thecodinglove.kmpsearchdata.Post
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
