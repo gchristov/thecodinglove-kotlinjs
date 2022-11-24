@@ -4,9 +4,9 @@ plugins {
 
 kotlin {
     sourceSets {
-        val commonTest by getting {
+        val commonMain by getting {
             dependencies {
-                implementation(projects.kmpSearchTestfixtures)
+                implementation(projects.kmpHtmlparse)
             }
         }
     }
