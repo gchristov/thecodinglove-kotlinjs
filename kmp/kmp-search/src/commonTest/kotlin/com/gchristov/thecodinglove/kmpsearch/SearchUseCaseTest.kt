@@ -118,6 +118,13 @@ class SearchUseCaseTest {
                 historyPage.size - 1 == testPage.size
             }
         }
+        // If all options are exhausted we shouldn't be able to search for an element
+        val actualResult = it.invoke(
+            query = SearchQuery,
+            searchHistory = searchHistory,
+            resultsPerPage = PostCreator.defaultPostPerPage()
+        )
+        assertTrue { actualResult == SearchResult.Empty }
     }
 
     private fun runBlockingTest(

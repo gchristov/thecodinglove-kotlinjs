@@ -16,34 +16,41 @@ class SearchUseCase(
         searchHistory: SearchHistory,
         resultsPerPage: Int
     ): SearchResult = withContext(dispatcher) {
-        // Obtain total number of posts
         val totalResults = searchRepository.getTotalPosts(query)
         if (totalResults <= 0) {
             return@withContext SearchResult.Empty
         }
-        // Randomise selected page
+
         val randomPostPage = Random.nextRandomPage(
             totalResults = totalResults,
             resultsPerPage = resultsPerPage,
             exclusions = searchHistory.getExcludedPages()
         )
+        if (randomPostPage == RandomResult.Invalid) {
+            return@withContext SearchResult.Empty
+        }
+
         val searchResults = searchRepository.search(
-            page = randomPostPage,
+            page = (randomPostPage as RandomResult.Valid).number,
             query = query
         )
         if (searchResults.isEmpty()) {
             return@withContext SearchResult.Empty
         }
-        // Randomise selected post from the search results
+
         val randomPostIndexOnPage = Random.nextRandomPostIndex(
             posts = searchResults,
-            exclusions = searchHistory.getExcludedPostIndexes(randomPostPage)
+            exclusions = searchHistory.getExcludedPostIndexes(randomPostPage.number)
         )
+        if (randomPostIndexOnPage == RandomResult.Invalid) {
+            return@withContext SearchResult.Empty
+        }
+
         SearchResult.Valid(
             totalPosts = totalResults,
-            post = searchResults[randomPostIndexOnPage],
-            postPage = randomPostPage,
-            postIndexOnPage = randomPostIndexOnPage,
+            post = searchResults[(randomPostIndexOnPage as RandomResult.Valid).number],
+            postPage = randomPostPage.number,
+            postIndexOnPage = randomPostIndexOnPage.number,
             postPageSize = searchResults.size
         )
     }
@@ -53,7 +60,7 @@ private fun Random.nextRandomPage(
     totalResults: Int,
     resultsPerPage: Int,
     exclusions: Set<Int>
-): Int {
+): RandomResult {
     val min = 1
     val max = max(
         a = min,
@@ -69,14 +76,14 @@ private fun Random.nextRandomPage(
 private fun Random.nextRandomPostIndex(
     posts: List<Post>,
     exclusions: Set<Int>
-): Int {
+): RandomResult {
     val min = 0
     val max = max(
         a = min,
         b = posts.size
     )
     if (max == 0) {
-        throw UnsupportedOperationException("List of posts cannot be empty")
+        return RandomResult.Invalid
     }
     return nextRandomIntInRange(
         start = min,
@@ -92,24 +99,29 @@ private fun Random.nextRandomPostIndex(
  * @return A random number within start-end, making sure it's not present in [exclusions]
  */
 private fun Random.nextRandomIntInRange(
-    start: Int,
-    end: Int,
-    exclusions: Set<Int>
-): Int {
+    start: Int, // 0
+    end: Int, // 4
+    exclusions: Set<Int> // [1,2]
+): RandomResult {
     // Make sure the numbers are sorted
     val sorted = exclusions.sorted()
     val rangeLength = end - start - sorted.size
     if (rangeLength <= 0) {
-        return end - 1
+        return RandomResult.Invalid
     }
     var randomInt: Int = nextInt(rangeLength) + start
     for (item in sorted) {
         if (item > randomInt) {
-            return randomInt
+            return RandomResult.Valid(randomInt)
         }
         randomInt++
     }
-    return randomInt
+    return RandomResult.Valid(randomInt)
+}
+
+private sealed class RandomResult {
+    object Invalid : RandomResult()
+    data class Valid(val number: Int) : RandomResult()
 }
 
 sealed class SearchResult {
