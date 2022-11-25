@@ -20,7 +20,7 @@ val projects = listOf(
 )
 /**
  * Javascript modules are under the 'appJs' directory.
- * KMP modules are under the 'kmp' directory..
+ * KMP modules are under the 'kmp' directory.
  */
 projects.forEach { project ->
     if (project.isGradlePlugin()) {
