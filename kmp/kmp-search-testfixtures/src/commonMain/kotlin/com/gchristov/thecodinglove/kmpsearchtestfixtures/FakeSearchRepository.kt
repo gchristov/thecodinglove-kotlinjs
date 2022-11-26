@@ -26,7 +26,11 @@ class FakeSearchRepository(
         return searchResponse.execute(pages?.get(page) ?: emptyList())
     }
 
-    override suspend fun getSearchSession(id: String): SearchSession {
-        return searchSessionResponse.execute(searchSession!!)
+    override suspend fun getSearchSession(id: String): SearchSession? {
+        return searchSessionResponse.execute(searchSession)
+    }
+
+    override suspend fun saveSearchSession(session: SearchSession) {
+        TODO("Not yet implemented")
     }
 }

@@ -32,7 +32,19 @@ internal class RealSearchRepository(
         return htmlPostParser.parsePosts(response).map { it.toPost() }
     }
 
-    override suspend fun getSearchSession(id: String): SearchSession {
-        TODO("Not yet implemented")
+    override suspend fun getSearchSession(id: String): SearchSession? {
+        val document = firebaseFirestore.document("search/$id").get()
+        return if (document.exists) {
+            return document.data()
+        } else {
+            null
+        }
+    }
+
+    override suspend fun saveSearchSession(searchSession: SearchSession) {
+        val batch = firebaseFirestore.batch()
+        val document = firebaseFirestore.document("search/${searchSession.id}")
+        batch.set(document, searchSession)
+        batch.commit()
     }
 }

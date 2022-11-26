@@ -11,5 +11,7 @@ interface SearchRepository {
         query: String
     ): List<Post>
 
-    suspend fun getSearchSession(id: String): SearchSession
+    suspend fun getSearchSession(id: String): SearchSession?
+
+    suspend fun saveSearchSession(session: SearchSession)
 }
