@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.kmpsearchtestfixtures
 
-import com.gchristov.thecodinglove.kmpsearchdata.Post
+import com.gchristov.thecodinglove.kmpsearchdata.model.Post
 
 object PostCreator {
     fun defaultTotalPosts() = 7

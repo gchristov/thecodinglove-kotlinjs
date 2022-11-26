@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.kmpsearch
 
-import com.gchristov.thecodinglove.kmpsearchdata.Post
+import com.gchristov.thecodinglove.kmpsearchdata.model.Post
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

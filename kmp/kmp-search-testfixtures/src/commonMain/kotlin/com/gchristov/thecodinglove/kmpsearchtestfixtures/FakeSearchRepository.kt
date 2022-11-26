@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.kmpsearchtestfixtures
 
 import com.gchristov.thecodinglove.kmpcommontest.FakeResponse
 import com.gchristov.thecodinglove.kmpcommontest.execute
-import com.gchristov.thecodinglove.kmpsearchdata.Post
+import com.gchristov.thecodinglove.kmpsearchdata.model.Post
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
 
 class FakeSearchRepository(

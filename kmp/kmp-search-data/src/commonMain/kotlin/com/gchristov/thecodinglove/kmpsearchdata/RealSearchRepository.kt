@@ -1,6 +1,8 @@
 package com.gchristov.thecodinglove.kmpsearchdata
 
 import com.gchristov.thecodinglove.kmphtmlparse.HtmlPostParser
+import com.gchristov.thecodinglove.kmpsearchdata.model.Post
+import com.gchristov.thecodinglove.kmpsearchdata.model.toPost
 import io.ktor.client.statement.*
 
 internal class RealSearchRepository(
