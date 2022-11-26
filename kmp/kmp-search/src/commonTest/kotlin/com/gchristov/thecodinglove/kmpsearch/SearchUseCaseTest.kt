@@ -51,6 +51,7 @@ class SearchUseCaseTest {
         )
         assertEquals(
             expected = SearchResult.Valid(
+                query = SearchQuery,
                 totalPosts = 1,
                 post = PostCreator.singlePageSinglePost()[1]!!.first(),
                 postPage = 1,

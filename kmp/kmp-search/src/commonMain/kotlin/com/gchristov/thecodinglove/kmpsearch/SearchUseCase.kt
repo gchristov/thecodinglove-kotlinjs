@@ -47,6 +47,7 @@ class SearchUseCase(
         }
 
         SearchResult.Valid(
+            query = query,
             totalPosts = totalResults,
             post = searchResults[(randomPostIndexOnPage as RandomResult.Valid).number],
             postPage = randomPostPage.number,
@@ -127,6 +128,7 @@ private sealed class RandomResult {
 sealed class SearchResult {
     object Empty : SearchResult()
     data class Valid(
+        val query: String,
         val totalPosts: Int,
         val post: Post,
         val postPage: Int,

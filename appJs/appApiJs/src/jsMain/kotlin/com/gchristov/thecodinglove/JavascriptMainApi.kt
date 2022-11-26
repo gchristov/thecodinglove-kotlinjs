@@ -13,8 +13,8 @@ import kotlinx.serialization.json.Json
 internal actual fun serveApi(args: Array<String>) {
     val fireFunctions = require("firebase-functions")
     exports.myTestFun = fireFunctions.https.onRequest { request, response ->
+        val searchQuery = (request.query.searchQuery as? String) ?: "release"
         // TODO: Do not use GlobalScope
-        val searchQuery = request.query.searchQuery as? String
         GlobalScope.launch {
             println("About to test Firestore")
             val firestore = CommonFirebaseModule.injectFirestore()
@@ -28,7 +28,7 @@ internal actual fun serveApi(args: Array<String>) {
             println("About to test search")
             val search = SearchModule.injectSearchUseCase()
             val searchResult = search(
-                query = searchQuery ?: "release",
+                query = searchQuery,
                 searchHistory = SearchHistory(),
                 resultsPerPage = 4
             )
@@ -60,6 +60,7 @@ private data class FunctionResult(
 
         @Serializable
         data class Valid(
+            val query: String,
             val totalPosts: Int,
             val postTitle: String,
             val postUrl: String,
@@ -74,6 +75,7 @@ private data class FunctionResult(
 private fun SearchResult.toResult() = when (this) {
     is SearchResult.Empty -> FunctionResult.FunctionSearchResult.Empty
     is SearchResult.Valid -> FunctionResult.FunctionSearchResult.Valid(
+        query = query,
         totalPosts = totalPosts,
         postTitle = post.title,
         postUrl = post.url,
