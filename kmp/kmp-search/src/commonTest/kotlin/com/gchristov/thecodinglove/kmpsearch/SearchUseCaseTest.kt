@@ -125,7 +125,7 @@ class SearchUseCaseTest {
             shuffleHistory = shuffleHistory,
             resultsPerPage = PostCreator.defaultPostPerPage()
         )
-        assertTrue { actualResult == SearchResult.Empty }
+        assertTrue { actualResult == SearchResult.Exhausted }
     }
 
     private fun runBlockingTest(
