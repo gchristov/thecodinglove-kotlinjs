@@ -67,7 +67,11 @@ private data class FunctionResult(
 
         @Serializable
         data class Valid(
-            val tmp: String
+            val query: String,
+            val postTitle: String,
+            val postUrl: String,
+            val postImageUrl: String,
+            val totalPosts: Int,
         ) : FunctionSearchResult()
     }
 }
@@ -75,6 +79,10 @@ private data class FunctionResult(
 private fun ShuffleResult.toResult() = when (this) {
     is ShuffleResult.Empty -> FunctionResult.FunctionSearchResult.Empty
     is ShuffleResult.Valid -> FunctionResult.FunctionSearchResult.Valid(
-        tmp = tmp
+        query = query,
+        postTitle = post.title,
+        postUrl = post.url,
+        postImageUrl = post.imageUrl,
+        totalPosts = totalPosts
     )
 }

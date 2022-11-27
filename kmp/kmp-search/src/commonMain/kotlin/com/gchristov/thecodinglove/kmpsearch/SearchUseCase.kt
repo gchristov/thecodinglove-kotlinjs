@@ -27,40 +27,43 @@ class SearchUseCase(
             resultsPerPage = resultsPerPage,
             exclusions = shuffleHistory.getExcludedPages()
         )
-        // TODO: Handle exhausted results
-        if (randomPostPage == RandomResult.Invalid || randomPostPage == RandomResult.Exhausted) {
-            return@withContext SearchResult.Empty
+        when (randomPostPage) {
+            is RandomResult.Exhausted -> return@withContext SearchResult.Exhausted
+            is RandomResult.Invalid -> return@withContext SearchResult.Empty
+            is RandomResult.Valid -> {
+                // Obtain all results from the random page
+                val searchResults = searchRepository.search(
+                    page = randomPostPage.number,
+                    query = query
+                )
+                if (searchResults.isEmpty()) {
+                    return@withContext SearchResult.Empty
+                }
+                // Randomise next post to return
+                val randomPostIndexOnPage = Random.nextRandomPostIndex(
+                    posts = searchResults,
+                    exclusions = shuffleHistory.getExcludedPostIndexes(randomPostPage.number)
+                )
+                when (randomPostIndexOnPage) {
+                    is RandomResult.Exhausted -> return@withContext SearchResult.Exhausted
+                    is RandomResult.Invalid -> return@withContext SearchResult.Empty
+                    is RandomResult.Valid -> SearchResult.Valid(
+                        query = query,
+                        totalPosts = totalResults,
+                        post = searchResults[randomPostIndexOnPage.number],
+                        postPage = randomPostPage.number,
+                        postIndexOnPage = randomPostIndexOnPage.number,
+                        postPageSize = searchResults.size
+                    )
+                }
+            }
         }
-        // Obtain all results from the random page
-        val searchResults = searchRepository.search(
-            page = (randomPostPage as RandomResult.Valid).number,
-            query = query
-        )
-        if (searchResults.isEmpty()) {
-            return@withContext SearchResult.Empty
-        }
-        // Randomise next post to return
-        val randomPostIndexOnPage = Random.nextRandomPostIndex(
-            posts = searchResults,
-            exclusions = shuffleHistory.getExcludedPostIndexes(randomPostPage.number)
-        )
-        if (randomPostIndexOnPage == RandomResult.Invalid) {
-            return@withContext SearchResult.Empty
-        }
-
-        SearchResult.Valid(
-            query = query,
-            totalPosts = totalResults,
-            post = searchResults[(randomPostIndexOnPage as RandomResult.Valid).number],
-            postPage = randomPostPage.number,
-            postIndexOnPage = randomPostIndexOnPage.number,
-            postPageSize = searchResults.size
-        )
     }
 }
 
 sealed class SearchResult {
     object Empty : SearchResult()
+    object Exhausted : SearchResult()
     data class Valid(
         val query: String,
         val totalPosts: Int,

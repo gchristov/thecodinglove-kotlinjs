@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.kmpsearch
 
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
+import com.gchristov.thecodinglove.kmpsearchdata.model.Post
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchSession
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -23,10 +24,14 @@ class ShuffleUseCase(
             shuffleHistory = shuffleHistory,
             resultsPerPage = resultsPerPage
         )
-        // TODO: Handle exhausted results
         when (searchResult) {
             is SearchResult.Empty -> ShuffleResult.Empty
-            is SearchResult.Valid -> ShuffleResult.Valid(tmp = "OK!")
+            is SearchResult.Exhausted -> TODO()
+            is SearchResult.Valid -> ShuffleResult.Valid(
+                query = searchResult.query,
+                post = searchResult.post,
+                totalPosts = searchResult.totalPosts
+            )
         }
     }
 
@@ -48,7 +53,9 @@ class ShuffleUseCase(
 sealed class ShuffleResult {
     object Empty : ShuffleResult()
     data class Valid(
-        val tmp: String
+        val query: String,
+        val post: Post,
+        val totalPosts: Int
     ) : ShuffleResult()
 }
 
