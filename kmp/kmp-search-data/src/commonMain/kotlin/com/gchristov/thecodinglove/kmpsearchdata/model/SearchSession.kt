@@ -6,19 +6,32 @@ data class SearchSession(
     val id: String,
     val query: String,
     val totalPosts: Int?,
-    val shuffleHistory: Map<Int, List<Int>>?
+    // Contains visited page numbers mapped to page post indexes
+    val searchHistory: Map<Int, List<Int>>
 )
 
 internal fun ApiSearchSession.toSearchSession() = SearchSession(
     id = id,
     query = query,
     totalPosts = totalPosts,
-    shuffleHistory = shuffleHistory
+    searchHistory = mutableMapOf<Int, List<Int>>().apply {
+        searchHistory.keys.forEach { page ->
+            searchHistory[page]?.let { itemIndex ->
+                put(page.toInt(), itemIndex)
+            }
+        }
+    }
 )
 
 internal fun SearchSession.toApiSearchSession() = ApiSearchSession(
     id = id,
     query = query,
     totalPosts = totalPosts,
-    shuffleHistory = shuffleHistory
+    searchHistory = mutableMapOf<String, List<Int>>().apply {
+        searchHistory.keys.forEach { page ->
+            searchHistory[page]?.let { itemIndex ->
+                put(page.toString(), itemIndex)
+            }
+        }
+    }
 )

@@ -15,7 +15,7 @@ object SearchModule : DiModule() {
         builder.apply {
             bindProvider { provideSearchUseCase(searchRepository = inject()) }
             bindProvider {
-                provideShuffleUseCase(
+                provideSearchWithSessionUseCase(
                     searchRepository = inject(),
                     searchUseCase = inject()
                 )
@@ -34,14 +34,14 @@ object SearchModule : DiModule() {
         searchRepository = searchRepository
     )
 
-    private fun provideShuffleUseCase(
+    private fun provideSearchWithSessionUseCase(
         searchRepository: SearchRepository,
         searchUseCase: SearchUseCase
-    ): ShuffleUseCase = ShuffleUseCase(
+    ): SearchWithSessionUseCase = SearchWithSessionUseCase(
         dispatcher = Dispatchers.Default,
         searchRepository = searchRepository,
         searchUseCase = searchUseCase
     )
 
-    fun injectShuffleUseCase(): ShuffleUseCase = inject()
+    fun injectSearchWithSessionUseCase(): SearchWithSessionUseCase = inject()
 }

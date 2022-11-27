@@ -17,11 +17,11 @@ class SearchUseCaseTest {
     fun searchWithNoResultsReturnsEmpty() = runBlockingTest(totalPosts = 0) {
         val actualResult = it.invoke(
             query = SearchQuery,
-            shuffleHistory = mutableMapOf(),
+            searchHistory = mutableMapOf(),
             resultsPerPage = PostCreator.defaultPostPerPage()
         )
         assertEquals(
-            expected = SearchResult.Empty,
+            expected = SearchUseCase.Result.Empty,
             actual = actualResult
         )
     }
@@ -30,11 +30,11 @@ class SearchUseCaseTest {
     fun searchWithEmptyResultsReturnsEmpty() = runBlockingTest(pages = emptyMap()) {
         val actualResult = it.invoke(
             query = SearchQuery,
-            shuffleHistory = mutableMapOf(),
+            searchHistory = mutableMapOf(),
             resultsPerPage = PostCreator.defaultPostPerPage()
         )
         assertEquals(
-            expected = SearchResult.Empty,
+            expected = SearchUseCase.Result.Empty,
             actual = actualResult,
         )
     }
@@ -46,11 +46,11 @@ class SearchUseCaseTest {
     ) {
         val actualResult = it.invoke(
             query = SearchQuery,
-            shuffleHistory = mutableMapOf(),
+            searchHistory = mutableMapOf(),
             resultsPerPage = PostCreator.defaultPostPerPage()
         )
         assertEquals(
-            expected = SearchResult.Valid(
+            expected = SearchUseCase.Result.Valid(
                 query = SearchQuery,
                 totalPosts = 1,
                 post = PostCreator.singlePageSinglePost()[1]!!.first(),
@@ -64,7 +64,7 @@ class SearchUseCaseTest {
 
     @Test
     fun searchExcludes() = runBlockingTest {
-        val shuffleHistory = mutableMapOf<Int, List<Int>>()
+        val searchHistory = mutableMapOf<Int, List<Int>>()
         val minPostPage = 1
         val maxPostPage = 2
         val minPostIndexOnPage = 0
@@ -73,17 +73,17 @@ class SearchUseCaseTest {
         for (i in 0 until PostCreator.defaultTotalPosts()) {
             val actualResult = it.invoke(
                 query = SearchQuery,
-                shuffleHistory = shuffleHistory,
+                searchHistory = searchHistory,
                 resultsPerPage = PostCreator.defaultPostPerPage()
-            ) as SearchResult.Valid
+            ) as SearchUseCase.Result.Valid
             // Ensure post isn't already picked
             assertFalse {
-                shuffleHistory.contains(
+                searchHistory.contains(
                     postPage = actualResult.postPage,
                     postIndexOnPage = actualResult.postIndexOnPage
                 )
             }
-            shuffleHistory.insert(
+            searchHistory.insert(
                 postPage = actualResult.postPage,
                 postIndexOnPage = actualResult.postIndexOnPage,
                 currentPageSize = actualResult.postPageSize
@@ -96,25 +96,25 @@ class SearchUseCaseTest {
 
     @Test
     fun searchExhausts() = runBlockingTest {
-        val shuffleHistory = mutableMapOf<Int, List<Int>>()
+        val searchHistory = mutableMapOf<Int, List<Int>>()
 
         for (i in 0 until PostCreator.defaultTotalPosts()) {
             val actualResult = it.invoke(
                 query = SearchQuery,
-                shuffleHistory = shuffleHistory,
+                searchHistory = searchHistory,
                 resultsPerPage = PostCreator.defaultPostPerPage()
-            ) as SearchResult.Valid
-            shuffleHistory.insert(
+            ) as SearchUseCase.Result.Valid
+            searchHistory.insert(
                 postPage = actualResult.postPage,
                 postIndexOnPage = actualResult.postIndexOnPage,
                 currentPageSize = actualResult.postPageSize
             )
         }
         // Make sure we've exhausted all options
-        assertTrue { shuffleHistory.size == PostCreator.multiPageMultiPost().size }
+        assertTrue { searchHistory.size == PostCreator.multiPageMultiPost().size }
         for (page in PostCreator.multiPageMultiPost().keys) {
             assertTrue {
-                val historyPage = shuffleHistory[page]!!
+                val historyPage = searchHistory[page]!!
                 val testPage = PostCreator.multiPageMultiPost()[page]!!
                 historyPage.size - 1 == testPage.size
             }
@@ -122,10 +122,10 @@ class SearchUseCaseTest {
         // If all options are exhausted we shouldn't be able to search for an element
         val actualResult = it.invoke(
             query = SearchQuery,
-            shuffleHistory = shuffleHistory,
+            searchHistory = searchHistory,
             resultsPerPage = PostCreator.defaultPostPerPage()
         )
-        assertTrue { actualResult == SearchResult.Exhausted }
+        assertTrue { actualResult == SearchUseCase.Result.Exhausted }
     }
 
     private fun runBlockingTest(

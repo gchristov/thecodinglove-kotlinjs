@@ -7,5 +7,6 @@ data class ApiSearchSession(
     val id: String,
     val query: String,
     val totalPosts: Int?,
-    val shuffleHistory: Map<Int, List<Int>>?
+    // Firebase doesn't like Map<Int, List<Int>> and throws ClassCastException
+    val searchHistory: Map<String, List<Int>>
 )

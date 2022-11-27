@@ -6,6 +6,14 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
+/*
+ Use-case to search for a random post, given a search session. This use-case:
+ • obtains the total results for the given query, if not provided
+ • chooses a random page index based on the total number of posts and posts per page
+ • obtains all posts for the given page
+ • chooses a random post from the page
+ • returns a summary of the search
+ */
 class SearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository
@@ -13,41 +21,37 @@ class SearchUseCase(
     suspend operator fun invoke(
         query: String,
         totalPosts: Int? = null,
-        shuffleHistory: Map<Int, List<Int>>,
+        searchHistory: Map<Int, List<Int>>,
         resultsPerPage: Int
-    ): SearchResult = withContext(dispatcher) {
-        // Process total posts
+    ): Result = withContext(dispatcher) {
         val totalResults = totalPosts ?: searchRepository.getTotalPosts(query)
         if (totalResults <= 0) {
-            return@withContext SearchResult.Empty
+            return@withContext Result.Empty
         }
-        // Randomise next page to search on
         val randomPostPage = Random.nextRandomPage(
             totalResults = totalResults,
             resultsPerPage = resultsPerPage,
-            exclusions = shuffleHistory.getExcludedPages()
+            exclusions = searchHistory.getExcludedPages()
         )
         when (randomPostPage) {
-            is RandomResult.Exhausted -> return@withContext SearchResult.Exhausted
-            is RandomResult.Invalid -> return@withContext SearchResult.Empty
+            is RandomResult.Exhausted -> return@withContext Result.Exhausted
+            is RandomResult.Invalid -> return@withContext Result.Empty
             is RandomResult.Valid -> {
-                // Obtain all results from the random page
                 val searchResults = searchRepository.search(
                     page = randomPostPage.number,
                     query = query
                 )
                 if (searchResults.isEmpty()) {
-                    return@withContext SearchResult.Empty
+                    return@withContext Result.Empty
                 }
-                // Randomise next post to return
                 val randomPostIndexOnPage = Random.nextRandomPostIndex(
                     posts = searchResults,
-                    exclusions = shuffleHistory.getExcludedPostIndexes(randomPostPage.number)
+                    exclusions = searchHistory.getExcludedPostIndexes(randomPostPage.number)
                 )
                 when (randomPostIndexOnPage) {
-                    is RandomResult.Exhausted -> return@withContext SearchResult.Exhausted
-                    is RandomResult.Invalid -> return@withContext SearchResult.Empty
-                    is RandomResult.Valid -> SearchResult.Valid(
+                    is RandomResult.Exhausted -> return@withContext Result.Exhausted
+                    is RandomResult.Invalid -> return@withContext Result.Empty
+                    is RandomResult.Valid -> Result.Valid(
                         query = query,
                         totalPosts = totalResults,
                         post = searchResults[randomPostIndexOnPage.number],
@@ -59,17 +63,17 @@ class SearchUseCase(
             }
         }
     }
-}
 
-sealed class SearchResult {
-    object Empty : SearchResult()
-    object Exhausted : SearchResult()
-    data class Valid(
-        val query: String,
-        val totalPosts: Int,
-        val post: Post,
-        val postPage: Int,
-        val postIndexOnPage: Int,
-        val postPageSize: Int
-    ) : SearchResult()
+    sealed class Result {
+        object Empty : Result()
+        object Exhausted : Result()
+        data class Valid(
+            val query: String,
+            val totalPosts: Int,
+            val post: Post,
+            val postPage: Int,
+            val postIndexOnPage: Int,
+            val postPageSize: Int
+        ) : Result()
+    }
 }
