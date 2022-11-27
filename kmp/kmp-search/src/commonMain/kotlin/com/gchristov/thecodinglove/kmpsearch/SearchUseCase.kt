@@ -12,23 +12,26 @@ class SearchUseCase(
 ) {
     suspend operator fun invoke(
         query: String,
-        searchHistory: SearchHistory,
+        totalPosts: Int? = null,
+        shuffleHistory: Map<Int, List<Int>>,
         resultsPerPage: Int
     ): SearchResult = withContext(dispatcher) {
-        val totalResults = searchRepository.getTotalPosts(query)
+        // Process total posts
+        val totalResults = totalPosts ?: searchRepository.getTotalPosts(query)
         if (totalResults <= 0) {
             return@withContext SearchResult.Empty
         }
-
+        // Randomise next page to search on
         val randomPostPage = Random.nextRandomPage(
             totalResults = totalResults,
             resultsPerPage = resultsPerPage,
-            exclusions = searchHistory.getExcludedPages()
+            exclusions = shuffleHistory.getExcludedPages()
         )
-        if (randomPostPage == RandomResult.Invalid) {
+        // TODO: Handle exhausted results
+        if (randomPostPage == RandomResult.Invalid || randomPostPage == RandomResult.Exhausted) {
             return@withContext SearchResult.Empty
         }
-
+        // Obtain all results from the random page
         val searchResults = searchRepository.search(
             page = (randomPostPage as RandomResult.Valid).number,
             query = query
@@ -36,10 +39,10 @@ class SearchUseCase(
         if (searchResults.isEmpty()) {
             return@withContext SearchResult.Empty
         }
-
+        // Randomise next post to return
         val randomPostIndexOnPage = Random.nextRandomPostIndex(
             posts = searchResults,
-            exclusions = searchHistory.getExcludedPostIndexes(randomPostPage.number)
+            exclusions = shuffleHistory.getExcludedPostIndexes(randomPostPage.number)
         )
         if (randomPostIndexOnPage == RandomResult.Invalid) {
             return@withContext SearchResult.Empty

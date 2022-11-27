@@ -7,7 +7,7 @@ import kotlin.random.Random
 internal fun Random.nextRandomPage(
     totalResults: Int,
     resultsPerPage: Int,
-    exclusions: Set<Int>
+    exclusions: List<Int>
 ): RandomResult {
     val min = 1
     val max = max(
@@ -23,7 +23,7 @@ internal fun Random.nextRandomPage(
 
 internal fun Random.nextRandomPostIndex(
     posts: List<Post>,
-    exclusions: Set<Int>
+    exclusions: List<Int>
 ): RandomResult {
     val min = 0
     val max = max(
@@ -47,15 +47,15 @@ internal fun Random.nextRandomPostIndex(
  * @return A random number within start-end, making sure it's not present in [exclusions]
  */
 private fun Random.nextRandomIntInRange(
-    start: Int, // 0
-    end: Int, // 4
-    exclusions: Set<Int> // [1,2]
+    start: Int,
+    end: Int,
+    exclusions: List<Int>
 ): RandomResult {
     // Make sure the numbers are sorted
     val sorted = exclusions.sorted()
     val rangeLength = end - start - sorted.size
     if (rangeLength <= 0) {
-        return RandomResult.Invalid
+        return RandomResult.Exhausted
     }
     var randomInt: Int = nextInt(rangeLength) + start
     for (item in sorted) {
@@ -69,5 +69,6 @@ private fun Random.nextRandomIntInRange(
 
 internal sealed class RandomResult {
     object Invalid : RandomResult()
+    object Exhausted : RandomResult()
     data class Valid(val number: Int) : RandomResult()
 }

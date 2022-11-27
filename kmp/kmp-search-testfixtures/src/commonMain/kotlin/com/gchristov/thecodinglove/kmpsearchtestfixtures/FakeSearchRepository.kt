@@ -30,7 +30,7 @@ class FakeSearchRepository(
         return searchSessionResponse.execute(searchSession)
     }
 
-    override suspend fun saveSearchSession(session: SearchSession) {
+    override suspend fun saveSearchSession(searchSession: SearchSession) {
         TODO("Not yet implemented")
     }
 }

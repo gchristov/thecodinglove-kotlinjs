@@ -17,7 +17,7 @@ class SearchUseCaseTest {
     fun searchWithNoResultsReturnsEmpty() = runBlockingTest(totalPosts = 0) {
         val actualResult = it.invoke(
             query = SearchQuery,
-            searchHistory = SearchHistory(),
+            shuffleHistory = mutableMapOf(),
             resultsPerPage = PostCreator.defaultPostPerPage()
         )
         assertEquals(
@@ -30,7 +30,7 @@ class SearchUseCaseTest {
     fun searchWithEmptyResultsReturnsEmpty() = runBlockingTest(pages = emptyMap()) {
         val actualResult = it.invoke(
             query = SearchQuery,
-            searchHistory = SearchHistory(),
+            shuffleHistory = mutableMapOf(),
             resultsPerPage = PostCreator.defaultPostPerPage()
         )
         assertEquals(
@@ -46,7 +46,7 @@ class SearchUseCaseTest {
     ) {
         val actualResult = it.invoke(
             query = SearchQuery,
-            searchHistory = SearchHistory(),
+            shuffleHistory = mutableMapOf(),
             resultsPerPage = PostCreator.defaultPostPerPage()
         )
         assertEquals(
@@ -64,7 +64,7 @@ class SearchUseCaseTest {
 
     @Test
     fun searchExcludes() = runBlockingTest {
-        val searchHistory = SearchHistory()
+        val shuffleHistory = mutableMapOf<Int, List<Int>>()
         val minPostPage = 1
         val maxPostPage = 2
         val minPostIndexOnPage = 0
@@ -73,17 +73,17 @@ class SearchUseCaseTest {
         for (i in 0 until PostCreator.defaultTotalPosts()) {
             val actualResult = it.invoke(
                 query = SearchQuery,
-                searchHistory = searchHistory,
+                shuffleHistory = shuffleHistory,
                 resultsPerPage = PostCreator.defaultPostPerPage()
             ) as SearchResult.Valid
             // Ensure post isn't already picked
             assertFalse {
-                searchHistory.contains(
+                shuffleHistory.contains(
                     postPage = actualResult.postPage,
                     postIndexOnPage = actualResult.postIndexOnPage
                 )
             }
-            searchHistory.insert(
+            shuffleHistory.insert(
                 postPage = actualResult.postPage,
                 postIndexOnPage = actualResult.postIndexOnPage,
                 currentPageSize = actualResult.postPageSize
@@ -96,25 +96,25 @@ class SearchUseCaseTest {
 
     @Test
     fun searchExhausts() = runBlockingTest {
-        val searchHistory = SearchHistory()
+        val shuffleHistory = mutableMapOf<Int, List<Int>>()
 
         for (i in 0 until PostCreator.defaultTotalPosts()) {
             val actualResult = it.invoke(
                 query = SearchQuery,
-                searchHistory = searchHistory,
+                shuffleHistory = shuffleHistory,
                 resultsPerPage = PostCreator.defaultPostPerPage()
             ) as SearchResult.Valid
-            searchHistory.insert(
+            shuffleHistory.insert(
                 postPage = actualResult.postPage,
                 postIndexOnPage = actualResult.postIndexOnPage,
                 currentPageSize = actualResult.postPageSize
             )
         }
         // Make sure we've exhausted all options
-        assertTrue { searchHistory.pageVisits.size == PostCreator.multiPageMultiPost().size }
+        assertTrue { shuffleHistory.size == PostCreator.multiPageMultiPost().size }
         for (page in PostCreator.multiPageMultiPost().keys) {
             assertTrue {
-                val historyPage = searchHistory.pageVisits[page]!!
+                val historyPage = shuffleHistory[page]!!
                 val testPage = PostCreator.multiPageMultiPost()[page]!!
                 historyPage.size - 1 == testPage.size
             }
@@ -122,7 +122,7 @@ class SearchUseCaseTest {
         // If all options are exhausted we shouldn't be able to search for an element
         val actualResult = it.invoke(
             query = SearchQuery,
-            searchHistory = searchHistory,
+            shuffleHistory = shuffleHistory,
             resultsPerPage = PostCreator.defaultPostPerPage()
         )
         assertTrue { actualResult == SearchResult.Empty }

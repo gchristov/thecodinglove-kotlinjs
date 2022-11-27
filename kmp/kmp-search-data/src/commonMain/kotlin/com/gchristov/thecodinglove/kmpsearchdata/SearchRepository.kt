@@ -13,5 +13,5 @@ interface SearchRepository {
 
     suspend fun getSearchSession(id: String): SearchSession?
 
-    suspend fun saveSearchSession(session: SearchSession)
+    suspend fun saveSearchSession(searchSession: SearchSession)
 }

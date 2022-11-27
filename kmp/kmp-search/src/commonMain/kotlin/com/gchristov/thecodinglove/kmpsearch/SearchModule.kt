@@ -14,6 +14,12 @@ object SearchModule : DiModule() {
     override fun bindLocalDependencies(builder: DI.Builder) {
         builder.apply {
             bindProvider { provideSearchUseCase(searchRepository = inject()) }
+            bindProvider {
+                provideShuffleUseCase(
+                    searchRepository = inject(),
+                    searchUseCase = inject()
+                )
+            }
         }
     }
 
@@ -28,5 +34,14 @@ object SearchModule : DiModule() {
         searchRepository = searchRepository
     )
 
-    fun injectSearchUseCase(): SearchUseCase = inject()
+    private fun provideShuffleUseCase(
+        searchRepository: SearchRepository,
+        searchUseCase: SearchUseCase
+    ): ShuffleUseCase = ShuffleUseCase(
+        dispatcher = Dispatchers.Default,
+        searchRepository = searchRepository,
+        searchUseCase = searchUseCase
+    )
+
+    fun injectShuffleUseCase(): ShuffleUseCase = inject()
 }

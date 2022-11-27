@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class ApiSearchSession(
     val id: String,
     val query: String,
-    val totalPosts: Int
+    val totalPosts: Int?,
+    val shuffleHistory: Map<Int, List<Int>>?
 )

@@ -1,9 +1,8 @@
 package com.gchristov.thecodinglove.kmpsearchdata
 
 import com.gchristov.thecodinglove.kmphtmlparse.HtmlPostParser
-import com.gchristov.thecodinglove.kmpsearchdata.model.Post
-import com.gchristov.thecodinglove.kmpsearchdata.model.SearchSession
-import com.gchristov.thecodinglove.kmpsearchdata.model.toPost
+import com.gchristov.thecodinglove.kmpsearchdata.api.ApiSearchSession
+import com.gchristov.thecodinglove.kmpsearchdata.model.*
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.statement.*
 
@@ -35,7 +34,8 @@ internal class RealSearchRepository(
     override suspend fun getSearchSession(id: String): SearchSession? {
         val document = firebaseFirestore.document("search/$id").get()
         return if (document.exists) {
-            return document.data()
+            val apiSearchSession: ApiSearchSession = document.data()
+            apiSearchSession.toSearchSession()
         } else {
             null
         }
@@ -44,7 +44,7 @@ internal class RealSearchRepository(
     override suspend fun saveSearchSession(searchSession: SearchSession) {
         val batch = firebaseFirestore.batch()
         val document = firebaseFirestore.document("search/${searchSession.id}")
-        batch.set(document, searchSession)
+        batch.set(document, searchSession.toApiSearchSession())
         batch.commit()
     }
 }

@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove
 
 import com.gchristov.thecodinglove.kmpcommonfirebase.CommonFirebaseModule
-import com.gchristov.thecodinglove.kmpsearch.SearchHistory
 import com.gchristov.thecodinglove.kmpsearch.SearchModule
-import com.gchristov.thecodinglove.kmpsearch.SearchResult
+import com.gchristov.thecodinglove.kmpsearch.ShuffleResult
+import com.gchristov.thecodinglove.kmpsearch.ShuffleType
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -14,6 +14,8 @@ internal actual fun serveApi(args: Array<String>) {
     val fireFunctions = require("firebase-functions")
     exports.myTestFun = fireFunctions.https.onRequest { request, response ->
         val searchQuery = (request.query.searchQuery as? String) ?: "release"
+        val searchSessionId = request.query.searchSessionId as? String
+
         // TODO: Do not use GlobalScope
         GlobalScope.launch {
             println("About to test Firestore")
@@ -25,16 +27,21 @@ internal actual fun serveApi(args: Array<String>) {
             batch.set(firestore.document("preferences/user1"), Count(count + 1))
             batch.commit()
 
-            println("About to test search")
-            val search = SearchModule.injectSearchUseCase()
-            val searchResult = search(
-                query = searchQuery,
-                searchHistory = SearchHistory(),
+            println("About to test shuffle")
+            val shuffle = SearchModule.injectShuffleUseCase()
+            val shuffleType = searchSessionId?.let {
+                ShuffleType.WithSessionId(
+                    query = searchQuery,
+                    sessionId = it
+                )
+            } ?: ShuffleType.NewSearch(searchQuery)
+            val shuffleResult = shuffle(
+                shuffleType = shuffleType,
                 resultsPerPage = 4
             )
             val result = FunctionResult(
                 invocations = count,
-                searchResult = searchResult.toResult()
+                searchResult = shuffleResult.toResult()
             )
             val jsonResponse = Json.encodeToString(result)
             response.send(jsonResponse)
@@ -60,28 +67,14 @@ private data class FunctionResult(
 
         @Serializable
         data class Valid(
-            val query: String,
-            val totalPosts: Int,
-            val postTitle: String,
-            val postUrl: String,
-            val postImageUrl: String,
-            val postPage: Int,
-            val postIndexOnPage: Int,
-            val postPageSize: Int
+            val tmp: String
         ) : FunctionSearchResult()
     }
 }
 
-private fun SearchResult.toResult() = when (this) {
-    is SearchResult.Empty -> FunctionResult.FunctionSearchResult.Empty
-    is SearchResult.Valid -> FunctionResult.FunctionSearchResult.Valid(
-        query = query,
-        totalPosts = totalPosts,
-        postTitle = post.title,
-        postUrl = post.url,
-        postImageUrl = post.imageUrl,
-        postPage = postPage,
-        postIndexOnPage = postIndexOnPage,
-        postPageSize = postPageSize,
+private fun ShuffleResult.toResult() = when (this) {
+    is ShuffleResult.Empty -> FunctionResult.FunctionSearchResult.Empty
+    is ShuffleResult.Valid -> FunctionResult.FunctionSearchResult.Valid(
+        tmp = tmp
     )
 }
