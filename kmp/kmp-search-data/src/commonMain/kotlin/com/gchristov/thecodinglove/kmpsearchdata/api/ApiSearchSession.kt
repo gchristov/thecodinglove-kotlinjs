@@ -11,10 +11,3 @@ data class ApiSearchSession(
     val searchHistory: Map<String, List<Int>>,
     val currentPost: ApiPost?
 )
-
-@Serializable
-data class ApiPost(
-    val title: String,
-    val url: String,
-    val imageUrl: String,
-)

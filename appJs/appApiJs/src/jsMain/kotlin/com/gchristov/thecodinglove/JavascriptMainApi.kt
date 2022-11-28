@@ -5,6 +5,7 @@ import com.gchristov.thecodinglove.kmpsearch.SearchType
 import com.gchristov.thecodinglove.kmpsearch.SearchWithSessionUseCase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -41,9 +42,11 @@ private external var exports: dynamic
 @Serializable
 sealed class Result {
     @Serializable
+    @SerialName("empty")
     object Empty : Result()
 
     @Serializable
+    @SerialName("valid")
     data class Valid(
         val query: String,
         val postTitle: String,
