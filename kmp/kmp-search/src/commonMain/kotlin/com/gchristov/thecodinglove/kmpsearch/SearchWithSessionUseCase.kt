@@ -60,7 +60,8 @@ class SearchWithSessionUseCase(
             query = searchType.query,
             totalPosts = null,
             searchHistory = emptyMap(),
-            currentPost = null
+            currentPost = null,
+            state = SearchSession.State.Searching
         )
         return when (searchType) {
             is SearchType.NewSearch -> newSession
