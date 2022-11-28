@@ -59,7 +59,8 @@ class SearchWithSessionUseCase(
             id = Random.nextInt().toString(),
             query = searchType.query,
             totalPosts = null,
-            searchHistory = emptyMap()
+            searchHistory = emptyMap(),
+            currentPost = null
         )
         return when (searchType) {
             is SearchType.NewSearch -> newSession
@@ -80,7 +81,8 @@ class SearchWithSessionUseCase(
                     postIndexOnPage = searchResult.postIndexOnPage,
                     currentPageSize = searchResult.postPageSize
                 )
-            }
+            },
+            currentPost = searchResult.post
         )
         searchRepository.saveSearchSession(updatedSearchSession)
     }

@@ -1,13 +1,15 @@
 package com.gchristov.thecodinglove.kmpsearchdata.model
 
+import com.gchristov.thecodinglove.kmpsearchdata.api.ApiPost
 import com.gchristov.thecodinglove.kmpsearchdata.api.ApiSearchSession
 
 data class SearchSession(
     val id: String,
     val query: String,
     val totalPosts: Int?,
-    // Contains visited page numbers mapped to page post indexes
-    val searchHistory: Map<Int, List<Int>>
+    // Contains visited page numbers mapped to visited post indexes on those pages
+    val searchHistory: Map<Int, List<Int>>,
+    val currentPost: Post?
 )
 
 internal fun ApiSearchSession.toSearchSession() = SearchSession(
@@ -20,6 +22,13 @@ internal fun ApiSearchSession.toSearchSession() = SearchSession(
                 put(page.toInt(), itemIndex)
             }
         }
+    },
+    currentPost = currentPost?.let {
+        Post(
+            title = it.title,
+            url = it.url,
+            imageUrl = it.imageUrl
+        )
     }
 )
 
@@ -33,5 +42,12 @@ internal fun SearchSession.toApiSearchSession() = ApiSearchSession(
                 put(page.toString(), itemIndex)
             }
         }
+    },
+    currentPost = currentPost?.let {
+        ApiPost(
+            title = it.title,
+            url = it.url,
+            imageUrl = it.imageUrl
+        )
     }
 )

@@ -32,7 +32,7 @@ internal class RealSearchRepository(
     }
 
     override suspend fun getSearchSession(id: String): SearchSession? {
-        val document = firebaseFirestore.document("search/$id").get()
+        val document = firebaseFirestore.document("searchSession/$id").get()
         return if (document.exists) {
             val apiSearchSession: ApiSearchSession = document.data()
             apiSearchSession.toSearchSession()
@@ -43,7 +43,7 @@ internal class RealSearchRepository(
 
     override suspend fun saveSearchSession(searchSession: SearchSession) {
         val batch = firebaseFirestore.batch()
-        val document = firebaseFirestore.document("search/${searchSession.id}")
+        val document = firebaseFirestore.document("searchSession/${searchSession.id}")
         batch.set(document, searchSession.toApiSearchSession())
         batch.commit()
     }
