@@ -7,9 +7,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
-/*
+/**
  Use-case to search for a random post, wrapping it within a search session. This use-case:
- • reuses or creates a new search session + search history
+ - reuses or creates a new search session + search history for the given query
+ - searches for results for the given query, using the search session
+ - if the search result is valid, updates the search history
+ - if the search results are exhausted, clears the search history and retries the search
  */
 class SearchWithSessionUseCase(
     private val dispatcher: CoroutineDispatcher,
@@ -29,10 +32,16 @@ class SearchWithSessionUseCase(
         )
         when (searchResult) {
             is SearchUseCase.Result.Empty -> Result.Empty
-            // TODO: Exhausted should clear history and try again
-            is SearchUseCase.Result.Exhausted -> Result.Empty
+            is SearchUseCase.Result.Exhausted -> {
+                clearSearchSessionHistory(searchSession)
+                invoke(
+                    searchType = searchType,
+                    resultsPerPage = resultsPerPage
+                )
+            }
+
             is SearchUseCase.Result.Valid -> {
-                updateSearchSession(
+                insertSearchResultInSessionHistory(
                     searchSession = searchSession,
                     searchResult = searchResult
                 )
@@ -59,7 +68,7 @@ class SearchWithSessionUseCase(
         }
     }
 
-    private suspend fun updateSearchSession(
+    private suspend fun insertSearchResultInSessionHistory(
         searchSession: SearchSession,
         searchResult: SearchUseCase.Result.Valid
     ) {
@@ -73,6 +82,11 @@ class SearchWithSessionUseCase(
                 )
             }
         )
+        searchRepository.saveSearchSession(updatedSearchSession)
+    }
+
+    private suspend fun clearSearchSessionHistory(searchSession: SearchSession) {
+        val updatedSearchSession = searchSession.copy(searchHistory = emptyMap())
         searchRepository.saveSearchSession(updatedSearchSession)
     }
 
