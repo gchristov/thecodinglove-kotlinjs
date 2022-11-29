@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.kmpsearchdata
+package com.gchristov.thecodinglove.kmpsearchdata.model
 
 import com.gchristov.thecodinglove.kmphtmlparsedata.HtmlPost
 

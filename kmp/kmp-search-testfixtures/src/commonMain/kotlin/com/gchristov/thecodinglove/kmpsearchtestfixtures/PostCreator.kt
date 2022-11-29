@@ -1,11 +1,9 @@
 package com.gchristov.thecodinglove.kmpsearchtestfixtures
 
-import com.gchristov.thecodinglove.kmpsearchdata.Post
+import com.gchristov.thecodinglove.kmpsearchdata.model.Post
 
 object PostCreator {
-    fun defaultTotalPosts() = 7
-
-    fun defaultPostPerPage() = 4
+    fun multiPageMultiPostPageSize() = 4
 
     fun multiPageMultiPost(): Map<Int, List<Post>> = mapOf(
         1 to listOf(
@@ -20,6 +18,14 @@ object PostCreator {
             Post(title = "p 2 i 2", url = "url", imageUrl = "imageUrl"),
         )
     )
+
+    fun multiPageMultiPostTotalCount(): Int {
+        var count = 0
+        for (page in multiPageMultiPost().values) {
+            count += page.size
+        }
+        return count
+    }
 
     fun singlePageSinglePost(): Map<Int, List<Post>> = mapOf(
         1 to listOf(

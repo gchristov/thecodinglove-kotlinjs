@@ -1,39 +1,35 @@
 package com.gchristov.thecodinglove.kmpsearch
 
-data class SearchHistory(
-    val pageVisits: Map<Int, Set<Int>> = mutableMapOf()
-)
-
-internal fun SearchHistory.insert(
+internal fun Map<Int, List<Int>>.insert(
     postPage: Int,
     postIndexOnPage: Int,
     currentPageSize: Int
 ) {
-    val page = (pageVisits[postPage] ?: mutableSetOf()) as MutableSet
+    val page = (this[postPage] ?: mutableListOf()) as MutableList
     page.add(postIndexOnPage)
     if (page.size >= currentPageSize) {
         page.add(TerminationIndex)
     }
-    (pageVisits as? MutableMap)?.put(postPage, page)
+    (this as? MutableMap)?.put(postPage, page)
 }
 
-internal fun SearchHistory.contains(
+internal fun Map<Int, List<Int>>.contains(
     postPage: Int,
     postIndexOnPage: Int
-): Boolean = pageVisits[postPage]?.contains(postIndexOnPage) == true
+): Boolean = this[postPage]?.contains(postIndexOnPage) == true
 
-internal fun SearchHistory.getExcludedPages(): Set<Int> {
-    val exclusions = mutableSetOf<Int>()
-    for (key in pageVisits.keys) {
-        if (pageVisits[key]?.contains(TerminationIndex) == true) {
+internal fun Map<Int, List<Int>>.getExcludedPages(): List<Int> {
+    val exclusions = mutableListOf<Int>()
+    for (key in this.keys) {
+        if (this[key]?.contains(TerminationIndex) == true) {
             exclusions.add(key)
         }
     }
     return exclusions
 }
 
-internal fun SearchHistory.getExcludedPostIndexes(page: Int): Set<Int> {
-    return pageVisits[page] ?: emptySet()
+internal fun Map<Int, List<Int>>.getExcludedPostIndexes(page: Int): List<Int> {
+    return this[page] ?: emptyList()
 }
 
 private const val TerminationIndex = -1
