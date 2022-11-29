@@ -1,7 +1,8 @@
-package com.gchristov.thecodinglove.kmpsearch
+package com.gchristov.thecodinglove.kmpsearch.usecase
 
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchUseCase
+import com.gchristov.thecodinglove.kmpsearch.contains
+import com.gchristov.thecodinglove.kmpsearch.insert
 import com.gchristov.thecodinglove.kmpsearchdata.model.Post
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.FakeSearchRepository
@@ -14,9 +15,12 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SearchUseCaseTest {
+class RealSearchUseCaseTest {
     @Test
-    fun searchWithNoResultsReturnsEmpty() = runBlockingTest(totalPosts = 0) {
+    fun searchWithNoResultsReturnsEmpty() = runBlockingTest(
+        totalPosts = 0,
+        pages = PostCreator.multiPageMultiPost()
+    ) {
         val actualResult = it.invoke(
             query = SearchQuery,
             searchHistory = mutableMapOf(),
@@ -29,7 +33,10 @@ class SearchUseCaseTest {
     }
 
     @Test
-    fun searchWithEmptyResultsReturnsEmpty() = runBlockingTest(pages = emptyMap()) {
+    fun searchWithEmptyResultsReturnsEmpty() = runBlockingTest(
+        totalPosts = 0,
+        pages = emptyMap()
+    ) {
         val actualResult = it.invoke(
             query = SearchQuery,
             searchHistory = mutableMapOf(),
@@ -65,7 +72,10 @@ class SearchUseCaseTest {
     }
 
     @Test
-    fun searchExcludes() = runBlockingTest {
+    fun searchExcludes() = runBlockingTest(
+        totalPosts = PostCreator.defaultTotalPosts(),
+        pages = PostCreator.multiPageMultiPost()
+    ) {
         val searchHistory = mutableMapOf<Int, List<Int>>()
         val minPostPage = 1
         val maxPostPage = 2
@@ -97,7 +107,10 @@ class SearchUseCaseTest {
     }
 
     @Test
-    fun searchExhausts() = runBlockingTest {
+    fun searchExhausts() = runBlockingTest(
+        totalPosts = PostCreator.defaultTotalPosts(),
+        pages = PostCreator.multiPageMultiPost()
+    ) {
         val searchHistory = mutableMapOf<Int, List<Int>>()
 
         for (i in 0 until PostCreator.defaultTotalPosts()) {
@@ -131,8 +144,8 @@ class SearchUseCaseTest {
     }
 
     private fun runBlockingTest(
-        totalPosts: Int = PostCreator.defaultTotalPosts(),
-        pages: Map<Int, List<Post>> = PostCreator.multiPageMultiPost(),
+        totalPosts: Int,
+        pages: Map<Int, List<Post>>,
         testBlock: suspend (SearchUseCase) -> Unit
     ) = runTest {
         val searchRepository = FakeSearchRepository(

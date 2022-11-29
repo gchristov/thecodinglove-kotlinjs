@@ -3,8 +3,11 @@ package com.gchristov.thecodinglove.kmpsearchtestfixtures
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchSession
 
 object SearchSessionCreator {
-    fun searchSession(query: String) = SearchSession(
-        id = "search_123",
+    fun searchSession(
+        id: String,
+        query: String
+    ) = SearchSession(
+        id = id,
         query = query,
         totalPosts = null,
         searchHistory = emptyMap(),

@@ -1,7 +1,6 @@
-package com.gchristov.thecodinglove.kmpsearch
+package com.gchristov.thecodinglove.kmpsearch.usecase
 
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchWithSessionUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchSession
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchType
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
@@ -12,19 +11,51 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SearchWithSessionUseCaseTest {
+class RealSearchWithSessionUseCaseTest {
     @Test
     fun searchWithNewSessionCreatesNewSession() =
         runBlockingTest(
-            searchResult = SearchResultCreator.validResult(SearchQuery),
+            searchResult = SearchResultCreator.validResult(query = SearchQuery),
             searchSession = null,
         ) { useCase, searchRepository ->
-            val searchResult = SearchResultCreator.validResult(SearchQuery)
-            val actualResult = useCase.invoke(
-                searchType = SearchType.NewSession(SearchQuery),
+            SearchResultCreator.validResult(query = SearchQuery)
+            useCase.invoke(
+                searchType = SearchType.NewSession(query = SearchQuery),
                 resultsPerPage = PostCreator.defaultPostPerPage()
             ) as SearchWithSessionUseCase.Result.Valid
             searchRepository.assertSessionNotFetched()
+        }
+
+    @Test
+    fun searchWithSessionIdReusesSession() =
+        runBlockingTest(
+            searchResult = SearchResultCreator.validResult(query = SearchQuery),
+            searchSession = SearchSessionCreator.searchSession(
+                id = SearchSessionId,
+                query = SearchQuery
+            ),
+        ) { useCase, searchRepository ->
+            useCase.invoke(
+                searchType = SearchType.WithSessionId(
+                    query = SearchQuery,
+                    sessionId = SearchSessionId
+                ),
+                resultsPerPage = PostCreator.defaultPostPerPage()
+            ) as SearchWithSessionUseCase.Result.Valid
+            searchRepository.assertSessionFetched()
+        }
+
+    @Test
+    fun searchUpdatesSession() =
+        runBlockingTest(
+            searchResult = SearchResultCreator.validResult(query = SearchQuery),
+            searchSession = null,
+        ) { useCase, searchRepository ->
+            val searchResult = SearchResultCreator.validResult(query = SearchQuery)
+            val actualResult = useCase.invoke(
+                searchType = SearchType.NewSession(query = SearchQuery),
+                resultsPerPage = PostCreator.defaultPostPerPage()
+            ) as SearchWithSessionUseCase.Result.Valid
             searchRepository.assertSessionSaved(
                 SearchSession(
                     id = actualResult.searchSessionId,
@@ -156,3 +187,4 @@ class SearchWithSessionUseCaseTest {
 }
 
 private const val SearchQuery = "test"
+private const val SearchSessionId = "session_123"
