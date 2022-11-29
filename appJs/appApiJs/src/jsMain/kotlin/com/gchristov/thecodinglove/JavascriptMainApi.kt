@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove
 
 import com.gchristov.thecodinglove.kmpsearch.SearchModule
-import com.gchristov.thecodinglove.kmpsearch.SearchType
-import com.gchristov.thecodinglove.kmpsearch.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchType
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
@@ -48,6 +48,7 @@ sealed class Result {
     @Serializable
     @SerialName("valid")
     data class Valid(
+        val searchSessionId: String,
         val query: String,
         val postTitle: String,
         val postUrl: String,
@@ -59,6 +60,7 @@ sealed class Result {
 private fun SearchWithSessionUseCase.Result.toResult() = when (this) {
     is SearchWithSessionUseCase.Result.Empty -> Result.Empty
     is SearchWithSessionUseCase.Result.Valid -> Result.Valid(
+        searchSessionId = searchSessionId,
         query = query,
         postTitle = post.title,
         postUrl = post.url,

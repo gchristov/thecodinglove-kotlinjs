@@ -1,7 +1,9 @@
 package com.gchristov.thecodinglove.kmpsearch
 
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.model.Post
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.FakeSearchRepository
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.PostCreator
 import kotlinx.coroutines.ExperimentalCoroutinesApi

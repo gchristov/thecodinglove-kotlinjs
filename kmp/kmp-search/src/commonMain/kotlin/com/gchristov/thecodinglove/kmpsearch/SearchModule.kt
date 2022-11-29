@@ -2,8 +2,12 @@ package com.gchristov.thecodinglove.kmpsearch
 
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.kmpcommondi.inject
+import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchUseCase
+import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchWithSessionUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.SearchDataModule
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
