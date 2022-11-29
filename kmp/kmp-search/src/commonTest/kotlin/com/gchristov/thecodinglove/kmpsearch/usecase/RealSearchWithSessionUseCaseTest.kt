@@ -14,83 +14,99 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class RealSearchWithSessionUseCaseTest {
     @Test
-    fun searchWithNewSessionCreatesNewSession() =
+    fun searchWithNewSessionCreatesNewSession() {
+        val searchType = SearchType.NewSession(query = SearchQuery)
+        val searchResult = SearchResultCreator.validResult(query = SearchQuery)
+
         runBlockingTest(
-            searchResult = SearchResultCreator.validResult(query = SearchQuery),
+            searchResult = searchResult,
             searchSession = null,
         ) { useCase, searchRepository ->
-            SearchResultCreator.validResult(query = SearchQuery)
             useCase.invoke(
-                searchType = SearchType.NewSession(query = SearchQuery),
+                searchType = searchType,
                 resultsPerPage = PostCreator.defaultPostPerPage()
-            ) as SearchWithSessionUseCase.Result.Valid
+            )
             searchRepository.assertSessionNotFetched()
         }
-
-    @Test
-    fun searchWithSessionIdReusesSession() =
-        runBlockingTest(
-            searchResult = SearchResultCreator.validResult(query = SearchQuery),
-            searchSession = SearchSessionCreator.searchSession(
-                id = SearchSessionId,
-                query = SearchQuery
-            ),
-        ) { useCase, searchRepository ->
-            useCase.invoke(
-                searchType = SearchType.WithSessionId(
-                    query = SearchQuery,
-                    sessionId = SearchSessionId
-                ),
-                resultsPerPage = PostCreator.defaultPostPerPage()
-            ) as SearchWithSessionUseCase.Result.Valid
-            searchRepository.assertSessionFetched()
-        }
-
-    @Test
-    fun searchWithEmptyResultsReturnsEmpty() = runBlockingTest(
-        searchResult = SearchUseCase.Result.Empty,
-        searchSession = null,
-    ) { useCase, _ ->
-        val actualResult = useCase.invoke(
-            searchType = SearchType.NewSession(query = SearchQuery),
-            resultsPerPage = PostCreator.defaultPostPerPage()
-        )
-        assertEquals(
-            expected = SearchWithSessionUseCase.Result.Empty,
-            actual = actualResult,
-        )
     }
 
     @Test
-    fun searchUpdatesSessionAndReturnsValidResult() =
+    fun searchWithSessionIdReusesSession() {
+        val searchType = SearchType.WithSessionId(
+            query = SearchQuery,
+            sessionId = SearchSessionId
+        )
+        val searchResult = SearchResultCreator.validResult(query = SearchQuery)
+        val searchSession = SearchSessionCreator.searchSession(
+            id = SearchSessionId,
+            query = SearchQuery
+        )
+
         runBlockingTest(
-            searchResult = SearchResultCreator.validResult(query = SearchQuery),
-            searchSession = SearchSessionCreator.searchSession(
-                id = SearchSessionId,
-                query = SearchQuery
-            ),
+            searchResult = searchResult,
+            searchSession = searchSession,
         ) { useCase, searchRepository ->
-            val searchResult = SearchResultCreator.validResult(query = SearchQuery)
-            val actualResult = useCase.invoke(
-                searchType = SearchType.WithSessionId(
-                    sessionId = SearchSessionId,
-                    query = SearchQuery
-                ),
+            useCase.invoke(
+                searchType = searchType,
                 resultsPerPage = PostCreator.defaultPostPerPage()
             )
-            val expectedResult = SearchWithSessionUseCase.Result.Valid(
-                searchSessionId = SearchSessionId,
-                query = SearchQuery,
-                post = searchResult.post,
-                totalPosts = searchResult.totalPosts
+            searchRepository.assertSessionFetched()
+        }
+    }
+
+    @Test
+    fun searchWithEmptyResultsReturnsEmpty() {
+        val searchType = SearchType.NewSession(query = SearchQuery)
+        val searchResult = SearchUseCase.Result.Empty
+
+        runBlockingTest(
+            searchResult = searchResult,
+            searchSession = null,
+        ) { useCase, _ ->
+            val actualResult = useCase.invoke(
+                searchType = searchType,
+                resultsPerPage = PostCreator.defaultPostPerPage()
             )
             assertEquals(
-                expected = expectedResult,
+                expected = SearchWithSessionUseCase.Result.Empty,
+                actual = actualResult,
+            )
+        }
+    }
+
+    @Test
+    fun searchUpdatesSessionAndReturnsValidResult() {
+        val searchType = SearchType.WithSessionId(
+            sessionId = SearchSessionId,
+            query = SearchQuery
+        )
+        val searchResult = SearchResultCreator.validResult(query = SearchQuery)
+        val searchSession = SearchSessionCreator.searchSession(
+            id = SearchSessionId,
+            query = SearchQuery
+        )
+        val expectedSearchWithSessionResult = SearchWithSessionUseCase.Result.Valid(
+            searchSessionId = searchSession.id,
+            query = searchSession.query,
+            post = searchResult.post,
+            totalPosts = searchResult.totalPosts
+        )
+
+        runBlockingTest(
+            searchResult = searchResult,
+            searchSession = searchSession,
+        ) { useCase, searchRepository ->
+            val actualResult = useCase.invoke(
+                searchType = searchType,
+                resultsPerPage = PostCreator.defaultPostPerPage()
+            )
+            assertEquals(
+                expected = expectedSearchWithSessionResult,
                 actual = actualResult
             )
             searchRepository.assertSessionSaved(
                 SearchSession(
-                    id = expectedResult.searchSessionId,
+                    id = searchSession.id,
                     query = SearchQuery,
                     totalPosts = searchResult.totalPosts,
                     searchHistory = mapOf(1 to listOf(0, -1)),
@@ -99,95 +115,7 @@ class RealSearchWithSessionUseCaseTest {
                 )
             )
         }
-
-//    @Test
-//    fun searchWithOneResultReturnsPost() = runBlockingTest(
-//        totalPosts = 1,
-//        pages = PostCreator.singlePageSinglePost()
-//    ) {
-//        val actualResult = it.invoke(
-//            query = SearchQuery,
-//            searchHistory = mutableMapOf(),
-//            resultsPerPage = PostCreator.defaultPostPerPage()
-//        )
-//        assertEquals(
-//            expected = SearchUseCase.Result.Valid(
-//                query = SearchQuery,
-//                totalPosts = 1,
-//                post = PostCreator.singlePageSinglePost()[1]!!.first(),
-//                postPage = 1,
-//                postIndexOnPage = 0,
-//                postPageSize = 1
-//            ),
-//            actual = actualResult
-//        )
-//    }
-//
-//    @Test
-//    fun searchExcludes() = runBlockingTest {
-//        val searchHistory = mutableMapOf<Int, List<Int>>()
-//        val minPostPage = 1
-//        val maxPostPage = 2
-//        val minPostIndexOnPage = 0
-//        val maxPostIndexOnPage = 3
-//
-//        for (i in 0 until PostCreator.defaultTotalPosts()) {
-//            val actualResult = it.invoke(
-//                query = SearchQuery,
-//                searchHistory = searchHistory,
-//                resultsPerPage = PostCreator.defaultPostPerPage()
-//            ) as SearchUseCase.Result.Valid
-//            // Ensure post isn't already picked
-//            assertFalse {
-//                searchHistory.contains(
-//                    postPage = actualResult.postPage,
-//                    postIndexOnPage = actualResult.postIndexOnPage
-//                )
-//            }
-//            searchHistory.insert(
-//                postPage = actualResult.postPage,
-//                postIndexOnPage = actualResult.postIndexOnPage,
-//                currentPageSize = actualResult.postPageSize
-//            )
-//            // Ensure ranges
-//            assertTrue { actualResult.postPage in minPostPage..maxPostPage }
-//            assertTrue { actualResult.postIndexOnPage in minPostIndexOnPage..maxPostIndexOnPage }
-//        }
-//    }
-//
-//    @Test
-//    fun searchExhausts() = runBlockingTest {
-//        val searchHistory = mutableMapOf<Int, List<Int>>()
-//
-//        for (i in 0 until PostCreator.defaultTotalPosts()) {
-//            val actualResult = it.invoke(
-//                query = SearchQuery,
-//                searchHistory = searchHistory,
-//                resultsPerPage = PostCreator.defaultPostPerPage()
-//            ) as SearchUseCase.Result.Valid
-//            searchHistory.insert(
-//                postPage = actualResult.postPage,
-//                postIndexOnPage = actualResult.postIndexOnPage,
-//                currentPageSize = actualResult.postPageSize
-//            )
-//        }
-//        // Make sure we've exhausted all options
-//        assertTrue { searchHistory.size == PostCreator.multiPageMultiPost().size }
-//        for (page in PostCreator.multiPageMultiPost().keys) {
-//            assertTrue {
-//                val historyPage = searchHistory[page]!!
-//                val testPage = PostCreator.multiPageMultiPost()[page]!!
-//                historyPage.size - 1 == testPage.size
-//            }
-//        }
-//        // If all options are exhausted we shouldn't be able to search for an element
-//        val actualResult = it.invoke(
-//            query = SearchQuery,
-//            searchHistory = searchHistory,
-//            resultsPerPage = PostCreator.defaultPostPerPage()
-//        )
-//        assertTrue { actualResult == SearchUseCase.Result.Exhausted }
-//    }
+    }
 
     private fun runBlockingTest(
         searchResult: SearchUseCase.Result,
