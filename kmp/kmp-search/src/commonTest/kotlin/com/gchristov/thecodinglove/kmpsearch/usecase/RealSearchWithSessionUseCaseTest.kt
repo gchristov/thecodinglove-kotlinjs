@@ -9,6 +9,7 @@ import com.gchristov.thecodinglove.kmpsearchtestfixtures.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RealSearchWithSessionUseCaseTest {
@@ -46,19 +47,50 @@ class RealSearchWithSessionUseCaseTest {
         }
 
     @Test
-    fun searchUpdatesSession() =
+    fun searchWithEmptyResultsReturnsEmpty() = runBlockingTest(
+        searchResult = SearchUseCase.Result.Empty,
+        searchSession = null,
+    ) { useCase, _ ->
+        val actualResult = useCase.invoke(
+            searchType = SearchType.NewSession(query = SearchQuery),
+            resultsPerPage = PostCreator.defaultPostPerPage()
+        )
+        assertEquals(
+            expected = SearchWithSessionUseCase.Result.Empty,
+            actual = actualResult,
+        )
+    }
+
+    @Test
+    fun searchUpdatesSessionAndReturnsValidResult() =
         runBlockingTest(
             searchResult = SearchResultCreator.validResult(query = SearchQuery),
-            searchSession = null,
+            searchSession = SearchSessionCreator.searchSession(
+                id = SearchSessionId,
+                query = SearchQuery
+            ),
         ) { useCase, searchRepository ->
             val searchResult = SearchResultCreator.validResult(query = SearchQuery)
             val actualResult = useCase.invoke(
-                searchType = SearchType.NewSession(query = SearchQuery),
+                searchType = SearchType.WithSessionId(
+                    sessionId = SearchSessionId,
+                    query = SearchQuery
+                ),
                 resultsPerPage = PostCreator.defaultPostPerPage()
-            ) as SearchWithSessionUseCase.Result.Valid
+            )
+            val expectedResult = SearchWithSessionUseCase.Result.Valid(
+                searchSessionId = SearchSessionId,
+                query = SearchQuery,
+                post = searchResult.post,
+                totalPosts = searchResult.totalPosts
+            )
+            assertEquals(
+                expected = expectedResult,
+                actual = actualResult
+            )
             searchRepository.assertSessionSaved(
                 SearchSession(
-                    id = actualResult.searchSessionId,
+                    id = expectedResult.searchSessionId,
                     query = SearchQuery,
                     totalPosts = searchResult.totalPosts,
                     searchHistory = mapOf(1 to listOf(0, -1)),
@@ -68,19 +100,6 @@ class RealSearchWithSessionUseCaseTest {
             )
         }
 
-//    @Test
-//    fun searchWithEmptyResultsReturnsEmpty() = runBlockingTest(pages = emptyMap()) {
-//        val actualResult = it.invoke(
-//            query = SearchQuery,
-//            searchHistory = mutableMapOf(),
-//            resultsPerPage = PostCreator.defaultPostPerPage()
-//        )
-//        assertEquals(
-//            expected = SearchUseCase.Result.Empty,
-//            actual = actualResult,
-//        )
-//    }
-//
 //    @Test
 //    fun searchWithOneResultReturnsPost() = runBlockingTest(
 //        totalPosts = 1,
