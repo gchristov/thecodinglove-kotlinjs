@@ -29,7 +29,7 @@ object SearchModule : DiModule() {
 
     private fun provideSearchUseCase(
         searchRepository: SearchRepository
-    ): SearchUseCase = SearchUseCase(
+    ): SearchUseCase = RealSearchUseCase(
         dispatcher = Dispatchers.Default,
         searchRepository = searchRepository
     )
@@ -37,7 +37,7 @@ object SearchModule : DiModule() {
     private fun provideSearchWithSessionUseCase(
         searchRepository: SearchRepository,
         searchUseCase: SearchUseCase
-    ): SearchWithSessionUseCase = SearchWithSessionUseCase(
+    ): SearchWithSessionUseCase = RealSearchWithSessionUseCase(
         dispatcher = Dispatchers.Default,
         searchRepository = searchRepository,
         searchUseCase = searchUseCase

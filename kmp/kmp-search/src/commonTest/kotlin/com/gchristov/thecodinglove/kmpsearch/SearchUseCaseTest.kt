@@ -137,7 +137,7 @@ class SearchUseCaseTest {
             totalPosts = totalPosts,
             pages = pages
         )
-        val useCase = SearchUseCase(
+        val useCase = RealSearchUseCase(
             dispatcher = FakeCoroutineDispatcher,
             searchRepository = searchRepository
         )

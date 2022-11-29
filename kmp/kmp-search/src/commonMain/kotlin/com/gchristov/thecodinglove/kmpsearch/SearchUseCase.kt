@@ -14,55 +14,13 @@ import kotlin.random.Random
  - chooses a random post from the page
  - returns a summary of the search
  */
-class SearchUseCase(
-    private val dispatcher: CoroutineDispatcher,
-    private val searchRepository: SearchRepository
-) {
+interface SearchUseCase {
     suspend operator fun invoke(
         query: String,
         totalPosts: Int? = null,
         searchHistory: Map<Int, List<Int>>,
         resultsPerPage: Int
-    ): Result = withContext(dispatcher) {
-        val totalResults = totalPosts ?: searchRepository.getTotalPosts(query)
-        if (totalResults <= 0) {
-            return@withContext Result.Empty
-        }
-        val randomPostPage = Random.nextRandomPage(
-            totalResults = totalResults,
-            resultsPerPage = resultsPerPage,
-            exclusions = searchHistory.getExcludedPages()
-        )
-        when (randomPostPage) {
-            is RandomResult.Exhausted -> Result.Exhausted
-            is RandomResult.Invalid -> Result.Empty
-            is RandomResult.Valid -> {
-                val searchResults = searchRepository.search(
-                    page = randomPostPage.number,
-                    query = query
-                )
-                if (searchResults.isEmpty()) {
-                    return@withContext Result.Empty
-                }
-                val randomPostIndexOnPage = Random.nextRandomPostIndex(
-                    posts = searchResults,
-                    exclusions = searchHistory.getExcludedPostIndexes(randomPostPage.number)
-                )
-                when (randomPostIndexOnPage) {
-                    is RandomResult.Exhausted -> Result.Exhausted
-                    is RandomResult.Invalid -> Result.Empty
-                    is RandomResult.Valid -> Result.Valid(
-                        query = query,
-                        totalPosts = totalResults,
-                        post = searchResults[randomPostIndexOnPage.number],
-                        postPage = randomPostPage.number,
-                        postIndexOnPage = randomPostIndexOnPage.number,
-                        postPageSize = searchResults.size
-                    )
-                }
-            }
-        }
-    }
+    ) : Result
 
     sealed class Result {
         object Empty : Result()
@@ -75,5 +33,56 @@ class SearchUseCase(
             val postIndexOnPage: Int,
             val postPageSize: Int
         ) : Result()
+    }
+}
+
+internal class RealSearchUseCase(
+    private val dispatcher: CoroutineDispatcher,
+    private val searchRepository: SearchRepository
+) : SearchUseCase {
+    override suspend operator fun invoke(
+        query: String,
+        totalPosts: Int?,
+        searchHistory: Map<Int, List<Int>>,
+        resultsPerPage: Int
+    ): SearchUseCase.Result = withContext(dispatcher) {
+        val totalResults = totalPosts ?: searchRepository.getTotalPosts(query)
+        if (totalResults <= 0) {
+            return@withContext SearchUseCase.Result.Empty
+        }
+        val randomPostPage = Random.nextRandomPage(
+            totalResults = totalResults,
+            resultsPerPage = resultsPerPage,
+            exclusions = searchHistory.getExcludedPages()
+        )
+        when (randomPostPage) {
+            is RandomResult.Exhausted -> SearchUseCase.Result.Exhausted
+            is RandomResult.Invalid -> SearchUseCase.Result.Empty
+            is RandomResult.Valid -> {
+                val searchResults = searchRepository.search(
+                    page = randomPostPage.number,
+                    query = query
+                )
+                if (searchResults.isEmpty()) {
+                    return@withContext SearchUseCase.Result.Empty
+                }
+                val randomPostIndexOnPage = Random.nextRandomPostIndex(
+                    posts = searchResults,
+                    exclusions = searchHistory.getExcludedPostIndexes(randomPostPage.number)
+                )
+                when (randomPostIndexOnPage) {
+                    is RandomResult.Exhausted -> SearchUseCase.Result.Exhausted
+                    is RandomResult.Invalid -> SearchUseCase.Result.Empty
+                    is RandomResult.Valid -> SearchUseCase.Result.Valid(
+                        query = query,
+                        totalPosts = totalResults,
+                        post = searchResults[randomPostIndexOnPage.number],
+                        postPage = randomPostPage.number,
+                        postIndexOnPage = randomPostIndexOnPage.number,
+                        postPageSize = searchResults.size
+                    )
+                }
+            }
+        }
     }
 }

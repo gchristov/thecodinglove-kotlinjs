@@ -24,7 +24,7 @@ internal actual fun serveApi(args: Array<String>) {
                     query = searchQuery,
                     sessionId = it
                 )
-            } ?: SearchType.NewSearch(searchQuery)
+            } ?: SearchType.NewSession(searchQuery)
             val searchResult = search(
                 searchType = searchType,
                 resultsPerPage = 4

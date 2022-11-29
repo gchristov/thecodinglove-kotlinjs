@@ -14,15 +14,44 @@ import kotlin.random.Random
  - if the search result is valid, updates the search history
  - if the search results are exhausted, clears the search history and retries the search
  */
-class SearchWithSessionUseCase(
-    private val dispatcher: CoroutineDispatcher,
-    private val searchRepository: SearchRepository,
-    private val searchUseCase: SearchUseCase
-) {
+interface SearchWithSessionUseCase {
     suspend operator fun invoke(
         searchType: SearchType,
         resultsPerPage: Int
-    ): Result = withContext(dispatcher) {
+    ): Result
+
+    sealed class Result {
+        object Empty : Result()
+        data class Valid(
+            val query: String,
+            val post: Post,
+            val totalPosts: Int
+        ) : Result()
+    }
+}
+
+sealed class SearchType {
+    abstract val query: String
+
+    data class WithSessionId(
+        override val query: String,
+        val sessionId: String
+    ) : SearchType()
+
+    data class NewSession(
+        override val query: String,
+    ) : SearchType()
+}
+
+internal class RealSearchWithSessionUseCase(
+    private val dispatcher: CoroutineDispatcher,
+    private val searchRepository: SearchRepository,
+    private val searchUseCase: SearchUseCase
+) : SearchWithSessionUseCase {
+    override suspend operator fun invoke(
+        searchType: SearchType,
+        resultsPerPage: Int
+    ): SearchWithSessionUseCase.Result = withContext(dispatcher) {
         val searchSession = getSearchSession(searchType)
         val searchResult = searchUseCase(
             query = searchSession.query,
@@ -31,7 +60,7 @@ class SearchWithSessionUseCase(
             resultsPerPage = resultsPerPage
         )
         when (searchResult) {
-            is SearchUseCase.Result.Empty -> Result.Empty
+            is SearchUseCase.Result.Empty -> SearchWithSessionUseCase.Result.Empty
             is SearchUseCase.Result.Exhausted -> {
                 clearSearchSessionHistory(searchSession)
                 invoke(
@@ -45,7 +74,7 @@ class SearchWithSessionUseCase(
                     searchSession = searchSession,
                     searchResult = searchResult
                 )
-                Result.Valid(
+                SearchWithSessionUseCase.Result.Valid(
                     query = searchResult.query,
                     post = searchResult.post,
                     totalPosts = searchResult.totalPosts
@@ -64,7 +93,7 @@ class SearchWithSessionUseCase(
             state = SearchSession.State.Searching
         )
         return when (searchType) {
-            is SearchType.NewSearch -> newSession
+            is SearchType.NewSession -> newSession
             is SearchType.WithSessionId -> searchRepository
                 .getSearchSession(searchType.sessionId) ?: newSession
         }
@@ -92,26 +121,4 @@ class SearchWithSessionUseCase(
         val updatedSearchSession = searchSession.copy(searchHistory = emptyMap())
         searchRepository.saveSearchSession(updatedSearchSession)
     }
-
-    sealed class Result {
-        object Empty : Result()
-        data class Valid(
-            val query: String,
-            val post: Post,
-            val totalPosts: Int
-        ) : Result()
-    }
-}
-
-sealed class SearchType {
-    abstract val query: String
-
-    data class WithSessionId(
-        override val query: String,
-        val sessionId: String
-    ) : SearchType()
-
-    data class NewSearch(
-        override val query: String,
-    ) : SearchType()
 }
