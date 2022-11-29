@@ -19,13 +19,14 @@ class RealSearchWithSessionUseCaseTest {
         val searchResult = SearchResultCreator.validResult(query = SearchQuery)
 
         runBlockingTest(
-            searchResult = searchResult,
+            singleSearchInvokationResult = searchResult,
             searchSession = null,
-        ) { useCase, searchRepository ->
+        ) { useCase, searchRepository, searchUseCase ->
             useCase.invoke(
                 searchType = searchType,
                 resultsPerPage = PostCreator.defaultPostPerPage()
             )
+            searchUseCase.assertInvokedOnce()
             searchRepository.assertSessionNotFetched()
         }
     }
@@ -43,33 +44,65 @@ class RealSearchWithSessionUseCaseTest {
         )
 
         runBlockingTest(
-            searchResult = searchResult,
+            singleSearchInvokationResult = searchResult,
             searchSession = searchSession,
-        ) { useCase, searchRepository ->
+        ) { useCase, searchRepository, searchUseCase ->
             useCase.invoke(
                 searchType = searchType,
                 resultsPerPage = PostCreator.defaultPostPerPage()
             )
+            searchUseCase.assertInvokedOnce()
             searchRepository.assertSessionFetched()
         }
     }
 
     @Test
-    fun searchWithEmptyResultsReturnsEmpty() {
+    fun searchWithEmptyResultReturnsEmpty() {
         val searchType = SearchType.NewSession(query = SearchQuery)
         val searchResult = SearchUseCase.Result.Empty
 
         runBlockingTest(
-            searchResult = searchResult,
+            singleSearchInvokationResult = searchResult,
             searchSession = null,
-        ) { useCase, _ ->
+        ) { useCase, _, searchUseCase ->
             val actualResult = useCase.invoke(
                 searchType = searchType,
                 resultsPerPage = PostCreator.defaultPostPerPage()
             )
+            searchUseCase.assertInvokedOnce()
             assertEquals(
                 expected = SearchWithSessionUseCase.Result.Empty,
                 actual = actualResult,
+            )
+        }
+    }
+
+    @Test
+    fun searchWithExhaustedResultClearsSearchSessionHistoryAndRetries() {
+        val searchType = SearchType.NewSession(query = SearchQuery)
+        val searchResults = listOf(
+            SearchUseCase.Result.Exhausted,
+            SearchUseCase.Result.Empty
+        )
+        val searchSession = SearchSessionCreator.searchSession(
+            id = SearchSessionId,
+            query = SearchQuery,
+            searchHistory = mapOf(1 to listOf(0, 1, 2, 3))
+        )
+
+        runBlockingTest(
+            singleSearchInvokationResult = null,
+            multiSearchInvokationResults = searchResults,
+            searchSession = searchSession,
+        ) { useCase, _, searchUseCase ->
+            useCase.invoke(
+                searchType = searchType,
+                resultsPerPage = PostCreator.defaultPostPerPage()
+            )
+            searchUseCase.assertInvokedTwice()
+            assertEquals(
+                expected = emptyMap(),
+                actual = searchSession.searchHistory,
             )
         }
     }
@@ -93,13 +126,14 @@ class RealSearchWithSessionUseCaseTest {
         )
 
         runBlockingTest(
-            searchResult = searchResult,
+            singleSearchInvokationResult = searchResult,
             searchSession = searchSession,
-        ) { useCase, searchRepository ->
+        ) { useCase, searchRepository, searchUseCase ->
             val actualResult = useCase.invoke(
                 searchType = searchType,
                 resultsPerPage = PostCreator.defaultPostPerPage()
             )
+            searchUseCase.assertInvokedOnce()
             assertEquals(
                 expected = expectedSearchWithSessionResult,
                 actual = actualResult
@@ -118,18 +152,22 @@ class RealSearchWithSessionUseCaseTest {
     }
 
     private fun runBlockingTest(
-        searchResult: SearchUseCase.Result,
+        singleSearchInvokationResult: SearchUseCase.Result? = null,
+        multiSearchInvokationResults: List<SearchUseCase.Result>? = null,
         searchSession: SearchSession?,
-        testBlock: suspend (SearchWithSessionUseCase, FakeSearchRepository) -> Unit
+        testBlock: suspend (SearchWithSessionUseCase, FakeSearchRepository, FakeSearchUseCase) -> Unit
     ) = runTest {
+        val searchInvokationResults = singleSearchInvokationResult?.let { listOf(it) }
+            ?: multiSearchInvokationResults
+            ?: emptyList()
         val searchRepository = FakeSearchRepository(searchSession = searchSession)
-        val searchUseCase = FakeSearchUseCase(result = searchResult)
+        val searchUseCase = FakeSearchUseCase(invokationResults = searchInvokationResults)
         val useCase = RealSearchWithSessionUseCase(
             dispatcher = FakeCoroutineDispatcher,
             searchRepository = searchRepository,
             searchUseCase = searchUseCase
         )
-        testBlock(useCase, searchRepository)
+        testBlock(useCase, searchRepository, searchUseCase)
     }
 }
 

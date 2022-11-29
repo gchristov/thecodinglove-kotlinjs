@@ -14,9 +14,9 @@ class FakeSearchRepository(
     private val pages: Map<Int, List<Post>>? = null,
     private val searchSession: SearchSession? = null
 ) : SearchRepository {
-    var totalPostsResponse: FakeResponse = FakeResponse.CompletesNormally
-    var searchResponse: FakeResponse = FakeResponse.CompletesNormally
-    var searchSessionResponse: FakeResponse = FakeResponse.CompletesNormally
+    private val totalPostsResponse: FakeResponse = FakeResponse.CompletesNormally
+    private val searchResponse: FakeResponse = FakeResponse.CompletesNormally
+    private val searchSessionResponse: FakeResponse = FakeResponse.CompletesNormally
 
     private var searchSessionGetCalled = false
     private var lastSavedSession: SearchSession? = null
