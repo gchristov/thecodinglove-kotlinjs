@@ -25,7 +25,7 @@ class RealSearchWithSessionUseCaseTest {
         ) { useCase, searchRepository, searchUseCase ->
             useCase.invoke(
                 searchType = searchType,
-                resultsPerPage = PostCreator.defaultPostPerPage()
+                resultsPerPage = PostCreator.multiPageMultiPostPageSize()
             )
             searchUseCase.assertInvokedOnce()
             searchRepository.assertSessionNotFetched()
@@ -50,7 +50,7 @@ class RealSearchWithSessionUseCaseTest {
         ) { useCase, searchRepository, searchUseCase ->
             useCase.invoke(
                 searchType = searchType,
-                resultsPerPage = PostCreator.defaultPostPerPage()
+                resultsPerPage = PostCreator.multiPageMultiPostPageSize()
             )
             searchUseCase.assertInvokedOnce()
             searchRepository.assertSessionFetched()
@@ -68,7 +68,7 @@ class RealSearchWithSessionUseCaseTest {
         ) { useCase, _, searchUseCase ->
             val actualResult = useCase.invoke(
                 searchType = searchType,
-                resultsPerPage = PostCreator.defaultPostPerPage()
+                resultsPerPage = PostCreator.multiPageMultiPostPageSize()
             )
             searchUseCase.assertInvokedOnce()
             assertEquals(
@@ -101,7 +101,7 @@ class RealSearchWithSessionUseCaseTest {
         ) { useCase, searchRepository, searchUseCase ->
             useCase.invoke(
                 searchType = searchType,
-                resultsPerPage = PostCreator.defaultPostPerPage()
+                resultsPerPage = PostCreator.multiPageMultiPostPageSize()
             )
             searchUseCase.assertInvokedTwice()
             searchRepository.assertSessionSaved(
@@ -141,7 +141,7 @@ class RealSearchWithSessionUseCaseTest {
         ) { useCase, searchRepository, searchUseCase ->
             val actualResult = useCase.invoke(
                 searchType = searchType,
-                resultsPerPage = PostCreator.defaultPostPerPage()
+                resultsPerPage = PostCreator.multiPageMultiPostPageSize()
             )
             searchUseCase.assertInvokedOnce()
             assertEquals(
