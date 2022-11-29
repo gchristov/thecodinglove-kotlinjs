@@ -8,6 +8,7 @@ import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.FakeSearchRepository
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.PostCreator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,7 +18,7 @@ import kotlin.test.assertTrue
 @OptIn(ExperimentalCoroutinesApi::class)
 class RealSearchUseCaseTest {
     @Test
-    fun searchWithNoResultsReturnsEmpty() = runBlockingTest(
+    fun searchWithNoResultsReturnsEmpty(): TestResult = runBlockingTest(
         totalPosts = 0,
         pages = PostCreator.multiPageMultiPost()
     ) {
@@ -33,7 +34,7 @@ class RealSearchUseCaseTest {
     }
 
     @Test
-    fun searchWithEmptyResultsReturnsEmpty() = runBlockingTest(
+    fun searchWithEmptyResultsReturnsEmpty(): TestResult = runBlockingTest(
         totalPosts = 0,
         pages = emptyMap()
     ) {
@@ -49,7 +50,7 @@ class RealSearchUseCaseTest {
     }
 
     @Test
-    fun searchWithOneResultReturnsPost() = runBlockingTest(
+    fun searchWithOneResultReturnsPost(): TestResult = runBlockingTest(
         totalPosts = 1,
         pages = PostCreator.singlePageSinglePost()
     ) {
@@ -72,7 +73,7 @@ class RealSearchUseCaseTest {
     }
 
     @Test
-    fun searchExcludes() = runBlockingTest(
+    fun searchExcludes(): TestResult = runBlockingTest(
         totalPosts = PostCreator.defaultTotalPosts(),
         pages = PostCreator.multiPageMultiPost()
     ) {
@@ -107,7 +108,7 @@ class RealSearchUseCaseTest {
     }
 
     @Test
-    fun searchExhausts() = runBlockingTest(
+    fun searchExhausts(): TestResult = runBlockingTest(
         totalPosts = PostCreator.defaultTotalPosts(),
         pages = PostCreator.multiPageMultiPost()
     ) {
@@ -147,7 +148,7 @@ class RealSearchUseCaseTest {
         totalPosts: Int,
         pages: Map<Int, List<Post>>,
         testBlock: suspend (SearchUseCase) -> Unit
-    ) = runTest {
+    ): TestResult = runTest {
         val searchRepository = FakeSearchRepository(
             totalPosts = totalPosts,
             pages = pages
