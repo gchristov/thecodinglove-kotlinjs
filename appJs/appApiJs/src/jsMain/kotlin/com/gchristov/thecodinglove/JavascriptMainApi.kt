@@ -25,10 +25,7 @@ internal actual fun serveApi(args: Array<String>) {
                     sessionId = it
                 )
             } ?: SearchType.NewSession(searchQuery)
-            val searchResult = search(
-                searchType = searchType,
-                resultsPerPage = 4
-            )
+            val searchResult = search(searchType)
             val result = searchResult.toResult()
             val jsonResponse = Json.encodeToString(result)
             response.send(jsonResponse)

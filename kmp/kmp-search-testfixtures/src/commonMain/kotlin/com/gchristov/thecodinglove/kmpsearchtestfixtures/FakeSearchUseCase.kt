@@ -17,7 +17,6 @@ class FakeSearchUseCase(
         query: String,
         totalPosts: Int?,
         searchHistory: Map<Int, List<Int>>,
-        resultsPerPage: Int
     ): SearchUseCase.Result = searchResponse.execute(invocationResults[invocations++])
 
     fun assertInvokedOnce() {

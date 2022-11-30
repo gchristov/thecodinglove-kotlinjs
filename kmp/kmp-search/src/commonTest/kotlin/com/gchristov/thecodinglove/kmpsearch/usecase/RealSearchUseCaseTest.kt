@@ -4,6 +4,7 @@ import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpsearch.contains
 import com.gchristov.thecodinglove.kmpsearch.insert
 import com.gchristov.thecodinglove.kmpsearchdata.model.Post
+import com.gchristov.thecodinglove.kmpsearchdata.model.SearchConfig
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.FakeSearchRepository
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.PostCreator
@@ -20,7 +21,6 @@ class RealSearchUseCaseTest {
     @Test
     fun searchWithNoResultsReturnsEmpty(): TestResult {
         val totalPosts = 0
-        val resultsPerPage = PostCreator.multiPageMultiPostPageSize()
         val pages = PostCreator.multiPageMultiPost()
 
         return runBlockingTest(
@@ -30,7 +30,6 @@ class RealSearchUseCaseTest {
             val actualResult = it.invoke(
                 query = SearchQuery,
                 searchHistory = mutableMapOf(),
-                resultsPerPage = resultsPerPage
             )
             assertEquals(
                 expected = SearchUseCase.Result.Empty,
@@ -42,7 +41,6 @@ class RealSearchUseCaseTest {
     @Test
     fun searchWithEmptyResultsReturnsEmpty(): TestResult {
         val totalPosts = 0
-        val resultsPerPage = PostCreator.multiPageMultiPostPageSize()
         val pages: Map<Int, List<Post>> = emptyMap()
 
         return runBlockingTest(
@@ -52,7 +50,6 @@ class RealSearchUseCaseTest {
             val actualResult = it.invoke(
                 query = SearchQuery,
                 searchHistory = mutableMapOf(),
-                resultsPerPage = resultsPerPage
             )
             assertEquals(
                 expected = SearchUseCase.Result.Empty,
@@ -64,7 +61,6 @@ class RealSearchUseCaseTest {
     @Test
     fun searchWithOneResultReturnsPost(): TestResult {
         val totalPosts = 1
-        val resultsPerPage = PostCreator.multiPageMultiPostPageSize()
         val pages = PostCreator.singlePageSinglePost()
 
         return runBlockingTest(
@@ -74,7 +70,6 @@ class RealSearchUseCaseTest {
             val actualResult = it.invoke(
                 query = SearchQuery,
                 searchHistory = mutableMapOf(),
-                resultsPerPage = resultsPerPage
             )
             assertEquals(
                 expected = SearchUseCase.Result.Valid(
@@ -93,7 +88,6 @@ class RealSearchUseCaseTest {
     @Test
     fun searchExcludes(): TestResult {
         val totalPosts = PostCreator.multiPageMultiPostTotalCount()
-        val resultsPerPage = PostCreator.multiPageMultiPostPageSize()
         val pages = PostCreator.multiPageMultiPost()
 
         return runBlockingTest(
@@ -110,7 +104,6 @@ class RealSearchUseCaseTest {
                 val actualResult = it.invoke(
                     query = SearchQuery,
                     searchHistory = searchHistory,
-                    resultsPerPage = resultsPerPage
                 ) as SearchUseCase.Result.Valid
                 // Ensure post isn't already picked
                 assertFalse {
@@ -134,7 +127,6 @@ class RealSearchUseCaseTest {
     @Test
     fun searchExhausts(): TestResult {
         val totalPosts = PostCreator.multiPageMultiPostTotalCount()
-        val resultsPerPage = PostCreator.multiPageMultiPostPageSize()
         val pages = PostCreator.multiPageMultiPost()
 
         return runBlockingTest(
@@ -147,7 +139,6 @@ class RealSearchUseCaseTest {
                 val actualResult = it.invoke(
                     query = SearchQuery,
                     searchHistory = searchHistory,
-                    resultsPerPage = resultsPerPage
                 ) as SearchUseCase.Result.Valid
                 searchHistory.insert(
                     postPage = actualResult.postPage,
@@ -168,7 +159,6 @@ class RealSearchUseCaseTest {
             val actualResult = it.invoke(
                 query = SearchQuery,
                 searchHistory = searchHistory,
-                resultsPerPage = PostCreator.multiPageMultiPostPageSize()
             )
             assertTrue { actualResult == SearchUseCase.Result.Exhausted }
         }
@@ -185,10 +175,14 @@ class RealSearchUseCaseTest {
         )
         val useCase = RealSearchUseCase(
             dispatcher = FakeCoroutineDispatcher,
-            searchRepository = searchRepository
+            searchRepository = searchRepository,
+            searchConfig = SearchConfig
         )
         testBlock(useCase)
     }
 }
 
 private const val SearchQuery = "test"
+private val SearchConfig = SearchConfig(
+    postsPerPage = PostCreator.multiPageMultiPostPageSize()
+)

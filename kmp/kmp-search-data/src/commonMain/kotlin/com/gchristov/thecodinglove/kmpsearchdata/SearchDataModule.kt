@@ -5,6 +5,7 @@ import com.gchristov.thecodinglove.kmpcommonfirebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.kmpcommonnetwork.CommonNetworkModule
 import com.gchristov.thecodinglove.kmphtmlparse.HtmlParseModule
 import com.gchristov.thecodinglove.kmphtmlparse.HtmlPostParser
+import com.gchristov.thecodinglove.kmpsearchdata.model.SearchConfig
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.*
 import org.kodein.di.DI
@@ -24,6 +25,7 @@ object SearchDataModule : DiModule() {
                     firebaseFirestore = instance()
                 )
             }
+            bindSingleton { provideSearchConfig() }
         }
     }
 
@@ -46,4 +48,6 @@ object SearchDataModule : DiModule() {
         htmlPostParser = htmlPostParser,
         firebaseFirestore = firebaseFirestore
     )
+
+    private fun provideSearchConfig(): SearchConfig = SearchConfig(postsPerPage = 4)
 }
