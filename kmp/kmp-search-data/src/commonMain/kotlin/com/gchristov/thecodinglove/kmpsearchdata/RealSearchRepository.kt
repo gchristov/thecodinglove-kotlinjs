@@ -50,7 +50,8 @@ internal class RealSearchRepository(
             .document(searchSession.id)
         document.set(
             data = searchSession.toApiSearchSession(),
-            encodeDefaults = true
+            encodeDefaults = true,
+            merge = true
         )
     }
 }
