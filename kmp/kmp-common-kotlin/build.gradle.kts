@@ -9,6 +9,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(Deps.Kotlin.coroutinesCore)
+                api(Deps.Uuid.uuid)
             }
         }
     }

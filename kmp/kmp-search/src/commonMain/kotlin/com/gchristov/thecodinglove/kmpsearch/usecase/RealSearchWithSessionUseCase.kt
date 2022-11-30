@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.kmpsearch.usecase
 
+import com.benasher44.uuid.uuid4
 import com.gchristov.thecodinglove.kmpsearch.insert
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchSession
@@ -8,7 +9,6 @@ import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import kotlin.random.Random
 
 internal class RealSearchWithSessionUseCase(
     private val dispatcher: CoroutineDispatcher,
@@ -48,7 +48,7 @@ internal class RealSearchWithSessionUseCase(
 
     private suspend fun getSearchSession(searchType: SearchType): SearchSession {
         val newSession = SearchSession(
-            id = Random.nextInt().toString(),
+            id = uuid4().toString(),
             query = searchType.query,
             totalPosts = null,
             searchHistory = emptyMap(),

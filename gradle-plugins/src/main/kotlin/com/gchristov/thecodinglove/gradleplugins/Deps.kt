@@ -3,16 +3,14 @@ package com.gchristov.thecodinglove.gradleplugins
 @Suppress("unused")
 class Deps {
     object Firebase {
-        private const val firebaseVersion = "1.6.2"
-        const val firestore = "dev.gitlive:firebase-firestore:$firebaseVersion"
+        const val firestore = "dev.gitlive:firebase-firestore:1.6.2"
         val firebase = NpmDependency("firebase", "9.10.0")
         val admin = NpmDependency("firebase-admin", "11.0.1")
         val functions = NpmDependency("firebase-functions", "3.24.0")
     }
 
     object Kodein {
-        private const val kodeinVersion = "7.15.0"
-        const val di = "org.kodein.di:kodein-di:$kodeinVersion"
+        const val di = "org.kodein.di:kodein-di:7.15.0"
     }
 
     object Kotlin {
@@ -39,6 +37,10 @@ class Deps {
     object Node {
         val htmlParser = NpmDependency("node-html-parser", "6.1.4")
         val express = NpmDependency("express", "4.18.2")
+    }
+
+    object Uuid {
+        val uuid = "com.benasher44:uuid:0.6.0"
     }
 }
 
