@@ -2,13 +2,13 @@ package com.gchristov.thecodinglove.kmpsearchtestfixtures
 
 import com.gchristov.thecodinglove.kmpcommontest.FakeResponse
 import com.gchristov.thecodinglove.kmpcommontest.execute
-import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
 import kotlin.test.assertEquals
 
-class FakeSearchUseCase(
+class FakeSearchWithHistoryUseCase(
     // Each result is passed as a response to the relevant invocation attempt
-    var invocationResults: List<SearchUseCase.Result>
-) : SearchUseCase {
+    var invocationResults: List<SearchWithHistoryUseCase.Result>
+) : SearchWithHistoryUseCase {
     private val searchResponse: FakeResponse = FakeResponse.CompletesNormally
 
     private var invocations = 0
@@ -17,7 +17,7 @@ class FakeSearchUseCase(
         query: String,
         totalPosts: Int?,
         searchHistory: Map<Int, List<Int>>,
-    ): SearchUseCase.Result = searchResponse.execute(invocationResults[invocations++])
+    ): SearchWithHistoryUseCase.Result = searchResponse.execute(invocationResults[invocations++])
 
     fun assertInvokedOnce() {
         assertEquals(

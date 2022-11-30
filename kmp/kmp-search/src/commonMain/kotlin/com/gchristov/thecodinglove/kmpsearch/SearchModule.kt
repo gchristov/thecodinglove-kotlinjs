@@ -2,12 +2,12 @@ package com.gchristov.thecodinglove.kmpsearch
 
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.kmpcommondi.inject
-import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchUseCase
+import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchWithHistoryUseCase
 import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchWithSessionUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.SearchDataModule
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchConfig
-import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
@@ -19,7 +19,7 @@ object SearchModule : DiModule() {
     override fun bindLocalDependencies(builder: DI.Builder) {
         builder.apply {
             bindProvider {
-                provideSearchUseCase(
+                provideSearchWithHistoryUseCase(
                     searchRepository = inject(),
                     searchConfig = inject()
                 )
@@ -27,7 +27,7 @@ object SearchModule : DiModule() {
             bindProvider {
                 provideSearchWithSessionUseCase(
                     searchRepository = inject(),
-                    searchUseCase = inject(),
+                    searchWithHistoryUseCase = inject(),
                 )
             }
         }
@@ -37,10 +37,10 @@ object SearchModule : DiModule() {
         return listOf(SearchDataModule.module)
     }
 
-    private fun provideSearchUseCase(
+    private fun provideSearchWithHistoryUseCase(
         searchRepository: SearchRepository,
         searchConfig: SearchConfig
-    ): SearchUseCase = RealSearchUseCase(
+    ): SearchWithHistoryUseCase = RealSearchWithHistoryUseCase(
         dispatcher = Dispatchers.Default,
         searchRepository = searchRepository,
         searchConfig = searchConfig
@@ -48,11 +48,11 @@ object SearchModule : DiModule() {
 
     private fun provideSearchWithSessionUseCase(
         searchRepository: SearchRepository,
-        searchUseCase: SearchUseCase
+        searchWithHistoryUseCase: SearchWithHistoryUseCase
     ): SearchWithSessionUseCase = RealSearchWithSessionUseCase(
         dispatcher = Dispatchers.Default,
         searchRepository = searchRepository,
-        searchUseCase = searchUseCase
+        searchWithHistoryUseCase = searchWithHistoryUseCase
     )
 
     fun injectSearchWithSessionUseCase(): SearchWithSessionUseCase = inject()

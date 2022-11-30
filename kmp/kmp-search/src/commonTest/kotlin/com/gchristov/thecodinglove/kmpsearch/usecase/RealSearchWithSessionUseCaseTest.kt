@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.kmpsearch.usecase
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchSession
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchType
-import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,14 +17,14 @@ class RealSearchWithSessionUseCaseTest {
     @Test
     fun searchWithNewSessionCreatesNewSession(): TestResult {
         val searchType = SearchType.NewSession(query = SearchQuery)
-        val searchResult = SearchResultCreator.validResult(query = SearchQuery)
+        val searchResult = SearchWithHistoryResultCreator.validResult(query = SearchQuery)
 
         return runBlockingTest(
             singleSearchInvocationResult = searchResult,
             searchSession = null,
-        ) { useCase, searchRepository, searchUseCase ->
+        ) { useCase, searchRepository, searchWithHistoryUseCase ->
             useCase.invoke(searchType)
-            searchUseCase.assertInvokedOnce()
+            searchWithHistoryUseCase.assertInvokedOnce()
             searchRepository.assertSessionNotFetched()
         }
     }
@@ -35,7 +35,7 @@ class RealSearchWithSessionUseCaseTest {
             query = SearchQuery,
             sessionId = SearchSessionId
         )
-        val searchResult = SearchResultCreator.validResult(query = SearchQuery)
+        val searchResult = SearchWithHistoryResultCreator.validResult(query = SearchQuery)
         val searchSession = SearchSessionCreator.searchSession(
             id = SearchSessionId,
             query = SearchQuery
@@ -44,9 +44,9 @@ class RealSearchWithSessionUseCaseTest {
         return runBlockingTest(
             singleSearchInvocationResult = searchResult,
             searchSession = searchSession,
-        ) { useCase, searchRepository, searchUseCase ->
+        ) { useCase, searchRepository, searchWithHistoryUseCase ->
             useCase.invoke(searchType = searchType)
-            searchUseCase.assertInvokedOnce()
+            searchWithHistoryUseCase.assertInvokedOnce()
             searchRepository.assertSessionFetched()
         }
     }
@@ -54,14 +54,14 @@ class RealSearchWithSessionUseCaseTest {
     @Test
     fun searchWithEmptyResultReturnsEmpty(): TestResult {
         val searchType = SearchType.NewSession(query = SearchQuery)
-        val searchResult = SearchUseCase.Result.Empty
+        val searchResult = SearchWithHistoryUseCase.Result.Empty
 
         return runBlockingTest(
             singleSearchInvocationResult = searchResult,
             searchSession = null,
-        ) { useCase, _, searchUseCase ->
+        ) { useCase, _, searchWithHistoryUseCase ->
             val actualResult = useCase.invoke(searchType)
-            searchUseCase.assertInvokedOnce()
+            searchWithHistoryUseCase.assertInvokedOnce()
             assertEquals(
                 expected = SearchWithSessionUseCase.Result.Empty,
                 actual = actualResult,
@@ -76,8 +76,8 @@ class RealSearchWithSessionUseCaseTest {
             sessionId = SearchSessionId
         )
         val searchResults = listOf(
-            SearchUseCase.Result.Exhausted,
-            SearchUseCase.Result.Empty
+            SearchWithHistoryUseCase.Result.Exhausted,
+            SearchWithHistoryUseCase.Result.Empty
         )
         val searchSession = SearchSessionCreator.searchSession(
             id = SearchSessionId,
@@ -89,9 +89,9 @@ class RealSearchWithSessionUseCaseTest {
             singleSearchInvocationResult = null,
             multiSearchInvocationResults = searchResults,
             searchSession = searchSession,
-        ) { useCase, searchRepository, searchUseCase ->
+        ) { useCase, searchRepository, searchWithHistoryUseCase ->
             useCase.invoke(searchType)
-            searchUseCase.assertInvokedTwice()
+            searchWithHistoryUseCase.assertInvokedTwice()
             searchRepository.assertSessionSaved(
                 SearchSession(
                     id = searchSession.id,
@@ -111,7 +111,7 @@ class RealSearchWithSessionUseCaseTest {
             sessionId = SearchSessionId,
             query = SearchQuery
         )
-        val searchResult = SearchResultCreator.validResult(query = SearchQuery)
+        val searchResult = SearchWithHistoryResultCreator.validResult(query = SearchQuery)
         val searchSession = SearchSessionCreator.searchSession(
             id = SearchSessionId,
             query = SearchQuery
@@ -126,9 +126,9 @@ class RealSearchWithSessionUseCaseTest {
         return runBlockingTest(
             singleSearchInvocationResult = searchResult,
             searchSession = searchSession,
-        ) { useCase, searchRepository, searchUseCase ->
+        ) { useCase, searchRepository, searchWithHistoryUseCase ->
             val actualResult = useCase.invoke(searchType)
-            searchUseCase.assertInvokedOnce()
+            searchWithHistoryUseCase.assertInvokedOnce()
             assertEquals(
                 expected = expectedSearchWithSessionResult,
                 actual = actualResult
@@ -147,20 +147,20 @@ class RealSearchWithSessionUseCaseTest {
     }
 
     private fun runBlockingTest(
-        singleSearchInvocationResult: SearchUseCase.Result? = null,
-        multiSearchInvocationResults: List<SearchUseCase.Result>? = null,
+        singleSearchInvocationResult: SearchWithHistoryUseCase.Result? = null,
+        multiSearchInvocationResults: List<SearchWithHistoryUseCase.Result>? = null,
         searchSession: SearchSession?,
-        testBlock: suspend (SearchWithSessionUseCase, FakeSearchRepository, FakeSearchUseCase) -> Unit
+        testBlock: suspend (SearchWithSessionUseCase, FakeSearchRepository, FakeSearchWithHistoryUseCase) -> Unit
     ): TestResult = runTest {
         val searchInvocationResults = singleSearchInvocationResult?.let { listOf(it) }
             ?: multiSearchInvocationResults
             ?: emptyList()
         val searchRepository = FakeSearchRepository(searchSession = searchSession)
-        val searchUseCase = FakeSearchUseCase(invocationResults = searchInvocationResults)
+        val searchUseCase = FakeSearchWithHistoryUseCase(invocationResults = searchInvocationResults)
         val useCase = RealSearchWithSessionUseCase(
             dispatcher = FakeCoroutineDispatcher,
             searchRepository = searchRepository,
-            searchUseCase = searchUseCase
+            searchWithHistoryUseCase = searchUseCase
         )
         testBlock(useCase, searchRepository, searchUseCase)
     }

@@ -10,7 +10,7 @@ Use-case to search for a random post, given a search session. This use-case:
 - chooses a random post from the page
 - returns a summary of the search
  */
-interface SearchUseCase {
+interface SearchWithHistoryUseCase {
     suspend operator fun invoke(
         query: String,
         totalPosts: Int? = null,
