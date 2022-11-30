@@ -23,10 +23,7 @@ class RealSearchWithSessionUseCaseTest {
             singleSearchInvocationResult = searchResult,
             searchSession = null,
         ) { useCase, searchRepository, searchUseCase ->
-            useCase.invoke(
-                searchType = searchType,
-                resultsPerPage = PostCreator.multiPageMultiPostPageSize()
-            )
+            useCase.invoke(searchType)
             searchUseCase.assertInvokedOnce()
             searchRepository.assertSessionNotFetched()
         }
@@ -48,10 +45,7 @@ class RealSearchWithSessionUseCaseTest {
             singleSearchInvocationResult = searchResult,
             searchSession = searchSession,
         ) { useCase, searchRepository, searchUseCase ->
-            useCase.invoke(
-                searchType = searchType,
-                resultsPerPage = PostCreator.multiPageMultiPostPageSize()
-            )
+            useCase.invoke(searchType = searchType)
             searchUseCase.assertInvokedOnce()
             searchRepository.assertSessionFetched()
         }
@@ -66,10 +60,7 @@ class RealSearchWithSessionUseCaseTest {
             singleSearchInvocationResult = searchResult,
             searchSession = null,
         ) { useCase, _, searchUseCase ->
-            val actualResult = useCase.invoke(
-                searchType = searchType,
-                resultsPerPage = PostCreator.multiPageMultiPostPageSize()
-            )
+            val actualResult = useCase.invoke(searchType)
             searchUseCase.assertInvokedOnce()
             assertEquals(
                 expected = SearchWithSessionUseCase.Result.Empty,
@@ -99,10 +90,7 @@ class RealSearchWithSessionUseCaseTest {
             multiSearchInvocationResults = searchResults,
             searchSession = searchSession,
         ) { useCase, searchRepository, searchUseCase ->
-            useCase.invoke(
-                searchType = searchType,
-                resultsPerPage = PostCreator.multiPageMultiPostPageSize()
-            )
+            useCase.invoke(searchType)
             searchUseCase.assertInvokedTwice()
             searchRepository.assertSessionSaved(
                 SearchSession(
@@ -139,10 +127,7 @@ class RealSearchWithSessionUseCaseTest {
             singleSearchInvocationResult = searchResult,
             searchSession = searchSession,
         ) { useCase, searchRepository, searchUseCase ->
-            val actualResult = useCase.invoke(
-                searchType = searchType,
-                resultsPerPage = PostCreator.multiPageMultiPostPageSize()
-            )
+            val actualResult = useCase.invoke(searchType)
             searchUseCase.assertInvokedOnce()
             assertEquals(
                 expected = expectedSearchWithSessionResult,

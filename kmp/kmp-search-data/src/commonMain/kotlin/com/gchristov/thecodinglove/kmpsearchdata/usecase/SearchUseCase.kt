@@ -15,7 +15,6 @@ interface SearchUseCase {
         query: String,
         totalPosts: Int? = null,
         searchHistory: Map<Int, List<Int>>,
-        resultsPerPage: Int
     ) : Result
 
     sealed class Result {

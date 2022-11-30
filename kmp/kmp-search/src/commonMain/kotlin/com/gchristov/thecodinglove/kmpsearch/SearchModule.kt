@@ -6,6 +6,7 @@ import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchUseCase
 import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchWithSessionUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.SearchDataModule
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
+import com.gchristov.thecodinglove.kmpsearchdata.model.SearchConfig
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.Dispatchers
@@ -17,11 +18,16 @@ object SearchModule : DiModule() {
 
     override fun bindLocalDependencies(builder: DI.Builder) {
         builder.apply {
-            bindProvider { provideSearchUseCase(searchRepository = inject()) }
+            bindProvider {
+                provideSearchUseCase(
+                    searchRepository = inject(),
+                    searchConfig = inject()
+                )
+            }
             bindProvider {
                 provideSearchWithSessionUseCase(
                     searchRepository = inject(),
-                    searchUseCase = inject()
+                    searchUseCase = inject(),
                 )
             }
         }
@@ -32,10 +38,12 @@ object SearchModule : DiModule() {
     }
 
     private fun provideSearchUseCase(
-        searchRepository: SearchRepository
+        searchRepository: SearchRepository,
+        searchConfig: SearchConfig
     ): SearchUseCase = RealSearchUseCase(
         dispatcher = Dispatchers.Default,
-        searchRepository = searchRepository
+        searchRepository = searchRepository,
+        searchConfig = searchConfig
     )
 
     private fun provideSearchWithSessionUseCase(

@@ -10,10 +10,7 @@ Use-case to search for a random post, wrapping it within a search session. This 
 - if the search results are exhausted, clears the search history and retries the search
  */
 interface SearchWithSessionUseCase {
-    suspend operator fun invoke(
-        searchType: SearchType,
-        resultsPerPage: Int
-    ): Result
+    suspend operator fun invoke(searchType: SearchType): Result
 
     sealed class Result {
         object Empty : Result()

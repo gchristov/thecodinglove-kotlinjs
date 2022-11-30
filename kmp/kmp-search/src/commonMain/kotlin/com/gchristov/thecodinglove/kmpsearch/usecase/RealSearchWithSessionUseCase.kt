@@ -13,27 +13,22 @@ import kotlin.random.Random
 internal class RealSearchWithSessionUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
-    private val searchUseCase: SearchUseCase
+    private val searchUseCase: SearchUseCase,
 ) : SearchWithSessionUseCase {
     override suspend operator fun invoke(
-        searchType: SearchType,
-        resultsPerPage: Int
+        searchType: SearchType
     ): SearchWithSessionUseCase.Result = withContext(dispatcher) {
         val searchSession = getSearchSession(searchType)
         val searchResult = searchUseCase(
             query = searchSession.query,
             totalPosts = searchSession.totalPosts,
             searchHistory = searchSession.searchHistory,
-            resultsPerPage = resultsPerPage
         )
         when (searchResult) {
             is SearchUseCase.Result.Empty -> SearchWithSessionUseCase.Result.Empty
             is SearchUseCase.Result.Exhausted -> {
                 clearSearchSessionHistory(searchSession)
-                invoke(
-                    searchType = searchType,
-                    resultsPerPage = resultsPerPage
-                )
+                invoke(searchType = searchType)
             }
 
             is SearchUseCase.Result.Valid -> {
