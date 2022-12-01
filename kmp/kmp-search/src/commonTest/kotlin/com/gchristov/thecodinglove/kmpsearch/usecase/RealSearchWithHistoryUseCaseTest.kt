@@ -152,6 +152,7 @@ class RealSearchWithHistoryUseCaseTest {
                 assertTrue {
                     val historyPage = searchHistory[page]!!
                     val testPage = PostCreator.multiPageMultiPost()[page]!!
+                    // Fully visited pages have an extra -1 in the list to indicate page termination
                     historyPage.size - 1 == testPage.size
                 }
             }
