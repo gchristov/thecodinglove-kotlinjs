@@ -6,6 +6,7 @@ import com.gchristov.thecodinglove.kmpsearchdata.usecase.PreloadSearchResultUseC
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.FakeSearchRepository
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.FakeSearchWithHistoryUseCase
+import com.gchristov.thecodinglove.kmpsearchtestfixtures.SearchSessionCreator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
@@ -27,6 +28,28 @@ class RealPreloadSearchResultUseCaseTest {
         }
     }
 
+    @Test
+    fun preloadWithEmptyResultReturnsEmpty(): TestResult {
+        val searchResult = SearchWithHistoryUseCase.Result.Empty
+        val searchSession = SearchSessionCreator.searchSession(
+            id = SearchSessionId,
+            query = SearchQuery
+        )
+
+        return runBlockingTest(
+            singleSearchInvocationResult = searchResult,
+            searchSession = searchSession,
+        ) { useCase, searchRepository, searchWithHistoryUseCase ->
+            val actualResult = useCase.invoke(searchSessionId = SearchSessionId)
+            searchRepository.assertSessionFetched()
+            searchWithHistoryUseCase.assertInvokedOnce()
+            assertEquals(
+                expected = PreloadSearchResultUseCase.Result.Empty,
+                actual = actualResult,
+            )
+        }
+    }
+
 //    @Test
 //    fun searchWithSessionIdReusesSession(): TestResult {
 //        val searchResult = SearchWithHistoryResultCreator.validResult(query = SearchQuery)
@@ -42,24 +65,6 @@ class RealPreloadSearchResultUseCaseTest {
 //            useCase.invoke(searchSessionId = SearchSessionId)
 //            searchWithHistoryUseCase.assertInvokedOnce()
 //            searchRepository.assertSessionFetched()
-//        }
-//    }
-//
-//    @Test
-//    fun searchWithEmptyResultReturnsEmpty(): TestResult {
-//        val searchType = SearchType.NewSession(query = SearchQuery)
-//        val searchResult = SearchWithHistoryUseCase.Result.Empty
-//
-//        return runBlockingTest(
-//            singleSearchInvocationResult = searchResult,
-//            searchSession = null,
-//        ) { useCase, _, searchWithHistoryUseCase ->
-//            val actualResult = useCase.invoke(searchType)
-//            searchWithHistoryUseCase.assertInvokedOnce()
-//            assertEquals(
-//                expected = SearchWithSessionUseCase.Result.Empty,
-//                actual = actualResult,
-//            )
 //        }
 //    }
 //
