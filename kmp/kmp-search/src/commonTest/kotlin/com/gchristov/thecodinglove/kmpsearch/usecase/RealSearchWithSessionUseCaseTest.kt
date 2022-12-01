@@ -99,6 +99,7 @@ class RealSearchWithSessionUseCaseTest {
                     totalPosts = null,
                     searchHistory = emptyMap(),
                     currentPost = null,
+                    preloadedPost = null,
                     state = SearchSession.State.Searching
                 )
             )
@@ -140,6 +141,7 @@ class RealSearchWithSessionUseCaseTest {
                     totalPosts = searchResult.totalPosts,
                     searchHistory = mapOf(1 to listOf(0, -1)),
                     currentPost = searchResult.post,
+                    preloadedPost = null,
                     state = SearchSession.State.Searching
                 )
             )

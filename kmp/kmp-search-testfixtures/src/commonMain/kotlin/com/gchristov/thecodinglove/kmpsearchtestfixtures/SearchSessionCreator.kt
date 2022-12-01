@@ -13,6 +13,7 @@ object SearchSessionCreator {
         totalPosts = null,
         searchHistory = searchHistory,
         currentPost = null,
+        preloadedPost = null,
         state = SearchSession.State.Searching
     )
 }

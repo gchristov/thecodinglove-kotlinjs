@@ -19,6 +19,16 @@ internal class RealSearchWithSessionUseCase(
         searchType: SearchType
     ): SearchWithSessionUseCase.Result = withContext(dispatcher) {
         val searchSession = getSearchSession(searchType)
+        // If a post is preloaded, return it right away
+        searchSession.preloadedPost?.let { preloadedPost ->
+            return@withContext SearchWithSessionUseCase.Result.Valid(
+                searchSessionId = searchSession.id,
+                query = searchSession.query,
+                post = preloadedPost,
+                totalPosts = searchSession.totalPosts ?: 0
+            )
+        }
+        // Else, run normal search
         val searchResult = searchWithHistoryUseCase(
             query = searchSession.query,
             totalPosts = searchSession.totalPosts,
@@ -53,6 +63,7 @@ internal class RealSearchWithSessionUseCase(
             totalPosts = null,
             searchHistory = emptyMap(),
             currentPost = null,
+            preloadedPost = null,
             state = SearchSession.State.Searching
         )
         return when (searchType) {
@@ -81,7 +92,11 @@ internal class RealSearchWithSessionUseCase(
     }
 
     private suspend fun clearSearchSessionHistory(searchSession: SearchSession) {
-        val updatedSearchSession = searchSession.copy(searchHistory = emptyMap())
+        val updatedSearchSession = searchSession.copy(
+            searchHistory = emptyMap(),
+            currentPost = null,
+            preloadedPost = null
+        )
         searchRepository.saveSearchSession(updatedSearchSession)
     }
 }
