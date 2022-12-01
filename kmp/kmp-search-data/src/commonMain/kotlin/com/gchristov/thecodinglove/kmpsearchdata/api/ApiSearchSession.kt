@@ -16,6 +16,7 @@ data class ApiSearchSession(
     // Firebase doesn't like Map<Int, List<Int>> and throws ClassCastException
     val searchHistory: Map<String, List<Int>>,
     val currentPost: ApiPost?,
+    val preloadedPost: ApiPost?,
     @Serializable(with = SessionStateSerializer::class)
     val state: State
 ) {

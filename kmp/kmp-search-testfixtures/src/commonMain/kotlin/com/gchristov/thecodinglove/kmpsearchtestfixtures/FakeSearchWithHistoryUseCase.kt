@@ -19,6 +19,13 @@ class FakeSearchWithHistoryUseCase(
         searchHistory: Map<Int, List<Int>>,
     ): SearchWithHistoryUseCase.Result = searchResponse.execute(invocationResults[invocations++])
 
+    fun assertNotInvoked() {
+        assertEquals(
+            expected = 0,
+            actual = invocations
+        )
+    }
+
     fun assertInvokedOnce() {
         assertEquals(
             expected = 1,

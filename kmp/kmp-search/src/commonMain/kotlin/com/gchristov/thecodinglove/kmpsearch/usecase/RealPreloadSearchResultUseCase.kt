@@ -1,44 +1,34 @@
 package com.gchristov.thecodinglove.kmpsearch.usecase
 
-import com.benasher44.uuid.uuid4
 import com.gchristov.thecodinglove.kmpsearch.insert
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchSession
-import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchType
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
-import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-internal class RealSearchWithSessionUseCase(
+internal class RealPreloadSearchResultUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
-) : SearchWithSessionUseCase {
+) : PreloadSearchResultUseCase {
     override suspend operator fun invoke(
-        searchType: SearchType
-    ): SearchWithSessionUseCase.Result = withContext(dispatcher) {
-        val searchSession = getSearchSession(searchType)
-        // If a post is preloaded, return it right away
-        searchSession.preloadedPost?.let { preloadedPost ->
-            return@withContext SearchWithSessionUseCase.Result.Valid(
-                searchSessionId = searchSession.id,
-                query = searchSession.query,
-                post = preloadedPost,
-                totalPosts = searchSession.totalPosts ?: 0
-            )
-        }
-        // Else, run normal search
+        searchSessionId: String
+    ): PreloadSearchResultUseCase.Result = withContext(dispatcher) {
+        val searchSession = searchRepository
+            .getSearchSession(searchSessionId)
+            ?: return@withContext PreloadSearchResultUseCase.Result.SessionNotFound
         val searchResult = searchWithHistoryUseCase(
             query = searchSession.query,
             totalPosts = searchSession.totalPosts,
             searchHistory = searchSession.searchHistory,
         )
         when (searchResult) {
-            is SearchWithHistoryUseCase.Result.Empty -> SearchWithSessionUseCase.Result.Empty
+            is SearchWithHistoryUseCase.Result.Empty -> PreloadSearchResultUseCase.Result.Empty
             is SearchWithHistoryUseCase.Result.Exhausted -> {
                 clearSearchSessionHistory(searchSession)
-                invoke(searchType = searchType)
+                invoke(searchSessionId = searchSessionId)
             }
 
             is SearchWithHistoryUseCase.Result.Valid -> {
@@ -46,30 +36,8 @@ internal class RealSearchWithSessionUseCase(
                     searchSession = searchSession,
                     searchResult = searchResult,
                 )
-                SearchWithSessionUseCase.Result.Valid(
-                    searchSessionId = searchSession.id,
-                    query = searchResult.query,
-                    post = searchResult.post,
-                    totalPosts = searchResult.totalPosts
-                )
+                PreloadSearchResultUseCase.Result.Success
             }
-        }
-    }
-
-    private suspend fun getSearchSession(searchType: SearchType): SearchSession {
-        val newSession = SearchSession(
-            id = uuid4().toString(),
-            query = searchType.query,
-            totalPosts = null,
-            searchHistory = emptyMap(),
-            currentPost = null,
-            preloadedPost = null,
-            state = SearchSession.State.Searching
-        )
-        return when (searchType) {
-            is SearchType.NewSession -> newSession
-            is SearchType.WithSessionId -> searchRepository
-                .getSearchSession(searchType.sessionId) ?: newSession
         }
     }
 
@@ -86,7 +54,9 @@ internal class RealSearchWithSessionUseCase(
                     currentPageSize = searchResult.postPageSize
                 )
             },
-            currentPost = searchResult.post
+            // The old preloaded post now becomes the current one, if found, and a new future one is set
+            currentPost = searchSession.preloadedPost ?: searchSession.currentPost,
+            preloadedPost = searchResult.post
         )
         searchRepository.saveSearchSession(updatedSearchSession)
     }
@@ -94,7 +64,8 @@ internal class RealSearchWithSessionUseCase(
     private suspend fun clearSearchSessionHistory(searchSession: SearchSession) {
         val updatedSearchSession = searchSession.copy(
             searchHistory = emptyMap(),
-            currentPost = null,
+            // When clearing we still want to set the current post to whatever is the preloaded one
+            currentPost = searchSession.preloadedPost,
             preloadedPost = null
         )
         searchRepository.saveSearchSession(updatedSearchSession)

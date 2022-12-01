@@ -10,6 +10,7 @@ data class SearchSession(
     // Contains visited page numbers mapped to visited post indexes on those pages
     val searchHistory: Map<Int, List<Int>>,
     val currentPost: Post?,
+    val preloadedPost: Post?,
     val state: State
 ) {
     sealed class State {
@@ -28,14 +29,15 @@ internal fun ApiSearchSession.toSearchSession() = SearchSession(
             }
         }
     },
-    currentPost = currentPost?.let {
-        Post(
-            title = it.title,
-            url = it.url,
-            imageUrl = it.imageUrl
-        )
-    },
+    currentPost = currentPost?.toPost(),
+    preloadedPost = preloadedPost?.toPost(),
     state = state.toSearchSessionState()
+)
+
+private fun ApiPost.toPost() = Post(
+    title = title,
+    url = url,
+    imageUrl = imageUrl
 )
 
 private fun ApiSearchSession.State.toSearchSessionState() = when (this) {
@@ -53,16 +55,17 @@ internal fun SearchSession.toApiSearchSession() = ApiSearchSession(
             }
         }
     },
-    currentPost = currentPost?.let {
-        ApiPost(
-            title = it.title,
-            url = it.url,
-            imageUrl = it.imageUrl
-        )
-    },
+    currentPost = currentPost?.toApiPost(),
+    preloadedPost = preloadedPost?.toApiPost(),
     state = state.toApiSearchSessionState()
 )
 
 private fun SearchSession.State.toApiSearchSessionState() = when (this) {
     is SearchSession.State.Searching -> ApiSearchSession.State.Searching
 }
+
+private fun Post.toApiPost() = ApiPost(
+    title = title,
+    url = url,
+    imageUrl = imageUrl
+)

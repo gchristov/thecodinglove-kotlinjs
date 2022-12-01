@@ -32,4 +32,10 @@ object PostCreator {
             Post(title = "p 1 i 0", url = "url", imageUrl = "imageUrl")
         )
     )
+
+    fun defaultPost() = Post(
+        title = "post",
+        url = "url",
+        imageUrl = "imageUrl"
+    )
 }
