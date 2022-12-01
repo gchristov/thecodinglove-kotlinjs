@@ -46,6 +46,7 @@ internal class RealPreloadSearchResultUseCase(
         searchResult: SearchWithHistoryUseCase.Result.Valid,
     ) {
         val updatedSearchSession = searchSession.copy(
+            totalPosts = searchResult.totalPosts,
             searchHistory = searchSession.searchHistory.toMutableMap().apply {
                 insert(
                     postPage = searchResult.postPage,
