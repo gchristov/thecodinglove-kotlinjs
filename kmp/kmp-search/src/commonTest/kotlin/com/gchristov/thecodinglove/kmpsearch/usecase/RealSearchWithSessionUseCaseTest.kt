@@ -30,6 +30,39 @@ class RealSearchWithSessionUseCaseTest {
     }
 
     @Test
+    fun searchWithSessionIdReturnsPreloadedPost(): TestResult {
+        val searchType = SearchType.WithSessionId(
+            query = SearchQuery,
+            sessionId = SearchSessionId
+        )
+        val searchResult = SearchWithHistoryResultCreator.validResult(query = SearchQuery)
+        val preloadedPost = PostCreator.defaultPost()
+        val searchSession = SearchSessionCreator.searchSession(
+            id = SearchSessionId,
+            query = SearchQuery,
+            preloadedPost = preloadedPost
+        )
+
+        return runBlockingTest(
+            singleSearchInvocationResult = searchResult,
+            searchSession = searchSession,
+        ) { useCase, searchRepository, searchWithHistoryUseCase ->
+            val actualResult = useCase.invoke(searchType = searchType)
+            searchWithHistoryUseCase.assertNotInvoked()
+            searchRepository.assertSessionFetched()
+            assertEquals(
+                expected = SearchWithSessionUseCase.Result.Valid(
+                    searchSessionId = searchSession.id,
+                    query = searchSession.query,
+                    post = preloadedPost,
+                    totalPosts = searchSession.totalPosts ?: 0
+                ),
+                actual = actualResult
+            )
+        }
+    }
+
+    @Test
     fun searchWithSessionIdReusesSession(): TestResult {
         val searchType = SearchType.WithSessionId(
             query = SearchQuery,
