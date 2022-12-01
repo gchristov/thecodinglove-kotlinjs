@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.kmpsearchtestfixtures
 
-import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
 
-object SearchResultCreator {
-    fun validResult(query: String) = SearchUseCase.Result.Valid(
+object SearchWithHistoryResultCreator {
+    fun validResult(query: String) = SearchWithHistoryUseCase.Result.Valid(
         query = query,
         totalPosts = 1,
         post = PostCreator.singlePageSinglePost()[1]!![0],

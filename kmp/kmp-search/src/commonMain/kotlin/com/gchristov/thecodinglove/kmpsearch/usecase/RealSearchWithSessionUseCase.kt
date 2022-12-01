@@ -5,7 +5,7 @@ import com.gchristov.thecodinglove.kmpsearch.insert
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchSession
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchType
-import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -13,28 +13,28 @@ import kotlinx.coroutines.withContext
 internal class RealSearchWithSessionUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
-    private val searchUseCase: SearchUseCase,
+    private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
 ) : SearchWithSessionUseCase {
     override suspend operator fun invoke(
         searchType: SearchType
     ): SearchWithSessionUseCase.Result = withContext(dispatcher) {
         val searchSession = getSearchSession(searchType)
-        val searchResult = searchUseCase(
+        val searchResult = searchWithHistoryUseCase(
             query = searchSession.query,
             totalPosts = searchSession.totalPosts,
             searchHistory = searchSession.searchHistory,
         )
         when (searchResult) {
-            is SearchUseCase.Result.Empty -> SearchWithSessionUseCase.Result.Empty
-            is SearchUseCase.Result.Exhausted -> {
+            is SearchWithHistoryUseCase.Result.Empty -> SearchWithSessionUseCase.Result.Empty
+            is SearchWithHistoryUseCase.Result.Exhausted -> {
                 clearSearchSessionHistory(searchSession)
                 invoke(searchType = searchType)
             }
 
-            is SearchUseCase.Result.Valid -> {
-                insertSearchResultInSessionHistory(
+            is SearchWithHistoryUseCase.Result.Valid -> {
+                insertSearchResultInSession(
                     searchSession = searchSession,
-                    searchResult = searchResult
+                    searchResult = searchResult,
                 )
                 SearchWithSessionUseCase.Result.Valid(
                     searchSessionId = searchSession.id,
@@ -62,9 +62,9 @@ internal class RealSearchWithSessionUseCase(
         }
     }
 
-    private suspend fun insertSearchResultInSessionHistory(
+    private suspend fun insertSearchResultInSession(
         searchSession: SearchSession,
-        searchResult: SearchUseCase.Result.Valid
+        searchResult: SearchWithHistoryUseCase.Result.Valid,
     ) {
         val updatedSearchSession = searchSession.copy(
             totalPosts = searchResult.totalPosts,

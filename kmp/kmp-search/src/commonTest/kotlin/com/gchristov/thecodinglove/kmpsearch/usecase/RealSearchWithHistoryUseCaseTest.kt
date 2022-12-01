@@ -5,7 +5,7 @@ import com.gchristov.thecodinglove.kmpsearch.contains
 import com.gchristov.thecodinglove.kmpsearch.insert
 import com.gchristov.thecodinglove.kmpsearchdata.model.Post
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchConfig
-import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.FakeSearchRepository
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.PostCreator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,7 +17,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealSearchUseCaseTest {
+class RealSearchWithHistoryUseCaseTest {
     @Test
     fun searchWithNoResultsReturnsEmpty(): TestResult {
         val totalPosts = 0
@@ -32,7 +32,7 @@ class RealSearchUseCaseTest {
                 searchHistory = mutableMapOf(),
             )
             assertEquals(
-                expected = SearchUseCase.Result.Empty,
+                expected = SearchWithHistoryUseCase.Result.Empty,
                 actual = actualResult
             )
         }
@@ -52,7 +52,7 @@ class RealSearchUseCaseTest {
                 searchHistory = mutableMapOf(),
             )
             assertEquals(
-                expected = SearchUseCase.Result.Empty,
+                expected = SearchWithHistoryUseCase.Result.Empty,
                 actual = actualResult,
             )
         }
@@ -72,7 +72,7 @@ class RealSearchUseCaseTest {
                 searchHistory = mutableMapOf(),
             )
             assertEquals(
-                expected = SearchUseCase.Result.Valid(
+                expected = SearchWithHistoryUseCase.Result.Valid(
                     query = SearchQuery,
                     totalPosts = 1,
                     post = pages[1]!!.first(),
@@ -104,7 +104,7 @@ class RealSearchUseCaseTest {
                 val actualResult = it.invoke(
                     query = SearchQuery,
                     searchHistory = searchHistory,
-                ) as SearchUseCase.Result.Valid
+                ) as SearchWithHistoryUseCase.Result.Valid
                 // Ensure post isn't already picked
                 assertFalse {
                     searchHistory.contains(
@@ -139,7 +139,7 @@ class RealSearchUseCaseTest {
                 val actualResult = it.invoke(
                     query = SearchQuery,
                     searchHistory = searchHistory,
-                ) as SearchUseCase.Result.Valid
+                ) as SearchWithHistoryUseCase.Result.Valid
                 searchHistory.insert(
                     postPage = actualResult.postPage,
                     postIndexOnPage = actualResult.postIndexOnPage,
@@ -160,20 +160,20 @@ class RealSearchUseCaseTest {
                 query = SearchQuery,
                 searchHistory = searchHistory,
             )
-            assertTrue { actualResult == SearchUseCase.Result.Exhausted }
+            assertTrue { actualResult == SearchWithHistoryUseCase.Result.Exhausted }
         }
     }
 
     private fun runBlockingTest(
         totalPosts: Int,
         pages: Map<Int, List<Post>>,
-        testBlock: suspend (SearchUseCase) -> Unit
+        testBlock: suspend (SearchWithHistoryUseCase) -> Unit
     ): TestResult = runTest {
         val searchRepository = FakeSearchRepository(
             totalPosts = totalPosts,
             pages = pages
         )
-        val useCase = RealSearchUseCase(
+        val useCase = RealSearchWithHistoryUseCase(
             dispatcher = FakeCoroutineDispatcher,
             searchRepository = searchRepository,
             searchConfig = SearchConfig

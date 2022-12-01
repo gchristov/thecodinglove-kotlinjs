@@ -3,24 +3,24 @@ package com.gchristov.thecodinglove.kmpsearch.usecase
 import com.gchristov.thecodinglove.kmpsearch.*
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchConfig
-import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchUseCase
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
-internal class RealSearchUseCase(
+internal class RealSearchWithHistoryUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchConfig: SearchConfig
-) : SearchUseCase {
+) : SearchWithHistoryUseCase {
     override suspend operator fun invoke(
         query: String,
         totalPosts: Int?,
         searchHistory: Map<Int, List<Int>>,
-    ): SearchUseCase.Result = withContext(dispatcher) {
+    ): SearchWithHistoryUseCase.Result = withContext(dispatcher) {
         val totalResults = totalPosts ?: searchRepository.getTotalPosts(query)
         if (totalResults <= 0) {
-            return@withContext SearchUseCase.Result.Empty
+            return@withContext SearchWithHistoryUseCase.Result.Empty
         }
         val randomPostPage = Random.nextRandomPage(
             totalResults = totalResults,
@@ -28,24 +28,24 @@ internal class RealSearchUseCase(
             exclusions = searchHistory.getExcludedPages()
         )
         when (randomPostPage) {
-            is RandomResult.Exhausted -> SearchUseCase.Result.Exhausted
-            is RandomResult.Invalid -> SearchUseCase.Result.Empty
+            is RandomResult.Exhausted -> SearchWithHistoryUseCase.Result.Exhausted
+            is RandomResult.Invalid -> SearchWithHistoryUseCase.Result.Empty
             is RandomResult.Valid -> {
                 val searchResults = searchRepository.search(
                     page = randomPostPage.number,
                     query = query
                 )
                 if (searchResults.isEmpty()) {
-                    return@withContext SearchUseCase.Result.Empty
+                    return@withContext SearchWithHistoryUseCase.Result.Empty
                 }
                 val randomPostIndexOnPage = Random.nextRandomPostIndex(
                     posts = searchResults,
                     exclusions = searchHistory.getExcludedPostIndexes(randomPostPage.number)
                 )
                 when (randomPostIndexOnPage) {
-                    is RandomResult.Exhausted -> SearchUseCase.Result.Exhausted
-                    is RandomResult.Invalid -> SearchUseCase.Result.Empty
-                    is RandomResult.Valid -> SearchUseCase.Result.Valid(
+                    is RandomResult.Exhausted -> SearchWithHistoryUseCase.Result.Exhausted
+                    is RandomResult.Invalid -> SearchWithHistoryUseCase.Result.Empty
+                    is RandomResult.Valid -> SearchWithHistoryUseCase.Result.Valid(
                         query = query,
                         totalPosts = totalResults,
                         post = searchResults[randomPostIndexOnPage.number],
