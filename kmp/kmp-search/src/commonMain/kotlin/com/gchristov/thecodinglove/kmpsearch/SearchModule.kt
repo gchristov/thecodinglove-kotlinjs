@@ -2,11 +2,13 @@ package com.gchristov.thecodinglove.kmpsearch
 
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.kmpcommondi.inject
+import com.gchristov.thecodinglove.kmpsearch.usecase.RealPreloadSearchResultUseCase
 import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchWithHistoryUseCase
 import com.gchristov.thecodinglove.kmpsearch.usecase.RealSearchWithSessionUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.SearchDataModule
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchConfig
+import com.gchristov.thecodinglove.kmpsearchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,12 @@ object SearchModule : DiModule() {
             }
             bindProvider {
                 provideSearchWithSessionUseCase(
+                    searchRepository = inject(),
+                    searchWithHistoryUseCase = inject(),
+                )
+            }
+            bindProvider {
+                providePreloadSearchResultUseCase(
                     searchRepository = inject(),
                     searchWithHistoryUseCase = inject(),
                 )
@@ -55,5 +63,16 @@ object SearchModule : DiModule() {
         searchWithHistoryUseCase = searchWithHistoryUseCase
     )
 
+    private fun providePreloadSearchResultUseCase(
+        searchRepository: SearchRepository,
+        searchWithHistoryUseCase: SearchWithHistoryUseCase
+    ): PreloadSearchResultUseCase = RealPreloadSearchResultUseCase(
+        dispatcher = Dispatchers.Default,
+        searchRepository = searchRepository,
+        searchWithHistoryUseCase = searchWithHistoryUseCase
+    )
+
     fun injectSearchWithSessionUseCase(): SearchWithSessionUseCase = inject()
+
+    fun injectPreloadSearchResultUseCase(): PreloadSearchResultUseCase = inject()
 }

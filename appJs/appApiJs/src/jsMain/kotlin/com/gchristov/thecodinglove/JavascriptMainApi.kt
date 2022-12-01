@@ -18,6 +18,7 @@ internal actual fun serveApi(args: Array<String>) {
 
         // TODO: Do not use GlobalScope
         GlobalScope.launch {
+            println("Performing normal search")
             val search = SearchModule.injectSearchWithSessionUseCase()
             val searchType = searchSessionId?.let {
                 SearchType.WithSessionId(
@@ -29,6 +30,12 @@ internal actual fun serveApi(args: Array<String>) {
             val result = searchResult.toResult()
             val jsonResponse = Json.encodeToString(result)
             response.send(jsonResponse)
+            if (result is Result.Valid) {
+                println("Preloading next result")
+                val preload = SearchModule.injectPreloadSearchResultUseCase()
+                val preloadResult = preload(result.searchSessionId)
+                println("Preload result $preloadResult")
+            }
         }
     }
 }
