@@ -156,13 +156,13 @@ class RealSearchWithSessionUseCaseTest {
             ?: multiSearchInvocationResults
             ?: emptyList()
         val searchRepository = FakeSearchRepository(searchSession = searchSession)
-        val searchUseCase = FakeSearchWithHistoryUseCase(invocationResults = searchInvocationResults)
+        val searchWithHistoryUseCase = FakeSearchWithHistoryUseCase(invocationResults = searchInvocationResults)
         val useCase = RealSearchWithSessionUseCase(
             dispatcher = FakeCoroutineDispatcher,
             searchRepository = searchRepository,
-            searchWithHistoryUseCase = searchUseCase
+            searchWithHistoryUseCase = searchWithHistoryUseCase
         )
-        testBlock(useCase, searchRepository, searchUseCase)
+        testBlock(useCase, searchRepository, searchWithHistoryUseCase)
     }
 }
 
