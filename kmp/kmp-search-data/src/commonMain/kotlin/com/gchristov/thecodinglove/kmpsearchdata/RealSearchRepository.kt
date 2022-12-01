@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.kmpsearchdata
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.kmphtmlparse.HtmlPostParser
 import com.gchristov.thecodinglove.kmpsearchdata.api.ApiSearchSession
 import com.gchristov.thecodinglove.kmpsearchdata.model.*
@@ -11,7 +12,7 @@ internal class RealSearchRepository(
     private val htmlPostParser: HtmlPostParser,
     private val firebaseFirestore: FirebaseFirestore
 ) : SearchRepository {
-    override suspend fun getTotalPosts(query: String): Int {
+    override suspend fun getTotalPosts(query: String): Either<Exception, Int> {
         val response = apiService.search(
             // First page should always exist if there are results
             page = 1,
@@ -23,12 +24,12 @@ internal class RealSearchRepository(
     override suspend fun search(
         page: Int,
         query: String
-    ): List<Post> {
+    ): Either<Exception, List<Post>> {
         val response = apiService.search(
             page = page,
             query = query
         ).bodyAsText()
-        return htmlPostParser.parsePosts(response).map { it.toPost() }
+        return htmlPostParser.parsePosts(response).map { posts -> posts.map { it.toPost() } }
     }
 
     override suspend fun getSearchSession(id: String): SearchSession? {

@@ -10,6 +10,7 @@ kotlin {
             dependencies {
                 api(Deps.Kotlin.coroutinesCore)
                 api(Deps.Uuid.uuid)
+                api(Deps.Arrow.core)
             }
         }
     }

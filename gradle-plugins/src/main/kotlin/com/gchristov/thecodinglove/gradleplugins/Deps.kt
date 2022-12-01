@@ -2,6 +2,10 @@ package com.gchristov.thecodinglove.gradleplugins
 
 @Suppress("unused")
 class Deps {
+    object Arrow {
+        const val core = "io.arrow-kt:arrow-core:1.1.3"
+    }
+
     object Firebase {
         const val firestore = "dev.gitlive:firebase-firestore:1.6.2"
         val firebase = NpmDependency("firebase", "9.10.0")
@@ -40,7 +44,7 @@ class Deps {
     }
 
     object Uuid {
-        val uuid = "com.benasher44:uuid:0.6.0"
+        const val uuid = "com.benasher44:uuid:0.6.0"
     }
 }
 

@@ -18,7 +18,13 @@ internal class RealSearchWithHistoryUseCase(
         totalPosts: Int?,
         searchHistory: Map<Int, List<Int>>,
     ): SearchWithHistoryUseCase.Result = withContext(dispatcher) {
-        val totalResults = totalPosts ?: searchRepository.getTotalPosts(query)
+        val totalResults = totalPosts ?: searchRepository.getTotalPosts(query).fold(
+            ifLeft = { exception ->
+                exception.printStackTrace()
+                0
+            },
+            ifRight = { it }
+        )
         if (totalResults <= 0) {
             return@withContext SearchWithHistoryUseCase.Result.Empty
         }
@@ -27,34 +33,50 @@ internal class RealSearchWithHistoryUseCase(
             resultsPerPage = searchConfig.postsPerPage,
             exclusions = searchHistory.getExcludedPages()
         )
-        when (randomPostPage) {
-            is RandomResult.Exhausted -> SearchWithHistoryUseCase.Result.Exhausted
-            is RandomResult.Invalid -> SearchWithHistoryUseCase.Result.Empty
-            is RandomResult.Valid -> {
+        randomPostPage.fold(
+            ifLeft = { randomError ->
+                when (randomError) {
+                    is RandomError.Exhausted -> SearchWithHistoryUseCase.Result.Exhausted
+                    is RandomError.Invalid -> SearchWithHistoryUseCase.Result.Empty
+                }
+            },
+            ifRight = { postPage ->
                 val searchResults = searchRepository.search(
-                    page = randomPostPage.number,
+                    page = postPage,
                     query = query
+                ).fold(
+                    ifLeft = { exception ->
+                        exception.printStackTrace()
+                        emptyList()
+                    },
+                    ifRight = { it }
                 )
                 if (searchResults.isEmpty()) {
                     return@withContext SearchWithHistoryUseCase.Result.Empty
                 }
                 val randomPostIndexOnPage = Random.nextRandomPostIndex(
                     posts = searchResults,
-                    exclusions = searchHistory.getExcludedPostIndexes(randomPostPage.number)
+                    exclusions = searchHistory.getExcludedPostIndexes(postPage)
                 )
-                when (randomPostIndexOnPage) {
-                    is RandomResult.Exhausted -> SearchWithHistoryUseCase.Result.Exhausted
-                    is RandomResult.Invalid -> SearchWithHistoryUseCase.Result.Empty
-                    is RandomResult.Valid -> SearchWithHistoryUseCase.Result.Valid(
-                        query = query,
-                        totalPosts = totalResults,
-                        post = searchResults[randomPostIndexOnPage.number],
-                        postPage = randomPostPage.number,
-                        postIndexOnPage = randomPostIndexOnPage.number,
-                        postPageSize = searchResults.size
-                    )
-                }
+                randomPostIndexOnPage.fold(
+                    ifLeft = { randomError ->
+                        when (randomError) {
+                            is RandomError.Exhausted -> SearchWithHistoryUseCase.Result.Exhausted
+                            is RandomError.Invalid -> SearchWithHistoryUseCase.Result.Empty
+                        }
+                    },
+                    ifRight = { postIndexOnPage ->
+                        SearchWithHistoryUseCase.Result.Valid(
+                            query = query,
+                            totalPosts = totalResults,
+                            post = searchResults[postIndexOnPage],
+                            postPage = postPage,
+                            postIndexOnPage = postIndexOnPage,
+                            postPageSize = searchResults.size
+                        )
+                    }
+                )
             }
-        }
+        )
     }
 }
