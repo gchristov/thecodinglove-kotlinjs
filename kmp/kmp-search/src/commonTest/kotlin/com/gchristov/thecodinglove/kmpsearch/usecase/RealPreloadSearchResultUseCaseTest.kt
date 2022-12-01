@@ -7,6 +7,7 @@ import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCas
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.FakeSearchRepository
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.FakeSearchWithHistoryUseCase
 import com.gchristov.thecodinglove.kmpsearchtestfixtures.SearchSessionCreator
+import com.gchristov.thecodinglove.kmpsearchtestfixtures.SearchWithHistoryResultCreator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
@@ -25,6 +26,24 @@ class RealPreloadSearchResultUseCaseTest {
                 expected = PreloadSearchResultUseCase.Result.SessionNotFound,
                 actual = actualResult
             )
+        }
+    }
+
+    @Test
+    fun preloadWithSessionIdReusesSession(): TestResult {
+        val searchResult = SearchWithHistoryResultCreator.validResult(query = SearchQuery)
+        val searchSession = SearchSessionCreator.searchSession(
+            id = SearchSessionId,
+            query = SearchQuery
+        )
+
+        return runBlockingTest(
+            singleSearchInvocationResult = searchResult,
+            searchSession = searchSession,
+        ) { useCase, searchRepository, searchWithHistoryUseCase ->
+            useCase.invoke(searchSessionId = SearchSessionId)
+            searchWithHistoryUseCase.assertInvokedOnce()
+            searchRepository.assertSessionFetched()
         }
     }
 
@@ -49,24 +68,6 @@ class RealPreloadSearchResultUseCaseTest {
             )
         }
     }
-
-//    @Test
-//    fun searchWithSessionIdReusesSession(): TestResult {
-//        val searchResult = SearchWithHistoryResultCreator.validResult(query = SearchQuery)
-//        val searchSession = SearchSessionCreator.searchSession(
-//            id = SearchSessionId,
-//            query = SearchQuery
-//        )
-//
-//        return runBlockingTest(
-//            singleSearchInvocationResult = searchResult,
-//            searchSession = searchSession,
-//        ) { useCase, searchRepository, searchWithHistoryUseCase ->
-//            useCase.invoke(searchSessionId = SearchSessionId)
-//            searchWithHistoryUseCase.assertInvokedOnce()
-//            searchRepository.assertSessionFetched()
-//        }
-//    }
 //
 //    @Test
 //    fun searchWithExhaustedResultClearsSearchSessionHistoryAndRetries(): TestResult {
