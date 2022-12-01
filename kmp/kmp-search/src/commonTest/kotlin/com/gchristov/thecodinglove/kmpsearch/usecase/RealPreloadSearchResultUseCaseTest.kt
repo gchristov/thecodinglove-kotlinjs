@@ -4,10 +4,7 @@ import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchSession
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
-import com.gchristov.thecodinglove.kmpsearchtestfixtures.FakeSearchRepository
-import com.gchristov.thecodinglove.kmpsearchtestfixtures.FakeSearchWithHistoryUseCase
-import com.gchristov.thecodinglove.kmpsearchtestfixtures.SearchSessionCreator
-import com.gchristov.thecodinglove.kmpsearchtestfixtures.SearchWithHistoryResultCreator
+import com.gchristov.thecodinglove.kmpsearchtestfixtures.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
@@ -68,44 +65,40 @@ class RealPreloadSearchResultUseCaseTest {
             )
         }
     }
-//
-//    @Test
-//    fun searchWithExhaustedResultClearsSearchSessionHistoryAndRetries(): TestResult {
-//        val searchType = SearchType.WithSessionId(
-//            query = SearchQuery,
-//            sessionId = SearchSessionId
-//        )
-//        val searchResults = listOf(
-//            SearchWithHistoryUseCase.Result.Exhausted,
-//            SearchWithHistoryUseCase.Result.Empty
-//        )
-//        val searchSession = SearchSessionCreator.searchSession(
-//            id = SearchSessionId,
-//            query = SearchQuery,
-//            searchHistory = mapOf(1 to listOf(0, 1, 2, 3))
-//        )
-//
-//        return runBlockingTest(
-//            singleSearchInvocationResult = null,
-//            multiSearchInvocationResults = searchResults,
-//            searchSession = searchSession,
-//        ) { useCase, searchRepository, searchWithHistoryUseCase ->
-//            useCase.invoke(searchType)
-//            searchWithHistoryUseCase.assertInvokedTwice()
-//            searchRepository.assertSessionSaved(
-//                SearchSession(
-//                    id = searchSession.id,
-//                    query = searchSession.query,
-//                    totalPosts = null,
-//                    searchHistory = emptyMap(),
-//                    currentPost = null,
-//                    preloadedPost = null,
-//                    state = SearchSession.State.Searching
-//                )
-//            )
-//        }
-//    }
-//
+
+    @Test
+    fun preloadWithExhaustedResultClearsSearchSessionHistoryAndRetries(): TestResult {
+        val searchResults = listOf(
+            SearchWithHistoryUseCase.Result.Exhausted,
+            SearchWithHistoryUseCase.Result.Empty
+        )
+        val searchSession = SearchSessionCreator.searchSession(
+            id = SearchSessionId,
+            query = SearchQuery,
+            searchHistory = mapOf(1 to listOf(0, 1, 2, 3)),
+            preloadedPost = PostCreator.defaultPost()
+        )
+
+        return runBlockingTest(
+            multiSearchInvocationResults = searchResults,
+            searchSession = searchSession,
+        ) { useCase, searchRepository, searchWithHistoryUseCase ->
+            useCase.invoke(searchSessionId = SearchSessionId)
+            searchWithHistoryUseCase.assertInvokedTwice()
+            searchRepository.assertSessionSaved(
+                SearchSession(
+                    id = searchSession.id,
+                    query = searchSession.query,
+                    totalPosts = null,
+                    searchHistory = emptyMap(),
+                    currentPost = searchSession.preloadedPost,
+                    preloadedPost = null,
+                    state = SearchSession.State.Searching
+                )
+            )
+        }
+    }
+
 //    @Test
 //    fun searchUpdatesSessionAndReturnsValidResult(): TestResult {
 //        val searchType = SearchType.WithSessionId(
