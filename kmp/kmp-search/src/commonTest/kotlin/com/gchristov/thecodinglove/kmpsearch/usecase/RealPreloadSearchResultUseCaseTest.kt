@@ -72,11 +72,12 @@ class RealPreloadSearchResultUseCaseTest {
             SearchWithHistoryUseCase.Result.Exhausted,
             SearchWithHistoryUseCase.Result.Empty
         )
+        val oldPreloadedPost = PostCreator.defaultPost()
         val searchSession = SearchSessionCreator.searchSession(
             id = SearchSessionId,
             query = SearchQuery,
             searchHistory = mapOf(1 to listOf(0, 1, 2, 3)),
-            preloadedPost = PostCreator.defaultPost()
+            preloadedPost = oldPreloadedPost
         )
 
         return runBlockingTest(
@@ -91,7 +92,7 @@ class RealPreloadSearchResultUseCaseTest {
                     query = searchSession.query,
                     totalPosts = null,
                     searchHistory = emptyMap(),
-                    currentPost = searchSession.preloadedPost,
+                    currentPost = oldPreloadedPost,
                     preloadedPost = null,
                     state = SearchSession.State.Searching
                 )
@@ -102,10 +103,11 @@ class RealPreloadSearchResultUseCaseTest {
     @Test
     fun preloadUpdatesSessionAndReturnsSuccessResult(): TestResult {
         val searchResult = SearchWithHistoryResultCreator.validResult(query = SearchQuery)
+        val oldPreloadedPost = PostCreator.defaultPost()
         val searchSession = SearchSessionCreator.searchSession(
             id = SearchSessionId,
             query = SearchQuery,
-            preloadedPost = searchResult.post
+            preloadedPost = oldPreloadedPost
         )
 
         return runBlockingTest(
@@ -124,7 +126,40 @@ class RealPreloadSearchResultUseCaseTest {
                     query = SearchQuery,
                     totalPosts = searchResult.totalPosts,
                     searchHistory = mapOf(1 to listOf(0, -1)),
-                    currentPost = searchSession.preloadedPost,
+                    currentPost = oldPreloadedPost,
+                    preloadedPost = searchResult.post,
+                    state = SearchSession.State.Searching
+                )
+            )
+        }
+    }
+
+    @Test
+    fun preloadKeepsCurrentPostIfNothingPreviouslyPreloaded(): TestResult {
+        val searchResult = SearchWithHistoryResultCreator.validResult(query = SearchQuery)
+        val searchSession = SearchSessionCreator.searchSession(
+            id = SearchSessionId,
+            query = SearchQuery,
+            preloadedPost = null
+        )
+
+        return runBlockingTest(
+            singleSearchInvocationResult = searchResult,
+            searchSession = searchSession,
+        ) { useCase, searchRepository, searchWithHistoryUseCase ->
+            val actualResult = useCase.invoke(searchSessionId = SearchSessionId)
+            searchWithHistoryUseCase.assertInvokedOnce()
+            assertEquals(
+                expected = PreloadSearchResultUseCase.Result.Success,
+                actual = actualResult
+            )
+            searchRepository.assertSessionSaved(
+                SearchSession(
+                    id = searchSession.id,
+                    query = SearchQuery,
+                    totalPosts = searchResult.totalPosts,
+                    searchHistory = mapOf(1 to listOf(0, -1)),
+                    currentPost = searchSession.currentPost,
                     preloadedPost = searchResult.post,
                     state = SearchSession.State.Searching
                 )
