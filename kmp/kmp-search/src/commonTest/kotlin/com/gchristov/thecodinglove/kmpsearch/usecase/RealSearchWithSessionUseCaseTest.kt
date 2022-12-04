@@ -51,7 +51,7 @@ class RealSearchWithSessionUseCaseTest {
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
             searchSession = searchSession,
         ) { useCase, searchRepository, searchWithHistoryUseCase ->
-            val actualResult = useCase.invoke(searchType = searchType)
+            val actualResult = useCase.invoke(type = searchType)
             searchWithHistoryUseCase.assertNotInvoked()
             searchRepository.assertSessionFetched()
             assertEquals(
@@ -84,7 +84,7 @@ class RealSearchWithSessionUseCaseTest {
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
             searchSession = searchSession,
         ) { useCase, searchRepository, searchWithHistoryUseCase ->
-            useCase.invoke(searchType = searchType)
+            useCase.invoke(type = searchType)
             searchWithHistoryUseCase.assertInvokedOnce()
             searchRepository.assertSessionFetched()
         }
