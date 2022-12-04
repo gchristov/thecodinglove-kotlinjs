@@ -9,7 +9,7 @@ internal fun Random.nextRandomPage(
     totalResults: Int,
     resultsPerPage: Int,
     exclusions: List<Int>
-): Either<RandomError, Int> {
+): Either<RangeException, Int> {
     val min = 1
     val max = max(
         a = min,
@@ -25,14 +25,14 @@ internal fun Random.nextRandomPage(
 internal fun Random.nextRandomPostIndex(
     posts: List<Post>,
     exclusions: List<Int>
-): Either<RandomError, Int> {
+): Either<RangeException, Int> {
     val min = 0
     val max = max(
         a = min,
         b = posts.size
     )
     if (max == 0) {
-        return Either.Left(RandomError.Invalid)
+        return Either.Left(RangeException.Empty)
     }
     return nextRandomIntInRange(
         start = min,
@@ -51,12 +51,12 @@ private fun Random.nextRandomIntInRange(
     start: Int,
     end: Int,
     exclusions: List<Int>
-): Either<RandomError, Int> {
+): Either<RangeException, Int> {
     // Make sure the numbers are sorted
     val sorted = exclusions.sorted()
     val rangeLength = end - start - sorted.size
     if (rangeLength <= 0) {
-        return Either.Left(RandomError.Exhausted)
+        return Either.Left(RangeException.Exhausted)
     }
     var randomInt: Int = nextInt(rangeLength) + start
     for (item in sorted) {
@@ -68,7 +68,7 @@ private fun Random.nextRandomIntInRange(
     return Either.Right(randomInt)
 }
 
-internal sealed class RandomError {
-    object Invalid : RandomError()
-    object Exhausted : RandomError()
+internal sealed class RangeException : Exception() {
+    object Empty : RangeException()
+    object Exhausted : RangeException()
 }

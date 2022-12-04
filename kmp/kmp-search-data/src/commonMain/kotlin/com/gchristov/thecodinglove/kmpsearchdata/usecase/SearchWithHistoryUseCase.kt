@@ -1,5 +1,7 @@
 package com.gchristov.thecodinglove.kmpsearchdata.usecase
 
+import arrow.core.Either
+import com.gchristov.thecodinglove.kmpsearchdata.SearchException
 import com.gchristov.thecodinglove.kmpsearchdata.model.Post
 
 /**
@@ -15,18 +17,14 @@ interface SearchWithHistoryUseCase {
         query: String,
         totalPosts: Int? = null,
         searchHistory: Map<Int, List<Int>>,
-    ) : Result
+    ) : Either<SearchException, Result>
 
-    sealed class Result {
-        object Empty : Result()
-        object Exhausted : Result()
-        data class Valid(
-            val query: String,
-            val totalPosts: Int,
-            val post: Post,
-            val postPage: Int,
-            val postIndexOnPage: Int,
-            val postPageSize: Int
-        ) : Result()
-    }
+    data class Result(
+        val query: String,
+        val totalPosts: Int,
+        val post: Post,
+        val postPage: Int,
+        val postIndexOnPage: Int,
+        val postPageSize: Int
+    )
 }
