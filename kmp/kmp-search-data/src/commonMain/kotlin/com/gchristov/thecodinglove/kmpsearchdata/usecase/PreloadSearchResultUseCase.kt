@@ -1,5 +1,8 @@
 package com.gchristov.thecodinglove.kmpsearchdata.usecase
 
+import arrow.core.Either
+import com.gchristov.thecodinglove.kmpsearchdata.SearchException
+
 /**
 Use-case to preload the next search result for faster API responses. Implementations should:
 - obtain the search session
@@ -7,11 +10,5 @@ Use-case to preload the next search result for faster API responses. Implementat
 - persist the preloaded post in the search session
  */
 interface PreloadSearchResultUseCase {
-    suspend operator fun invoke(searchSessionId: String) : Result
-
-    sealed class Result {
-        object Success : Result()
-        object SessionNotFound : Result()
-        object Empty : Result()
-    }
+    suspend operator fun invoke(searchSessionId: String) : Either<SearchException, Unit>
 }

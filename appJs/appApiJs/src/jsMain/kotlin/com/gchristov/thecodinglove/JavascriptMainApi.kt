@@ -25,22 +25,25 @@ internal actual fun serveApi(args: Array<String>) {
                     sessionId = it
                 )
             } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
-            search(searchType).fold(
-                ifLeft = {
-                    it.printStackTrace()
-                    val jsonResponse = Json.encodeToString(Result.Empty)
-                    response.send(jsonResponse)
-                },
-                ifRight = {
-                    val result = it.toResult()
-                    val jsonResponse = Json.encodeToString(result)
-                    response.send(jsonResponse)
-                    println("Preloading next result")
-                    val preload = SearchModule.injectPreloadSearchResultUseCase()
-                    val preloadResult = preload(result.searchSessionId)
-                    println("Preload result $preloadResult")
-                }
-            )
+            search(searchType)
+                .fold(
+                    ifLeft = {
+                        it.printStackTrace()
+                        val jsonResponse = Json.encodeToString(Result.Empty)
+                        response.send(jsonResponse)
+                    },
+                    ifRight = { searchResult ->
+                        val jsonResponse = Json.encodeToString(searchResult.toResult())
+                        response.send(jsonResponse)
+                        println("Preloading next result")
+                        val preload = SearchModule.injectPreloadSearchResultUseCase()
+                        preload(searchResult.searchSessionId)
+                            .fold(
+                                ifLeft = { it.printStackTrace() },
+                                ifRight = { println("Preload complete") }
+                            )
+                    }
+                )
         }
     }
 }

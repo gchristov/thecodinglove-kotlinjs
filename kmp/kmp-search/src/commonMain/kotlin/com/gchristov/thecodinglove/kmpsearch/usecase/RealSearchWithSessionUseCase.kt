@@ -40,7 +40,7 @@ internal class RealSearchWithSessionUseCase(
                     ifLeft = {
                         when (it) {
                             is SearchException.Exhausted -> {
-                                searchSession.clearHistory(searchRepository)
+                                searchSession.clearExhaustedHistory(searchRepository)
                                 invoke(type = type)
                             }
 
@@ -48,7 +48,7 @@ internal class RealSearchWithSessionUseCase(
                         }
                     },
                     ifRight = { searchResult ->
-                        searchSession.insert(
+                        searchSession.insertCurrentPost(
                             searchResult = searchResult,
                             searchRepository = searchRepository
                         )
@@ -82,7 +82,7 @@ private suspend fun SearchWithSessionUseCase.Type.getSearchSession(searchReposit
     }
 }
 
-private suspend fun SearchSession.insert(
+private suspend fun SearchSession.insertCurrentPost(
     searchResult: SearchWithHistoryUseCase.Result,
     searchRepository: SearchRepository
 ) {
@@ -100,7 +100,7 @@ private suspend fun SearchSession.insert(
     searchRepository.saveSearchSession(updatedSearchSession)
 }
 
-private suspend fun SearchSession.clearHistory(searchRepository: SearchRepository) {
+private suspend fun SearchSession.clearExhaustedHistory(searchRepository: SearchRepository) {
     val updatedSearchSession = copy(
         searchHistory = emptyMap(),
         currentPost = null,
