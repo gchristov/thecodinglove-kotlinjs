@@ -1,8 +1,10 @@
 package com.gchristov.thecodinglove.kmpsearch.usecase
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpsearch.contains
 import com.gchristov.thecodinglove.kmpsearch.insert
+import com.gchristov.thecodinglove.kmpsearchdata.SearchException
 import com.gchristov.thecodinglove.kmpsearchdata.model.Post
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchConfig
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
@@ -32,7 +34,7 @@ class RealSearchWithHistoryUseCaseTest {
                 searchHistory = mutableMapOf(),
             )
             assertEquals(
-                expected = SearchWithHistoryUseCase.Result.Empty,
+                expected = Either.Left(SearchException.Empty),
                 actual = actualResult
             )
         }
@@ -52,7 +54,7 @@ class RealSearchWithHistoryUseCaseTest {
                 searchHistory = mutableMapOf(),
             )
             assertEquals(
-                expected = SearchWithHistoryUseCase.Result.Empty,
+                expected = Either.Left(SearchException.Empty),
                 actual = actualResult,
             )
         }
@@ -72,13 +74,15 @@ class RealSearchWithHistoryUseCaseTest {
                 searchHistory = mutableMapOf(),
             )
             assertEquals(
-                expected = SearchWithHistoryUseCase.Result.Valid(
-                    query = SearchQuery,
-                    totalPosts = 1,
-                    post = pages[1]!!.first(),
-                    postPage = 1,
-                    postIndexOnPage = 0,
-                    postPageSize = 1
+                expected = Either.Right(
+                    SearchWithHistoryUseCase.Result(
+                        query = SearchQuery,
+                        totalPosts = 1,
+                        post = pages[1]!!.first(),
+                        postPage = 1,
+                        postIndexOnPage = 0,
+                        postPageSize = 1
+                    )
                 ),
                 actual = actualResult
             )
@@ -101,10 +105,10 @@ class RealSearchWithHistoryUseCaseTest {
             val maxPostIndexOnPage = 3
 
             for (i in 0 until totalPosts) {
-                val actualResult = it.invoke(
+                val actualResult = (it.invoke(
                     query = SearchQuery,
                     searchHistory = searchHistory,
-                ) as SearchWithHistoryUseCase.Result.Valid
+                ) as Either.Right).value
                 // Ensure post isn't already picked
                 assertFalse {
                     searchHistory.contains(
@@ -136,10 +140,10 @@ class RealSearchWithHistoryUseCaseTest {
             val searchHistory = mutableMapOf<Int, List<Int>>()
 
             for (i in 0 until totalPosts) {
-                val actualResult = it.invoke(
+                val actualResult = (it.invoke(
                     query = SearchQuery,
                     searchHistory = searchHistory,
-                ) as SearchWithHistoryUseCase.Result.Valid
+                ) as Either.Right).value
                 searchHistory.insert(
                     postPage = actualResult.postPage,
                     postIndexOnPage = actualResult.postIndexOnPage,
@@ -161,7 +165,7 @@ class RealSearchWithHistoryUseCaseTest {
                 query = SearchQuery,
                 searchHistory = searchHistory,
             )
-            assertTrue { actualResult == SearchWithHistoryUseCase.Result.Exhausted }
+            assertTrue { actualResult == Either.Left(SearchException.Exhausted) }
         }
     }
 
