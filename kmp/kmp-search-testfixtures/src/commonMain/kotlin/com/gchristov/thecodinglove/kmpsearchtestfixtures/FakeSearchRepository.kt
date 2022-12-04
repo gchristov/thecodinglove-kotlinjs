@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.kmpsearchtestfixtures
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeResponse
 import com.gchristov.thecodinglove.kmpcommontest.execute
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
@@ -21,15 +22,15 @@ class FakeSearchRepository(
     private var searchSessionGetCalled = false
     private var lastSavedSession: SearchSession? = null
 
-    override suspend fun getTotalPosts(query: String): Int {
-        return totalPostsResponse.execute(totalPosts!!)
+    override suspend fun getTotalPosts(query: String): Either<Exception, Int> {
+        return Either.Right(totalPostsResponse.execute(totalPosts!!))
     }
 
     override suspend fun search(
         page: Int,
         query: String
-    ): List<Post> {
-        return searchResponse.execute(pages?.get(page) ?: emptyList())
+    ): Either<Exception, List<Post>> {
+        return Either.Right(searchResponse.execute(pages?.get(page) ?: emptyList()))
     }
 
     override suspend fun getSearchSession(id: String): SearchSession? {

@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove
 
 import com.gchristov.thecodinglove.kmpsearch.SearchModule
-import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchType
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -21,21 +20,30 @@ internal actual fun serveApi(args: Array<String>) {
             println("Performing normal search")
             val search = SearchModule.injectSearchWithSessionUseCase()
             val searchType = searchSessionId?.let {
-                SearchType.WithSessionId(
+                SearchWithSessionUseCase.Type.WithSessionId(
                     query = searchQuery,
                     sessionId = it
                 )
-            } ?: SearchType.NewSession(searchQuery)
-            val searchResult = search(searchType)
-            val result = searchResult.toResult()
-            val jsonResponse = Json.encodeToString(result)
-            response.send(jsonResponse)
-            if (result is Result.Valid) {
-                println("Preloading next result")
-                val preload = SearchModule.injectPreloadSearchResultUseCase()
-                val preloadResult = preload(result.searchSessionId)
-                println("Preload result $preloadResult")
-            }
+            } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
+            search(searchType)
+                .fold(
+                    ifLeft = {
+                        it.printStackTrace()
+                        val jsonResponse = Json.encodeToString(Result.Empty)
+                        response.send(jsonResponse)
+                    },
+                    ifRight = { searchResult ->
+                        val jsonResponse = Json.encodeToString(searchResult.toResult())
+                        response.send(jsonResponse)
+                        println("Preloading next result")
+                        val preload = SearchModule.injectPreloadSearchResultUseCase()
+                        preload(searchResult.searchSessionId)
+                            .fold(
+                                ifLeft = { it.printStackTrace() },
+                                ifRight = { println("Preload complete") }
+                            )
+                    }
+                )
         }
     }
 }
@@ -61,14 +69,11 @@ sealed class Result {
     ) : Result()
 }
 
-private fun SearchWithSessionUseCase.Result.toResult() = when (this) {
-    is SearchWithSessionUseCase.Result.Empty -> Result.Empty
-    is SearchWithSessionUseCase.Result.Valid -> Result.Valid(
-        searchSessionId = searchSessionId,
-        query = query,
-        postTitle = post.title,
-        postUrl = post.url,
-        postImageUrl = post.imageUrl,
-        totalPosts = totalPosts
-    )
-}
+private fun SearchWithSessionUseCase.Result.toResult() = Result.Valid(
+    searchSessionId = searchSessionId,
+    query = query,
+    postTitle = post.title,
+    postUrl = post.url,
+    postImageUrl = post.imageUrl,
+    totalPosts = totalPosts
+)

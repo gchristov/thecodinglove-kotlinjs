@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.kmpsearchtestfixtures
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
 
 object SearchWithHistoryResultCreator {
-    fun validResult(query: String) = SearchWithHistoryUseCase.Result.Valid(
+    fun validResult(query: String) = SearchWithHistoryUseCase.Result(
         query = query,
         totalPosts = 1,
         post = PostCreator.singlePageSinglePost()[1]!![0],

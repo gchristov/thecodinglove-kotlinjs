@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.kmpsearch
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.kmpsearchdata.model.Post
 import kotlin.math.max
 import kotlin.random.Random
@@ -8,7 +9,7 @@ internal fun Random.nextRandomPage(
     totalResults: Int,
     resultsPerPage: Int,
     exclusions: List<Int>
-): RandomResult {
+): Either<RangeException, Int> {
     val min = 1
     val max = max(
         a = min,
@@ -24,14 +25,14 @@ internal fun Random.nextRandomPage(
 internal fun Random.nextRandomPostIndex(
     posts: List<Post>,
     exclusions: List<Int>
-): RandomResult {
+): Either<RangeException, Int> {
     val min = 0
     val max = max(
         a = min,
         b = posts.size
     )
     if (max == 0) {
-        return RandomResult.Invalid
+        return Either.Left(RangeException.Empty)
     }
     return nextRandomIntInRange(
         start = min,
@@ -50,25 +51,24 @@ private fun Random.nextRandomIntInRange(
     start: Int,
     end: Int,
     exclusions: List<Int>
-): RandomResult {
+): Either<RangeException, Int> {
     // Make sure the numbers are sorted
     val sorted = exclusions.sorted()
     val rangeLength = end - start - sorted.size
     if (rangeLength <= 0) {
-        return RandomResult.Exhausted
+        return Either.Left(RangeException.Exhausted)
     }
     var randomInt: Int = nextInt(rangeLength) + start
     for (item in sorted) {
         if (item > randomInt) {
-            return RandomResult.Valid(randomInt)
+            return Either.Right(randomInt)
         }
         randomInt++
     }
-    return RandomResult.Valid(randomInt)
+    return Either.Right(randomInt)
 }
 
-internal sealed class RandomResult {
-    object Invalid : RandomResult()
-    object Exhausted : RandomResult()
-    data class Valid(val number: Int) : RandomResult()
+internal sealed class RangeException : Exception() {
+    object Empty : RangeException()
+    object Exhausted : RangeException()
 }

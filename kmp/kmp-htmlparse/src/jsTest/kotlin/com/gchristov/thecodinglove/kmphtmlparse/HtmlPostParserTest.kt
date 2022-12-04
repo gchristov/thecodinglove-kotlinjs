@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.kmphtmlparse
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmphtmlparsedata.HtmlPost
 import com.gchristov.thecodinglove.kmphtmlparsetestfixtures.HtmlCreator
@@ -7,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HtmlPostParserTest {
@@ -14,7 +16,7 @@ class HtmlPostParserTest {
     fun parseTotalPosts() = runBlockingTest { parser ->
         val actualCount = parser.parseTotalPosts(HtmlCreator.defaultHtml())
         assertEquals(
-            expected = 314,
+            expected = Either.Right(314),
             actual = actualCount
         )
     }
@@ -22,17 +24,14 @@ class HtmlPostParserTest {
     @Test
     fun parseInvalidTotalPosts() = runBlockingTest { parser ->
         val actualCount = parser.parseTotalPosts(HtmlCreator.invalidResultsCountHtml())
-        assertEquals(
-            expected = 0,
-            actual = actualCount
-        )
+        assertTrue { actualCount.isLeft() }
     }
 
     @Test
     fun parsePosts() = runBlockingTest { parser ->
         val actualPosts = parser.parsePosts(HtmlCreator.defaultHtml())
         assertEquals(
-            expected = ActualPostList,
+            expected = Either.Right(ActualPostList),
             actual = actualPosts
         )
     }
@@ -41,7 +40,7 @@ class HtmlPostParserTest {
     fun parseInvalidPosts() = runBlockingTest { parser ->
         val actualPosts = parser.parsePosts(HtmlCreator.invalidHtml())
         assertEquals(
-            expected = emptyList(),
+            expected = Either.Right(emptyList()),
             actual = actualPosts
         )
     }

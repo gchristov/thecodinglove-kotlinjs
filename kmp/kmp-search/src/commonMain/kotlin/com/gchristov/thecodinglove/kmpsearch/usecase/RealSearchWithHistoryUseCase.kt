@@ -1,6 +1,9 @@
 package com.gchristov.thecodinglove.kmpsearch.usecase
 
+import arrow.core.Either
+import arrow.core.flatMap
 import com.gchristov.thecodinglove.kmpsearch.*
+import com.gchristov.thecodinglove.kmpsearchdata.SearchException
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchConfig
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
@@ -17,44 +20,55 @@ internal class RealSearchWithHistoryUseCase(
         query: String,
         totalPosts: Int?,
         searchHistory: Map<Int, List<Int>>,
-    ): SearchWithHistoryUseCase.Result = withContext(dispatcher) {
-        val totalResults = totalPosts ?: searchRepository.getTotalPosts(query)
-        if (totalResults <= 0) {
-            return@withContext SearchWithHistoryUseCase.Result.Empty
-        }
-        val randomPostPage = Random.nextRandomPage(
-            totalResults = totalResults,
-            resultsPerPage = searchConfig.postsPerPage,
-            exclusions = searchHistory.getExcludedPages()
-        )
-        when (randomPostPage) {
-            is RandomResult.Exhausted -> SearchWithHistoryUseCase.Result.Exhausted
-            is RandomResult.Invalid -> SearchWithHistoryUseCase.Result.Empty
-            is RandomResult.Valid -> {
-                val searchResults = searchRepository.search(
-                    page = randomPostPage.number,
-                    query = query
-                )
-                if (searchResults.isEmpty()) {
-                    return@withContext SearchWithHistoryUseCase.Result.Empty
+    ): Either<SearchException, SearchWithHistoryUseCase.Result> = withContext(dispatcher) {
+        // Find total number of posts
+        (totalPosts?.let { Either.Right(it) } ?: searchRepository.getTotalPosts(query))
+            .mapLeft { SearchException.Empty }
+            .flatMap { totalResults ->
+                if (totalResults <= 0) {
+                    return@withContext Either.Left(SearchException.Empty)
                 }
-                val randomPostIndexOnPage = Random.nextRandomPostIndex(
-                    posts = searchResults,
-                    exclusions = searchHistory.getExcludedPostIndexes(randomPostPage.number)
+                // Generate random page number
+                Random.nextRandomPage(
+                    totalResults = totalResults,
+                    resultsPerPage = searchConfig.postsPerPage,
+                    exclusions = searchHistory.getExcludedPages()
                 )
-                when (randomPostIndexOnPage) {
-                    is RandomResult.Exhausted -> SearchWithHistoryUseCase.Result.Exhausted
-                    is RandomResult.Invalid -> SearchWithHistoryUseCase.Result.Empty
-                    is RandomResult.Valid -> SearchWithHistoryUseCase.Result.Valid(
-                        query = query,
-                        totalPosts = totalResults,
-                        post = searchResults[randomPostIndexOnPage.number],
-                        postPage = randomPostPage.number,
-                        postIndexOnPage = randomPostIndexOnPage.number,
-                        postPageSize = searchResults.size
-                    )
-                }
+                    .mapLeft { it.toSearchException() }
+                    .flatMap { postPage ->
+                        // Get all posts on the random page
+                        searchRepository.search(
+                            page = postPage,
+                            query = query
+                        )
+                            .mapLeft { SearchException.Empty }
+                            .flatMap { searchResults ->
+                                if (searchResults.isEmpty()) {
+                                    return@withContext Either.Left(SearchException.Empty)
+                                }
+                                // Pick a post randomly from the page
+                                Random.nextRandomPostIndex(
+                                    posts = searchResults,
+                                    exclusions = searchHistory.getExcludedPostIndexes(postPage)
+                                )
+                                    .mapLeft { it.toSearchException() }
+                                    .map { postIndexOnPage ->
+                                        SearchWithHistoryUseCase.Result(
+                                            query = query,
+                                            totalPosts = totalResults,
+                                            post = searchResults[postIndexOnPage],
+                                            postPage = postPage,
+                                            postIndexOnPage = postIndexOnPage,
+                                            postPageSize = searchResults.size
+                                        )
+                                    }
+                            }
+                    }
             }
-        }
     }
+}
+
+private fun RangeException.toSearchException() = when (this) {
+    is RangeException.Empty -> SearchException.Empty
+    is RangeException.Exhausted -> SearchException.Exhausted
 }

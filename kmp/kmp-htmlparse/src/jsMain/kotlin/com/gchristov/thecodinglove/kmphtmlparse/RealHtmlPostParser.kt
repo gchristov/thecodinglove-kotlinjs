@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.kmphtmlparse
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.kmphtmlparsedata.HtmlPost
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -7,38 +8,45 @@ import kotlinx.coroutines.withContext
 external fun require(module: String): dynamic
 
 internal class RealHtmlPostParser(private val dispatcher: CoroutineDispatcher) : HtmlPostParser {
-    override suspend fun parseTotalPosts(content: String): Int = withContext(dispatcher) {
-        try {
-            val root = acquireRootNode(content)
-            val resultsCountNode = root.querySelectorAll(TotalPostsSelector)[0]
-            (resultsCountNode.text as? String)?.toInt() ?: 0
-        } catch (error: Exception) {
-            0
-        }
-    }
-
-    override suspend fun parsePosts(content: String): List<HtmlPost> = withContext(dispatcher) {
-        val posts = mutableListOf<HtmlPost>()
-        val root = acquireRootNode(content)
-        val postNodes = root.querySelectorAll(PostSelector)
-        val numPosts = postNodes.length as Int
-        for (i in 0 until numPosts) {
-            val post = postNodes[i]
-            val postTitle = parsePostTitle(post)
-            val postUrl = parsePostUrl(post)
-            val postImageUrl = parsePostImageUrl(post)
-            if (postTitle != null && postUrl != null && postImageUrl != null) {
-                posts.add(
-                    HtmlPost(
-                        title = postTitle,
-                        url = postUrl,
-                        imageUrl = postImageUrl
-                    )
-                )
+    override suspend fun parseTotalPosts(content: String): Either<Exception, Int> =
+        withContext(dispatcher) {
+            try {
+                val root = acquireRootNode(content)
+                val resultsCountNode = root.querySelectorAll(TotalPostsSelector)[0]
+                val count = (resultsCountNode.text as? String)?.toInt() ?: 0
+                Either.Right(count)
+            } catch (error: Exception) {
+                Either.Left(error)
             }
         }
-        posts
-    }
+
+    override suspend fun parsePosts(content: String): Either<Exception, List<HtmlPost>> =
+        withContext(dispatcher) {
+            try {
+                val posts = mutableListOf<HtmlPost>()
+                val root = acquireRootNode(content)
+                val postNodes = root.querySelectorAll(PostSelector)
+                val numPosts = postNodes.length as Int
+                for (i in 0 until numPosts) {
+                    val post = postNodes[i]
+                    val postTitle = parsePostTitle(post)
+                    val postUrl = parsePostUrl(post)
+                    val postImageUrl = parsePostImageUrl(post)
+                    if (postTitle != null && postUrl != null && postImageUrl != null) {
+                        posts.add(
+                            HtmlPost(
+                                title = postTitle,
+                                url = postUrl,
+                                imageUrl = postImageUrl
+                            )
+                        )
+                    }
+                }
+                Either.Right(posts)
+            } catch (error: Exception) {
+                Either.Left(error)
+            }
+        }
 
     private suspend fun acquireRootNode(content: String): dynamic = withContext(dispatcher) {
         val htmlParser = require("node-html-parser")
