@@ -14,6 +14,8 @@ internal actual fun serveApi(args: Array<String>) {
     exports.myTestFun = fireFunctions.https.onRequest { request, response ->
         val searchQuery = (request.query.searchQuery as? String) ?: "release"
         val searchSessionId = request.query.searchSessionId as? String
+        val test = request.body.channel_name as? String
+        println(test)
 
         // TODO: Do not use GlobalScope
         GlobalScope.launch {
