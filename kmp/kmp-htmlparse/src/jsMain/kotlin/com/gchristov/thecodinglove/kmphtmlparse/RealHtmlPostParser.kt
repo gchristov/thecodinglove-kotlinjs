@@ -1,11 +1,10 @@
 package com.gchristov.thecodinglove.kmphtmlparse
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.kmpcommonkotlin.requireModule
 import com.gchristov.thecodinglove.kmphtmlparsedata.HtmlPost
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-
-external fun require(module: String): dynamic
 
 internal class RealHtmlPostParser(private val dispatcher: CoroutineDispatcher) : HtmlPostParser {
     override suspend fun parseTotalPosts(content: String): Either<Exception, Int> =
@@ -49,7 +48,7 @@ internal class RealHtmlPostParser(private val dispatcher: CoroutineDispatcher) :
         }
 
     private suspend fun acquireRootNode(content: String): dynamic = withContext(dispatcher) {
-        val htmlParser = require("node-html-parser")
+        val htmlParser = requireModule("node-html-parser")
         htmlParser.parse(content)
     }
 
