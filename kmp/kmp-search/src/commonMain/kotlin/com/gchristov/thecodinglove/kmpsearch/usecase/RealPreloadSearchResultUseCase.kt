@@ -27,14 +27,12 @@ internal class RealPreloadSearchResultUseCase(
             )
                 .fold(
                     ifLeft = {
-                        when (it) {
-                            is SearchException.Exhausted -> {
-                                searchSession.clearExhaustedHistory(searchRepository)
-                                invoke(searchSessionId = searchSessionId)
-                            }
-
-                            else -> Either.Left(it)
+                        if (it is SearchException.Exhausted) {
+                            // Only clear the preloaded post and let session search deal with
+                            // updating the history
+                            searchSession.clearPreloadedPost(searchRepository)
                         }
+                        Either.Left(it)
                     },
                     ifRight = { searchResult ->
                         searchSession.insertPreloadedPost(
@@ -60,19 +58,12 @@ private suspend fun SearchSession.insertPreloadedPost(
                 currentPageSize = searchResult.postPageSize
             )
         },
-        // The old preloaded post now becomes the current one, if found, and a new future one is set
-        currentPost = preloadedPost ?: currentPost,
         preloadedPost = searchResult.post
     )
     searchRepository.saveSearchSession(updatedSearchSession)
 }
 
-private suspend fun SearchSession.clearExhaustedHistory(searchRepository: SearchRepository) {
-    val updatedSearchSession = copy(
-        searchHistory = emptyMap(),
-        // When clearing we still want to set the current post to whatever is the preloaded one
-        currentPost = preloadedPost,
-        preloadedPost = null
-    )
+private suspend fun SearchSession.clearPreloadedPost(searchRepository: SearchRepository) {
+    val updatedSearchSession = copy(preloadedPost = null)
     searchRepository.saveSearchSession(updatedSearchSession)
 }

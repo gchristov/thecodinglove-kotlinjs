@@ -5,6 +5,7 @@ import com.benasher44.uuid.uuid4
 import com.gchristov.thecodinglove.kmpsearch.insert
 import com.gchristov.thecodinglove.kmpsearchdata.SearchException
 import com.gchristov.thecodinglove.kmpsearchdata.SearchRepository
+import com.gchristov.thecodinglove.kmpsearchdata.model.Post
 import com.gchristov.thecodinglove.kmpsearchdata.model.SearchSession
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithHistoryUseCase
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
@@ -21,6 +22,10 @@ internal class RealSearchWithSessionUseCase(
             val searchSession = type.getSearchSession(searchRepository)
             // If a post is preloaded, return it right away
             searchSession.preloadedPost?.let { preloadedPost ->
+                searchSession.usePreloadedPost(
+                    preloadedPost = preloadedPost,
+                    searchRepository = searchRepository
+                )
                 return@withContext Either.Right(
                     SearchWithSessionUseCase.Result(
                         searchSessionId = searchSession.id,
@@ -104,6 +109,17 @@ private suspend fun SearchSession.clearExhaustedHistory(searchRepository: Search
     val updatedSearchSession = copy(
         searchHistory = emptyMap(),
         currentPost = null,
+    )
+    searchRepository.saveSearchSession(updatedSearchSession)
+}
+
+private suspend fun SearchSession.usePreloadedPost(
+    preloadedPost: Post,
+    searchRepository: SearchRepository
+) {
+    val updatedSearchSession = copy(
+        currentPost = preloadedPost,
+        // Clear the preloaded post so that if it fails to load next time, we trigger search
         preloadedPost = null
     )
     searchRepository.saveSearchSession(updatedSearchSession)

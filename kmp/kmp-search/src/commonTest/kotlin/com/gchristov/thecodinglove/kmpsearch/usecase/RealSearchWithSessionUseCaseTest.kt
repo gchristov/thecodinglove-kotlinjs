@@ -55,6 +55,17 @@ class RealSearchWithSessionUseCaseTest {
             val actualResult = useCase.invoke(type = searchType)
             searchWithHistoryUseCase.assertNotInvoked()
             searchRepository.assertSessionFetched()
+            searchRepository.assertSessionSaved(
+                SearchSession(
+                    id = searchSession.id,
+                    query = searchSession.query,
+                    totalPosts = searchSession.totalPosts,
+                    searchHistory = searchSession.searchHistory,
+                    currentPost = preloadedPost,
+                    preloadedPost = null,
+                    state = searchSession.state
+                )
+            )
             assertEquals(
                 expected = Either.Right(
                     SearchWithSessionUseCase.Result(
