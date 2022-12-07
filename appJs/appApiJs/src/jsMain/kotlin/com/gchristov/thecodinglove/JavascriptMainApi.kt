@@ -1,66 +1,53 @@
 package com.gchristov.thecodinglove
 
 import com.gchristov.thecodinglove.kmpcommonkotlin.exports
+import com.gchristov.thecodinglove.kmpsearch.SearchModule
 import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 internal actual fun serveApi(args: Array<String>) {
     exports.myTestFun = FirebaseFunctions.https.onRequest { request, response ->
-        println("Hello")
-        response.send("World!")
-//        val searchQuery = (request.query.searchQuery as? String) ?: "release"
-//        val searchSessionId = request.query.searchSessionId as? String
-//        val test = request.body.channel_name as? String
-//        println(test)
-//
-//        // TODO: Do not use GlobalScope
-//        GlobalScope.launch {
-//            println("Performing normal search")
-//            val search = SearchModule.injectSearchWithSessionUseCase()
-//            val searchType = searchSessionId?.let {
-//                SearchWithSessionUseCase.Type.WithSessionId(
-//                    query = searchQuery,
-//                    sessionId = it
-//                )
-//            } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
-//            search(searchType)
-//                .fold(
-//                    ifLeft = {
-//                        it.printStackTrace()
-//                        val jsonResponse = Json.encodeToString(Result.Empty)
-//                        response.send(jsonResponse)
-//                    },
-//                    ifRight = { searchResult ->
-//                        val jsonResponse = Json.encodeToString(searchResult.toResult())
-//                        response.send(jsonResponse)
-//                        println("Preloading next result")
-//                        val preload = SearchModule.injectPreloadSearchResultUseCase()
-//                        preload(searchResult.searchSessionId)
-//                            .fold(
-//                                ifLeft = { it.printStackTrace() },
-//                                ifRight = { println("Preload complete") }
-//                            )
-//                    }
-//                )
-//        }
+        val searchQuery: String = request.query["searchQuery"] ?: "release"
+        val searchSessionId: String? = request.query["searchSessionId"]
+        val test: String? = request.body["channel_name"]
+        println(test)
+
+        // TODO: Do not use GlobalScope
+        GlobalScope.launch {
+            println("Performing normal search")
+            val search = SearchModule.injectSearchWithSessionUseCase()
+            val searchType = searchSessionId?.let {
+                SearchWithSessionUseCase.Type.WithSessionId(
+                    query = searchQuery,
+                    sessionId = it
+                )
+            } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
+            search(searchType)
+                .fold(
+                    ifLeft = {
+                        it.printStackTrace()
+                        val jsonResponse = Json.encodeToString(Result.Empty)
+                        response.send(jsonResponse)
+                    },
+                    ifRight = { searchResult ->
+                        val jsonResponse = Json.encodeToString(searchResult.toResult())
+                        response.send(jsonResponse)
+                        println("Preloading next result")
+                        val preload = SearchModule.injectPreloadSearchResultUseCase()
+                        preload(searchResult.searchSessionId)
+                            .fold(
+                                ifLeft = { it.printStackTrace() },
+                                ifRight = { println("Preload complete") }
+                            )
+                    }
+                )
+        }
     }
-}
-
-@JsModule("firebase-functions")
-@JsNonModule
-external object FirebaseFunctions {
-    var https: Https
-}
-
-external object Https {
-    fun onRequest(callback: (req: Request, res: Response) -> Unit)
-}
-
-external class Request
-
-external class Response {
-    fun send(data: String)
 }
 
 @Serializable
