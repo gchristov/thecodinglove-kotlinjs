@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove
 
 import com.gchristov.thecodinglove.kmpcommonkotlin.exports
-import com.gchristov.thecodinglove.kmpsearch.SearchModule
-import com.gchristov.thecodinglove.kmpsearchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.search.SearchModule
+import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName

@@ -4,7 +4,7 @@ plugins {
 
 kotlin {
     sourceSets {
-        val commonMain by getting {
+        val jsMain by getting {
             dependencies {
                 implementation(projects.kmpCommonFirebase)
                 implementation(projects.htmlparse)

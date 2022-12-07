@@ -4,12 +4,12 @@ plugins {
 
 kotlin {
     sourceSets {
-        val commonMain by getting {
+        val jsMain by getting {
             dependencies {
                 api(projects.htmlparseData)
             }
         }
-        val commonTest by getting {
+        val jsTest by getting {
             dependencies {
                 implementation(projects.htmlparseTestfixtures)
             }
