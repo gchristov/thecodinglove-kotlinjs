@@ -6,12 +6,12 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(projects.kmpHtmlparseData)
+                api(projects.searchData)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation(projects.kmpHtmlparseTestfixtures)
+                implementation(projects.searchTestfixtures)
             }
         }
     }
