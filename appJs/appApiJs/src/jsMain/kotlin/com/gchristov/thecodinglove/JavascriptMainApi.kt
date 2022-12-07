@@ -19,7 +19,7 @@ internal actual fun serveApi(args: Array<String>) {
 
         // TODO: Do not use GlobalScope
         GlobalScope.launch {
-            println("Performing normal search")
+            println("Performing search")
             val search = SearchModule.injectSearchWithSessionUseCase()
             val searchType = searchSessionId?.let {
                 SearchWithSessionUseCase.Type.WithSessionId(
