@@ -10,7 +10,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-internal actual fun serveApi(args: Array<String>) {
+fun main() {
+    serveApi()
+}
+
+private fun serveApi() {
     exports.myTestFun = FirebaseFunctions.https.onRequest { request, response ->
         val searchQuery: String = request.query["searchQuery"] ?: "release"
         val searchSessionId: String? = request.query["searchSessionId"]

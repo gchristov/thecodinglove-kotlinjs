@@ -8,7 +8,7 @@ plugins {
 
 kotlin {
     sourceSets {
-        val commonMain by getting {
+        val jsMain by getting {
             dependencies {
                 // TODO: Use feature modules here when ready. These are only used for examples
                 implementation(projects.kmpCommonKotlin)
