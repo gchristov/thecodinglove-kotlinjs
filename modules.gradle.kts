@@ -13,6 +13,7 @@ val projects = listOf(
     "appBackend/search",
     "appBackend/search-data",
     "appBackend/search-testfixtures",
+    "appBackend/slack-data",
     "appWeb/appWeb",
 )
 
