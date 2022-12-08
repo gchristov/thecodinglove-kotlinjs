@@ -18,7 +18,7 @@ private fun serveApi() {
     exports.myTestFun = FirebaseFunctions.https.onRequest { request, response ->
         val searchQuery: String = request.query["searchQuery"] ?: "release"
         val searchSessionId: String? = request.query["searchSessionId"]
-        val test: String? = request.body["channel_name"]
+        val test: ApiSlackSlashCommand? = request.body.parse()
         println(test)
 
         // TODO: Do not use GlobalScope
@@ -53,6 +53,28 @@ private fun serveApi() {
         }
     }
 }
+
+@Serializable
+data class ApiSlackSlashCommand(
+    @SerialName("team_id")
+    val teamId: String,
+    @SerialName("team_domain")
+    val teamDomain: String,
+    @SerialName("channel_id")
+    val channelId: String,
+    @SerialName("channel_name")
+    val channelName: String,
+    @SerialName("user_id")
+    val userId: String,
+    @SerialName("user_name")
+    val userName: String,
+    @SerialName("command")
+    val command: String,
+    @SerialName("text")
+    val text: String,
+    @SerialName("response_url")
+    val responseUrl: String,
+)
 
 @Serializable
 sealed class Result {
