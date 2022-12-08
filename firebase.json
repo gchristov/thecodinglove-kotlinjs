@@ -6,11 +6,11 @@
       "firebase-debug.log",
       "firebase-debug.*.log"
     ],
-    "source": "build/productionApi",
+    "source": "build/productionBackend",
     "runtime": "nodejs16"
   },
   "hosting": {
-    "public": "build/productionHtml",
+    "public": "build/productionWeb",
     "rewrites": [
       {
         "source": "/api/test",

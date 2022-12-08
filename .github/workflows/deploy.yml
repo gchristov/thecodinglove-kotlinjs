@@ -49,11 +49,11 @@ jobs:
         with:
           name: Javascript deploy
           path: |
-            build/productionApi/*.json
-            build/productionApi/*.ts
-            build/productionApi/*.js
-            build/productionApi/*.map
-            build/productionHtml
+            build/productionBackend/*.json
+            build/productionBackend/*.ts
+            build/productionBackend/*.js
+            build/productionBackend/*.map
+            build/productionWeb
             firebase-debug.log*
             firebase-debug.*.log
             local.properties
