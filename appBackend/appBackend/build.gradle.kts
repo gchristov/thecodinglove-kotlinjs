@@ -13,6 +13,7 @@ kotlin {
                 // TODO: Use feature modules here when ready. These are only used for examples
                 implementation(projects.kmpCommonKotlin)
                 implementation(projects.search)
+                implementation(projects.slack)
                 // Ideally these would be linked from corresponding submodules but that is currently
                 // not supported out of the box or through the npm-publish plugin and causes "module
                 // not found" errors. As a workaround, all NPM dependencies will be listed here,

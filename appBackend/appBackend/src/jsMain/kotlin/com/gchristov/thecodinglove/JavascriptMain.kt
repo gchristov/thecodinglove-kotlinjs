@@ -4,6 +4,7 @@ import com.gchristov.thecodinglove.kmpcommonkotlin.exports
 import com.gchristov.thecodinglove.kmpcommonnetwork.CommonNetworkModule
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.slack.SlackModule
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
@@ -12,14 +13,14 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 fun main() {
-    serveApi()
+    SlackModule.injectSlackSlashCommandService().register()
 }
 
 private fun serveApi() {
     exports.myTestFun = FirebaseFunctions.https.onRequest { request, response ->
         val searchQuery: String = request.query["searchQuery"] ?: "release"
         val searchSessionId: String? = request.query["searchSessionId"]
-        val test: ApiSlackSlashCommand? = request.body.parseJson(CommonNetworkModule.injectJsonParser())
+        val test: ApiSlackSlashCommand? = request.body.bodyFromJson(CommonNetworkModule.injectJsonParser())
         println(test)
 
         // TODO: Do not use GlobalScope
