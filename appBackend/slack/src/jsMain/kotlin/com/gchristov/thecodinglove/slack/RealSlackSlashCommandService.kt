@@ -7,6 +7,7 @@ import com.gchristov.thecodinglove.kmpcommonkotlin.exports
 import com.gchristov.thecodinglove.kmpcommonnetwork.CommonNetworkModule
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.slackdata.SlackSlashCommandRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -15,8 +16,17 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-internal class RealSlackSlashCommandService : SlackSlashCommandService {
+internal class RealSlackSlashCommandService(
+    private val slackSlashCommandRepository: SlackSlashCommandRepository
+) : SlackSlashCommandService {
     override fun register() {
+        exports.myTestFun = slackSlashCommandRepository.observeSlashCommand { command, response ->
+            println(command)
+            response.send("WORKS!")
+        }
+    }
+
+    private fun reg() {
         exports.myTestFun = FirebaseFunctions.https.onRequest { request, response ->
             val searchQuery: String = request.query["searchQuery"] ?: "release"
             val searchSessionId: String? = request.query["searchSessionId"]
