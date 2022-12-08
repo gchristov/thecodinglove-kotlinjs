@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove
 
 import com.gchristov.thecodinglove.kmpcommonkotlin.exports
+import com.gchristov.thecodinglove.kmpcommonnetwork.CommonNetworkModule
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.GlobalScope
@@ -18,7 +19,7 @@ private fun serveApi() {
     exports.myTestFun = FirebaseFunctions.https.onRequest { request, response ->
         val searchQuery: String = request.query["searchQuery"] ?: "release"
         val searchSessionId: String? = request.query["searchSessionId"]
-        val test: ApiSlackSlashCommand? = request.body.parse()
+        val test: ApiSlackSlashCommand? = request.body.parseJson(CommonNetworkModule.injectJsonParser())
         println(test)
 
         // TODO: Do not use GlobalScope

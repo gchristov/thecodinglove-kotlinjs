@@ -27,11 +27,9 @@ external class FirebaseFunctionsMap
 
 inline operator fun <T> FirebaseFunctionsMap.get(key: String): T? = asDynamic()[key] as? T
 
-inline fun <reified T> FirebaseFunctionsMap.parse(): T? =
+inline fun <reified T> FirebaseFunctionsMap.parseJson(jsonParser: Json): T? =
     jsonParser.decodeFromString(string = JSON.stringify(this))
 
 external class FirebaseFunctionsResponse {
     fun send(data: String)
 }
-
-val jsonParser = Json { ignoreUnknownKeys = true }
