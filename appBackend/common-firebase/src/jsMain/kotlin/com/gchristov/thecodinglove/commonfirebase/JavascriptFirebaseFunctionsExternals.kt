@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove
+package com.gchristov.thecodinglove.commonfirebase
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
