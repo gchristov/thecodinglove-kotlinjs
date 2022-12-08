@@ -7,6 +7,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(projects.slackData)
+                implementation(projects.search)
             }
         }
     }
