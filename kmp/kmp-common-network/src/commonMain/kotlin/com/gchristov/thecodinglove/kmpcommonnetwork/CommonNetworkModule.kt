@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove.kmpcommonnetwork
 
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
-import com.gchristov.thecodinglove.kmpcommondi.inject
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
@@ -34,7 +33,4 @@ object CommonNetworkModule : DiModule() {
             level = LogLevel.INFO
         }
     }
-
-    // TODO: Remove eventually
-    fun injectJsonParser(): Json = inject()
 }

@@ -36,11 +36,13 @@ internal class RealSlackSlashCommandRepository(
         result: SearchWithSessionUseCase.Result,
         response: FirebaseFunctionsResponse
     ) {
+        // TODO: Needs correct mapping
         val jsonResponse = Json.encodeToString(result.toResult())
         response.send(jsonResponse)
     }
 
     override fun sendErrorResponse(response: FirebaseFunctionsResponse) {
+        // TODO: Needs correct mapping
         val jsonResponse = Json.encodeToString(Result.Empty)
         response.send(jsonResponse)
     }

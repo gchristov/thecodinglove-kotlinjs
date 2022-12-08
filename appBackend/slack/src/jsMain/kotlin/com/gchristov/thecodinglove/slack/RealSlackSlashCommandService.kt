@@ -34,9 +34,11 @@ internal class RealSlackSlashCommandService(
                         search(searchType)
                             .fold(
                                 ifLeft = {
+                                    // TODO: Send better error responses
                                     slackSlashCommandRepository.sendErrorResponse(response)
                                 },
                                 ifRight = { searchResult ->
+                                    // TODO: Send correct success responses
                                     slackSlashCommandRepository.sendResponse(
                                         result = searchResult,
                                         response = response
