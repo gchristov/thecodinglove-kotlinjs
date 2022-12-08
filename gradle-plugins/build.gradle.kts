@@ -19,15 +19,15 @@ gradlePlugin {
         id = "build-config-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.BuildConfigPlugin"
     }
-    plugins.register("javascript-browser-executable-plugin") {
-        id = "javascript-browser-executable-plugin"
+    plugins.register("web-browser-executable-plugin") {
+        id = "web-browser-executable-plugin"
         implementationClass =
-            "com.gchristov.thecodinglove.gradleplugins.js.JavascriptBrowserExecutablePlugin"
+            "com.gchristov.thecodinglove.gradleplugins.web.WebBrowserExecutablePlugin"
     }
-    plugins.register("javascript-node-executable-plugin") {
-        id = "javascript-node-executable-plugin"
+    plugins.register("backend-node-executable-plugin") {
+        id = "backend-node-executable-plugin"
         implementationClass =
-            "com.gchristov.thecodinglove.gradleplugins.js.JavascriptNodeExecutablePlugin"
+            "com.gchristov.thecodinglove.gradleplugins.backend.BackendNodeExecutablePlugin"
     }
 }
 

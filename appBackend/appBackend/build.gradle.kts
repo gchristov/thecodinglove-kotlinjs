@@ -1,7 +1,7 @@
 import com.gchristov.thecodinglove.gradleplugins.Deps
 
 plugins {
-    id("javascript-node-executable-plugin")
+    id("backend-node-executable-plugin")
     // TODO: This shouldn't be needed here but is used for examples
     id("kmp-data-plugin")
 }

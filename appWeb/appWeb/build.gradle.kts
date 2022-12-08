@@ -1,3 +1,3 @@
 plugins {
-    id("javascript-browser-executable-plugin")
+    id("web-browser-executable-plugin")
 }
