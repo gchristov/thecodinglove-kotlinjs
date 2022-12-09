@@ -7,7 +7,6 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(projects.firebasefunctions)
-                implementation(projects.searchData)
             }
         }
     }
