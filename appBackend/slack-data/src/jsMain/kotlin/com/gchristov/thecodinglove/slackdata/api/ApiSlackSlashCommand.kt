@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.slackdata.api
 
+import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommand
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -23,4 +24,17 @@ data class ApiSlackSlashCommand(
     val text: String,
     @SerialName("response_url")
     val responseUrl: String,
+)
+
+// TODO: Not really needed, so remove eventually
+internal fun SlackSlashCommand.toSlashCommand() = ApiSlackSlashCommand(
+    teamId = teamId,
+    teamDomain = teamDomain,
+    channelId = channelId,
+    channelName = channelName,
+    userId = userId,
+    userName = userName,
+    command = command,
+    text = text,
+    responseUrl = responseUrl
 )
