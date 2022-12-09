@@ -2,28 +2,45 @@ package com.gchristov.thecodinglove.slack
 
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.kmpcommondi.inject
+import com.gchristov.thecodinglove.search.SearchModule
+import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
 import com.gchristov.thecodinglove.slackdata.SlackSlashCommandRepository
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
+import org.kodein.di.bindSingleton
 
 object SlackModule : DiModule() {
     override fun name() = "slack"
 
     override fun bindLocalDependencies(builder: DI.Builder) {
         builder.apply {
-            bindProvider {
-                provideSlackSlashCommandService(slackSlashCommandRepository = inject())
+            bindSingleton {
+                provideSlackSlashCommandService(
+                    slackSlashCommandRepository = inject(),
+                    searchWithSessionUseCase = inject(),
+                    preloadSearchResultUseCase = inject()
+                )
             }
         }
     }
 
     override fun moduleDependencies(): List<DI.Module> {
-        return listOf(SlackDataModule.module)
+        return listOf(
+            SlackDataModule.module,
+            SearchModule.module,
+        )
     }
 
-    private fun provideSlackSlashCommandService(slackSlashCommandRepository: SlackSlashCommandRepository): SlackSlashCommandService =
-        RealSlackSlashCommandService(slackSlashCommandRepository = slackSlashCommandRepository)
+    private fun provideSlackSlashCommandService(
+        slackSlashCommandRepository: SlackSlashCommandRepository,
+        searchWithSessionUseCase: SearchWithSessionUseCase,
+        preloadSearchResultUseCase: PreloadSearchResultUseCase
+    ): SlackSlashCommandService = SlackSlashCommandService(
+        slackSlashCommandRepository = slackSlashCommandRepository,
+        searchWithSessionUseCase = searchWithSessionUseCase,
+        preloadSearchResultUseCase = preloadSearchResultUseCase
+    )
 
     fun injectSlackSlashCommandService(): SlackSlashCommandService = inject()
 }

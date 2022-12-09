@@ -13,8 +13,12 @@
     "public": "build/productionWeb",
     "rewrites": [
       {
-        "source": "/api/test",
-        "function": "myTestFun"
+        "source": "/api/search",
+        "function": "search"
+      },
+      {
+        "source": "/api/slack/slashcommand",
+        "function": "slackSlashCommand"
       }
     ]
   }

@@ -8,6 +8,7 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
+                implementation(projects.search)
                 implementation(projects.slack)
                 // Ideally these would be linked from corresponding submodules but that is currently
                 // not supported out of the box or through the npm-publish plugin and causes "module

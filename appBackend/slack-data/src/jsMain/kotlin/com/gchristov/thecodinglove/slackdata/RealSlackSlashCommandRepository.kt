@@ -18,7 +18,7 @@ internal class RealSlackSlashCommandRepository(
 ) : SlackSlashCommandRepository {
     override fun observeSlashCommandRequest(
         callback: (
-            command: Either<Exception, SlackSlashCommand>,
+            request: Either<Exception, SlackSlashCommand>,
             response: FirebaseFunctionsResponse
         ) -> Unit
     ) = FirebaseFunctions.https.onRequest { request, response ->

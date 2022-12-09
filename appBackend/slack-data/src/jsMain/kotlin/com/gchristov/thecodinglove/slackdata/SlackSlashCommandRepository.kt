@@ -8,7 +8,7 @@ import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommand
 interface SlackSlashCommandRepository {
     fun observeSlashCommandRequest(
         callback: (
-            command: Either<Exception, SlackSlashCommand>,
+            request: Either<Exception, SlackSlashCommand>,
             response: FirebaseFunctionsResponse
         ) -> Unit
     )

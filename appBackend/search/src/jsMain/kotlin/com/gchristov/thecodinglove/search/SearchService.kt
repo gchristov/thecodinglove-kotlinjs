@@ -1,46 +1,39 @@
-package com.gchristov.thecodinglove.slack
+package com.gchristov.thecodinglove.search
 
 import com.gchristov.thecodinglove.kmpcommonkotlin.exports
+import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
-import com.gchristov.thecodinglove.slackdata.SlackSlashCommandRepository
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class SlackSlashCommandService(
-    private val slackSlashCommandRepository: SlackSlashCommandRepository,
+class SearchService(
+    private val searchRepository: SearchRepository,
     private val searchWithSessionUseCase: SearchWithSessionUseCase,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase
 ) {
     fun register() {
-        exports.slackSlashCommand = slackSlashCommandRepository.observeSlashCommandRequest { request, response ->
+        exports.search = searchRepository.observeSearchRequest { request, response ->
             request.fold(
                 ifLeft = { error ->
                     error.printStackTrace()
-                    slackSlashCommandRepository.sendSlashCommandErrorResponse(response)
+                    searchRepository.sendSearchErrorResponse(response)
                 },
-                ifRight = { command ->
-                    println(command)
-                    val searchSessionId: String? = null
+                ifRight = { searchType ->
+                    println(searchType)
 
                     // TODO: Do not use GlobalScope
                     GlobalScope.launch {
                         println("Performing search")
-                        val searchType = searchSessionId?.let {
-                            SearchWithSessionUseCase.Type.WithSessionId(
-                                query = command.text,
-                                sessionId = it
-                            )
-                        } ?: SearchWithSessionUseCase.Type.NewSession(command.text)
                         searchWithSessionUseCase(searchType)
                             .fold(
                                 ifLeft = {
                                     // TODO: Send better error responses
-                                    slackSlashCommandRepository.sendSlashCommandErrorResponse(response)
+                                    searchRepository.sendSearchErrorResponse(response)
                                 },
                                 ifRight = { searchResult ->
                                     // TODO: Send correct success responses
-                                    slackSlashCommandRepository.sendSlashCommandResponse(
+                                    searchRepository.sendSearchResponse(
                                         result = searchResult,
                                         response = response
                                     )

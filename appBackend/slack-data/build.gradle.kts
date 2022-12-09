@@ -6,7 +6,7 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(projects.commonFirebase)
+                implementation(projects.firebasefunctions)
                 implementation(projects.searchData)
             }
         }
