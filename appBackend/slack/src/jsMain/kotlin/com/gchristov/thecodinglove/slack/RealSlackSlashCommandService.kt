@@ -11,11 +11,11 @@ internal class RealSlackSlashCommandService(
     private val slackSlashCommandRepository: SlackSlashCommandRepository
 ) : SlackSlashCommandService {
     override fun register() {
-        exports.slackSlashCommand = slackSlashCommandRepository.observe { request, response ->
+        exports.slackSlashCommand = slackSlashCommandRepository.observeSlashCommandRequest { request, response ->
             request.fold(
                 ifLeft = { error ->
                     error.printStackTrace()
-                    slackSlashCommandRepository.sendErrorResponse(response)
+                    slackSlashCommandRepository.sendSlashCommandErrorResponse(response)
                 },
                 ifRight = { command ->
                     println(command)
@@ -35,11 +35,11 @@ internal class RealSlackSlashCommandService(
                             .fold(
                                 ifLeft = {
                                     // TODO: Send better error responses
-                                    slackSlashCommandRepository.sendErrorResponse(response)
+                                    slackSlashCommandRepository.sendSlashCommandErrorResponse(response)
                                 },
                                 ifRight = { searchResult ->
                                     // TODO: Send correct success responses
-                                    slackSlashCommandRepository.sendResponse(
+                                    slackSlashCommandRepository.sendSlashCommandResponse(
                                         result = searchResult,
                                         response = response
                                     )

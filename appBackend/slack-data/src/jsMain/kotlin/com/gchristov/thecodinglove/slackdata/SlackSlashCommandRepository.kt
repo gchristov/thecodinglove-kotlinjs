@@ -6,17 +6,17 @@ import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommand
 
 interface SlackSlashCommandRepository {
-    fun observe(
+    fun observeSlashCommandRequest(
         callback: (
             command: Either<Exception, SlackSlashCommand>,
             response: FirebaseFunctionsResponse
         ) -> Unit
     )
 
-    fun sendResponse(
+    fun sendSlashCommandResponse(
         result: SearchWithSessionUseCase.Result,
         response: FirebaseFunctionsResponse
     )
 
-    fun sendErrorResponse(response: FirebaseFunctionsResponse)
+    fun sendSlashCommandErrorResponse(response: FirebaseFunctionsResponse)
 }

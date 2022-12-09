@@ -16,7 +16,7 @@ import kotlinx.serialization.json.Json
 internal class RealSlackSlashCommandRepository(
     private val jsonParser: Json
 ) : SlackSlashCommandRepository {
-    override fun observe(
+    override fun observeSlashCommandRequest(
         callback: (
             command: Either<Exception, SlackSlashCommand>,
             response: FirebaseFunctionsResponse
@@ -32,7 +32,7 @@ internal class RealSlackSlashCommandRepository(
         }
     }
 
-    override fun sendResponse(
+    override fun sendSlashCommandResponse(
         result: SearchWithSessionUseCase.Result,
         response: FirebaseFunctionsResponse
     ) {
@@ -41,7 +41,7 @@ internal class RealSlackSlashCommandRepository(
         response.send(jsonResponse)
     }
 
-    override fun sendErrorResponse(response: FirebaseFunctionsResponse) {
+    override fun sendSlashCommandErrorResponse(response: FirebaseFunctionsResponse) {
         // TODO: Needs correct mapping
         val jsonResponse = Json.encodeToString(Result.Empty)
         response.send(jsonResponse)
