@@ -1,11 +1,13 @@
 package com.gchristov.thecodinglove.searchtestfixtures
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.commonfirebase.FirebaseFunctionsResponse
 import com.gchristov.thecodinglove.kmpcommontest.FakeResponse
 import com.gchristov.thecodinglove.kmpcommontest.execute
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.Post
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
+import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -40,6 +42,26 @@ class FakeSearchRepository(
 
     override suspend fun saveSearchSession(searchSession: SearchSession) {
         lastSavedSession = searchSession
+    }
+
+    override fun observeSearchRequest(
+        callback: (
+            request: Either<Exception, SearchWithSessionUseCase.Type>,
+            response: FirebaseFunctionsResponse
+        ) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun sendSearchResponse(
+        result: SearchWithSessionUseCase.Result,
+        response: FirebaseFunctionsResponse
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun sendSearchErrorResponse(response: FirebaseFunctionsResponse) {
+        TODO("Not yet implemented")
     }
 
     fun assertSessionFetched() {

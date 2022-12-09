@@ -14,6 +14,7 @@ import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
+import org.kodein.di.bindSingleton
 
 object SearchModule : DiModule() {
     override fun name() = "search"
@@ -36,6 +37,13 @@ object SearchModule : DiModule() {
                 providePreloadSearchResultUseCase(
                     searchRepository = inject(),
                     searchWithHistoryUseCase = inject(),
+                )
+            }
+            bindSingleton {
+                provideSearchService(
+                    searchRepository = inject(),
+                    searchWithSessionUseCase = inject(),
+                    preloadSearchResultUseCase = inject()
                 )
             }
         }
@@ -72,7 +80,15 @@ object SearchModule : DiModule() {
         searchWithHistoryUseCase = searchWithHistoryUseCase
     )
 
-    fun injectSearchWithSessionUseCase(): SearchWithSessionUseCase = inject()
+    private fun provideSearchService(
+        searchRepository: SearchRepository,
+        searchWithSessionUseCase: SearchWithSessionUseCase,
+        preloadSearchResultUseCase: PreloadSearchResultUseCase
+    ): SearchService = SearchService(
+        searchRepository = searchRepository,
+        searchWithSessionUseCase = searchWithSessionUseCase,
+        preloadSearchResultUseCase = preloadSearchResultUseCase
+    )
 
-    fun injectPreloadSearchResultUseCase(): PreloadSearchResultUseCase = inject()
+    fun injectSearchService(): SearchService = inject()
 }

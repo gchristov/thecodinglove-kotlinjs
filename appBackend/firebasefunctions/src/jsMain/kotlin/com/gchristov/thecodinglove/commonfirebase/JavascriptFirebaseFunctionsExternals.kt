@@ -1,4 +1,7 @@
-package com.gchristov.thecodinglove
+package com.gchristov.thecodinglove.commonfirebase
+
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 @JsModule("firebase-functions")
 @JsNonModule
@@ -23,6 +26,9 @@ external class FirebaseFunctionsRequest {
 external class FirebaseFunctionsMap
 
 inline operator fun <T> FirebaseFunctionsMap.get(key: String): T? = asDynamic()[key] as? T
+
+inline fun <reified T> FirebaseFunctionsMap.bodyFromJson(jsonParser: Json): T =
+    jsonParser.decodeFromString(string = JSON.stringify(this))
 
 external class FirebaseFunctionsResponse {
     fun send(data: String)
