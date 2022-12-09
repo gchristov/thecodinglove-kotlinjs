@@ -20,8 +20,6 @@ class SearchService(
                     searchRepository.sendSearchErrorResponse(response)
                 },
                 ifRight = { searchType ->
-                    println(searchType)
-
                     // TODO: Do not use GlobalScope
                     GlobalScope.launch {
                         println("Performing search")
