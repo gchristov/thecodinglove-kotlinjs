@@ -11,7 +11,7 @@ object DiGraph {
 
 inline fun <reified T : Any> DiGraph.inject(): T = di.direct.instance()
 
-fun DiGraph.insertModules(modules: List<DI.Module>) {
+fun DiGraph.registerModules(modules: List<DI.Module>) {
     di = DI.lazy {
         modules.forEach { importOnce(it) }
     }

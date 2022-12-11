@@ -4,7 +4,7 @@ import com.gchristov.thecodinglove.htmlparse.HtmlParseModule
 import com.gchristov.thecodinglove.kmpcommondi.CommonDiModule
 import com.gchristov.thecodinglove.kmpcommondi.DiGraph
 import com.gchristov.thecodinglove.kmpcommondi.inject
-import com.gchristov.thecodinglove.kmpcommondi.insertModules
+import com.gchristov.thecodinglove.kmpcommondi.registerModules
 import com.gchristov.thecodinglove.kmpcommonfirebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.kmpcommonnetwork.CommonNetworkModule
 import com.gchristov.thecodinglove.search.SearchModule
@@ -21,7 +21,7 @@ fun main() {
 
 private fun setupDi() {
     // Add all modules that should participate in dependency injection for this app
-    DiGraph.insertModules(
+    DiGraph.registerModules(
         listOf(
             CommonDiModule.module,
             CommonFirebaseModule.module,
