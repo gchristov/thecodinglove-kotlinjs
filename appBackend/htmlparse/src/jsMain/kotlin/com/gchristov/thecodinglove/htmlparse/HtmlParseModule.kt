@@ -8,7 +8,7 @@ import org.kodein.di.bindProvider
 object HtmlParseModule : DiModule() {
     override fun name() = "htmlparse"
 
-    override fun bindLocalDependencies(builder: DI.Builder) {
+    override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindProvider { provideHtmlPostParser() }
         }

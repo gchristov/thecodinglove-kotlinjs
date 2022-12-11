@@ -13,7 +13,7 @@ import org.kodein.di.instance
 object CommonNetworkModule : DiModule() {
     override fun name() = "kmp-common-network"
 
-    override fun bindLocalDependencies(builder: DI.Builder) {
+    override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindSingleton { provideJsonParser() }
             bindSingleton { provideHttpClient(jsonParser = instance()) }

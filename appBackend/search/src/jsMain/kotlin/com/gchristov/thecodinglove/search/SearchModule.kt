@@ -1,11 +1,9 @@
 package com.gchristov.thecodinglove.search
 
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
-import com.gchristov.thecodinglove.kmpcommondi.inject
 import com.gchristov.thecodinglove.search.usecase.RealPreloadSearchResultUseCase
 import com.gchristov.thecodinglove.search.usecase.RealSearchWithHistoryUseCase
 import com.gchristov.thecodinglove.search.usecase.RealSearchWithSessionUseCase
-import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
@@ -15,42 +13,39 @@ import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
+import org.kodein.di.instance
 
 object SearchModule : DiModule() {
     override fun name() = "search"
 
-    override fun bindLocalDependencies(builder: DI.Builder) {
+    override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindProvider {
                 provideSearchWithHistoryUseCase(
-                    searchRepository = inject(),
-                    searchConfig = inject()
+                    searchRepository = instance(),
+                    searchConfig = instance()
                 )
             }
             bindProvider {
                 provideSearchWithSessionUseCase(
-                    searchRepository = inject(),
-                    searchWithHistoryUseCase = inject(),
+                    searchRepository = instance(),
+                    searchWithHistoryUseCase = instance(),
                 )
             }
             bindProvider {
                 providePreloadSearchResultUseCase(
-                    searchRepository = inject(),
-                    searchWithHistoryUseCase = inject(),
+                    searchRepository = instance(),
+                    searchWithHistoryUseCase = instance(),
                 )
             }
             bindSingleton {
                 provideSearchService(
-                    searchRepository = inject(),
-                    searchWithSessionUseCase = inject(),
-                    preloadSearchResultUseCase = inject()
+                    searchRepository = instance(),
+                    searchWithSessionUseCase = instance(),
+                    preloadSearchResultUseCase = instance()
                 )
             }
         }
-    }
-
-    override fun moduleDependencies(): List<DI.Module> {
-        return listOf(SearchDataModule.module)
     }
 
     private fun provideSearchWithHistoryUseCase(
@@ -89,6 +84,4 @@ object SearchModule : DiModule() {
         searchWithSessionUseCase = searchWithSessionUseCase,
         preloadSearchResultUseCase = preloadSearchResultUseCase
     )
-
-    fun injectSearchService(): SearchService = inject()
 }
