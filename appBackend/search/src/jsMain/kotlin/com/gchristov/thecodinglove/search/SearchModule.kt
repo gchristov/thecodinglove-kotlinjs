@@ -10,6 +10,7 @@ import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
@@ -40,6 +41,7 @@ object SearchModule : DiModule() {
             }
             bindSingleton {
                 provideSearchService(
+                    jsonParser = instance(),
                     searchRepository = instance(),
                     searchWithSessionUseCase = instance(),
                     preloadSearchResultUseCase = instance()
@@ -76,10 +78,12 @@ object SearchModule : DiModule() {
     )
 
     private fun provideSearchService(
+        jsonParser: Json,
         searchRepository: SearchRepository,
         searchWithSessionUseCase: SearchWithSessionUseCase,
         preloadSearchResultUseCase: PreloadSearchResultUseCase
     ): SearchService = SearchService(
+        jsonParser = jsonParser,
         searchRepository = searchRepository,
         searchWithSessionUseCase = searchWithSessionUseCase,
         preloadSearchResultUseCase = preloadSearchResultUseCase

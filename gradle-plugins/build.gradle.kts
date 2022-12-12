@@ -28,6 +28,11 @@ gradlePlugin {
         implementationClass =
             "com.gchristov.thecodinglove.gradleplugins.backend.BackendExecutablePlugin"
     }
+    plugins.register("backend-service-plugin") {
+        id = "backend-service-plugin"
+        implementationClass =
+            "com.gchristov.thecodinglove.gradleplugins.backend.BackendServicePlugin"
+    }
 }
 
 repositories {
