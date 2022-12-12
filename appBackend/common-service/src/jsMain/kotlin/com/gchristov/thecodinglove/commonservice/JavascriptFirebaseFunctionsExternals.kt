@@ -7,11 +7,11 @@ external var exports: dynamic
 
 @JsModule("firebase-functions")
 @JsNonModule
-external object FirebaseFunctions {
+internal external object FirebaseFunctions {
     val https: FirebaseFunctionsHttps
 }
 
-external object FirebaseFunctionsHttps {
+internal external object FirebaseFunctionsHttps {
     fun onRequest(
         callback: (
             request: ApiRequest,
