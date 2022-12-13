@@ -9,18 +9,10 @@ class SlackSlashCommandService(
     private val jsonParser: Json
 ) : Service() {
     override fun register() {
-        exports.slackSlashCommand = registerApiCallback { request, response ->
-            handleRequest(
-                request = request,
-                response = response
-            )
-        }
+        exports.slackSlashCommand = registerForApiCallbacks()
     }
 
-    private fun handleRequest(
-        request: ApiRequest,
-        response: ApiResponse
-    ) {
+    override suspend fun handleRequest(request: ApiRequest, response: ApiResponse) {
         try {
             // TODO: Needs correct response mapping
             val command: ApiSlackSlashCommand = request.body.bodyFromJson(jsonParser)

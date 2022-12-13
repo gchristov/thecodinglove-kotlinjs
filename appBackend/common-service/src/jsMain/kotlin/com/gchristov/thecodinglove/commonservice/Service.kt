@@ -1,14 +1,31 @@
 package com.gchristov.thecodinglove.commonservice
 
-abstract class Service {
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+
+abstract class Service : CoroutineScope {
+
+    private val job = Job()
+
     abstract fun register()
 
-    fun registerApiCallback(
-        callback: (
-            request: ApiRequest,
-            response: ApiResponse
-        ) -> Unit
-    ) = FirebaseFunctions.https.onRequest { request, response ->
-        callback(request, response)
-    }
+    protected abstract suspend fun handleRequest(
+        request: ApiRequest,
+        response: ApiResponse
+    )
+
+    override val coroutineContext: CoroutineContext
+        get() = job
+
+    protected fun registerForApiCallbacks() =
+        FirebaseFunctions.https.onRequest { request, response ->
+            launch {
+                handleRequest(
+                    request = request,
+                    response = response
+                )
+            }
+        }
 }

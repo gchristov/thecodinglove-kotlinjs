@@ -4,8 +4,6 @@ import com.gchristov.thecodinglove.commonservice.*
 import com.gchristov.thecodinglove.searchdata.api.toSearchResult
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -14,18 +12,10 @@ class SearchService(
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
 ) : Service() {
     override fun register() {
-        exports.search = registerApiCallback { request, response ->
-            handleRequest(
-                request = request,
-                response = response
-            )
-        }
+        exports.search = registerForApiCallbacks()
     }
 
-    private fun handleRequest(
-        request: ApiRequest,
-        response: ApiResponse
-    ) {
+    override suspend fun handleRequest(request: ApiRequest, response: ApiResponse) {
         try {
             val searchQuery: String = request.query["searchQuery"] ?: "release"
             val searchSessionId: String? = request.query["searchSessionId"]
@@ -36,13 +26,10 @@ class SearchService(
                 )
             } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
 
-            // TODO: Do not use GlobalScope
-            GlobalScope.launch {
-                search(
-                    searchType = searchType,
-                    response = response
-                )
-            }
+            search(
+                searchType = searchType,
+                response = response
+            )
         } catch (error: Exception) {
             error.printStackTrace()
             // TODO: Needs correct response mapping
