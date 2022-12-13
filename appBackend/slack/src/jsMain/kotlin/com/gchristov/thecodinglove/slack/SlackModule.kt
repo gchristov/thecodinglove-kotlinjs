@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack
 
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
-import com.gchristov.thecodinglove.slackdata.SlackSlashCommandRepository
+import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
@@ -12,14 +12,14 @@ object SlackModule : DiModule() {
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindSingleton {
-                provideSlackSlashCommandService(slackSlashCommandRepository = instance())
+                provideSlackSlashCommandService(jsonParser = instance())
             }
         }
     }
 
     private fun provideSlackSlashCommandService(
-        slackSlashCommandRepository: SlackSlashCommandRepository,
+        jsonParser: Json
     ): SlackSlashCommandService = SlackSlashCommandService(
-        slackSlashCommandRepository = slackSlashCommandRepository,
+        jsonParser = jsonParser
     )
 }

@@ -1,9 +1,6 @@
 package com.gchristov.thecodinglove.searchdata
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonfirebase.FirebaseFunctions
-import com.gchristov.thecodinglove.commonfirebase.FirebaseFunctionsResponse
-import com.gchristov.thecodinglove.commonfirebase.get
 import com.gchristov.thecodinglove.htmlparse.HtmlPostParser
 import com.gchristov.thecodinglove.searchdata.api.ApiSearchSession
 import com.gchristov.thecodinglove.searchdata.model.*
@@ -12,13 +9,9 @@ import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.statement.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlin.Exception
 import kotlin.Int
 import kotlin.String
-import kotlin.Unit
-import kotlin.let
 
 internal class RealSearchRepository(
     private val apiService: SearchApi,
@@ -63,46 +56,10 @@ internal class RealSearchRepository(
             .collection("searchSession")
             .document(searchSession.id)
         document.set(
-            data = searchSession.toApiSearchSession(),
+            data = searchSession.toSearchSession(),
             encodeDefaults = true,
             merge = true
         )
-    }
-
-    override fun observeSearchRequest(
-        callback: (
-            request: Either<Exception, SearchWithSessionUseCase.Type>,
-            response: FirebaseFunctionsResponse
-        ) -> Unit
-    ) = FirebaseFunctions.https.onRequest { request, response ->
-        try {
-            val searchQuery: String = request.query["searchQuery"] ?: "release"
-            val searchSessionId: String? = request.query["searchSessionId"]
-            val searchType = searchSessionId?.let {
-                SearchWithSessionUseCase.Type.WithSessionId(
-                    query = searchQuery,
-                    sessionId = it
-                )
-            } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
-            callback(Either.Right(searchType), response)
-        } catch (error: Exception) {
-            callback(Either.Left(error), response)
-        }
-    }
-
-    override fun sendSearchResponse(
-        result: SearchWithSessionUseCase.Result,
-        response: FirebaseFunctionsResponse
-    ) {
-        // TODO: Needs correct mapping
-        val jsonResponse = Json.encodeToString(result.toResult())
-        response.send(jsonResponse)
-    }
-
-    override fun sendSearchErrorResponse(response: FirebaseFunctionsResponse) {
-        // TODO: Needs correct mapping
-        val jsonResponse = Json.encodeToString(Result.Empty)
-        response.send(jsonResponse)
     }
 }
 

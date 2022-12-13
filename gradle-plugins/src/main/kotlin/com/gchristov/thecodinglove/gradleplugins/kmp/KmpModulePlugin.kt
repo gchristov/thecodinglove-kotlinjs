@@ -1,13 +1,14 @@
 package com.gchristov.thecodinglove.gradleplugins.kmp
 
 import com.gchristov.thecodinglove.gradleplugins.Deps
+import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 @Suppress("unused")
-open class KmpModulePlugin : KmpPlatformPlugin() {
+class KmpModulePlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        super.apply(target)
+        target.plugins.apply("kmp-platform-plugin")
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
             sourceSets.maybeCreate("commonMain").dependencies {
                 implementation(project(":kmp-common-kotlin"))

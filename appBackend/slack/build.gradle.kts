@@ -1,5 +1,5 @@
 plugins {
-    id("kmp-module-plugin")
+    id("backend-service-plugin")
 }
 
 kotlin {

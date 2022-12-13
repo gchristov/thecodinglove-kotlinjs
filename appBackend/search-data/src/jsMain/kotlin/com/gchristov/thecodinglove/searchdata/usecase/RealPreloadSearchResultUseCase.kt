@@ -1,12 +1,9 @@
-package com.gchristov.thecodinglove.search.usecase
+package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.search.insert
 import com.gchristov.thecodinglove.searchdata.SearchException
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
-import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 

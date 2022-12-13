@@ -6,9 +6,13 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(projects.firebasefunctions)
                 implementation(projects.kmpCommonFirebase)
                 implementation(projects.htmlparse)
+            }
+        }
+        val jsTest by getting {
+            dependencies {
+                implementation(projects.searchTestfixtures)
             }
         }
     }

@@ -1,5 +1,5 @@
 plugins {
-    id("kmp-module-plugin")
+    id("backend-service-plugin")
 }
 
 kotlin {
@@ -7,11 +7,6 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 api(projects.searchData)
-            }
-        }
-        val jsTest by getting {
-            dependencies {
-                implementation(projects.searchTestfixtures)
             }
         }
     }

@@ -13,7 +13,9 @@ class WebExecutablePlugin : Plugin<Project> {
                 binaries.executable()
                 browser {
                     commonWebpackConfig {
-                        cssSupport.enabled = true
+                        cssSupport {
+                            enabled = true
+                        }
                     }
                 }
             }

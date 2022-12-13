@@ -1,12 +1,10 @@
-package com.gchristov.thecodinglove.search.usecase
+package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import arrow.core.flatMap
-import com.gchristov.thecodinglove.search.*
 import com.gchristov.thecodinglove.searchdata.SearchException
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
