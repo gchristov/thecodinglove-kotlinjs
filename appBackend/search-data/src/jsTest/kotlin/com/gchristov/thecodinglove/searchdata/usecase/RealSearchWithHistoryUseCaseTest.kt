@@ -1,13 +1,10 @@
-package com.gchristov.thecodinglove.search.usecase
+package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.search.contains
-import com.gchristov.thecodinglove.search.insert
 import com.gchristov.thecodinglove.searchdata.SearchException
 import com.gchristov.thecodinglove.searchdata.model.Post
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchRepository
 import com.gchristov.thecodinglove.searchtestfixtures.PostCreator
 import kotlinx.coroutines.ExperimentalCoroutinesApi

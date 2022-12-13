@@ -9,10 +9,5 @@ kotlin {
                 api(projects.searchData)
             }
         }
-        val jsTest by getting {
-            dependencies {
-                implementation(projects.searchTestfixtures)
-            }
-        }
     }
 }
