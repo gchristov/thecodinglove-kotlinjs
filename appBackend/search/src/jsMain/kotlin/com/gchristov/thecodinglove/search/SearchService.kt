@@ -54,7 +54,7 @@ class SearchService(
         searchType: SearchWithSessionUseCase.Type,
         response: ApiResponse
     ) {
-        println("Performing search")
+        println("Performing search...")
         searchWithSessionUseCase(searchType)
             .fold(
                 ifLeft = {
@@ -72,7 +72,7 @@ class SearchService(
     }
 
     private suspend fun preload(searchSessionId: String) {
-        println("Preloading next result")
+        println("Preloading next result...")
         preloadSearchResultUseCase(searchSessionId)
             .fold(
                 ifLeft = { it.printStackTrace() },
