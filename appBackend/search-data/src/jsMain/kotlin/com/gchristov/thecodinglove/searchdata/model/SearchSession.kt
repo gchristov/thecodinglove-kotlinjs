@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.searchdata.model
 
-import com.gchristov.thecodinglove.searchdata.api.ApiPost
 import com.gchristov.thecodinglove.searchdata.api.ApiSearchSession
+import com.gchristov.thecodinglove.searchdata.api.toPost
 
 data class SearchSession(
     val id: String,
@@ -34,17 +34,11 @@ internal fun ApiSearchSession.toSearchSession() = SearchSession(
     state = state.toSearchSessionState()
 )
 
-private fun ApiPost.toPost() = Post(
-    title = title,
-    url = url,
-    imageUrl = imageUrl
-)
-
 private fun ApiSearchSession.State.toSearchSessionState() = when (this) {
     is ApiSearchSession.State.Searching -> SearchSession.State.Searching
 }
 
-internal fun SearchSession.toApiSearchSession() = ApiSearchSession(
+internal fun SearchSession.toSearchSession() = ApiSearchSession(
     id = id,
     query = query,
     totalPosts = totalPosts,
@@ -55,17 +49,11 @@ internal fun SearchSession.toApiSearchSession() = ApiSearchSession(
             }
         }
     },
-    currentPost = currentPost?.toApiPost(),
-    preloadedPost = preloadedPost?.toApiPost(),
-    state = state.toApiSearchSessionState()
+    currentPost = currentPost?.toPost(),
+    preloadedPost = preloadedPost?.toPost(),
+    state = state.toSearchSessionState()
 )
 
-private fun SearchSession.State.toApiSearchSessionState() = when (this) {
+private fun SearchSession.State.toSearchSessionState() = when (this) {
     is SearchSession.State.Searching -> ApiSearchSession.State.Searching
 }
-
-private fun Post.toApiPost() = ApiPost(
-    title = title,
-    url = url,
-    imageUrl = imageUrl
-)

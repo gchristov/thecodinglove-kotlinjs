@@ -56,7 +56,7 @@ internal class RealSearchRepository(
             .collection("searchSession")
             .document(searchSession.id)
         document.set(
-            data = searchSession.toApiSearchSession(),
+            data = searchSession.toSearchSession(),
             encodeDefaults = true,
             merge = true
         )
