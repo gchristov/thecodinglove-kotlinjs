@@ -40,7 +40,6 @@ object SearchModule : DiModule() {
             }
             bindSingleton {
                 provideSearchService(
-                    searchRepository = instance(),
                     searchWithSessionUseCase = instance(),
                     preloadSearchResultUseCase = instance()
                 )
@@ -76,11 +75,9 @@ object SearchModule : DiModule() {
     )
 
     private fun provideSearchService(
-        searchRepository: SearchRepository,
         searchWithSessionUseCase: SearchWithSessionUseCase,
         preloadSearchResultUseCase: PreloadSearchResultUseCase
     ): SearchService = SearchService(
-        searchRepository = searchRepository,
         searchWithSessionUseCase = searchWithSessionUseCase,
         preloadSearchResultUseCase = preloadSearchResultUseCase
     )
