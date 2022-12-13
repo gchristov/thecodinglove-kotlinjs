@@ -12,7 +12,10 @@ class SlackSlashCommandService(
         exports.slackSlashCommand = registerForApiCallbacks()
     }
 
-    override suspend fun handleRequest(request: ApiRequest, response: ApiResponse) {
+    override suspend fun handleRequest(
+        request: ApiRequest,
+        response: ApiResponse
+    ) {
         try {
             // TODO: Needs correct response mapping
             val command: ApiSlackSlashCommand = request.body.bodyFromJson(jsonParser)

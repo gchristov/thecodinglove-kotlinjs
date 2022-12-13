@@ -15,7 +15,10 @@ class SearchService(
         exports.search = registerForApiCallbacks()
     }
 
-    override suspend fun handleRequest(request: ApiRequest, response: ApiResponse) {
+    override suspend fun handleRequest(
+        request: ApiRequest,
+        response: ApiResponse
+    ) {
         try {
             val searchQuery: String = request.query["searchQuery"] ?: "release"
             val searchSessionId: String? = request.query["searchSessionId"]
