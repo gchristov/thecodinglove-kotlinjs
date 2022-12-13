@@ -1,9 +1,6 @@
 package com.gchristov.thecodinglove.search
 
-import com.gchristov.thecodinglove.commonservice.ApiResponse
-import com.gchristov.thecodinglove.commonservice.Service
-import com.gchristov.thecodinglove.commonservice.exports
-import com.gchristov.thecodinglove.commonservice.get
+import com.gchristov.thecodinglove.commonservice.*
 import com.gchristov.thecodinglove.searchdata.api.toSearchResult
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
@@ -18,28 +15,38 @@ class SearchService(
 ) : Service() {
     override fun register() {
         exports.search = registerApiCallback { request, response ->
-            try {
-                val searchQuery: String = request.query["searchQuery"] ?: "release"
-                val searchSessionId: String? = request.query["searchSessionId"]
-                val searchType = searchSessionId?.let {
-                    SearchWithSessionUseCase.Type.WithSessionId(
-                        query = searchQuery,
-                        sessionId = it
-                    )
-                } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
+            handleRequest(
+                request = request,
+                response = response
+            )
+        }
+    }
 
-                // TODO: Do not use GlobalScope
-                GlobalScope.launch {
-                    search(
-                        searchType = searchType,
-                        response = response
-                    )
-                }
-            } catch (error: Exception) {
-                error.printStackTrace()
-                // TODO: Needs correct response mapping
-                response.send("ERROR")
+    private fun handleRequest(
+        request: ApiRequest,
+        response: ApiResponse
+    ) {
+        try {
+            val searchQuery: String = request.query["searchQuery"] ?: "release"
+            val searchSessionId: String? = request.query["searchSessionId"]
+            val searchType = searchSessionId?.let {
+                SearchWithSessionUseCase.Type.WithSessionId(
+                    query = searchQuery,
+                    sessionId = it
+                )
+            } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
+
+            // TODO: Do not use GlobalScope
+            GlobalScope.launch {
+                search(
+                    searchType = searchType,
+                    response = response
+                )
             }
+        } catch (error: Exception) {
+            error.printStackTrace()
+            // TODO: Needs correct response mapping
+            response.send("ERROR")
         }
     }
 
