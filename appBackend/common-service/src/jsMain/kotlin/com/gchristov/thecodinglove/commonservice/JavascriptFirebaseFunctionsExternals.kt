@@ -30,7 +30,9 @@ internal external object PubSubTopic {
     fun onPublish(callback: (message: PubSubMessage) -> Promise<Unit>)
 }
 
-external class PubSubMessage
+external class PubSubMessage {
+    val json: ParametersMap
+}
 
 external class ApiResponse {
     fun send(data: String)
