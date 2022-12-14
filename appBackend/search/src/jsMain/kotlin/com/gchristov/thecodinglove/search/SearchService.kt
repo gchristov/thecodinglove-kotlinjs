@@ -36,7 +36,7 @@ class SearchService(
         } catch (error: Exception) {
             error.printStackTrace()
             // TODO: Needs correct response mapping
-            response.send("ERROR")
+            response.status(400).send("ERROR")
         }
     }
 
@@ -50,7 +50,7 @@ class SearchService(
                 ifLeft = {
                     it.printStackTrace()
                     // TODO: Needs correct response mapping
-                    response.send("ERROR")
+                    response.status(400).send("ERROR")
                 },
                 ifRight = { searchResult ->
                     // TODO: Needs correct response mapping
