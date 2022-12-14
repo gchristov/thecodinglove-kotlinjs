@@ -6,11 +6,12 @@ class Deps {
         const val core = "io.arrow-kt:arrow-core:1.1.3"
     }
 
-    object Firebase {
-        const val firestore = "dev.gitlive:firebase-firestore:1.6.2"
+    object Google {
+        const val firebaseFirestore = "dev.gitlive:firebase-firestore:1.6.2"
         val firebase = NpmDependency("firebase", "9.10.0")
-        val admin = NpmDependency("firebase-admin", "11.0.1")
-        val functions = NpmDependency("firebase-functions", "3.24.0")
+        val firebaseAdmin = NpmDependency("firebase-admin", "11.0.1")
+        val firebaseFunctions = NpmDependency("firebase-functions", "3.24.0")
+        val pubSub = NpmDependency("@google-cloud/pubsub", "3.2.1")
     }
 
     object Kodein {

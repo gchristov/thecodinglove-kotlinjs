@@ -19,7 +19,7 @@ object SlackModule : DiModule() {
 
     private fun provideSlackSlashCommandService(
         jsonParser: Json
-    ): SlackSlashCommandService = SlackSlashCommandService(
+    ): SlackSlashCommandApiService = SlackSlashCommandApiService(
         jsonParser = jsonParser
     )
 }

@@ -1,16 +1,16 @@
 package com.gchristov.thecodinglove.search
 
 import com.gchristov.thecodinglove.commonservice.*
+import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
 import com.gchristov.thecodinglove.searchdata.api.toSearchResult
-import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class SearchService(
+class SearchApiService(
+    private val pubSub: PubSub,
     private val searchWithSessionUseCase: SearchWithSessionUseCase,
-    private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
-) : Service() {
+) : ApiService() {
     override fun register() {
         exports.search = registerForApiCallbacks()
     }
@@ -54,19 +54,16 @@ class SearchService(
                 },
                 ifRight = { searchResult ->
                     // TODO: Needs correct response mapping
-                    response.send(Json.encodeToString(searchResult.toSearchResult()))
                     println("Search complete")
                     preload(searchResult.searchSessionId)
+                    response.send(Json.encodeToString(searchResult.toSearchResult()))
                 }
             )
     }
 
-    private suspend fun preload(searchSessionId: String) {
+    private fun preload(searchSessionId: String) {
         println("Preloading next result...")
-        preloadSearchResultUseCase(searchSessionId)
-            .fold(
-                ifLeft = { it.printStackTrace() },
-                ifRight = { println("Preload complete") }
-            )
+        val preload = PreloadPubSubService.buildTopicMessage(searchSessionId)
+        pubSub.topic(preload.topic).publish(Buffer.from(Json.encodeToString(preload)))
     }
 }

@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.kmpcommondi
 
 import org.kodein.di.DI
 
-object CommonDiModule : DiModule() {
+object KmpCommonDiModule : DiModule() {
     override fun name() = "kmp-common-di"
 
     override fun bindDependencies(builder: DI.Builder) {

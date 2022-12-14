@@ -13,7 +13,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(Deps.Firebase.firestore)
+                api(Deps.Google.firebaseFirestore)
             }
         }
     }

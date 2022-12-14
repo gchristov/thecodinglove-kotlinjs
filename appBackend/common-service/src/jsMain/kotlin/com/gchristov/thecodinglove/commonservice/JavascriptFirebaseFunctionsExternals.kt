@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.commonservice
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlin.js.Promise
 
 external var exports: dynamic
 
@@ -9,6 +10,7 @@ external var exports: dynamic
 @JsNonModule
 internal external object FirebaseFunctions {
     val https: FirebaseFunctionsHttps
+    val pubsub: FirebaseFunctionsPubSub
 }
 
 internal external object FirebaseFunctionsHttps {
@@ -18,6 +20,18 @@ internal external object FirebaseFunctionsHttps {
             response: ApiResponse
         ) -> Unit
     )
+}
+
+internal external object FirebaseFunctionsPubSub {
+    fun topic(name: String): PubSubSubscriberTopic
+}
+
+internal external object PubSubSubscriberTopic {
+    fun onPublish(callback: (message: PubSubMessage) -> Promise<Unit>)
+}
+
+external class PubSubMessage {
+    val json: ParametersMap
 }
 
 external class ApiResponse {

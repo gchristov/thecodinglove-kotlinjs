@@ -5,9 +5,9 @@ import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class SlackSlashCommandService(
+class SlackSlashCommandApiService(
     private val jsonParser: Json
-) : Service() {
+) : ApiService() {
     override fun register() {
         exports.slackSlashCommand = registerForApiCallbacks()
     }
