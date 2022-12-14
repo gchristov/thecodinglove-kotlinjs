@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.kmpcommonnetwork
 
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.*
@@ -25,6 +26,7 @@ object KmpCommonNetworkModule : DiModule() {
     }
 
     private fun provideHttpClient(jsonSerializer: Json) = HttpClient {
+        BrowserUserAgent()
         install(ContentNegotiation) {
             json(jsonSerializer)
         }
