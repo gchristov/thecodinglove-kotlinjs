@@ -1,14 +1,13 @@
 package com.gchristov.thecodinglove
 
-import com.gchristov.thecodinglove.commonservice.PubSubMessage
-import com.gchristov.thecodinglove.commonservice.PubSubService
-import com.gchristov.thecodinglove.commonservice.exports
+import com.gchristov.thecodinglove.commonservice.*
 import com.gchristov.thecodinglove.htmlparse.HtmlParseModule
 import com.gchristov.thecodinglove.kmpcommondi.CommonDiModule
 import com.gchristov.thecodinglove.kmpcommondi.DiGraph
 import com.gchristov.thecodinglove.kmpcommondi.inject
 import com.gchristov.thecodinglove.kmpcommondi.registerModules
 import com.gchristov.thecodinglove.kmpcommonfirebase.CommonFirebaseModule
+import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
 import com.gchristov.thecodinglove.kmpcommonnetwork.CommonNetworkModule
 import com.gchristov.thecodinglove.search.SearchApiService
 import com.gchristov.thecodinglove.search.SearchModule
@@ -39,12 +38,24 @@ private fun setupDi() {
 private fun setupServices() {
     DiGraph.inject<SearchApiService>().register()
     DiGraph.inject<SlackSlashCommandApiService>().register()
+    PreloadTriggerService().register()
     PreloadPubSubService().register()
+}
+
+private class PreloadTriggerService : ApiService() {
+    override fun register() {
+        exports.pubsubsend = registerForApiCallbacks()
+    }
+
+    override suspend fun handleRequest(request: ApiRequest, response: ApiResponse) {
+        PubSub("thecodinglove-4ab53").topic("trigger").publish(Buffer.from("HELLO!"))
+        response.send("OK")
+    }
 }
 
 private class PreloadPubSubService : PubSubService() {
     override fun register() {
-        exports.pubsubtest = registerForPubSubCallbacks("trigger")
+        exports.pubsubreceive = registerForPubSubCallbacks("trigger")
     }
 
     override suspend fun handleMessage(message: PubSubMessage) {
