@@ -16,13 +16,14 @@ object SearchModule : DiModule() {
         builder.apply {
             bindSingleton {
                 provideSearchApiService(
+                    jsonSerializer = instance(),
                     pubSub = instance(),
                     searchWithSessionUseCase = instance()
                 )
             }
             bindSingleton {
                 providePreloadPubSubService(
-                    jsonParser = instance(),
+                    jsonSerializer = instance(),
                     preloadSearchResultUseCase = instance()
                 )
             }
@@ -30,18 +31,20 @@ object SearchModule : DiModule() {
     }
 
     private fun provideSearchApiService(
+        jsonSerializer: Json,
         pubSub: PubSub,
         searchWithSessionUseCase: SearchWithSessionUseCase
     ): SearchApiService = SearchApiService(
+        jsonSerializer = jsonSerializer,
         pubSub = pubSub,
         searchWithSessionUseCase = searchWithSessionUseCase
     )
 
     private fun providePreloadPubSubService(
-        jsonParser: Json,
+        jsonSerializer: Json,
         preloadSearchResultUseCase: PreloadSearchResultUseCase
     ): PreloadPubSubService = PreloadPubSubService(
-        jsonParser = jsonParser,
+        jsonSerializer = jsonSerializer,
         preloadSearchResultUseCase = preloadSearchResultUseCase
     )
 }

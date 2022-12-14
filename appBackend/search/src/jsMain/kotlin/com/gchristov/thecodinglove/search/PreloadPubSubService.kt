@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 class PreloadPubSubService(
-    private val jsonParser: Json,
+    private val jsonSerializer: Json,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase
 ) : PubSubService() {
     override fun topic(): String = Topic
@@ -22,7 +22,7 @@ class PreloadPubSubService(
     override suspend fun handleMessage(message: PubSubMessage): Either<Exception, Unit> {
         println("Received request to pre-load search results")
         return try {
-            val topicMessage = message.json.bodyFromJson<PreloadTopicMessage>(jsonParser)
+            val topicMessage = message.json.bodyFromJson<PreloadTopicMessage>(jsonSerializer)
             return preloadSearchResultUseCase(searchSessionId = topicMessage.searchSessionId)
         } catch (error: Exception) {
             error.printStackTrace()

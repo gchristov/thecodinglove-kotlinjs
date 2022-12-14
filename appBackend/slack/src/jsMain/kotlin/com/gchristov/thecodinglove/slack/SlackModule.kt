@@ -12,14 +12,14 @@ object SlackModule : DiModule() {
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindSingleton {
-                provideSlackSlashCommandService(jsonParser = instance())
+                provideSlackSlashCommandService(jsonSerializer = instance())
             }
         }
     }
 
     private fun provideSlackSlashCommandService(
-        jsonParser: Json
+        jsonSerializer: Json
     ): SlackSlashCommandApiService = SlackSlashCommandApiService(
-        jsonParser = jsonParser
+        jsonSerializer = jsonSerializer
     )
 }
