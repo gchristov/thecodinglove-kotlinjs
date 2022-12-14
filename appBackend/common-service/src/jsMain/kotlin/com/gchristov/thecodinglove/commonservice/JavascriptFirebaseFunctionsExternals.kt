@@ -22,6 +22,8 @@ internal external object FirebaseFunctionsHttps {
 
 external class ApiResponse {
     fun send(data: String)
+
+    fun status(status: Int): ApiResponse
 }
 
 external class ApiRequest {
