@@ -10,7 +10,7 @@ import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-object CommonFirebaseModule : DiModule() {
+object KmpCommonFirebaseModule : DiModule() {
     override fun name() = "kmp-common-firebase"
 
     override fun bindDependencies(builder: DI.Builder) {

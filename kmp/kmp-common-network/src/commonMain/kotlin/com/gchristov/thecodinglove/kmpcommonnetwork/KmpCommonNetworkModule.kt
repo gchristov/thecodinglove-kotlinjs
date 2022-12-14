@@ -10,7 +10,7 @@ import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-object CommonNetworkModule : DiModule() {
+object KmpCommonNetworkModule : DiModule() {
     override fun name() = "kmp-common-network"
 
     override fun bindDependencies(builder: DI.Builder) {
