@@ -23,10 +23,10 @@ internal external object FirebaseFunctionsHttps {
 }
 
 internal external object FirebaseFunctionsPubSub {
-    fun topic(name: String): SubscriberTopic
+    fun topic(name: String): PubSubSubscriberTopic
 }
 
-internal external object SubscriberTopic {
+internal external object PubSubSubscriberTopic {
     fun onPublish(callback: (message: PubSubMessage) -> Promise<Unit>)
 }
 

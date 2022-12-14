@@ -5,9 +5,9 @@ package com.gchristov.thecodinglove.commonservice
 import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
 
 external class PubSub(projectId: String) {
-    fun topic(name: String): PublisherTopic
+    fun topic(name: String): PubSubPublisherTopic
 }
 
-external class PublisherTopic {
+external class PubSubPublisherTopic {
     fun publish(message: Buffer)
 }
