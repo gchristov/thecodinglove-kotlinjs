@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.commonservice
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlin.js.Promise
 
 external var exports: dynamic
 
@@ -26,7 +27,7 @@ internal external object FirebaseFunctionsPubSub {
 }
 
 internal external object PubSubTopic {
-    fun onPublish(callback: (message: PubSubMessage) -> Unit)
+    fun onPublish(callback: (message: PubSubMessage) -> Promise<Unit>)
 }
 
 external class PubSubMessage
