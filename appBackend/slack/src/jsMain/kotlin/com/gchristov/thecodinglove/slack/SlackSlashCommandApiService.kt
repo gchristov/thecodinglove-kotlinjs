@@ -6,7 +6,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class SlackSlashCommandApiService(
-    private val jsonParser: Json
+    private val jsonSerializer: Json
 ) : ApiService() {
     override fun register() {
         exports.slackSlashCommand = registerForApiCallbacks()
@@ -18,8 +18,8 @@ class SlackSlashCommandApiService(
     ) {
         try {
             // TODO: Needs correct response mapping
-            val command: ApiSlackSlashCommand = request.body.bodyFromJson(jsonParser)
-            response.send(Json.encodeToString(command))
+            val command: ApiSlackSlashCommand = request.body.bodyFromJson(jsonSerializer)
+            response.send(jsonSerializer.encodeToString(command))
         } catch (error: Exception) {
             error.printStackTrace()
             // TODO: Needs correct response mapping

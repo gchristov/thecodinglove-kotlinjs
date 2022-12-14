@@ -15,18 +15,18 @@ object KmpCommonNetworkModule : DiModule() {
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
-            bindSingleton { provideJsonParser() }
-            bindSingleton { provideHttpClient(jsonParser = instance()) }
+            bindSingleton { provideJsonSerializer() }
+            bindSingleton { provideHttpClient(jsonSerializer = instance()) }
         }
     }
 
-    private fun provideJsonParser(): Json = Json {
+    private fun provideJsonSerializer(): Json = Json {
         ignoreUnknownKeys = true
     }
 
-    private fun provideHttpClient(jsonParser: Json) = HttpClient {
+    private fun provideHttpClient(jsonSerializer: Json) = HttpClient {
         install(ContentNegotiation) {
-            json(jsonParser)
+            json(jsonSerializer)
         }
         install(Logging) {
             logger = Logger.SIMPLE

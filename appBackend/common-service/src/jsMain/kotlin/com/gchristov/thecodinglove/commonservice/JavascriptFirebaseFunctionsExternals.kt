@@ -49,5 +49,6 @@ external class ParametersMap
 
 inline operator fun <T> ParametersMap.get(key: String): T? = asDynamic()[key] as? T
 
-inline fun <reified T> ParametersMap.bodyFromJson(jsonParser: Json): T =
-    jsonParser.decodeFromString(string = JSON.stringify(this))
+inline fun <reified T> ParametersMap.bodyFromJson(
+    jsonSerializer: Json
+): T = jsonSerializer.decodeFromString(string = JSON.stringify(this))

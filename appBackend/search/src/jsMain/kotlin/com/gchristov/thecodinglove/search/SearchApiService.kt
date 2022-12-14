@@ -8,6 +8,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class SearchApiService(
+    private val jsonSerializer: Json,
     private val pubSub: PubSub,
     private val searchWithSessionUseCase: SearchWithSessionUseCase,
 ) : ApiService() {
@@ -56,7 +57,7 @@ class SearchApiService(
                     // TODO: Needs correct response mapping
                     println("Search complete")
                     preload(searchResult.searchSessionId)
-                    response.send(Json.encodeToString(searchResult.toSearchResult()))
+                    response.send(jsonSerializer.encodeToString(searchResult.toSearchResult()))
                 }
             )
     }
@@ -64,6 +65,6 @@ class SearchApiService(
     private fun preload(searchSessionId: String) {
         println("Preloading next result...")
         val preload = PreloadPubSubService.buildTopicMessage(searchSessionId)
-        pubSub.topic(preload.topic).publish(Buffer.from(Json.encodeToString(preload)))
+        pubSub.topic(preload.topic).publish(Buffer.from(jsonSerializer.encodeToString(preload)))
     }
 }
