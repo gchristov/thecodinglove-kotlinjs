@@ -13,8 +13,10 @@ class PreloadPubSubService(
     private val jsonParser: Json,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase
 ) : PubSubService() {
+    override fun topic(): String = Topic
+
     override fun register() {
-        exports.preloadPubSub = registerForPubSubCallbacks("trigger")
+        exports.preloadPubSub = registerForPubSubCallbacks()
     }
 
     override suspend fun handleMessage(message: PubSubMessage): Either<Exception, Unit> {
@@ -27,7 +29,19 @@ class PreloadPubSubService(
             Either.Left(error)
         }
     }
+
+    companion object {
+        fun buildTopicMessage(searchSessionId: String) = PreloadTopicMessage(
+            topic = Topic,
+            searchSessionId = searchSessionId
+        )
+    }
 }
 
 @Serializable
-data class PreloadTopicMessage(val searchSessionId: String)
+data class PreloadTopicMessage(
+    val topic: String,
+    val searchSessionId: String
+)
+
+private const val Topic = "preloadPubSub"

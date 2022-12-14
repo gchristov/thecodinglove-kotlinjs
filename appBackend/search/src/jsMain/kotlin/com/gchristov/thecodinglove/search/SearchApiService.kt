@@ -63,7 +63,7 @@ class SearchApiService(
 
     private fun preload(searchSessionId: String) {
         println("Preloading next result...")
-        val preload = PreloadTopicMessage(searchSessionId = searchSessionId)
-        pubSub.topic("trigger").publish(Buffer.from(Json.encodeToString(preload)))
+        val preload = PreloadPubSubService.buildTopicMessage(searchSessionId)
+        pubSub.topic(preload.topic).publish(Buffer.from(Json.encodeToString(preload)))
     }
 }

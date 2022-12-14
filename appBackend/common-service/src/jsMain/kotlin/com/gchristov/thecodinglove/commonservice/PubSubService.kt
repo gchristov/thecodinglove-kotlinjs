@@ -11,6 +11,8 @@ abstract class PubSubService : CoroutineScope {
 
     private val job = Job()
 
+    abstract fun topic(): String
+
     abstract fun register()
 
     protected abstract suspend fun handleMessage(message: PubSubMessage): Either<Exception, Unit>
@@ -18,8 +20,8 @@ abstract class PubSubService : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = job
 
-    protected fun registerForPubSubCallbacks(topic: String) =
-        FirebaseFunctions.pubsub.topic(topic).onPublish {
+    protected fun registerForPubSubCallbacks() =
+        FirebaseFunctions.pubsub.topic(topic()).onPublish {
             Promise { resolve, reject ->
                 launch {
                     handleMessage(it).fold(
