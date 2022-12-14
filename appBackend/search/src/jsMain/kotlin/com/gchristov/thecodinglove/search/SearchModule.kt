@@ -24,7 +24,7 @@ object SearchModule : DiModule() {
     private fun provideSearchService(
         searchWithSessionUseCase: SearchWithSessionUseCase,
         preloadSearchResultUseCase: PreloadSearchResultUseCase
-    ): SearchService = SearchService(
+    ): SearchApiService = SearchApiService(
         searchWithSessionUseCase = searchWithSessionUseCase,
         preloadSearchResultUseCase = preloadSearchResultUseCase
     )

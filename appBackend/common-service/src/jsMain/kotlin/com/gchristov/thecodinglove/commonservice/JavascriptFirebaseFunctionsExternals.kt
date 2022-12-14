@@ -9,6 +9,7 @@ external var exports: dynamic
 @JsNonModule
 internal external object FirebaseFunctions {
     val https: FirebaseFunctionsHttps
+    val pubsub: FirebaseFunctionsPubSub
 }
 
 internal external object FirebaseFunctionsHttps {
@@ -19,6 +20,16 @@ internal external object FirebaseFunctionsHttps {
         ) -> Unit
     )
 }
+
+internal external object FirebaseFunctionsPubSub {
+    fun topic(name: String): PubSubTopic
+}
+
+internal external object PubSubTopic {
+    fun onPublish(callback: (message: PubSubMessage) -> Unit)
+}
+
+external class PubSubMessage
 
 external class ApiResponse {
     fun send(data: String)

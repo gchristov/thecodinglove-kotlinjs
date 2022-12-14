@@ -7,10 +7,10 @@ import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class SearchService(
+class SearchApiService(
     private val searchWithSessionUseCase: SearchWithSessionUseCase,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
-) : Service() {
+) : ApiService() {
     override fun register() {
         exports.search = registerForApiCallbacks()
     }

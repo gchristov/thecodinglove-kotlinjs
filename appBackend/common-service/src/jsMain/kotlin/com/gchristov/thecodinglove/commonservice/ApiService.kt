@@ -5,7 +5,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-abstract class Service : CoroutineScope {
+abstract class ApiService : CoroutineScope {
 
     private val job = Job()
 
