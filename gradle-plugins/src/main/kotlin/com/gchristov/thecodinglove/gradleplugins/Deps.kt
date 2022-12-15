@@ -6,6 +6,11 @@ class Deps {
         const val core = "io.arrow-kt:arrow-core:1.1.3"
     }
 
+    object Crypto {
+        const val mac = "com.diglol.crypto:mac:0.1.3"
+        const val encoding = "com.diglol.encoding:encoding:0.1.0"
+    }
+
     object Google {
         const val firebaseFirestore = "dev.gitlive:firebase-firestore:1.6.2"
         val firebase = NpmDependency("firebase", "9.10.0")

@@ -4,14 +4,6 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.searchdata.SearchException
 import com.gchristov.thecodinglove.searchdata.model.Post
 
-/**
-Use-case to search for a random post, given a search session. Implementations should:
-- obtain the total results for the given query, if not provided
-- choose a random page index based on the total number of posts and posts per page
-- obtain all posts for the given page
-- choose a random post from the page
-- return a summary of the search
- */
 interface SearchWithHistoryUseCase {
     suspend operator fun invoke(
         query: String,

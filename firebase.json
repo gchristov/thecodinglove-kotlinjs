@@ -30,7 +30,7 @@
       "port": 5000
     },
     "pubsub": {
-      "port": 8085
+      "port": 5003
     },
     "ui": {
       "enabled": false
