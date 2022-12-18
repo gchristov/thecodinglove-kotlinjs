@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.searchdata.SearchException
+import com.gchristov.thecodinglove.searchdata.SearchError
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
 import com.gchristov.thecodinglove.searchtestfixtures.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -105,7 +105,7 @@ class RealSearchWithSessionUseCaseTest {
     @Test
     fun searchWithEmptyResultReturnsEmpty(): TestResult {
         val searchType = SearchWithSessionUseCase.Type.NewSession(query = SearchQuery)
-        val searchWithHistoryResult = Either.Left(SearchException.Empty)
+        val searchWithHistoryResult = Either.Left(SearchError.Empty)
 
         return runBlockingTest(
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
@@ -127,8 +127,8 @@ class RealSearchWithSessionUseCaseTest {
             sessionId = SearchSessionId
         )
         val searchWithHistoryResults = listOf(
-            Either.Left(SearchException.Exhausted),
-            Either.Left(SearchException.Empty)
+            Either.Left(SearchError.Exhausted),
+            Either.Left(SearchError.Empty)
         )
         val searchSession = SearchSessionCreator.searchSession(
             id = SearchSessionId,
@@ -201,8 +201,8 @@ class RealSearchWithSessionUseCaseTest {
     }
 
     private fun runBlockingTest(
-        singleSearchWithHistoryInvocationResult: Either<SearchException, SearchWithHistoryUseCase.Result>? = null,
-        multiSearchWithHistoryInvocationResults: List<Either<SearchException, SearchWithHistoryUseCase.Result>>? = null,
+        singleSearchWithHistoryInvocationResult: Either<SearchError, SearchWithHistoryUseCase.Result>? = null,
+        multiSearchWithHistoryInvocationResults: List<Either<SearchError, SearchWithHistoryUseCase.Result>>? = null,
         searchSession: SearchSession?,
         testBlock: suspend (SearchWithSessionUseCase, FakeSearchRepository, FakeSearchWithHistoryUseCase) -> Unit
     ): TestResult = runTest {

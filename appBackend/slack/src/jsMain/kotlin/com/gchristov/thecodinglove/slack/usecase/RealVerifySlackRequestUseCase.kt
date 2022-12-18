@@ -12,20 +12,20 @@ import kotlinx.coroutines.withContext
 internal class RealVerifySlackRequestUseCase(
     private val dispatcher: CoroutineDispatcher,
 ) : VerifySlackRequestUseCase {
-    override suspend fun invoke(request: ApiRequest): Either<Exception, Unit> =
+    override suspend fun invoke(request: ApiRequest): Either<Throwable, Unit> =
         withContext(dispatcher) {
             try {
                 val timestamp: String = request.headers["x-slack-request-timestamp"]
-                    ?: return@withContext Either.Left(Exception(ErrorMessage))
+                    ?: return@withContext Either.Left(Throwable(ErrorMessage))
                 val signature: String = request.headers["x-slack-signature"]
-                    ?: return@withContext Either.Left(Exception(ErrorMessage))
+                    ?: return@withContext Either.Left(Throwable(ErrorMessage))
                 val rawBody = request.bodyAsString()
                 verifySlackRequest(
                     timestamp = timestamp,
                     signature = signature,
                     rawBody = rawBody
                 )
-            } catch (error: Exception) {
+            } catch (error: Throwable) {
                 Either.Left(error)
             }
         }
@@ -34,7 +34,7 @@ internal class RealVerifySlackRequestUseCase(
         timestamp: String,
         signature: String,
         rawBody: String?
-    ): Either<Exception, Unit> {
+    ): Either<Throwable, Unit> {
         val baseString = "$Version:$timestamp:$rawBody"
         val data = baseString.encodeToByteArray()
         val key = SlackSigningSecret.encodeToByteArray()
@@ -51,7 +51,7 @@ internal class RealVerifySlackRequestUseCase(
         ) {
             Either.Right(Unit)
         } else {
-            Either.Left(Exception(message = "Request signature could not be verified"))
+            Either.Left(Throwable(ErrorMessage))
         }
     }
 }

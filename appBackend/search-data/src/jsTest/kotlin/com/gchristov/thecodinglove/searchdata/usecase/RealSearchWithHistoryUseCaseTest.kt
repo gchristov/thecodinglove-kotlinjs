@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.searchdata.SearchException
+import com.gchristov.thecodinglove.searchdata.SearchError
 import com.gchristov.thecodinglove.searchdata.model.Post
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchRepository
@@ -31,7 +31,7 @@ class RealSearchWithHistoryUseCaseTest {
                 searchHistory = mutableMapOf(),
             )
             assertEquals(
-                expected = Either.Left(SearchException.Empty),
+                expected = Either.Left(SearchError.Empty),
                 actual = actualResult
             )
         }
@@ -51,7 +51,7 @@ class RealSearchWithHistoryUseCaseTest {
                 searchHistory = mutableMapOf(),
             )
             assertEquals(
-                expected = Either.Left(SearchException.Empty),
+                expected = Either.Left(SearchError.Empty),
                 actual = actualResult,
             )
         }
@@ -162,7 +162,7 @@ class RealSearchWithHistoryUseCaseTest {
                 query = SearchQuery,
                 searchHistory = searchHistory,
             )
-            assertTrue { actualResult == Either.Left(SearchException.Exhausted) }
+            assertTrue { actualResult == Either.Left(SearchError.Exhausted) }
         }
     }
 

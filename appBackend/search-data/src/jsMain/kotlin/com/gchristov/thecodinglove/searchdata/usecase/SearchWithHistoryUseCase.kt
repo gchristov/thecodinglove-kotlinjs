@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.searchdata.SearchException
+import com.gchristov.thecodinglove.searchdata.SearchError
 import com.gchristov.thecodinglove.searchdata.model.Post
 
 interface SearchWithHistoryUseCase {
@@ -9,7 +9,7 @@ interface SearchWithHistoryUseCase {
         query: String,
         totalPosts: Int? = null,
         searchHistory: Map<Int, List<Int>>,
-    ) : Either<SearchException, Result>
+    ) : Either<SearchError, Result>
 
     data class Result(
         val query: String,

@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.searchdata.SearchException
+import com.gchristov.thecodinglove.searchdata.SearchError
 
 interface PreloadSearchResultUseCase {
-    suspend operator fun invoke(searchSessionId: String) : Either<SearchException, Unit>
+    suspend operator fun invoke(searchSessionId: String) : Either<SearchError, Unit>
 }

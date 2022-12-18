@@ -19,12 +19,12 @@ class PreloadPubSubService(
         exports.preloadPubSub = registerForPubSubCallbacks()
     }
 
-    override suspend fun handleMessage(message: PubSubMessage): Either<Exception, Unit> {
+    override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> {
         println("Received request to pre-load search results")
         return try {
             val topicMessage = message.bodyAsJson<PreloadTopicMessage>(jsonSerializer)
             return preloadSearchResultUseCase(searchSessionId = topicMessage.searchSessionId)
-        } catch (error: Exception) {
+        } catch (error: Throwable) {
             error.printStackTrace()
             Either.Left(error)
         }

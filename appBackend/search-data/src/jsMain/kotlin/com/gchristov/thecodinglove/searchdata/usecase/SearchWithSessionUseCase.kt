@@ -1,11 +1,11 @@
 package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.searchdata.SearchException
+import com.gchristov.thecodinglove.searchdata.SearchError
 import com.gchristov.thecodinglove.searchdata.model.Post
 
 interface SearchWithSessionUseCase {
-    suspend operator fun invoke(type: Type): Either<SearchException, Result>
+    suspend operator fun invoke(type: Type): Either<SearchError, Result>
 
     sealed class Type {
         abstract val query: String

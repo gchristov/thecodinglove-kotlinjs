@@ -34,7 +34,7 @@ class SearchApiService(
                 searchType = searchType,
                 response = response
             )
-        } catch (error: Exception) {
+        } catch (error: Throwable) {
             sendError(
                 error = error,
                 response = response

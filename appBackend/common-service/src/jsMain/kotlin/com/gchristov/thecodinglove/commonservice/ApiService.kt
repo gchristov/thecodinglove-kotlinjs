@@ -33,7 +33,7 @@ abstract class ApiService(private val jsonSerializer: Json) : CoroutineScope {
         }
 
     protected fun sendError(
-        error: Exception,
+        error: Throwable,
         response: ApiResponse
     ) {
         error.printStackTrace()
@@ -49,6 +49,6 @@ private data class Error(
     val errorMessage: String
 )
 
-private fun Exception.toError() = Error(
+private fun Throwable.toError() = Error(
     errorMessage = message ?: "Something unexpected happened. Please try again."
 )

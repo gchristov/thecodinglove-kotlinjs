@@ -7,19 +7,19 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 internal class RealHtmlPostParser(private val dispatcher: CoroutineDispatcher) : HtmlPostParser {
-    override suspend fun parseTotalPosts(content: String): Either<Exception, Int> =
+    override suspend fun parseTotalPosts(content: String): Either<Throwable, Int> =
         withContext(dispatcher) {
             try {
                 val root = acquireRootNode(content)
                 val resultsCountNode = root.querySelectorAll(TotalPostsSelector)[0]
                 val count = (resultsCountNode.text as? String)?.toInt() ?: 0
                 Either.Right(count)
-            } catch (error: Exception) {
+            } catch (error: Throwable) {
                 Either.Left(error)
             }
         }
 
-    override suspend fun parsePosts(content: String): Either<Exception, List<HtmlPost>> =
+    override suspend fun parsePosts(content: String): Either<Throwable, List<HtmlPost>> =
         withContext(dispatcher) {
             try {
                 val posts = mutableListOf<HtmlPost>()
@@ -42,7 +42,7 @@ internal class RealHtmlPostParser(private val dispatcher: CoroutineDispatcher) :
                     }
                 }
                 Either.Right(posts)
-            } catch (error: Exception) {
+            } catch (error: Throwable) {
                 Either.Left(error)
             }
         }

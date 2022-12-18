@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import com.benasher44.uuid.uuid4
-import com.gchristov.thecodinglove.searchdata.SearchException
+import com.gchristov.thecodinglove.searchdata.SearchError
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.Post
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
@@ -14,7 +14,7 @@ internal class RealSearchWithSessionUseCase(
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
 ) : SearchWithSessionUseCase {
-    override suspend operator fun invoke(type: SearchWithSessionUseCase.Type): Either<SearchException, SearchWithSessionUseCase.Result> =
+    override suspend operator fun invoke(type: SearchWithSessionUseCase.Type): Either<SearchError, SearchWithSessionUseCase.Result> =
         withContext(dispatcher) {
             val searchSession = type.getSearchSession(searchRepository)
             // If a post is preloaded, return it right away
@@ -41,7 +41,7 @@ internal class RealSearchWithSessionUseCase(
                 .fold(
                     ifLeft = {
                         when (it) {
-                            is SearchException.Exhausted -> {
+                            is SearchError.Exhausted -> {
                                 searchSession.clearExhaustedHistory(searchRepository)
                                 invoke(type = type)
                             }
