@@ -9,6 +9,7 @@ import diglol.crypto.Hmac
 import diglol.encoding.encodeHexToString
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 
 internal class RealVerifySlackRequestUseCase(
     private val dispatcher: CoroutineDispatcher,
@@ -17,6 +18,9 @@ internal class RealVerifySlackRequestUseCase(
     override suspend fun invoke(request: ApiRequest): Either<Throwable, Unit> =
         withContext(dispatcher) {
             try {
+                val currentMoment = Clock.System.now()
+                println(currentMoment)
+
                 val timestamp: String = request.headers["x-slack-request-timestamp"]
                     ?: return@withContext Either.Left(Throwable(ErrorMessage))
                 val signature: String = request.headers["x-slack-signature"]

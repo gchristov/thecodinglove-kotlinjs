@@ -33,6 +33,7 @@ class Deps {
         const val coroutinesTest =
             "org.jetbrains.kotlinx:kotlinx-coroutines-test:${coroutinesTestVersion}"
         const val test = "org.jetbrains.kotlin:kotlin-test"
+        const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
     }
 
     object Ktor {
@@ -47,6 +48,7 @@ class Deps {
     object Node {
         val htmlParser = NpmDependency("node-html-parser", "6.1.4")
         val express = NpmDependency("express", "4.18.2")
+        val jsJoda = NpmDependency("@js-joda/core", "5.4.2")
     }
 
     object Uuid {

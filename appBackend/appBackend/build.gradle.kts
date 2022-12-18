@@ -17,9 +17,10 @@ kotlin {
                 implementation(npm(Deps.Google.firebase.name, Deps.Google.firebase.version))
                 implementation(npm(Deps.Google.firebaseAdmin.name, Deps.Google.firebaseAdmin.version))
                 implementation(npm(Deps.Google.firebaseFunctions.name, Deps.Google.firebaseFunctions.version))
+                implementation(npm(Deps.Google.pubSub.name, Deps.Google.pubSub.version))
                 implementation(npm(Deps.Node.htmlParser.name, Deps.Node.htmlParser.version))
                 implementation(npm(Deps.Node.express.name, Deps.Node.express.version))
-                implementation(npm(Deps.Google.pubSub.name, Deps.Google.pubSub.version))
+                implementation(npm(Deps.Node.jsJoda.name, Deps.Node.jsJoda.version))
             }
         }
     }
