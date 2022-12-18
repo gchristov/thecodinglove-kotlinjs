@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slack
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.slack.usecase.RealVerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slack.usecase.VerifySlackRequestUseCase
+import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
@@ -15,7 +16,7 @@ object SlackModule : DiModule() {
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
-            bindProvider { provideVerifySlackRequestUseCase() }
+            bindProvider { provideVerifySlackRequestUseCase(slackConfig = instance()) }
             bindSingleton {
                 provideSlackSlashCommandService(
                     jsonSerializer = instance(),
@@ -25,10 +26,12 @@ object SlackModule : DiModule() {
         }
     }
 
-    private fun provideVerifySlackRequestUseCase(): VerifySlackRequestUseCase =
-        RealVerifySlackRequestUseCase(
-            dispatcher = Dispatchers.Default
-        )
+    private fun provideVerifySlackRequestUseCase(
+        slackConfig: SlackConfig
+    ): VerifySlackRequestUseCase = RealVerifySlackRequestUseCase(
+        dispatcher = Dispatchers.Default,
+        slackConfig = slackConfig
+    )
 
     private fun provideSlackSlashCommandService(
         jsonSerializer: Json,

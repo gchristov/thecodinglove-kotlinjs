@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.commonservice.ApiRequest
 import com.gchristov.thecodinglove.commonservice.bodyAsString
 import com.gchristov.thecodinglove.commonservice.get
+import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import diglol.crypto.Hmac
 import diglol.encoding.encodeHexToString
 import kotlinx.coroutines.CoroutineDispatcher
@@ -11,6 +12,7 @@ import kotlinx.coroutines.withContext
 
 internal class RealVerifySlackRequestUseCase(
     private val dispatcher: CoroutineDispatcher,
+    private val slackConfig: SlackConfig,
 ) : VerifySlackRequestUseCase {
     override suspend fun invoke(request: ApiRequest): Either<Throwable, Unit> =
         withContext(dispatcher) {
@@ -23,7 +25,8 @@ internal class RealVerifySlackRequestUseCase(
                 verifySlackRequest(
                     timestamp = timestamp,
                     signature = signature,
-                    rawBody = rawBody
+                    rawBody = rawBody,
+                    signingSecret = slackConfig.signingSecret
                 )
             } catch (error: Throwable) {
                 Either.Left(error)
@@ -33,11 +36,12 @@ internal class RealVerifySlackRequestUseCase(
     private suspend fun verifySlackRequest(
         timestamp: String,
         signature: String,
-        rawBody: String?
+        rawBody: String?,
+        signingSecret: String
     ): Either<Throwable, Unit> {
         val baseString = "$Version:$timestamp:$rawBody"
         val data = baseString.encodeToByteArray()
-        val key = SlackSigningSecret.encodeToByteArray()
+        val key = signingSecret.encodeToByteArray()
         val cypher = Hmac(
             type = Hmac.Type.SHA256,
             key = key
@@ -57,6 +61,4 @@ internal class RealVerifySlackRequestUseCase(
 }
 
 private val Version = "v0"
-// TODO: Fix this with a local thingy, like Firebase
-private val SlackSigningSecret = "TODO: FIX THIS"
 private val ErrorMessage = "Request signature could not be verified"

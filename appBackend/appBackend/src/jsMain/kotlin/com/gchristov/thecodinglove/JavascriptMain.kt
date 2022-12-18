@@ -14,6 +14,7 @@ import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slack.SlackModule
 import com.gchristov.thecodinglove.slack.SlackSlashCommandApiService
+import com.gchristov.thecodinglove.slackdata.SlackDataModule
 
 fun main() {
     setupDi()
@@ -32,6 +33,7 @@ private fun setupDi() {
             SearchModule.module,
             SearchDataModule.module,
             SlackModule.module,
+            SlackDataModule.module,
         )
     )
 }
