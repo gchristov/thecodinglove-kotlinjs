@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.commonservice
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicedata.api.FirebaseFunctions
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegistrations
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -22,15 +22,17 @@ abstract class PubSubService : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = job
 
-    protected fun registerForPubSubCallbacks() =
-        FirebaseFunctions.pubsub.topic(topic()).onPublish {
+    protected fun registerForPubSubCallbacks() = PubSubServiceRegistrations.register(
+        topic = topic(),
+        callback = { message ->
             Promise { resolve, reject ->
                 launch {
-                    handleMessage(it).fold(
+                    handleMessage(message).fold(
                         ifLeft = { reject(it) },
                         ifRight = { resolve(it) }
                     )
                 }
             }
         }
+    )
 }
