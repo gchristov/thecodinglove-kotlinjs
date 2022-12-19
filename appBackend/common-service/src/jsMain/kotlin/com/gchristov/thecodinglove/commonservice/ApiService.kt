@@ -1,6 +1,9 @@
 package com.gchristov.thecodinglove.commonservice
 
-import com.gchristov.thecodinglove.commonservicedata.api.*
+import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
+import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegistrations
+import com.gchristov.thecodinglove.commonservicedata.api.FirebaseFunctionsHttpsResponse
+import com.gchristov.thecodinglove.commonservicedata.api.sendJson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -23,15 +26,14 @@ abstract class ApiService(private val jsonSerializer: Json) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = job
 
-    protected fun registerForApiCallbacks() =
-        FirebaseFunctions.https.onRequest { request, response ->
-            launch {
-                handleRequest(
-                    request = ApiRequestFacade(ApiParametersMapFacade())(request),
-                    response = response
-                )
-            }
+    protected fun registerForApiCallbacks() = ApiServiceRegistrations.register { request, response ->
+        launch {
+            handleRequest(
+                request = request,
+                response = response
+            )
         }
+    }
 
     protected fun sendError(
         error: Throwable,
