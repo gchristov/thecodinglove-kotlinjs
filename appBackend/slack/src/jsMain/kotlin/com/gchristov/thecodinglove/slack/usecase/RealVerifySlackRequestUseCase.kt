@@ -24,9 +24,9 @@ internal class RealVerifySlackRequestUseCase(
             try {
                 val timestamp: Long = request.headers.get<String>("x-slack-request-timestamp")
                     ?.toLong()
-                    ?: return@withContext Either.Left(Throwable(ErrorMessage))
+                    ?: return@withContext Either.Left(Throwable(GenericError))
                 val signature: String = request.headers["x-slack-signature"]
-                    ?: return@withContext Either.Left(Throwable(ErrorMessage))
+                    ?: return@withContext Either.Left(Throwable(GenericError))
                 val rawBody = request.bodyAsString()
                 println("Verifying Slack request\n" +
                         "timestamp: $timestamp\n" +
@@ -58,7 +58,7 @@ internal class RealVerifySlackRequestUseCase(
             unit = DateTimeUnit.MINUTE
         )
         return if (timestampInstant < Clock.System.now()) {
-            Either.Left(Exception(ErrorMessage))
+            Either.Left(Exception(TooOldError))
         } else {
             Either.Right(Unit)
         }
@@ -86,10 +86,11 @@ internal class RealVerifySlackRequestUseCase(
         ) {
             Either.Right(Unit)
         } else {
-            Either.Left(Throwable(ErrorMessage))
+            Either.Left(Throwable(GenericError))
         }
     }
 }
 
 private val Version = "v0"
-private val ErrorMessage = "Request signature could not be verified"
+private val GenericError = "Request signature could not be verified"
+private val TooOldError = "Request too old"
