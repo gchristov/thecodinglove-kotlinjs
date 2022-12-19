@@ -1,13 +1,15 @@
 package com.gchristov.thecodinglove.slack
 
 import com.gchristov.thecodinglove.commonservice.*
+import com.gchristov.thecodinglove.slack.usecase.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class SlackSlashCommandApiService(
-    private val jsonSerializer: Json
-) : ApiService() {
+    private val jsonSerializer: Json,
+    private val verifySlackRequestUseCase: VerifySlackRequestUseCase,
+) : ApiService(jsonSerializer) {
     override fun register() {
         exports.slackSlashCommand = registerForApiCallbacks()
     }
@@ -16,14 +18,25 @@ class SlackSlashCommandApiService(
         request: ApiRequest,
         response: ApiResponse
     ) {
-        try {
-            // TODO: Needs correct response mapping
-            val command: ApiSlackSlashCommand = request.body.bodyFromJson(jsonSerializer)
-            response.send(jsonSerializer.encodeToString(command))
-        } catch (error: Exception) {
-            error.printStackTrace()
-            // TODO: Needs correct response mapping
-            response.status(400).send("ERROR")
-        }
+        verifySlackRequestUseCase(request).fold(
+            ifLeft = {
+                sendError(
+                    error = it,
+                    response = response
+                )
+            },
+            ifRight = {
+                try {
+                    // TODO: Handle valid request
+                    val command: ApiSlackSlashCommand = request.bodyAsJson(jsonSerializer)
+                    response.sendJson(data = jsonSerializer.encodeToString(command))
+                } catch (error: Throwable) {
+                    sendError(
+                        error = error,
+                        response = response
+                    )
+                }
+            }
+        )
     }
 }

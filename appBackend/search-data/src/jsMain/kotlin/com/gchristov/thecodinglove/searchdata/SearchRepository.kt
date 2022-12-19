@@ -5,12 +5,12 @@ import com.gchristov.thecodinglove.searchdata.model.Post
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
 
 interface SearchRepository {
-    suspend fun getTotalPosts(query: String): Either<Exception, Int>
+    suspend fun getTotalPosts(query: String): Either<Throwable, Int>
 
     suspend fun search(
         page: Int,
         query: String
-    ): Either<Exception, List<Post>>
+    ): Either<Throwable, List<Post>>
 
     suspend fun getSearchSession(id: String): SearchSession?
 

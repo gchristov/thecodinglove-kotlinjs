@@ -9,16 +9,16 @@ import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.statement.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlin.Exception
 import kotlin.Int
 import kotlin.String
+import kotlin.Throwable
 
 internal class RealSearchRepository(
     private val apiService: SearchApi,
     private val htmlPostParser: HtmlPostParser,
     private val firebaseFirestore: FirebaseFirestore
 ) : SearchRepository {
-    override suspend fun getTotalPosts(query: String): Either<Exception, Int> {
+    override suspend fun getTotalPosts(query: String): Either<Throwable, Int> {
         val response = apiService.search(
             // First page should always exist if there are results
             page = 1,
@@ -30,7 +30,7 @@ internal class RealSearchRepository(
     override suspend fun search(
         page: Int,
         query: String
-    ): Either<Exception, List<Post>> {
+    ): Either<Throwable, List<Post>> {
         val response = apiService.search(
             page = page,
             query = query

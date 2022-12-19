@@ -11,7 +11,7 @@ class SearchApiService(
     private val jsonSerializer: Json,
     private val pubSub: PubSub,
     private val searchWithSessionUseCase: SearchWithSessionUseCase,
-) : ApiService() {
+) : ApiService(jsonSerializer) {
     override fun register() {
         exports.search = registerForApiCallbacks()
     }
@@ -34,10 +34,11 @@ class SearchApiService(
                 searchType = searchType,
                 response = response
             )
-        } catch (error: Exception) {
-            error.printStackTrace()
-            // TODO: Needs correct response mapping
-            response.status(400).send("ERROR")
+        } catch (error: Throwable) {
+            sendError(
+                error = error,
+                response = response
+            )
         }
     }
 
@@ -49,15 +50,16 @@ class SearchApiService(
         searchWithSessionUseCase(searchType)
             .fold(
                 ifLeft = {
-                    it.printStackTrace()
-                    // TODO: Needs correct response mapping
-                    response.status(400).send("ERROR")
+                    sendError(
+                        error = it,
+                        response = response
+                    )
                 },
                 ifRight = { searchResult ->
                     // TODO: Needs correct response mapping
                     println("Search complete")
                     preload(searchResult.searchSessionId)
-                    response.send(jsonSerializer.encodeToString(searchResult.toSearchResult()))
+                    response.sendJson(data = jsonSerializer.encodeToString(searchResult.toSearchResult()))
                 }
             )
     }

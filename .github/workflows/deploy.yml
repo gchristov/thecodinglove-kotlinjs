@@ -37,6 +37,7 @@ jobs:
           echo FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }} >> ./local.properties
           echo FIREBASE_GCM_SENDER_ID=${{ secrets.FIREBASE_GCM_SENDER_ID }} >> ./local.properties
           echo FIREBASE_APPLICATION_ID=${{ secrets.FIREBASE_APPLICATION_ID }} >> ./local.properties
+          echo SLACK_SIGNING_SECRET=${{ secrets.SLACK_SIGNING_SECRET }} >> ./local.properties
           set -o pipefail && bash ./scripts/build.sh
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
@@ -87,6 +88,7 @@ jobs:
           echo FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }} >> ./local.properties
           echo FIREBASE_GCM_SENDER_ID=${{ secrets.FIREBASE_GCM_SENDER_ID }} >> ./local.properties
           echo FIREBASE_APPLICATION_ID=${{ secrets.FIREBASE_APPLICATION_ID }} >> ./local.properties
+          echo SLACK_SIGNING_SECRET=${{ secrets.SLACK_SIGNING_SECRET }} >> ./local.properties
           set -o pipefail && ./gradlew --continue jsNodeTest
       # Always run this job even if the previous steps fail to collect all test reports
       - name: Generate Javascript test report

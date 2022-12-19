@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.searchdata.SearchException
+import com.gchristov.thecodinglove.searchdata.SearchError
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
 import kotlinx.coroutines.CoroutineDispatcher
@@ -12,11 +12,11 @@ internal class RealPreloadSearchResultUseCase(
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
 ) : PreloadSearchResultUseCase {
-    override suspend operator fun invoke(searchSessionId: String): Either<SearchException, Unit> =
+    override suspend operator fun invoke(searchSessionId: String): Either<SearchError, Unit> =
         withContext(dispatcher) {
             val searchSession = searchRepository
                 .getSearchSession(searchSessionId)
-                ?: return@withContext Either.Left(SearchException.SessionNotFound)
+                ?: return@withContext Either.Left(SearchError.SessionNotFound)
             searchWithHistoryUseCase(
                 query = searchSession.query,
                 totalPosts = searchSession.totalPosts,
@@ -24,7 +24,7 @@ internal class RealPreloadSearchResultUseCase(
             )
                 .fold(
                     ifLeft = {
-                        if (it is SearchException.Exhausted) {
+                        if (it is SearchError.Exhausted) {
                             // Only clear the preloaded post and let session search deal with
                             // updating the history
                             searchSession.clearPreloadedPost(searchRepository)

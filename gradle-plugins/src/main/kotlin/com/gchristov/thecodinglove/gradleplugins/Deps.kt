@@ -6,6 +6,11 @@ class Deps {
         const val core = "io.arrow-kt:arrow-core:1.1.3"
     }
 
+    object Crypto {
+        const val mac = "com.diglol.crypto:mac:0.1.3"
+        const val encoding = "com.diglol.encoding:encoding:0.1.0"
+    }
+
     object Google {
         const val firebaseFirestore = "dev.gitlive:firebase-firestore:1.6.2"
         val firebase = NpmDependency("firebase", "9.10.0")
@@ -28,6 +33,7 @@ class Deps {
         const val coroutinesTest =
             "org.jetbrains.kotlinx:kotlinx-coroutines-test:${coroutinesTestVersion}"
         const val test = "org.jetbrains.kotlin:kotlin-test"
+        const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
     }
 
     object Ktor {
@@ -42,6 +48,7 @@ class Deps {
     object Node {
         val htmlParser = NpmDependency("node-html-parser", "6.1.4")
         val express = NpmDependency("express", "4.18.2")
+        val jsJoda = NpmDependency("@js-joda/core", "5.4.2")
     }
 
     object Uuid {

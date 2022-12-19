@@ -15,7 +15,7 @@ abstract class PubSubService : CoroutineScope {
 
     abstract fun register()
 
-    protected abstract suspend fun handleMessage(message: PubSubMessage): Either<Exception, Unit>
+    protected abstract suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit>
 
     override val coroutineContext: CoroutineContext
         get() = job

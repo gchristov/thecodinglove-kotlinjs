@@ -9,8 +9,11 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(Deps.Kotlin.coroutinesCore)
+                api(Deps.Kotlin.dateTime)
                 api(Deps.Uuid.uuid)
                 api(Deps.Arrow.core)
+                api(Deps.Crypto.mac)
+                api(Deps.Crypto.encoding)
             }
         }
     }

@@ -3,13 +3,13 @@ package com.gchristov.thecodinglove.searchtestfixtures
 import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeResponse
 import com.gchristov.thecodinglove.kmpcommontest.execute
-import com.gchristov.thecodinglove.searchdata.SearchException
+import com.gchristov.thecodinglove.searchdata.SearchError
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
 import kotlin.test.assertEquals
 
 class FakeSearchWithHistoryUseCase(
     // Each result is passed as a response to the relevant invocation attempt
-    var invocationResults: List<Either<SearchException, SearchWithHistoryUseCase.Result>>
+    var invocationResults: List<Either<SearchError, SearchWithHistoryUseCase.Result>>
 ) : SearchWithHistoryUseCase {
     private val searchResponse: FakeResponse = FakeResponse.CompletesNormally
 
@@ -19,7 +19,7 @@ class FakeSearchWithHistoryUseCase(
         query: String,
         totalPosts: Int?,
         searchHistory: Map<Int, List<Int>>,
-    ): Either<SearchException, SearchWithHistoryUseCase.Result> =
+    ): Either<SearchError, SearchWithHistoryUseCase.Result> =
         searchResponse.execute(invocationResults[invocations++])
 
     fun assertNotInvoked() {

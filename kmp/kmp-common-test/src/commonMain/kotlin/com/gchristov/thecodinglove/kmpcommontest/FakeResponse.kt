@@ -12,7 +12,7 @@ sealed class FakeResponse {
 
 suspend fun <T> FakeResponse.execute(value: T): T = when (this) {
     is FakeResponse.CompletesNormally -> value
-    is FakeResponse.Error -> throw Exception(message)
+    is FakeResponse.Error -> throw Throwable(message)
     is FakeResponse.LoadsForever -> withContext(Dispatchers.Default) {
         // Simulate an artificial delay for tests which is run on a separate background context to
         // suspend the calling coroutine

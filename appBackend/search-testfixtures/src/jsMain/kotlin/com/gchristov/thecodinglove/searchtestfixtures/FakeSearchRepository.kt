@@ -22,14 +22,14 @@ class FakeSearchRepository(
     private var searchSessionGetCalled = false
     private var lastSavedSession: SearchSession? = null
 
-    override suspend fun getTotalPosts(query: String): Either<Exception, Int> {
+    override suspend fun getTotalPosts(query: String): Either<Throwable, Int> {
         return Either.Right(totalPostsResponse.execute(totalPosts!!))
     }
 
     override suspend fun search(
         page: Int,
         query: String
-    ): Either<Exception, List<Post>> {
+    ): Either<Throwable, List<Post>> {
         return Either.Right(searchResponse.execute(pages?.get(page) ?: emptyList()))
     }
 
