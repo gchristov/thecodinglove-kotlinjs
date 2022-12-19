@@ -8,7 +8,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.coroutines.CoroutineContext
 
@@ -26,14 +25,15 @@ abstract class ApiService(private val jsonSerializer: Json) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = job
 
-    protected fun registerForApiCallbacks() = ApiServiceRegistrations.register { request, response ->
-        launch {
-            handleRequest(
-                request = request,
-                response = response
-            )
+    protected fun registerForApiCallbacks() =
+        ApiServiceRegistrations.register { request, response ->
+            launch {
+                handleRequest(
+                    request = request,
+                    response = response
+                )
+            }
         }
-    }
 
     protected fun sendError(
         error: Throwable,
@@ -42,7 +42,8 @@ abstract class ApiService(private val jsonSerializer: Json) : CoroutineScope {
         error.printStackTrace()
         response.sendJson(
             status = 400,
-            data = jsonSerializer.encodeToString(error.toError())
+            data = error.toError(),
+            jsonSerializer = jsonSerializer
         )
     }
 }

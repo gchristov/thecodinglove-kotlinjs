@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.commonservicedata.api
 
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 interface ApiRequest {
@@ -29,16 +30,17 @@ interface ApiResponse {
     fun status(status: Int)
 }
 
-fun ApiResponse.sendJson(
+inline fun <reified T> ApiResponse.sendJson(
     status: Int = 200,
-    data: String,
+    data: T,
+    jsonSerializer: Json
 ) {
     status(status)
     setHeader(
         header = "Content-Type",
         value = "application/json"
     )
-    send(data)
+    send(jsonSerializer.encodeToString(data))
 }
 
 internal fun FirebaseFunctionsHttpsRequest.toApiRequest() = object : ApiRequest {

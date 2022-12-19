@@ -8,7 +8,6 @@ import com.gchristov.thecodinglove.commonservicedata.api.sendJson
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.slack.usecase.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class SlackSlashCommandApiService(
@@ -33,8 +32,12 @@ class SlackSlashCommandApiService(
             ifRight = {
                 try {
                     // TODO: Handle valid request
-                    val command: ApiSlackSlashCommand = requireNotNull(request.bodyAsJson(jsonSerializer))
-                    response.sendJson(data = jsonSerializer.encodeToString(command))
+                    val command: ApiSlackSlashCommand =
+                        requireNotNull(request.bodyAsJson(jsonSerializer))
+                    response.sendJson(
+                        data = command,
+                        jsonSerializer = jsonSerializer
+                    )
                 } catch (error: Throwable) {
                     sendError(
                         error = error,

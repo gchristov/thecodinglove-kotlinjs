@@ -3,13 +3,12 @@ package com.gchristov.thecodinglove.search
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
-import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.api.sendJson
+import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
 import com.gchristov.thecodinglove.searchdata.api.toSearchResult
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class SearchApiService(
@@ -64,7 +63,10 @@ class SearchApiService(
                     // TODO: Needs correct response mapping
                     println("Search complete")
                     preload(searchResult.searchSessionId)
-                    response.sendJson(data = jsonSerializer.encodeToString(searchResult.toSearchResult()))
+                    response.sendJson(
+                        data = searchResult.toSearchResult(),
+                        jsonSerializer = jsonSerializer
+                    )
                 }
             )
     }
