@@ -12,6 +12,7 @@ env:
   FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
   FIREBASE_GCM_SENDER_ID: ${{ secrets.FIREBASE_GCM_SENDER_ID }}
   FIREBASE_APPLICATION_ID: ${{ secrets.FIREBASE_APPLICATION_ID }}
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
   SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
 
 jobs:
@@ -72,7 +73,7 @@ jobs:
         with:
           path: '~/.konan/**'
           key: konan-js-test
-      - name: Javascript tests
+      - name: Run Javascript tests
         run: |
           set -o pipefail && bash ./scripts/env.sh && ./gradlew --continue jsNodeTest
       # Always run this job even if the previous steps fail to collect all test reports
