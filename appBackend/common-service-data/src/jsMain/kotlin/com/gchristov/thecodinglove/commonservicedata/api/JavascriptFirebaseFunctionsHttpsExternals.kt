@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.commonservicedata.api
 
-external object FirebaseFunctionsHttps {
+internal external object FirebaseFunctionsHttps {
     fun onRequest(
         callback: (
             request: FirebaseFunctionsHttpsRequest,
@@ -9,20 +9,20 @@ external object FirebaseFunctionsHttps {
     )
 }
 
-external class FirebaseFunctionsHttpsRequest {
+internal external class FirebaseFunctionsHttpsRequest {
     val headers: FirebaseFunctionsHttpsParameterMap
     val query: FirebaseFunctionsHttpsParameterMap
     val body: dynamic
     val rawBody: String
 }
 
-external class FirebaseFunctionsHttpsParameterMap
+internal external class FirebaseFunctionsHttpsParameterMap
 
-inline operator fun <T> FirebaseFunctionsHttpsParameterMap.get(key: String): T? {
+internal inline operator fun <T> FirebaseFunctionsHttpsParameterMap.get(key: String): T? {
     return asDynamic()[key] as? T
 }
 
-external class FirebaseFunctionsHttpsResponse {
+internal external class FirebaseFunctionsHttpsResponse {
     fun setHeader(
         header: String,
         value: String
