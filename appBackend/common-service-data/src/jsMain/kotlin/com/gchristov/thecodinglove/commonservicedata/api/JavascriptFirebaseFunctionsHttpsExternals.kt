@@ -32,14 +32,3 @@ external class FirebaseFunctionsHttpsResponse {
 
     fun status(status: Int): FirebaseFunctionsHttpsResponse
 }
-
-fun FirebaseFunctionsHttpsResponse.sendJson(
-    status: Int = 200,
-    data: String,
-) {
-    this.setHeader(
-        header = "Content-Type",
-        value = "application/json"
-    )
-    this.status(status).send(data)
-}

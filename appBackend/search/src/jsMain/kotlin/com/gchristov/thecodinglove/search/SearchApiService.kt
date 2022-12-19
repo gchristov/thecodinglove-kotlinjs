@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.search
 
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
-import com.gchristov.thecodinglove.commonservicedata.api.FirebaseFunctionsHttpsResponse
+import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
 import com.gchristov.thecodinglove.commonservicedata.api.exports
 import com.gchristov.thecodinglove.commonservicedata.api.sendJson
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSub
@@ -23,7 +23,7 @@ class SearchApiService(
 
     override suspend fun handleRequest(
         request: ApiRequest,
-        response: FirebaseFunctionsHttpsResponse
+        response: ApiResponse
     ) {
         try {
             val searchQuery: String = request.query["searchQuery"] ?: "release"
@@ -49,7 +49,7 @@ class SearchApiService(
 
     private suspend fun search(
         searchType: SearchWithSessionUseCase.Type,
-        response: FirebaseFunctionsHttpsResponse
+        response: ApiResponse
     ) {
         println("Performing search...")
         searchWithSessionUseCase(searchType)

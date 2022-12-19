@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.commonservice
 
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
+import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegistrations
-import com.gchristov.thecodinglove.commonservicedata.api.FirebaseFunctionsHttpsResponse
 import com.gchristov.thecodinglove.commonservicedata.api.sendJson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -20,7 +20,7 @@ abstract class ApiService(private val jsonSerializer: Json) : CoroutineScope {
 
     protected abstract suspend fun handleRequest(
         request: ApiRequest,
-        response: FirebaseFunctionsHttpsResponse
+        response: ApiResponse
     )
 
     override val coroutineContext: CoroutineContext
@@ -37,7 +37,7 @@ abstract class ApiService(private val jsonSerializer: Json) : CoroutineScope {
 
     protected fun sendError(
         error: Throwable,
-        response: FirebaseFunctionsHttpsResponse
+        response: ApiResponse
     ) {
         error.printStackTrace()
         response.sendJson(

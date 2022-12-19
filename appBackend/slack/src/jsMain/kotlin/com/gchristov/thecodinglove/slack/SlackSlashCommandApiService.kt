@@ -17,7 +17,7 @@ class SlackSlashCommandApiService(
 
     override suspend fun handleRequest(
         request: ApiRequest,
-        response: FirebaseFunctionsHttpsResponse
+        response: ApiResponse
     ) {
         verifySlackRequestUseCase(request).fold(
             ifLeft = {
