@@ -5,7 +5,8 @@ package com.gchristov.thecodinglove.commonservicedata.pubsub
 
 import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
 
-internal external class PubSub(projectId: String) {
+@JsName("PubSub")
+internal external class GoogleCloudPubSub(projectId: String) {
     fun topic(name: String): GoogleGloudPubSubTopic
 }
 

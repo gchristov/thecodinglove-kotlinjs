@@ -12,6 +12,6 @@ class RealPubSubSender(private val projectId: String) : PubSubSender {
                     "topic: $topic\n" +
                     "body: $body"
         )
-        PubSub(projectId).topic(topic).publish(Buffer.from(body))
+        GoogleCloudPubSub(projectId).topic(topic).publish(Buffer.from(body))
     }
 }
