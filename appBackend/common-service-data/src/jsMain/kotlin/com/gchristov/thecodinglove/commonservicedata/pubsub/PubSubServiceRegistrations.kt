@@ -11,7 +11,3 @@ object PubSubServiceRegistrations {
         callback(message.toPubSubMessage())
     }
 }
-
-private fun FirebaseFunctionsPubSubMessage.toPubSubMessage() = object : PubSubMessage {
-    override val json: Any = this@toPubSubMessage.json as Any
-}

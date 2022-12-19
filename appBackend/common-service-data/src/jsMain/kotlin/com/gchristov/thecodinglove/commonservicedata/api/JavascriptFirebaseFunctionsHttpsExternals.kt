@@ -13,7 +13,7 @@ internal external class FirebaseFunctionsHttpsRequest {
     val headers: FirebaseFunctionsHttpsParameterMap
     val query: FirebaseFunctionsHttpsParameterMap
     val body: dynamic
-    val rawBody: String
+    val rawBody: String?
 }
 
 internal external class FirebaseFunctionsHttpsParameterMap

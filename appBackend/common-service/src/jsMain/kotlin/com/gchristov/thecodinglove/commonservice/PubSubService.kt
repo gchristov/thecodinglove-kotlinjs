@@ -27,6 +27,10 @@ abstract class PubSubService : CoroutineScope {
         callback = { message ->
             Promise { resolve, reject ->
                 launch {
+                    println(
+                        "Received PubSub request" +
+                                "\ntopic: ${topic()}"
+                    )
                     handleMessage(message).fold(
                         ifLeft = { reject(it) },
                         ifRight = { resolve(it) }
