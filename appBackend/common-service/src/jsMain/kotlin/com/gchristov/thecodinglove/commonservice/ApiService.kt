@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.commonservice
 
-import com.gchristov.thecodinglove.commonservicedata.*
+import com.gchristov.thecodinglove.commonservicedata.api.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

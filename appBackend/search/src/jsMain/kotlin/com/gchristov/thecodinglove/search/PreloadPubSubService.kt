@@ -2,9 +2,9 @@ package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservice.PubSubService
-import com.gchristov.thecodinglove.commonservicedata.PubSubMessage
-import com.gchristov.thecodinglove.commonservicedata.bodyAsJson
-import com.gchristov.thecodinglove.commonservicedata.exports
+import com.gchristov.thecodinglove.commonservicedata.api.exports
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
+import com.gchristov.thecodinglove.commonservicedata.pubsub.bodyAsJson
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

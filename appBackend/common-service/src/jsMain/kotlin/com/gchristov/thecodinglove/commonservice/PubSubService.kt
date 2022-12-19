@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.commonservice
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicedata.FirebaseFunctions
-import com.gchristov.thecodinglove.commonservicedata.PubSubMessage
+import com.gchristov.thecodinglove.commonservicedata.api.FirebaseFunctions
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.commonservicedata
 
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSub
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import dev.gitlive.firebase.FirebaseOptions
 import org.kodein.di.DI

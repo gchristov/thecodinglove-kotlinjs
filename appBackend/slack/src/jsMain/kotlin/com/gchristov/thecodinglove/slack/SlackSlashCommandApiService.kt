@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack
 
 import com.gchristov.thecodinglove.commonservice.ApiService
-import com.gchristov.thecodinglove.commonservicedata.*
+import com.gchristov.thecodinglove.commonservicedata.api.*
 import com.gchristov.thecodinglove.slack.usecase.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import kotlinx.serialization.encodeToString

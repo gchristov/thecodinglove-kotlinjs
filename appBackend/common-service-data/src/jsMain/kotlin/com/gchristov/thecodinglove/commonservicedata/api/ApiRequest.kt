@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.commonservicedata
+package com.gchristov.thecodinglove.commonservicedata.api
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json

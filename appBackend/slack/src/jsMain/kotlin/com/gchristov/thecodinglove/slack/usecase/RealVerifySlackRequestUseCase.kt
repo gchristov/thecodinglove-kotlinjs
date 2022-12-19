@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.slack.usecase
 
 import arrow.core.Either
 import arrow.core.flatMap
-import com.gchristov.thecodinglove.commonservicedata.ApiRequest
+import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import diglol.crypto.Hmac
 import diglol.encoding.encodeHexToString
