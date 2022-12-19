@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slack.usecase
 
 import arrow.core.Either
+import arrow.core.flatMap
 import com.gchristov.thecodinglove.commonservice.ApiRequest
 import com.gchristov.thecodinglove.commonservice.bodyAsString
 import com.gchristov.thecodinglove.commonservice.get
@@ -10,6 +11,9 @@ import diglol.encoding.encodeHexToString
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.plus
 
 internal class RealVerifySlackRequestUseCase(
     private val dispatcher: CoroutineDispatcher,
@@ -18,27 +22,50 @@ internal class RealVerifySlackRequestUseCase(
     override suspend fun invoke(request: ApiRequest): Either<Throwable, Unit> =
         withContext(dispatcher) {
             try {
-                val currentMoment = Clock.System.now()
-                println(currentMoment)
-
-                val timestamp: String = request.headers["x-slack-request-timestamp"]
+                val timestamp: Long = request.headers.get<String>("x-slack-request-timestamp")
+                    ?.toLong()
                     ?: return@withContext Either.Left(Throwable(ErrorMessage))
                 val signature: String = request.headers["x-slack-signature"]
                     ?: return@withContext Either.Left(Throwable(ErrorMessage))
                 val rawBody = request.bodyAsString()
-                verifySlackRequest(
+                println("Verifying Slack request\n" +
+                        "timestamp: $timestamp\n" +
+                        "signature: $signature\n" +
+                        "body: $rawBody")
+
+                verifyTimestamp(
                     timestamp = timestamp,
-                    signature = signature,
-                    rawBody = rawBody,
-                    signingSecret = slackConfig.signingSecret
-                )
+                    validityMinutes = slackConfig.timestampValidityMinutes
+                ).flatMap {
+                    verifyRequest(
+                        timestamp = timestamp,
+                        signature = signature,
+                        rawBody = rawBody,
+                        signingSecret = slackConfig.signingSecret
+                    )
+                }
             } catch (error: Throwable) {
                 Either.Left(error)
             }
         }
 
-    private suspend fun verifySlackRequest(
-        timestamp: String,
+    private fun verifyTimestamp(
+        timestamp: Long,
+        validityMinutes: Int
+    ): Either<Throwable, Unit> {
+        val timestampInstant = Instant.fromEpochSeconds(timestamp).plus(
+            value = validityMinutes,
+            unit = DateTimeUnit.MINUTE
+        )
+        return if (timestampInstant < Clock.System.now()) {
+            Either.Left(Exception(ErrorMessage))
+        } else {
+            Either.Right(Unit)
+        }
+    }
+
+    private suspend fun verifyRequest(
+        timestamp: Long,
         signature: String,
         rawBody: String?,
         signingSecret: String

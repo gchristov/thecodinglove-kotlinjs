@@ -15,6 +15,7 @@ object SlackDataModule : DiModule() {
     }
 
     private fun provideSlackConfig(): SlackConfig = SlackConfig(
-        signingSecret = BuildKonfig.SLACK_SIGNING_SECRET
+        signingSecret = BuildKonfig.SLACK_SIGNING_SECRET,
+        timestampValidityMinutes = 5
     )
 }
