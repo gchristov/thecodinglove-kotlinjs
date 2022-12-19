@@ -17,7 +17,7 @@ abstract class ApiService(private val jsonSerializer: Json) : CoroutineScope {
 
     protected abstract suspend fun handleRequest(
         request: ApiRequest,
-        response: ApiResponse
+        response: FirebaseFunctionsHttpsResponse
     )
 
     override val coroutineContext: CoroutineContext
@@ -27,7 +27,7 @@ abstract class ApiService(private val jsonSerializer: Json) : CoroutineScope {
         FirebaseFunctions.https.onRequest { request, response ->
             launch {
                 handleRequest(
-                    request = ApiRequestFacade(ParametersMapFacade()).transform(request),
+                    request = ApiRequestFacade(ApiParametersMapFacade())(request),
                     response = response
                 )
             }
@@ -35,7 +35,7 @@ abstract class ApiService(private val jsonSerializer: Json) : CoroutineScope {
 
     protected fun sendError(
         error: Throwable,
-        response: ApiResponse
+        response: FirebaseFunctionsHttpsResponse
     ) {
         error.printStackTrace()
         response.sendJson(

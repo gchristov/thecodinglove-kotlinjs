@@ -3,13 +3,26 @@ package com.gchristov.thecodinglove.commonservicedata.api
 external object FirebaseFunctionsHttps {
     fun onRequest(
         callback: (
-            request: RealApiRequest,
-            response: ApiResponse
+            request: FirebaseFunctionsHttpsRequest,
+            response: FirebaseFunctionsHttpsResponse
         ) -> Unit
     )
 }
 
-external class ApiResponse {
+external class FirebaseFunctionsHttpsRequest {
+    val headers: FirebaseFunctionsHttpsParameterMap
+    val query: FirebaseFunctionsHttpsParameterMap
+    val body: dynamic
+    val rawBody: String
+}
+
+external class FirebaseFunctionsHttpsParameterMap
+
+inline operator fun <T> FirebaseFunctionsHttpsParameterMap.get(key: String): T? {
+    return asDynamic()[key] as? T
+}
+
+external class FirebaseFunctionsHttpsResponse {
     fun setHeader(
         header: String,
         value: String
@@ -17,10 +30,10 @@ external class ApiResponse {
 
     fun send(data: String)
 
-    fun status(status: Int): ApiResponse
+    fun status(status: Int): FirebaseFunctionsHttpsResponse
 }
 
-fun ApiResponse.sendJson(
+fun FirebaseFunctionsHttpsResponse.sendJson(
     status: Int = 200,
     data: String,
 ) {
@@ -30,14 +43,3 @@ fun ApiResponse.sendJson(
     )
     this.status(status).send(data)
 }
-
-external class RealApiRequest {
-    val headers: RealParametersMap
-    val query: RealParametersMap
-    val body: dynamic
-    val rawBody: String
-}
-
-external class RealParametersMap
-
-inline operator fun <T> RealParametersMap.get(key: String): T? = asDynamic()[key] as? T
