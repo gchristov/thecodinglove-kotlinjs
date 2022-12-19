@@ -4,20 +4,14 @@ import com.gchristov.thecodinglove.commonservicedata.api.FirebaseFunctions
 import kotlin.js.Promise
 
 object PubSubServiceRegistrations {
-    private val pubSubMessageFacade = PubSubMessageFacade()
-
     fun register(
         topic: String,
         callback: (message: PubSubMessage) -> Promise<Unit>
     ) = FirebaseFunctions.pubsub.topic(topic).onPublish { message ->
-        callback(pubSubMessageFacade(message))
+        callback(message.toPubSubMessage())
     }
 }
 
-private class PubSubMessageFacade {
-    operator fun invoke(
-        message: FirebaseFunctionsPubSubMessage
-    ): PubSubMessage = object : PubSubMessage {
-        override val json: Any = message.json as Any
-    }
+private fun FirebaseFunctionsPubSubMessage.toPubSubMessage() = object : PubSubMessage {
+    override val json: Any = this@toPubSubMessage.json as Any
 }
