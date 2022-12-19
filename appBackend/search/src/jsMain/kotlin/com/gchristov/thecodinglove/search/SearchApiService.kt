@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.search
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
-import com.gchristov.thecodinglove.commonservicedata.api.exports
+import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.api.sendJson
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage

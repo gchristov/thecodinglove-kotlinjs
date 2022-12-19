@@ -1,5 +1,7 @@
 package com.gchristov.thecodinglove.commonservicedata.api
 
+import com.gchristov.thecodinglove.commonservicedata.FirebaseFunctions
+
 object ApiServiceRegistrations {
     fun register(
         callback: (

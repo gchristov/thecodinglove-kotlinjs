@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.commonservicedata.pubsub
 
-import com.gchristov.thecodinglove.commonservicedata.api.FirebaseFunctions
+import com.gchristov.thecodinglove.commonservicedata.FirebaseFunctions
 import kotlin.js.Promise
 
 object PubSubServiceRegistrations {
