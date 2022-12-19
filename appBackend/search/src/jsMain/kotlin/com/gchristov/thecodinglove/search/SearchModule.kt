@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.search
 
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSub
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
@@ -17,7 +17,7 @@ object SearchModule : DiModule() {
             bindSingleton {
                 provideSearchApiService(
                     jsonSerializer = instance(),
-                    pubSub = instance(),
+                    pubSubSender = instance(),
                     searchWithSessionUseCase = instance()
                 )
             }
@@ -32,11 +32,11 @@ object SearchModule : DiModule() {
 
     private fun provideSearchApiService(
         jsonSerializer: Json,
-        pubSub: PubSub,
+        pubSubSender: PubSubSender,
         searchWithSessionUseCase: SearchWithSessionUseCase
     ): SearchApiService = SearchApiService(
         jsonSerializer = jsonSerializer,
-        pubSub = pubSub,
+        pubSubSender = pubSubSender,
         searchWithSessionUseCase = searchWithSessionUseCase
     )
 

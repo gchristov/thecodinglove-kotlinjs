@@ -5,10 +5,10 @@ package com.gchristov.thecodinglove.commonservicedata.pubsub
 
 import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
 
-external class PubSub(projectId: String) {
-    fun topic(name: String): PubSubPublisherTopic
+internal external class PubSub(projectId: String) {
+    fun topic(name: String): GoogleGloudPubSubTopic
 }
 
-external class PubSubPublisherTopic {
+internal external class GoogleGloudPubSubTopic {
     fun publish(message: Buffer)
 }

@@ -29,7 +29,6 @@ class SlackSlashCommandApiService(
             ifRight = {
                 try {
                     // TODO: Handle valid request
-                    println(JSON.stringify(request.body))
                     val command: ApiSlackSlashCommand = request.bodyAsJson(jsonSerializer)
                     response.sendJson(data = jsonSerializer.encodeToString(command))
                 } catch (error: Throwable) {

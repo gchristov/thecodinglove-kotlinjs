@@ -5,8 +5,8 @@ import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
 import com.gchristov.thecodinglove.commonservicedata.api.exports
 import com.gchristov.thecodinglove.commonservicedata.api.sendJson
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSub
-import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
+import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
 import com.gchristov.thecodinglove.searchdata.api.toSearchResult
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import kotlinx.serialization.encodeToString
@@ -14,7 +14,7 @@ import kotlinx.serialization.json.Json
 
 class SearchApiService(
     private val jsonSerializer: Json,
-    private val pubSub: PubSub,
+    private val pubSubSender: PubSubSender,
     private val searchWithSessionUseCase: SearchWithSessionUseCase,
 ) : ApiService(jsonSerializer) {
     override fun register() {
@@ -51,7 +51,7 @@ class SearchApiService(
         searchType: SearchWithSessionUseCase.Type,
         response: ApiResponse
     ) {
-        println("Performing search...")
+        println("Performing search")
         searchWithSessionUseCase(searchType)
             .fold(
                 ifLeft = {
@@ -70,8 +70,11 @@ class SearchApiService(
     }
 
     private fun preload(searchSessionId: String) {
-        println("Preloading next result...")
-        val preload = PreloadPubSubService.buildTopicMessage(searchSessionId)
-        pubSub.topic(preload.topic).publish(Buffer.from(jsonSerializer.encodeToString(preload)))
+        val preloadMessage = PreloadPubSubService.buildTopicMessage(searchSessionId)
+        pubSubSender.sendMessage(
+            topic = preloadMessage.topic,
+            body = preloadMessage,
+            jsonSerializer = jsonSerializer
+        )
     }
 }

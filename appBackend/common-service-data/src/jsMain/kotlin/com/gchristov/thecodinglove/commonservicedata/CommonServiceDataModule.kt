@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.commonservicedata
 
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSub
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
+import com.gchristov.thecodinglove.commonservicedata.pubsub.RealPubSubSender
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import dev.gitlive.firebase.FirebaseOptions
 import org.kodein.di.DI
@@ -12,11 +13,11 @@ object CommonServiceDataModule : DiModule() {
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
-            bindSingleton { providePubSub(options = instance()) }
+            bindSingleton { providePubSubSender(options = instance()) }
         }
     }
 
-    private fun providePubSub(
+    private fun providePubSubSender(
         options: FirebaseOptions
-    ) = PubSub(projectId = requireNotNull(options.projectId))
+    ): PubSubSender = RealPubSubSender(projectId = requireNotNull(options.projectId))
 }

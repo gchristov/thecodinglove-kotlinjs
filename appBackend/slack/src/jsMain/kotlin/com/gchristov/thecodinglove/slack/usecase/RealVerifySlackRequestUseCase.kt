@@ -25,10 +25,12 @@ internal class RealVerifySlackRequestUseCase(
                     ?: return@withContext Either.Left(Throwable(GenericError))
                 val signature: String = request.headers["x-slack-signature"]
                     ?: return@withContext Either.Left(Throwable(GenericError))
-                println("Verifying Slack request\n" +
-                        "timestamp: $timestamp\n" +
-                        "signature: $signature\n" +
-                        "body: ${request.rawBody}")
+                println(
+                    "Verifying Slack request\n" +
+                            "timestamp: $timestamp\n" +
+                            "signature: $signature\n" +
+                            "body: ${request.rawBody}"
+                )
 
                 verifyTimestamp(
                     timestamp = timestamp,
