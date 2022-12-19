@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.search
 
-import com.gchristov.thecodinglove.commonservice.*
+import com.gchristov.thecodinglove.commonservice.ApiService
+import com.gchristov.thecodinglove.commonservicedata.*
 import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
 import com.gchristov.thecodinglove.searchdata.api.toSearchResult
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase

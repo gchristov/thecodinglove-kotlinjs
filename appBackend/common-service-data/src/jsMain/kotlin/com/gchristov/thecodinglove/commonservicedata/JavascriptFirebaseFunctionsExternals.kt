@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.commonservice
+package com.gchristov.thecodinglove.commonservicedata
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -8,17 +8,17 @@ external var exports: dynamic
 
 @JsModule("firebase-functions")
 @JsNonModule
-internal external object FirebaseFunctions {
+external object FirebaseFunctions {
     val https: FirebaseFunctionsHttps
     val pubsub: FirebaseFunctionsPubSub
 }
 
 // HTTPS
 
-internal external object FirebaseFunctionsHttps {
+external object FirebaseFunctionsHttps {
     fun onRequest(
         callback: (
-            request: ApiRequest,
+            request: RealApiRequest,
             response: ApiResponse
         ) -> Unit
     )
@@ -46,32 +46,24 @@ fun ApiResponse.sendJson(
     this.status(status).send(data)
 }
 
-external class ApiRequest {
-    val headers: ParametersMap
-    val query: ParametersMap
+external class RealApiRequest {
+    val headers: RealParametersMap
+    val query: RealParametersMap
+    val body: dynamic
+    val rawBody: String
 }
 
-fun ApiRequest.bodyAsString(): String {
-    val rawBody = asDynamic().rawBody
-    // Kotlin .toString() doesn't really work well here and we end up with wrong content
-    return js("rawBody.toString()").toString()
-}
+external class RealParametersMap
 
-inline fun <reified T> ApiRequest.bodyAsJson(
-    jsonSerializer: Json
-): T = jsonSerializer.decodeFromString(string = JSON.stringify(asDynamic().body))
-
-external class ParametersMap
-
-inline operator fun <T> ParametersMap.get(key: String): T? = asDynamic()[key] as? T
+inline operator fun <T> RealParametersMap.get(key: String): T? = asDynamic()[key] as? T
 
 // PubSub
 
-internal external object FirebaseFunctionsPubSub {
+external object FirebaseFunctionsPubSub {
     fun topic(name: String): PubSubSubscriberTopic
 }
 
-internal external object PubSubSubscriberTopic {
+external object PubSubSubscriberTopic {
     fun onPublish(callback: (message: PubSubMessage) -> Promise<Unit>)
 }
 

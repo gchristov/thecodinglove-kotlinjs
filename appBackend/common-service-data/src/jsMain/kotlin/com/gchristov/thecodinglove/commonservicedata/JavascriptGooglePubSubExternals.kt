@@ -1,7 +1,7 @@
 // This is needed, otherwise we get "PubSub is not a constructor" error
 @file:JsModule("@google-cloud/pubsub")
 @file:JsNonModule
-package com.gchristov.thecodinglove.commonservice
+package com.gchristov.thecodinglove.commonservicedata
 
 import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
 

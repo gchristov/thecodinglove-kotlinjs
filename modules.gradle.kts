@@ -8,6 +8,7 @@ val projects = listOf(
     "kmp/kmp-common-test",
     "appBackend/appBackend",
     "appBackend/common-service",
+    "appBackend/common-service-data",
     "appBackend/firebasefunctions",
     "appBackend/htmlparse",
     "appBackend/htmlparse-data",

@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove
 
-import com.gchristov.thecodinglove.commonservice.CommonServiceModule
+import com.gchristov.thecodinglove.commonservicedata.CommonServiceDataModule
 import com.gchristov.thecodinglove.htmlparse.HtmlParseModule
 import com.gchristov.thecodinglove.kmpcommondi.DiGraph
 import com.gchristov.thecodinglove.kmpcommondi.KmpCommonDiModule
@@ -28,7 +28,7 @@ private fun setupDi() {
             KmpCommonDiModule.module,
             KmpCommonFirebaseModule.module,
             KmpCommonNetworkModule.module,
-            CommonServiceModule.module,
+            CommonServiceDataModule.module,
             HtmlParseModule.module,
             SearchModule.module,
             SearchDataModule.module,

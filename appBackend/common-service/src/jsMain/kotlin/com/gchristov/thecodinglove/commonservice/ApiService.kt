@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.commonservice
 
+import com.gchristov.thecodinglove.commonservicedata.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -26,7 +27,7 @@ abstract class ApiService(private val jsonSerializer: Json) : CoroutineScope {
         FirebaseFunctions.https.onRequest { request, response ->
             launch {
                 handleRequest(
-                    request = request,
+                    request = ApiRequestFacade(ParametersMapFacade()).transform(request),
                     response = response
                 )
             }

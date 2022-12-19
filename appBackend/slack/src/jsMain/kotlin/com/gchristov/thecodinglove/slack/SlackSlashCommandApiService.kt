@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slack
 
-import com.gchristov.thecodinglove.commonservice.*
+import com.gchristov.thecodinglove.commonservice.ApiService
+import com.gchristov.thecodinglove.commonservicedata.*
 import com.gchristov.thecodinglove.slack.usecase.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import kotlinx.serialization.encodeToString
@@ -28,6 +29,7 @@ class SlackSlashCommandApiService(
             ifRight = {
                 try {
                     // TODO: Handle valid request
+                    println(JSON.stringify(request.body))
                     val command: ApiSlackSlashCommand = request.bodyAsJson(jsonSerializer)
                     response.sendJson(data = jsonSerializer.encodeToString(command))
                 } catch (error: Throwable) {

@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.search
 
-import com.gchristov.thecodinglove.commonservice.PubSub
+import com.gchristov.thecodinglove.commonservicedata.PubSub
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase

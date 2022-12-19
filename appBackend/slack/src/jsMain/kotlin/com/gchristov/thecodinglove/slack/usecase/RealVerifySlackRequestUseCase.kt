@@ -2,9 +2,7 @@ package com.gchristov.thecodinglove.slack.usecase
 
 import arrow.core.Either
 import arrow.core.flatMap
-import com.gchristov.thecodinglove.commonservice.ApiRequest
-import com.gchristov.thecodinglove.commonservice.bodyAsString
-import com.gchristov.thecodinglove.commonservice.get
+import com.gchristov.thecodinglove.commonservicedata.ApiRequest
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import diglol.crypto.Hmac
 import diglol.encoding.encodeHexToString
@@ -27,11 +25,10 @@ internal class RealVerifySlackRequestUseCase(
                     ?: return@withContext Either.Left(Throwable(GenericError))
                 val signature: String = request.headers["x-slack-signature"]
                     ?: return@withContext Either.Left(Throwable(GenericError))
-                val rawBody = request.bodyAsString()
                 println("Verifying Slack request\n" +
                         "timestamp: $timestamp\n" +
                         "signature: $signature\n" +
-                        "body: $rawBody")
+                        "body: ${request.rawBody}")
 
                 verifyTimestamp(
                     timestamp = timestamp,
@@ -40,7 +37,7 @@ internal class RealVerifySlackRequestUseCase(
                     verifyRequest(
                         timestamp = timestamp,
                         signature = signature,
-                        rawBody = rawBody,
+                        rawBody = request.rawBody,
                         signingSecret = slackConfig.signingSecret
                     )
                 }
