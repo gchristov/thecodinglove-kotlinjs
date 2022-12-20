@@ -1,19 +1,20 @@
 package com.gchristov.thecodinglove.slack
 
 import com.gchristov.thecodinglove.commonservice.ApiService
-import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
-import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
-import com.gchristov.thecodinglove.commonservicedata.api.bodyAsJson
-import com.gchristov.thecodinglove.commonservicedata.api.sendJson
+import com.gchristov.thecodinglove.commonservicedata.api.*
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.slack.usecase.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import kotlinx.serialization.json.Json
 
 class SlackSlashCommandApiService(
+    apiServiceRegister: ApiServiceRegister,
     private val jsonSerializer: Json,
     private val verifySlackRequestUseCase: VerifySlackRequestUseCase,
-) : ApiService(jsonSerializer) {
+) : ApiService(
+    apiServiceRegister = apiServiceRegister,
+    jsonSerializer = jsonSerializer
+) {
     override fun register() {
         exports.slackSlashCommand = registerForApiCallbacks()
     }

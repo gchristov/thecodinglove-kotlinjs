@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.search
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
+import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.api.sendJson
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
@@ -12,10 +13,14 @@ import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import kotlinx.serialization.json.Json
 
 class SearchApiService(
+    apiServiceRegister: ApiServiceRegister,
     private val jsonSerializer: Json,
     private val pubSubSender: PubSubSender,
     private val searchWithSessionUseCase: SearchWithSessionUseCase,
-) : ApiService(jsonSerializer) {
+) : ApiService(
+    apiServiceRegister = apiServiceRegister,
+    jsonSerializer = jsonSerializer
+) {
     override fun register() {
         exports.search = registerForApiCallbacks()
     }

@@ -4,15 +4,17 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.commonservice.PubSubService
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.bodyAsJson
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 class PreloadPubSubService(
+    pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase
-) : PubSubService() {
+) : PubSubService(pubSubServiceRegister = pubSubServiceRegister) {
     override fun topic(): String = Topic
 
     override fun register() {

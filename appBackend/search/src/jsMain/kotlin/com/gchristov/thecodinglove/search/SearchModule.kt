@@ -1,6 +1,8 @@
 package com.gchristov.thecodinglove.search
 
+import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
@@ -16,6 +18,7 @@ object SearchModule : DiModule() {
         builder.apply {
             bindSingleton {
                 provideSearchApiService(
+                    apiServiceRegister = instance(),
                     jsonSerializer = instance(),
                     pubSubSender = instance(),
                     searchWithSessionUseCase = instance()
@@ -23,6 +26,7 @@ object SearchModule : DiModule() {
             }
             bindSingleton {
                 providePreloadPubSubService(
+                    pubSubServiceRegister = instance(),
                     jsonSerializer = instance(),
                     preloadSearchResultUseCase = instance()
                 )
@@ -31,19 +35,23 @@ object SearchModule : DiModule() {
     }
 
     private fun provideSearchApiService(
+        apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
         pubSubSender: PubSubSender,
         searchWithSessionUseCase: SearchWithSessionUseCase
     ): SearchApiService = SearchApiService(
+        apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         pubSubSender = pubSubSender,
         searchWithSessionUseCase = searchWithSessionUseCase
     )
 
     private fun providePreloadPubSubService(
+        pubSubServiceRegister: PubSubServiceRegister,
         jsonSerializer: Json,
         preloadSearchResultUseCase: PreloadSearchResultUseCase
     ): PreloadPubSubService = PreloadPubSubService(
+        pubSubServiceRegister = pubSubServiceRegister,
         jsonSerializer = jsonSerializer,
         preloadSearchResultUseCase = preloadSearchResultUseCase
     )
