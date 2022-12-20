@@ -8,10 +8,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                // TODO: This should be private
                 api(Deps.Ktor.client)
                 implementation(Deps.Ktor.contentNegotiation)
-                api(Deps.Ktor.serialisation)
+                implementation(Deps.Ktor.serialization)
                 implementation(Deps.Ktor.logging)
                 implementation(Deps.Ktor.logback)
             }

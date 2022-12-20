@@ -34,13 +34,14 @@ class Deps {
             "org.jetbrains.kotlinx:kotlinx-coroutines-test:${coroutinesTestVersion}"
         const val test = "org.jetbrains.kotlin:kotlin-test"
         const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
+        const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
     }
 
     object Ktor {
         private const val ktorVersion = "2.1.2"
         const val client = "io.ktor:ktor-client-core:$ktorVersion"
         const val contentNegotiation = "io.ktor:ktor-client-content-negotiation:$ktorVersion"
-        const val serialisation = "io.ktor:ktor-serialization-kotlinx-json:$ktorVersion"
+        const val serialization = "io.ktor:ktor-serialization-kotlinx-json:$ktorVersion"
         const val logging = "io.ktor:ktor-client-logging:$ktorVersion"
         const val logback = "ch.qos.logback:logback-classic:1.2.10"
     }

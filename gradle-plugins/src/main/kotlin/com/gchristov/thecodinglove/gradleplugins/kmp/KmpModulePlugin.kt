@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 class KmpModulePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.plugins.apply("kmp-platform-plugin")
+        target.plugins.apply("org.jetbrains.kotlin.plugin.serialization")
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
             sourceSets.maybeCreate("commonMain").dependencies {
                 implementation(project(":kmp-common-kotlin"))
