@@ -14,7 +14,7 @@ data class SlackSlashCommand(
     val responseUrl: String,
 )
 
-internal fun ApiSlackSlashCommand.toSlashCommand() = SlackSlashCommand(
+fun ApiSlackSlashCommand.toSlashCommand() = SlackSlashCommand(
     teamId = teamId,
     teamDomain = teamDomain,
     channelId = channelId,

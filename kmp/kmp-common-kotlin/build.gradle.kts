@@ -10,6 +10,7 @@ kotlin {
             dependencies {
                 api(Deps.Kotlin.coroutinesCore)
                 api(Deps.Kotlin.dateTime)
+                api(Deps.Kotlin.serialization)
                 api(Deps.Uuid.uuid)
                 api(Deps.Arrow.core)
                 api(Deps.Crypto.mac)

@@ -1,18 +1,20 @@
 package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservice.PubSubMessage
 import com.gchristov.thecodinglove.commonservice.PubSubService
-import com.gchristov.thecodinglove.commonservice.bodyAsJson
-import com.gchristov.thecodinglove.commonservice.exports
+import com.gchristov.thecodinglove.commonservicedata.exports
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
+import com.gchristov.thecodinglove.commonservicedata.pubsub.bodyAsJson
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 class PreloadPubSubService(
+    pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase
-) : PubSubService() {
+) : PubSubService(pubSubServiceRegister = pubSubServiceRegister) {
     override fun topic(): String = Topic
 
     override fun register() {
@@ -20,9 +22,8 @@ class PreloadPubSubService(
     }
 
     override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> {
-        println("Received request to pre-load search results")
         return try {
-            val topicMessage = message.bodyAsJson<PreloadTopicMessage>(jsonSerializer)
+            val topicMessage = requireNotNull(message.bodyAsJson<PreloadTopicMessage>(jsonSerializer))
             return preloadSearchResultUseCase(searchSessionId = topicMessage.searchSessionId)
         } catch (error: Throwable) {
             error.printStackTrace()

@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.slack
 
+import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.slack.usecase.RealVerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slack.usecase.VerifySlackRequestUseCase
@@ -19,6 +20,7 @@ object SlackModule : DiModule() {
             bindProvider { provideVerifySlackRequestUseCase(slackConfig = instance()) }
             bindSingleton {
                 provideSlackSlashCommandService(
+                    apiServiceRegister = instance(),
                     jsonSerializer = instance(),
                     verifySlackRequestUseCase = instance()
                 )
@@ -34,9 +36,11 @@ object SlackModule : DiModule() {
     )
 
     private fun provideSlackSlashCommandService(
+        apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
         verifySlackRequestUseCase: VerifySlackRequestUseCase
     ): SlackSlashCommandApiService = SlackSlashCommandApiService(
+        apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         verifySlackRequestUseCase = verifySlackRequestUseCase
     )
