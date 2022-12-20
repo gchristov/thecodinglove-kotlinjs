@@ -10,7 +10,7 @@ interface PubSubServiceRegister {
     )
 }
 
-class RealPubSubServiceRegister : PubSubServiceRegister {
+internal class RealPubSubServiceRegister : PubSubServiceRegister {
     override fun register(
         topic: String,
         callback: (message: PubSubMessage) -> Promise<Unit>

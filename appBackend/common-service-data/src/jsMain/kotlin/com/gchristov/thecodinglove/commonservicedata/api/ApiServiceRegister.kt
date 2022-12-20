@@ -11,7 +11,7 @@ interface ApiServiceRegister {
     )
 }
 
-class RealApiServiceRegister : ApiServiceRegister {
+internal class RealApiServiceRegister : ApiServiceRegister {
     override fun register(
         callback: (
             request: ApiRequest,
