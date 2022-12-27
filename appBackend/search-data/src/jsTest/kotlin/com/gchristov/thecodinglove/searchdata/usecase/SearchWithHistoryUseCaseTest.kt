@@ -16,7 +16,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealSearchWithHistoryUseCaseTest {
+class SearchWithHistoryUseCaseTest {
     @Test
     fun searchWithNoResultsReturnsEmpty(): TestResult {
         val totalPosts = 0

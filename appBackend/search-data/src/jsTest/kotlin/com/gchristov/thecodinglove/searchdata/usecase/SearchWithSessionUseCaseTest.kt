@@ -12,7 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealSearchWithSessionUseCaseTest {
+class SearchWithSessionUseCaseTest {
     @Test
     fun searchWithNewSessionCreatesNewSession(): TestResult {
         val searchType = SearchWithSessionUseCase.Type.NewSession(query = SearchQuery)
