@@ -20,7 +20,7 @@ abstract class ApiService(
 
     abstract fun register()
 
-    protected abstract suspend fun handleRequest(
+    abstract suspend fun handleRequest(
         request: ApiRequest,
         response: ApiResponse
     )
