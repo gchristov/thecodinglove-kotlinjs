@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import com.benasher44.uuid.uuid4
-import com.gchristov.thecodinglove.searchdata.SearchError
+import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.Post
 import com.gchristov.thecodinglove.searchdata.model.SearchSession

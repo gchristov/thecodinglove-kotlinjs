@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.searchdata
+package com.gchristov.thecodinglove.searchdata.model
 
 sealed class SearchError : Throwable() {
     object Empty : SearchError()

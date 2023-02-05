@@ -6,6 +6,7 @@ import com.gchristov.thecodinglove.slack.usecase.RealVerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slack.usecase.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import kotlinx.coroutines.Dispatchers
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
@@ -32,7 +33,8 @@ object SlackModule : DiModule() {
         slackConfig: SlackConfig
     ): VerifySlackRequestUseCase = RealVerifySlackRequestUseCase(
         dispatcher = Dispatchers.Default,
-        slackConfig = slackConfig
+        slackConfig = slackConfig,
+        clock = Clock.System
     )
 
     private fun provideSlackSlashCommandService(
