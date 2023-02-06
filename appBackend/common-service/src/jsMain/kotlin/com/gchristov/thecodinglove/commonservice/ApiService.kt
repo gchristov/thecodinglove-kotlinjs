@@ -41,7 +41,6 @@ abstract class ApiService(
         error: Throwable,
         response: ApiResponse
     ) {
-        error.printStackTrace()
         response.sendJson(
             status = 400,
             data = error.toError(),

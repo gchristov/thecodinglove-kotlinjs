@@ -11,7 +11,6 @@ kotlin {
         }
         val jsTest by getting {
             dependencies {
-                implementation(projects.commonServiceTestfixtures)
                 implementation(projects.searchTestfixtures)
             }
         }

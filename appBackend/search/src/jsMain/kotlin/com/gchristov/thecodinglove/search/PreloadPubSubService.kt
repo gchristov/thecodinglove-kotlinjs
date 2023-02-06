@@ -24,9 +24,8 @@ class PreloadPubSubService(
     override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> {
         return try {
             val topicMessage = requireNotNull(message.bodyAsJson<PreloadTopicMessage>(jsonSerializer))
-            return preloadSearchResultUseCase(searchSessionId = topicMessage.searchSessionId)
+            preloadSearchResultUseCase(searchSessionId = topicMessage.searchSessionId)
         } catch (error: Throwable) {
-            error.printStackTrace()
             Either.Left(error)
         }
     }
