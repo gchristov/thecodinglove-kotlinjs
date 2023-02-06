@@ -70,10 +70,10 @@ class SearchApiService(
     }
 
     private fun preload(searchSessionId: String) {
-        val preloadMessage = PreloadPubSubService.buildTopicMessage(searchSessionId)
+        val preloadPubSubMessage = PreloadPubSubService.buildPubSubMessage(searchSessionId)
         pubSubSender.sendMessage(
-            topic = preloadMessage.topic,
-            body = preloadMessage,
+            topic = preloadPubSubMessage.topic,
+            body = preloadPubSubMessage,
             jsonSerializer = jsonSerializer
         )
     }

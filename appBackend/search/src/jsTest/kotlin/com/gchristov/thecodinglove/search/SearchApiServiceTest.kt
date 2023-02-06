@@ -37,7 +37,8 @@ class SearchApiServiceTest {
             searchSessionId = TestSearchSessionId,
             query = TestSearchQuery
         )
-        val expectedPubSub = PreloadPubSubService.buildTopicMessage(TestSearchSessionId)
+        val expectedPreloadPubSubMessage =
+            PreloadPubSubService.buildPubSubMessage(TestSearchSessionId)
         return runBlockingTest(
             searchSessionId = null,
             searchWithSessionInvocationResult = Either.Right(expectedResult)
@@ -52,8 +53,8 @@ class SearchApiServiceTest {
                 SearchWithSessionUseCase.Type.NewSession(query = TestSearchQuery)
             )
             pubSubSender.assertEquals(
-                topic = expectedPubSub.topic,
-                body = Json.encodeToString(expectedPubSub)
+                topic = expectedPreloadPubSubMessage.topic,
+                body = Json.encodeToString(expectedPreloadPubSubMessage)
             )
             response.assertEquals(
                 header = "Content-Type",
@@ -70,7 +71,8 @@ class SearchApiServiceTest {
             searchSessionId = TestSearchSessionId,
             query = TestSearchQuery
         )
-        val expectedPubSub = PreloadPubSubService.buildTopicMessage(TestSearchSessionId)
+        val expectedPreloadPubSubMessage =
+            PreloadPubSubService.buildPubSubMessage(TestSearchSessionId)
         return runBlockingTest(
             searchSessionId = TestSearchSessionId,
             searchQuery = TestSearchQuery,
@@ -89,8 +91,8 @@ class SearchApiServiceTest {
                 )
             )
             pubSubSender.assertEquals(
-                topic = expectedPubSub.topic,
-                body = Json.encodeToString(expectedPubSub)
+                topic = expectedPreloadPubSubMessage.topic,
+                body = Json.encodeToString(expectedPreloadPubSubMessage)
             )
             response.assertEquals(
                 header = "Content-Type",

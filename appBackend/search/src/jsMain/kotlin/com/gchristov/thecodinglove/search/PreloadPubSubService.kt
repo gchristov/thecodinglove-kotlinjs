@@ -6,8 +6,8 @@ import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.bodyAsJson
+import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 class PreloadPubSubService(
@@ -23,7 +23,8 @@ class PreloadPubSubService(
 
     override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> {
         return try {
-            val topicMessage = requireNotNull(message.bodyAsJson<PreloadTopicMessage>(jsonSerializer))
+            val topicMessage =
+                requireNotNull(message.bodyAsJson<PreloadPubSubMessage>(jsonSerializer))
             preloadSearchResultUseCase(searchSessionId = topicMessage.searchSessionId)
         } catch (error: Throwable) {
             Either.Left(error)
@@ -31,17 +32,11 @@ class PreloadPubSubService(
     }
 
     companion object {
-        fun buildTopicMessage(searchSessionId: String) = PreloadTopicMessage(
+        fun buildPubSubMessage(searchSessionId: String) = PreloadPubSubMessage(
             topic = Topic,
             searchSessionId = searchSessionId
         )
     }
 }
-
-@Serializable
-data class PreloadTopicMessage(
-    val topic: String,
-    val searchSessionId: String
-)
 
 private const val Topic = "preloadPubSub"

@@ -19,7 +19,7 @@ abstract class PubSubService(
 
     abstract fun register()
 
-    protected abstract suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit>
+    abstract suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit>
 
     override val coroutineContext: CoroutineContext
         get() = job
