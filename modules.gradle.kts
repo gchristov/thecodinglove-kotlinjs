@@ -9,6 +9,7 @@ val projects = listOf(
     "appBackend/appBackend",
     "appBackend/common-service",
     "appBackend/common-service-data",
+    "appBackend/common-service-testfixtures",
     "appBackend/firebasefunctions",
     "appBackend/htmlparse",
     "appBackend/htmlparse-data",
@@ -18,6 +19,7 @@ val projects = listOf(
     "appBackend/search-testfixtures",
     "appBackend/slack",
     "appBackend/slack-data",
+    "appBackend/slack-testfixtures",
     "appWeb/appWeb",
 )
 

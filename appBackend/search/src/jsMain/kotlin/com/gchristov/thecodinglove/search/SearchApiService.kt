@@ -29,26 +29,19 @@ class SearchApiService(
         request: ApiRequest,
         response: ApiResponse
     ) {
-        try {
-            val searchQuery: String = request.query["searchQuery"] ?: "release"
-            val searchSessionId: String? = request.query["searchSessionId"]
-            val searchType = searchSessionId?.let {
-                SearchWithSessionUseCase.Type.WithSessionId(
-                    query = searchQuery,
-                    sessionId = it
-                )
-            } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
+        val searchQuery: String = request.query["searchQuery"] ?: "release"
+        val searchSessionId: String? = request.query["searchSessionId"]
+        val searchType = searchSessionId?.let {
+            SearchWithSessionUseCase.Type.WithSessionId(
+                query = searchQuery,
+                sessionId = it
+            )
+        } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
 
-            search(
-                searchType = searchType,
-                response = response
-            )
-        } catch (error: Throwable) {
-            sendError(
-                error = error,
-                response = response
-            )
-        }
+        search(
+            searchType = searchType,
+            response = response
+        )
     }
 
     private suspend fun search(
@@ -77,10 +70,10 @@ class SearchApiService(
     }
 
     private fun preload(searchSessionId: String) {
-        val preloadMessage = PreloadPubSubService.buildTopicMessage(searchSessionId)
+        val preloadPubSubMessage = PreloadPubSubService.buildPubSubMessage(searchSessionId)
         pubSubSender.sendMessage(
-            topic = preloadMessage.topic,
-            body = preloadMessage,
+            topic = preloadPubSubMessage.topic,
+            body = preloadPubSubMessage,
             jsonSerializer = jsonSerializer
         )
     }

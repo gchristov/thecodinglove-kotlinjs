@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.searchdata.SearchError
+import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
 import com.gchristov.thecodinglove.searchtestfixtures.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,7 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealSearchWithSessionUseCaseTest {
+class SearchWithSessionUseCaseTest {
     @Test
     fun searchWithNewSessionCreatesNewSession(): TestResult {
         val searchType = SearchWithSessionUseCase.Type.NewSession(query = SearchQuery)

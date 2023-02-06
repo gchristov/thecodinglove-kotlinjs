@@ -12,6 +12,9 @@ class BackendServicePlugin : Plugin<Project> {
             sourceSets.maybeCreate("jsMain").dependencies {
                 implementation(project(":common-service"))
             }
+            sourceSets.maybeCreate("jsTest").dependencies {
+                implementation(project(":common-service-testfixtures"))
+            }
         }
     }
 }

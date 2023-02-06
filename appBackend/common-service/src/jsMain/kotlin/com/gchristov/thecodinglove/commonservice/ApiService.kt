@@ -20,7 +20,7 @@ abstract class ApiService(
 
     abstract fun register()
 
-    protected abstract suspend fun handleRequest(
+    abstract suspend fun handleRequest(
         request: ApiRequest,
         response: ApiResponse
     )
@@ -41,7 +41,6 @@ abstract class ApiService(
         error: Throwable,
         response: ApiResponse
     ) {
-        error.printStackTrace()
         response.sendJson(
             status = 400,
             data = error.toError(),
