@@ -7,11 +7,8 @@ import com.gchristov.thecodinglove.searchdata.model.Post
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
 import com.gchristov.thecodinglove.searchdata.model.toPost
 import com.gchristov.thecodinglove.searchdata.model.toSearchSession
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.statement.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 interface SearchRepository {
     suspend fun getTotalPosts(query: String): Either<Throwable, Int>
@@ -75,30 +72,3 @@ internal class RealSearchRepository(
         )
     }
 }
-
-@Serializable
-private sealed class Result {
-    @Serializable
-    @SerialName("empty")
-    object Empty : Result()
-
-    @Serializable
-    @SerialName("valid")
-    data class Valid(
-        val searchSessionId: String,
-        val query: String,
-        val postTitle: String,
-        val postUrl: String,
-        val postImageUrl: String,
-        val totalPosts: Int,
-    ) : Result()
-}
-
-private fun SearchWithSessionUseCase.Result.toResult() = Result.Valid(
-    searchSessionId = searchSessionId,
-    query = query,
-    postTitle = post.title,
-    postUrl = post.url,
-    postImageUrl = post.imageUrl,
-    totalPosts = totalPosts
-)

@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.searchdata.usecase
+package com.gchristov.thecodinglove.search.usecase
 
 import arrow.core.Either
 import com.benasher44.uuid.uuid4
-import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.Post
+import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

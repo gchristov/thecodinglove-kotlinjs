@@ -4,9 +4,8 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiResponse
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiServiceRegister
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSender
-import com.gchristov.thecodinglove.searchdata.api.toSearchResult
+import com.gchristov.thecodinglove.search.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.searchdata.model.SearchError
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchApiRequest
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchWithSessionUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.SearchWithSessionResultCreator

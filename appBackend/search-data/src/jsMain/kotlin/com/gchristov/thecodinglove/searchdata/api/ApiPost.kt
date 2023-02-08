@@ -10,7 +10,7 @@ data class ApiPost(
     val imageUrl: String,
 )
 
-internal fun Post.toPost() = ApiPost(
+fun Post.toPost() = ApiPost(
     title = title,
     url = url,
     imageUrl = imageUrl

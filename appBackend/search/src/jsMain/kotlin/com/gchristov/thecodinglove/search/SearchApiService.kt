@@ -8,8 +8,9 @@ import com.gchristov.thecodinglove.commonservicedata.api.sendJson
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
-import com.gchristov.thecodinglove.searchdata.api.toSearchResult
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.search.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.searchdata.api.ApiSearchResult
+import com.gchristov.thecodinglove.searchdata.api.toPost
 import kotlinx.serialization.json.Json
 
 class SearchApiService(
@@ -78,3 +79,10 @@ class SearchApiService(
         )
     }
 }
+
+internal fun SearchWithSessionUseCase.Result.toSearchResult() = ApiSearchResult(
+    searchSessionId = searchSessionId,
+    query = query,
+    post = post.toPost(),
+    totalPosts = totalPosts
+)

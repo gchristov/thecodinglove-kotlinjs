@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.searchdata.usecase
+package com.gchristov.thecodinglove.search.usecase
 
 internal fun Map<Int, List<Int>>.insert(
     postPage: Int,

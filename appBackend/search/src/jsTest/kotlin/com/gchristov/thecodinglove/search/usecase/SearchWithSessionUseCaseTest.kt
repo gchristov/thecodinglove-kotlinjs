@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.searchdata.usecase
+package com.gchristov.thecodinglove.search.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher

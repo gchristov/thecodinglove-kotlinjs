@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.searchtestfixtures
 
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.search.usecase.SearchWithSessionUseCase
 
 object SearchWithSessionResultCreator {
     fun validResult(

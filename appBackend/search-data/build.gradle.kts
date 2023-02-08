@@ -10,10 +10,5 @@ kotlin {
                 implementation(projects.htmlparse)
             }
         }
-        val jsTest by getting {
-            dependencies {
-                implementation(projects.searchTestfixtures)
-            }
-        }
     }
 }

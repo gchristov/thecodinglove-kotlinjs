@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.searchtestfixtures
 
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
+import com.gchristov.thecodinglove.search.usecase.SearchWithHistoryUseCase
 
 object SearchWithHistoryResultCreator {
     fun validResult(query: String) = SearchWithHistoryUseCase.Result(
