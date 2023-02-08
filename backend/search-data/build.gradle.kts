@@ -7,7 +7,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(projects.kmpCommonFirebase)
-                implementation(projects.htmlparse)
+                implementation(projects.htmlParse)
             }
         }
     }

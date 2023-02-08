@@ -6,12 +6,12 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                api(projects.htmlparseData)
+                api(projects.htmlParseData)
             }
         }
         val jsTest by getting {
             dependencies {
-                implementation(projects.htmlparseTestfixtures)
+                implementation(projects.htmlParseTestfixtures)
             }
         }
     }
