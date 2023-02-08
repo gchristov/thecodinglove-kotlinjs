@@ -31,7 +31,7 @@ class HtmlPostParserTest {
     fun parsePosts() = runBlockingTest { parser ->
         val actualPosts = parser.parsePosts(HtmlCreator.defaultHtml())
         assertEquals(
-            expected = Either.Right(ActualPostList),
+            expected = Either.Right(TestActualPostList),
             actual = actualPosts
         )
     }
@@ -52,7 +52,7 @@ class HtmlPostParserTest {
         }
 }
 
-private val ActualPostList = listOf(
+private val TestActualPostList = listOf(
     HtmlPost(
         title = "When the sales guy is about to click on a button I never tested",
         url = "https://thecodinglove.com/when-the-sales-guy-is-about-to-click-on-a-button-i-never-tested",

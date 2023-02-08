@@ -16,7 +16,7 @@ class PreloadSearchResultUseCaseTest {
     @Test
     fun preloadWithMissingSessionReturnsSessionNotFound(): TestResult {
         return runBlockingTest(searchSession = null) { useCase, searchRepository, searchWithHistoryUseCase ->
-            val actualResult = useCase.invoke(searchSessionId = SearchSessionId)
+            val actualResult = useCase.invoke(searchSessionId = TestSearchSessionId)
             searchRepository.assertSessionFetched()
             searchWithHistoryUseCase.assertNotInvoked()
             assertEquals(
@@ -29,18 +29,18 @@ class PreloadSearchResultUseCaseTest {
     @Test
     fun preloadWithSessionIdReusesSession(): TestResult {
         val searchWithHistoryResult = Either.Right(
-            SearchWithHistoryResultCreator.validResult(query = SearchQuery)
+            SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
         )
         val searchSession = SearchSessionCreator.searchSession(
-            id = SearchSessionId,
-            query = SearchQuery
+            id = TestSearchSessionId,
+            query = TestSearchQuery
         )
 
         return runBlockingTest(
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
             searchSession = searchSession,
         ) { useCase, searchRepository, searchWithHistoryUseCase ->
-            useCase.invoke(searchSessionId = SearchSessionId)
+            useCase.invoke(searchSessionId = TestSearchSessionId)
             searchWithHistoryUseCase.assertInvokedOnce()
             searchRepository.assertSessionFetched()
         }
@@ -50,15 +50,15 @@ class PreloadSearchResultUseCaseTest {
     fun preloadWithEmptyResultReturnsEmpty(): TestResult {
         val searchWithHistoryResult = Either.Left(SearchError.Empty)
         val searchSession = SearchSessionCreator.searchSession(
-            id = SearchSessionId,
-            query = SearchQuery
+            id = TestSearchSessionId,
+            query = TestSearchQuery
         )
 
         return runBlockingTest(
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
             searchSession = searchSession,
         ) { useCase, searchRepository, searchWithHistoryUseCase ->
-            val actualResult = useCase.invoke(searchSessionId = SearchSessionId)
+            val actualResult = useCase.invoke(searchSessionId = TestSearchSessionId)
             searchRepository.assertSessionFetched()
             searchWithHistoryUseCase.assertInvokedOnce()
             assertEquals(
@@ -71,8 +71,8 @@ class PreloadSearchResultUseCaseTest {
     @Test
     fun preloadWithExhaustedResultClearsPreloadedPostAndReturnsExhausted(): TestResult {
         val searchSession = SearchSessionCreator.searchSession(
-            id = SearchSessionId,
-            query = SearchQuery,
+            id = TestSearchSessionId,
+            query = TestSearchQuery,
             searchHistory = mapOf(1 to listOf(0, 1, 2, 3)),
             preloadedPost = PostCreator.defaultPost()
         )
@@ -81,7 +81,7 @@ class PreloadSearchResultUseCaseTest {
             singleSearchWithHistoryInvocationResult = Either.Left(SearchError.Exhausted),
             searchSession = searchSession,
         ) { useCase, searchRepository, searchWithHistoryUseCase ->
-            val actualResult = useCase.invoke(searchSessionId = SearchSessionId)
+            val actualResult = useCase.invoke(searchSessionId = TestSearchSessionId)
             searchWithHistoryUseCase.assertInvokedOnce()
             searchRepository.assertSessionSaved(
                 SearchSession(
@@ -104,17 +104,17 @@ class PreloadSearchResultUseCaseTest {
     @Test
     fun preloadUpdatesSessionAndReturnsSuccessResult(): TestResult {
         val searchWithHistoryResult =
-            SearchWithHistoryResultCreator.validResult(query = SearchQuery)
+            SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
         val searchSession = SearchSessionCreator.searchSession(
-            id = SearchSessionId,
-            query = SearchQuery
+            id = TestSearchSessionId,
+            query = TestSearchQuery
         )
 
         return runBlockingTest(
             singleSearchWithHistoryInvocationResult = Either.Right(searchWithHistoryResult),
             searchSession = searchSession,
         ) { useCase, searchRepository, searchWithHistoryUseCase ->
-            val actualResult = useCase.invoke(searchSessionId = SearchSessionId)
+            val actualResult = useCase.invoke(searchSessionId = TestSearchSessionId)
             searchWithHistoryUseCase.assertInvokedOnce()
             searchRepository.assertSessionSaved(
                 SearchSession(
@@ -154,5 +154,5 @@ class PreloadSearchResultUseCaseTest {
     }
 }
 
-private const val SearchQuery = "test"
-private const val SearchSessionId = "session_123"
+private const val TestSearchQuery = "test"
+private const val TestSearchSessionId = "session_123"

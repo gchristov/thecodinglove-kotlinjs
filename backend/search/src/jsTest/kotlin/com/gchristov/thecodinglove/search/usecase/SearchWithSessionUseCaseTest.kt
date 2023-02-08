@@ -15,9 +15,9 @@ import kotlin.test.assertEquals
 class SearchWithSessionUseCaseTest {
     @Test
     fun searchWithNewSessionCreatesNewSession(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.NewSession(query = SearchQuery)
+        val searchType = SearchWithSessionUseCase.Type.NewSession(query = TestSearchQuery)
         val searchWithHistoryResult = Either.Right(
-            SearchWithHistoryResultCreator.validResult(query = SearchQuery)
+            SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
         )
 
         return runBlockingTest(
@@ -33,16 +33,16 @@ class SearchWithSessionUseCaseTest {
     @Test
     fun searchWithSessionIdReturnsPreloadedPost(): TestResult {
         val searchType = SearchWithSessionUseCase.Type.WithSessionId(
-            query = SearchQuery,
-            sessionId = SearchSessionId
+            query = TestSearchQuery,
+            sessionId = TestSearchSessionId
         )
         val searchWithHistoryResult = Either.Right(
-            SearchWithHistoryResultCreator.validResult(query = SearchQuery)
+            SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
         )
         val preloadedPost = PostCreator.defaultPost()
         val searchSession = SearchSessionCreator.searchSession(
-            id = SearchSessionId,
-            query = SearchQuery,
+            id = TestSearchSessionId,
+            query = TestSearchQuery,
             preloadedPost = preloadedPost
         )
 
@@ -81,15 +81,15 @@ class SearchWithSessionUseCaseTest {
     @Test
     fun searchWithSessionIdReusesSession(): TestResult {
         val searchType = SearchWithSessionUseCase.Type.WithSessionId(
-            query = SearchQuery,
-            sessionId = SearchSessionId
+            query = TestSearchQuery,
+            sessionId = TestSearchSessionId
         )
         val searchWithHistoryResult = Either.Right(
-            SearchWithHistoryResultCreator.validResult(query = SearchQuery)
+            SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
         )
         val searchSession = SearchSessionCreator.searchSession(
-            id = SearchSessionId,
-            query = SearchQuery
+            id = TestSearchSessionId,
+            query = TestSearchQuery
         )
 
         return runBlockingTest(
@@ -104,7 +104,7 @@ class SearchWithSessionUseCaseTest {
 
     @Test
     fun searchWithEmptyResultReturnsEmpty(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.NewSession(query = SearchQuery)
+        val searchType = SearchWithSessionUseCase.Type.NewSession(query = TestSearchQuery)
         val searchWithHistoryResult = Either.Left(SearchError.Empty)
 
         return runBlockingTest(
@@ -123,16 +123,16 @@ class SearchWithSessionUseCaseTest {
     @Test
     fun searchWithExhaustedResultClearsSearchSessionHistoryAndRetries(): TestResult {
         val searchType = SearchWithSessionUseCase.Type.WithSessionId(
-            query = SearchQuery,
-            sessionId = SearchSessionId
+            query = TestSearchQuery,
+            sessionId = TestSearchSessionId
         )
         val searchWithHistoryResults = listOf(
             Either.Left(SearchError.Exhausted),
             Either.Left(SearchError.Empty)
         )
         val searchSession = SearchSessionCreator.searchSession(
-            id = SearchSessionId,
-            query = SearchQuery,
+            id = TestSearchSessionId,
+            query = TestSearchQuery,
             searchHistory = mapOf(1 to listOf(0, 1, 2, 3))
         )
 
@@ -159,15 +159,15 @@ class SearchWithSessionUseCaseTest {
     @Test
     fun searchUpdatesSessionAndReturnsValidResult(): TestResult {
         val searchType = SearchWithSessionUseCase.Type.WithSessionId(
-            sessionId = SearchSessionId,
-            query = SearchQuery
+            sessionId = TestSearchSessionId,
+            query = TestSearchQuery
         )
         val searchWithHistoryResult = SearchWithHistoryResultCreator.validResult(
-            query = SearchQuery
+            query = TestSearchQuery
         )
         val searchSession = SearchSessionCreator.searchSession(
-            id = SearchSessionId,
-            query = SearchQuery
+            id = TestSearchSessionId,
+            query = TestSearchQuery
         )
         val expectedSearchWithSessionResult = SearchWithSessionUseCase.Result(
             searchSessionId = searchSession.id,
@@ -189,7 +189,7 @@ class SearchWithSessionUseCaseTest {
             searchRepository.assertSessionSaved(
                 SearchSession(
                     id = searchSession.id,
-                    query = SearchQuery,
+                    query = TestSearchQuery,
                     totalPosts = searchWithHistoryResult.totalPosts,
                     searchHistory = mapOf(1 to listOf(0, -1)),
                     currentPost = searchWithHistoryResult.post,
@@ -222,5 +222,5 @@ class SearchWithSessionUseCaseTest {
     }
 }
 
-private const val SearchQuery = "test"
-private const val SearchSessionId = "session_123"
+private const val TestSearchQuery = "test"
+private const val TestSearchSessionId = "session_123"
