@@ -1,26 +1,26 @@
 includeBuild("gradle-plugins")
 
 val projects = listOf(
-    "kmp/kmp-common-di",
-    "kmp/kmp-common-firebase",
-    "kmp/kmp-common-kotlin",
-    "kmp/kmp-common-network",
-    "kmp/kmp-common-test",
-    "appBackend/appBackend",
-    "appBackend/common-service",
-    "appBackend/common-service-data",
-    "appBackend/common-service-testfixtures",
-    "appBackend/firebasefunctions",
-    "appBackend/htmlparse",
-    "appBackend/htmlparse-data",
-    "appBackend/htmlparse-testfixtures",
-    "appBackend/search",
-    "appBackend/search-data",
-    "appBackend/search-testfixtures",
-    "appBackend/slack",
-    "appBackend/slack-data",
-    "appBackend/slack-testfixtures",
-    "appWeb/appWeb",
+    "shared/kmp-common-di",
+    "shared/kmp-common-firebase",
+    "shared/kmp-common-kotlin",
+    "shared/kmp-common-network",
+    "shared/kmp-common-test",
+    "backend/appBackend",
+    "backend/common-service",
+    "backend/common-service-data",
+    "backend/common-service-testfixtures",
+    "backend/firebasefunctions",
+    "backend/htmlparse",
+    "backend/htmlparse-data",
+    "backend/htmlparse-testfixtures",
+    "backend/search",
+    "backend/search-data",
+    "backend/search-testfixtures",
+    "backend/slack",
+    "backend/slack-data",
+    "backend/slack-testfixtures",
+    "client/appWeb/appWeb",
 )
 
 projects.forEach { project ->
@@ -29,10 +29,4 @@ projects.forEach { project ->
     project(":$name").projectDir = java.io.File(project)
 }
 
-fun String.projectName(): String {
-    val parts = this.split("/")
-    if (parts.size > 1) {
-        return parts[1]
-    }
-    return parts[0]
-}
+fun String.projectName(): String = this.split("/").last()
