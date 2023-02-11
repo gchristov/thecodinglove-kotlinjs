@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.commonservice
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
@@ -23,7 +24,7 @@ abstract class ApiService(
     abstract suspend fun handleRequest(
         request: ApiRequest,
         response: ApiResponse
-    )
+    ): Either<Throwable, Unit>
 
     override val coroutineContext: CoroutineContext
         get() = job
@@ -33,6 +34,16 @@ abstract class ApiService(
             handleRequest(
                 request = request,
                 response = response
+            ).fold(
+                ifLeft = {
+                    sendError(
+                        error = it,
+                        response = response
+                    )
+                },
+                ifRight = {
+                    // TODO: Add some request metrics in here
+                }
             )
         }
     }

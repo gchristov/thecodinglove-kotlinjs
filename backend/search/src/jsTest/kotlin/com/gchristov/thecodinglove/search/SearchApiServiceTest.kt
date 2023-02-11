@@ -17,6 +17,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.kodein.di.bindings.ErasedContext.value
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SearchApiServiceTest {
@@ -42,7 +44,7 @@ class SearchApiServiceTest {
             searchSessionId = null,
             searchWithSessionInvocationResult = Either.Right(expectedResult)
         ) { service, pubSubSender, searchUseCase, request, response, register ->
-            service.handleRequest(
+            val actualResult = service.handleRequest(
                 request = request,
                 response = response
             )
@@ -61,6 +63,7 @@ class SearchApiServiceTest {
                 data = Json.encodeToString(expectedResult.toSearchResult()),
                 status = 200
             )
+            assertTrue { actualResult.isRight() }
         }
     }
 
@@ -77,7 +80,7 @@ class SearchApiServiceTest {
             searchQuery = TestSearchQuery,
             searchWithSessionInvocationResult = Either.Right(expectedResult)
         ) { service, pubSubSender, searchUseCase, request, response, register ->
-            service.handleRequest(
+            val actualResult = service.handleRequest(
                 request = request,
                 response = response
             )
@@ -99,6 +102,7 @@ class SearchApiServiceTest {
                 data = Json.encodeToString(expectedResult.toSearchResult()),
                 status = 200
             )
+            assertTrue { actualResult.isRight() }
         }
     }
 
@@ -108,18 +112,16 @@ class SearchApiServiceTest {
         searchQuery = TestSearchQuery,
         searchWithSessionInvocationResult = Either.Left(SearchError.Empty)
     ) { service, pubSubSender, searchUseCase, request, response, register ->
-        service.handleRequest(
+        val actualResult = service.handleRequest(
             request = request,
             response = response
         )
         register.assertNotInvoked()
         searchUseCase.assertInvokedOnce()
         pubSubSender.assertNotInvoked()
-        response.assertEquals(
-            header = "Content-Type",
-            headerValue = "application/json",
-            data = "{\"errorMessage\":\"Something unexpected happened. Please try again.\"}",
-            status = 400
+        assertEquals(
+            expected = Either.Left(SearchError.Empty),
+            actual = actualResult
         )
     }
 

@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.slack
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.*
 import com.gchristov.thecodinglove.commonservicedata.exports
@@ -23,32 +24,23 @@ class SlackSlashCommandApiService(
     override suspend fun handleRequest(
         request: ApiRequest,
         response: ApiResponse
-    ) {
-        verifySlackRequestUseCase(request).fold(
-            ifLeft = {
+    ): Either<Throwable, Unit> = verifySlackRequestUseCase(request)
+        .map {
+            try {
+                // TODO: Handle valid request
+                val apiCommand: ApiSlackSlashCommand =
+                    requireNotNull(request.bodyAsJson(jsonSerializer))
+                val command = apiCommand.toSlashCommand()
+                println(command)
+                response.sendJson(
+                    data = apiCommand,
+                    jsonSerializer = jsonSerializer
+                )
+            } catch (error: Throwable) {
                 sendError(
-                    error = it,
+                    error = error,
                     response = response
                 )
-            },
-            ifRight = {
-                try {
-                    // TODO: Handle valid request
-                    val apiCommand: ApiSlackSlashCommand =
-                        requireNotNull(request.bodyAsJson(jsonSerializer))
-                    val command = apiCommand.toSlashCommand()
-                    println(command)
-                    response.sendJson(
-                        data = apiCommand,
-                        jsonSerializer = jsonSerializer
-                    )
-                } catch (error: Throwable) {
-                    sendError(
-                        error = error,
-                        response = response
-                    )
-                }
             }
-        )
-    }
+        }
 }

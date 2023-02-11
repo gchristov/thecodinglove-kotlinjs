@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.search
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
@@ -29,46 +30,15 @@ class SearchApiService(
     override suspend fun handleRequest(
         request: ApiRequest,
         response: ApiResponse
-    ) {
-        val searchQuery: String = request.query["searchQuery"] ?: "release"
-        val searchSessionId: String? = request.query["searchSessionId"]
-        val searchType = searchSessionId?.let {
-            SearchWithSessionUseCase.Type.WithSessionId(
-                query = searchQuery,
-                sessionId = it
+    ): Either<Throwable, Unit> = searchWithSessionUseCase(request.toSearchType())
+        .map { result ->
+            // TODO: Needs correct response mapping
+            preload(result.searchSessionId)
+            response.sendJson(
+                data = result.toSearchResult(),
+                jsonSerializer = jsonSerializer
             )
-        } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
-
-        search(
-            searchType = searchType,
-            response = response
-        )
-    }
-
-    private suspend fun search(
-        searchType: SearchWithSessionUseCase.Type,
-        response: ApiResponse
-    ) {
-        println("Performing search")
-        searchWithSessionUseCase(searchType)
-            .fold(
-                ifLeft = {
-                    sendError(
-                        error = it,
-                        response = response
-                    )
-                },
-                ifRight = { searchResult ->
-                    // TODO: Needs correct response mapping
-                    println("Search complete")
-                    preload(searchResult.searchSessionId)
-                    response.sendJson(
-                        data = searchResult.toSearchResult(),
-                        jsonSerializer = jsonSerializer
-                    )
-                }
-            )
-    }
+        }
 
     private fun preload(searchSessionId: String) {
         val preloadPubSubMessage = PreloadPubSubService.buildPubSubMessage(searchSessionId)
@@ -78,6 +48,17 @@ class SearchApiService(
             jsonSerializer = jsonSerializer
         )
     }
+}
+
+private fun ApiRequest.toSearchType(): SearchWithSessionUseCase.Type {
+    val searchQuery: String = query["searchQuery"] ?: "release"
+    val searchSessionId: String? = query["searchSessionId"]
+    return searchSessionId?.let {
+        SearchWithSessionUseCase.Type.WithSessionId(
+            query = searchQuery,
+            sessionId = it
+        )
+    } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
 }
 
 internal fun SearchWithSessionUseCase.Result.toSearchResult() = ApiSearchResult(
