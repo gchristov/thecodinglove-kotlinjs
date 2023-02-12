@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.slack
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.slack.usecase.RealVerifySlackRequestUseCase
-import com.gchristov.thecodinglove.slack.usecase.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
+import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json

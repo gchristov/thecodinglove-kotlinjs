@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
+import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import diglol.crypto.Hmac
 import diglol.encoding.encodeHexToString
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,19 +14,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.plus
 
-interface VerifySlackRequestUseCase {
-    suspend operator fun invoke(request: ApiRequest): Either<Throwable, Unit>
-
-    sealed class Error(message: String? = null) : Throwable(message) {
-        object MissingTimestamp : Error()
-        object MissingSignature : Error()
-        object TooOld : Error()
-        object SignatureMismatch : Error()
-        data class Other(override val message: String?) : Error(message)
-    }
-}
-
-internal class RealVerifySlackRequestUseCase(
+class RealVerifySlackRequestUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val slackConfig: SlackConfig,
     private val clock: Clock

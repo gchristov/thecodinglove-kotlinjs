@@ -4,14 +4,13 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
+import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.insert
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-interface PreloadSearchResultUseCase {
-    suspend operator fun invoke(searchSessionId: String) : Either<SearchError, Unit>
-}
-
-internal class RealPreloadSearchResultUseCase(
+class RealPreloadSearchResultUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,

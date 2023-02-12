@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slack.usecase
 import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
+import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slacktestfixtures.FakeSlackApiRequest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
@@ -13,7 +14,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class VerifySlackRequestUseCaseTest {
+class RealVerifySlackRequestUseCaseTest {
     @Test
     fun verifyWithMissingTimestampReturnsError(): TestResult {
         return runBlockingTest { useCase ->

@@ -4,9 +4,9 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.*
 import com.gchristov.thecodinglove.commonservicedata.exports
-import com.gchristov.thecodinglove.slack.usecase.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import com.gchristov.thecodinglove.slackdata.domain.toSlashCommand
+import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import kotlinx.serialization.json.Json
 
 class SlackSlashCommandApiService(

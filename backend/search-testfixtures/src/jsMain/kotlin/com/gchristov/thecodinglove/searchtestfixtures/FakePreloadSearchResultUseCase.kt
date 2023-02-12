@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.searchtestfixtures
 import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeResponse
 import com.gchristov.thecodinglove.kmpcommontest.execute
-import com.gchristov.thecodinglove.search.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.model.SearchError
+import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import kotlin.test.assertEquals
 
 class FakePreloadSearchResultUseCase(

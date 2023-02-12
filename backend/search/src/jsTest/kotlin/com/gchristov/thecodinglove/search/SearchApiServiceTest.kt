@@ -4,8 +4,8 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiResponse
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiServiceRegister
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSender
-import com.gchristov.thecodinglove.search.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.searchdata.model.SearchError
+import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchApiRequest
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchWithSessionUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.SearchWithSessionResultCreator
@@ -60,7 +60,9 @@ class SearchApiServiceTest {
             response.assertEquals(
                 header = "Content-Type",
                 headerValue = "application/json",
-                data = Json.encodeToString(expectedResult.toSearchResult()),
+                data = """
+                        {"searchSessionId":"session_123","query":"test","post":{"title":"post","url":"url","imageUrl":"imageUrl"},"totalPosts":1}
+                       """.trimIndent(),
                 status = 200
             )
             assertTrue { actualResult.isRight() }
@@ -99,7 +101,9 @@ class SearchApiServiceTest {
             response.assertEquals(
                 header = "Content-Type",
                 headerValue = "application/json",
-                data = Json.encodeToString(expectedResult.toSearchResult()),
+                data = """
+                        {"searchSessionId":"session_123","query":"test","post":{"title":"post","url":"url","imageUrl":"imageUrl"},"totalPosts":1}
+                       """.trimIndent(),
                 status = 200
             )
             assertTrue { actualResult.isRight() }

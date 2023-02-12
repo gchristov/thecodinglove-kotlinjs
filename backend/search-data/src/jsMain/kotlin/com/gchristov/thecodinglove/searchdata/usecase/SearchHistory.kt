@@ -1,6 +1,6 @@
-package com.gchristov.thecodinglove.search.usecase
+package com.gchristov.thecodinglove.searchdata.usecase
 
-internal fun Map<Int, List<Int>>.insert(
+fun Map<Int, List<Int>>.insert(
     postPage: Int,
     postIndexOnPage: Int,
     currentPageSize: Int
@@ -13,12 +13,12 @@ internal fun Map<Int, List<Int>>.insert(
     (this as? MutableMap)?.put(postPage, page)
 }
 
-internal fun Map<Int, List<Int>>.contains(
+fun Map<Int, List<Int>>.contains(
     postPage: Int,
     postIndexOnPage: Int
 ): Boolean = this[postPage]?.contains(postIndexOnPage) == true
 
-internal fun Map<Int, List<Int>>.getExcludedPages(): List<Int> {
+fun Map<Int, List<Int>>.getExcludedPages(): List<Int> {
     val exclusions = mutableListOf<Int>()
     for (key in this.keys) {
         if (this[key]?.contains(TerminationIndex) == true) {
@@ -28,7 +28,7 @@ internal fun Map<Int, List<Int>>.getExcludedPages(): List<Int> {
     return exclusions
 }
 
-internal fun Map<Int, List<Int>>.getExcludedPostIndexes(page: Int): List<Int> {
+fun Map<Int, List<Int>>.getExcludedPostIndexes(page: Int): List<Int> {
     return this[page] ?: emptyList()
 }
 

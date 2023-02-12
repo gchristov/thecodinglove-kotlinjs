@@ -6,8 +6,8 @@ import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.bodyAsJson
-import com.gchristov.thecodinglove.search.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
+import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import kotlinx.serialization.json.Json
 
 class PreloadPubSubService(

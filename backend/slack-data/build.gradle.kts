@@ -7,6 +7,16 @@ plugins {
     id("build-config-plugin")
 }
 
+kotlin {
+    sourceSets {
+        val jsMain by getting {
+            dependencies {
+                implementation(projects.commonServiceData)
+            }
+        }
+    }
+}
+
 buildkonfig {
     packageName = packageId
     defaultConfigs {
