@@ -6,34 +6,13 @@ import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.Post
 import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
+import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.insert
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-interface SearchWithSessionUseCase {
-    suspend operator fun invoke(type: Type): Either<SearchError, Result>
-
-    sealed class Type {
-        abstract val query: String
-
-        data class WithSessionId(
-            override val query: String,
-            val sessionId: String
-        ) : Type()
-
-        data class NewSession(
-            override val query: String,
-        ) : Type()
-    }
-
-    data class Result(
-        val searchSessionId: String,
-        val query: String,
-        val post: Post,
-        val totalPosts: Int
-    )
-}
-
-internal class RealSearchWithSessionUseCase(
+class RealSearchWithSessionUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,

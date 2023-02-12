@@ -1,11 +1,11 @@
-package com.gchristov.thecodinglove.search.usecase
+package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.searchdata.model.Post
 import kotlin.math.max
 import kotlin.random.Random
 
-internal fun Random.nextRandomPage(
+fun Random.nextRandomPage(
     totalResults: Int,
     resultsPerPage: Int,
     exclusions: List<Int>
@@ -22,7 +22,7 @@ internal fun Random.nextRandomPage(
     )
 }
 
-internal fun Random.nextRandomPostIndex(
+fun Random.nextRandomPostIndex(
     posts: List<Post>,
     exclusions: List<Int>
 ): Either<RangeError, Int> {
@@ -68,7 +68,7 @@ private fun Random.nextRandomIntInRange(
     return Either.Right(randomInt)
 }
 
-internal sealed class RangeError : Throwable() {
+sealed class RangeError : Throwable() {
     object Empty : RangeError()
     object Exhausted : RangeError()
 }

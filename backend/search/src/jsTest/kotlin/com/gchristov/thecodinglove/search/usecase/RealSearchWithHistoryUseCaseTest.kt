@@ -5,6 +5,9 @@ import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.searchdata.model.Post
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
 import com.gchristov.thecodinglove.searchdata.model.SearchError
+import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.contains
+import com.gchristov.thecodinglove.searchdata.usecase.insert
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchRepository
 import com.gchristov.thecodinglove.searchtestfixtures.PostCreator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,7 +19,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SearchWithHistoryUseCaseTest {
+class RealSearchWithHistoryUseCaseTest {
     @Test
     fun searchWithNoResultsReturnsEmpty(): TestResult {
         val totalPosts = 0
