@@ -35,7 +35,11 @@ abstract class PubSubService(
                     )
                     handleMessage(message).fold(
                         ifLeft = { reject(it) },
-                        ifRight = { resolve(it) }
+                        ifRight = {
+                            // No need to specifically ack here, as this is done automatically. More
+                            // info https://stackoverflow.com/a/54996122/1589525
+                            resolve(it)
+                        }
                     )
                 }
             }
