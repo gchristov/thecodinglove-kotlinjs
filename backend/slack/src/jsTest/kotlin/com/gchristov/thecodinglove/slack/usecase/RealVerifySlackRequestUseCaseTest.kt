@@ -127,6 +127,7 @@ class RealVerifySlackRequestUseCaseTest {
                 slackConfig = SlackConfig(
                     signingSecret = TestSigningSecret,
                     timestampValidityMinutes = TestTimestampValidityInMinutes,
+                    requestVerificationEnabled = true
                 ),
                 clock = TestClock
             )

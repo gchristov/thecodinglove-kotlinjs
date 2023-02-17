@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slack
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.slack.usecase.RealVerifySlackRequestUseCase
+import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +24,9 @@ object SlackModule : DiModule() {
                 provideSlackSlashCommandService(
                     apiServiceRegister = instance(),
                     jsonSerializer = instance(),
-                    verifySlackRequestUseCase = instance()
+                    verifySlackRequestUseCase = instance(),
+                    slackRepository = instance(),
+                    slackConfig = instance()
                 )
             }
         }
@@ -40,10 +43,14 @@ object SlackModule : DiModule() {
     private fun provideSlackSlashCommandService(
         apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
-        verifySlackRequestUseCase: VerifySlackRequestUseCase
+        verifySlackRequestUseCase: VerifySlackRequestUseCase,
+        slackRepository: SlackRepository,
+        slackConfig: SlackConfig
     ): SlackSlashCommandApiService = SlackSlashCommandApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
-        verifySlackRequestUseCase = verifySlackRequestUseCase
+        verifySlackRequestUseCase = verifySlackRequestUseCase,
+        slackRepository = slackRepository,
+        slackConfig = slackConfig
     )
 }

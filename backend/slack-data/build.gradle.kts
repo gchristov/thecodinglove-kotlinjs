@@ -25,5 +25,10 @@ buildkonfig {
             name = "SLACK_SIGNING_SECRET",
             value = getLocalSecret(rootProject, "SLACK_SIGNING_SECRET")
         )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN,
+            name = "SLACK_REQUEST_VERIFICATION_ENABLED",
+            value = getLocalSecret(rootProject, "SLACK_REQUEST_VERIFICATION_ENABLED")
+        )
     }
 }
