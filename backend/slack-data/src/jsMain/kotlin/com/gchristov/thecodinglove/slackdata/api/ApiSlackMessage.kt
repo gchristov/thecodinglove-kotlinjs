@@ -5,24 +5,17 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class ApiSlackMessage {
-    @SerialName("text")
     abstract val text: String?
-
-    @SerialName("response_type")
     abstract val responseType: String
-
-    @SerialName("replace_original")
     abstract val replaceOriginal: Boolean
-
-    @SerialName("delete_original")
     abstract val deleteOriginal: Boolean
 
     @Serializable
     data class ApiProcessing(
-        override val text: String,
-        override val responseType: String = "ephemeral",
-        override val replaceOriginal: Boolean = true,
-        override val deleteOriginal: Boolean = false,
+        @SerialName("text") override val text: String,
+        @SerialName("response_type") override val responseType: String = "ephemeral",
+        @SerialName("replace_original") override val replaceOriginal: Boolean = true,
+        @SerialName("delete_original") override val deleteOriginal: Boolean = false,
     ) : ApiSlackMessage()
 }
 
