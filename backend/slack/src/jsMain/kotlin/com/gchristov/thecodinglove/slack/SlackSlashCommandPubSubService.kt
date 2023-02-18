@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.search
+package com.gchristov.thecodinglove.slack
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservice.PubSubService
@@ -6,32 +6,32 @@ import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.bodyAsJson
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
-import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
+import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubMessage
 import kotlinx.serialization.json.Json
 
-class PreloadPubSubService(
+class SlackSlashCommandPubSubService(
     pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
-    private val preloadSearchResultUseCase: PreloadSearchResultUseCase
 ) : PubSubService(pubSubServiceRegister = pubSubServiceRegister) {
     override fun topic(): String = Topic
 
     override fun register() {
-        exports.preloadPubSub = registerForPubSubCallbacks()
+        exports.slackSlashCommandPubSub = registerForPubSubCallbacks()
     }
 
     override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> {
         return try {
             val topicMessage =
-                requireNotNull(message.bodyAsJson<PreloadPubSubMessage>(jsonSerializer))
-            preloadSearchResultUseCase(searchSessionId = topicMessage.searchSessionId)
+                requireNotNull(message.bodyAsJson<SlackSlashCommandPubSubMessage>(jsonSerializer))
+            // TODO: Reply to slack using response_url
+            println(topicMessage)
+            Either.Right(Unit)
         } catch (error: Throwable) {
             Either.Left(error)
         }
     }
 
     companion object {
-        const val Topic = "preloadPubSub"
+        const val Topic = "slackSlashCommandPubSub"
     }
 }

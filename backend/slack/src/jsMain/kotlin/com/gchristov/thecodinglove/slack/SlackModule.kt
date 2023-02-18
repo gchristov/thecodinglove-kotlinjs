@@ -1,6 +1,8 @@
 package com.gchristov.thecodinglove.slack
 
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.slack.usecase.RealVerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
@@ -21,12 +23,19 @@ object SlackModule : DiModule() {
         builder.apply {
             bindProvider { provideVerifySlackRequestUseCase(slackConfig = instance()) }
             bindSingleton {
-                provideSlackSlashCommandService(
+                provideSlackSlashCommandApiService(
                     apiServiceRegister = instance(),
                     jsonSerializer = instance(),
                     verifySlackRequestUseCase = instance(),
                     slackRepository = instance(),
-                    slackConfig = instance()
+                    slackConfig = instance(),
+                    pubSubSender = instance()
+                )
+            }
+            bindSingleton {
+                provideSlackSlashCommandPubSubService(
+                    pubSubServiceRegister = instance(),
+                    jsonSerializer = instance(),
                 )
             }
         }
@@ -40,17 +49,27 @@ object SlackModule : DiModule() {
         clock = Clock.System
     )
 
-    private fun provideSlackSlashCommandService(
+    private fun provideSlackSlashCommandApiService(
         apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
         verifySlackRequestUseCase: VerifySlackRequestUseCase,
         slackRepository: SlackRepository,
-        slackConfig: SlackConfig
+        slackConfig: SlackConfig,
+        pubSubSender: PubSubSender,
     ): SlackSlashCommandApiService = SlackSlashCommandApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         verifySlackRequestUseCase = verifySlackRequestUseCase,
         slackRepository = slackRepository,
-        slackConfig = slackConfig
+        slackConfig = slackConfig,
+        pubSubSender = pubSubSender
+    )
+
+    private fun provideSlackSlashCommandPubSubService(
+        pubSubServiceRegister: PubSubServiceRegister,
+        jsonSerializer: Json,
+    ): SlackSlashCommandPubSubService = SlackSlashCommandPubSubService(
+        pubSubServiceRegister = pubSubServiceRegister,
+        jsonSerializer = jsonSerializer,
     )
 }

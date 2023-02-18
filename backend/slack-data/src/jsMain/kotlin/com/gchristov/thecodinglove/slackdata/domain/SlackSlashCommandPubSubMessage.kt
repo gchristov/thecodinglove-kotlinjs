@@ -1,8 +1,10 @@
 package com.gchristov.thecodinglove.slackdata.domain
 
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
+import kotlinx.serialization.Serializable
 
-data class SlackSlashCommand(
+@Serializable
+data class SlackSlashCommandPubSubMessage(
     val teamId: String,
     val teamDomain: String,
     val channelId: String,
@@ -14,7 +16,7 @@ data class SlackSlashCommand(
     val responseUrl: String,
 )
 
-fun ApiSlackSlashCommand.toSlashCommand() = SlackSlashCommand(
+fun ApiSlackSlashCommand.toPubSubMessage() = SlackSlashCommandPubSubMessage(
     teamId = teamId,
     teamDomain = teamDomain,
     channelId = channelId,

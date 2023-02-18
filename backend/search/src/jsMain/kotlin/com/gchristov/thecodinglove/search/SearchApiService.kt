@@ -11,6 +11,7 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
 import com.gchristov.thecodinglove.searchdata.api.ApiSearchResult
 import com.gchristov.thecodinglove.searchdata.api.toPost
+import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import kotlinx.serialization.json.Json
 
@@ -33,18 +34,17 @@ class SearchApiService(
     ): Either<Throwable, Unit> = searchWithSessionUseCase(request.toSearchType())
         .map { result ->
             // TODO: Needs correct response mapping
-            preload(result.searchSessionId)
+            publishPreloadMessage(result.searchSessionId)
             response.sendJson(
                 data = result.toSearchResult(),
                 jsonSerializer = jsonSerializer
             )
         }
 
-    private fun preload(searchSessionId: String) {
-        val preloadPubSubMessage = PreloadPubSubService.buildPubSubMessage(searchSessionId)
+    private fun publishPreloadMessage(searchSessionId: String) {
         pubSubSender.sendMessage(
-            topic = preloadPubSubMessage.topic,
-            body = preloadPubSubMessage,
+            topic = PreloadPubSubService.Topic,
+            body = PreloadPubSubMessage(searchSessionId),
             jsonSerializer = jsonSerializer
         )
     }
