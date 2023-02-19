@@ -39,6 +39,11 @@ abstract class ApiService(
                     sendError(
                         error = it,
                         response = response
+                    ).fold(
+                        ifLeft = {},
+                        ifRight = {
+                            // TODO: Add some request metrics in here
+                        }
                     )
                 },
                 ifRight = {
@@ -48,16 +53,14 @@ abstract class ApiService(
         }
     }
 
-    protected fun sendError(
+    private fun sendError(
         error: Throwable,
         response: ApiResponse
-    ) {
-        response.sendJson(
-            status = 400,
-            data = error.toError(),
-            jsonSerializer = jsonSerializer
-        )
-    }
+    ) = response.sendJson(
+        status = 400,
+        data = error.toError(),
+        jsonSerializer = jsonSerializer
+    )
 }
 
 @Serializable

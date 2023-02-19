@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
+import arrow.core.flatMap
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
@@ -32,22 +33,22 @@ class SearchApiService(
         request: ApiRequest,
         response: ApiResponse
     ): Either<Throwable, Unit> = searchWithSessionUseCase(request.toSearchType())
-        .map { result ->
-            // TODO: Needs correct response mapping
+        .flatMap { result ->
             publishPreloadMessage(result.searchSessionId)
-            response.sendJson(
-                data = result.toSearchResult(),
-                jsonSerializer = jsonSerializer
-            )
+                .flatMap {
+                    // TODO: Needs correct response mapping
+                    response.sendJson(
+                        data = result.toSearchResult(),
+                        jsonSerializer = jsonSerializer
+                    )
+                }
         }
 
-    private fun publishPreloadMessage(searchSessionId: String) {
-        pubSubSender.sendMessage(
-            topic = PreloadPubSubService.Topic,
-            body = PreloadPubSubMessage(searchSessionId),
-            jsonSerializer = jsonSerializer
-        )
-    }
+    private fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
+        topic = PreloadPubSubService.Topic,
+        body = PreloadPubSubMessage(searchSessionId),
+        jsonSerializer = jsonSerializer
+    )
 }
 
 private fun ApiRequest.toSearchType(): SearchWithSessionUseCase.Type {

@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.slackdata
 
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
+import io.ktor.client.*
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
@@ -12,10 +13,18 @@ object SlackDataModule : DiModule() {
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
+            bindSingleton { provideSlackApi(client = instance()) }
             bindSingleton { provideSlackConfig() }
-            bindSingleton { provideSlackRepository(jsonSerializer = instance()) }
+            bindSingleton {
+                provideSlackRepository(
+                    api = instance(),
+                    jsonSerializer = instance()
+                )
+            }
         }
     }
+
+    private fun provideSlackApi(client: HttpClient) = SlackApi(client)
 
     private fun provideSlackConfig(): SlackConfig = SlackConfig(
         signingSecret = BuildKonfig.SLACK_SIGNING_SECRET,
@@ -23,7 +32,11 @@ object SlackDataModule : DiModule() {
         requestVerificationEnabled = BuildKonfig.SLACK_REQUEST_VERIFICATION_ENABLED
     )
 
-    private fun provideSlackRepository(jsonSerializer: Json): SlackRepository = RealSlackRepository(
+    private fun provideSlackRepository(
+        api: SlackApi,
+        jsonSerializer: Json
+    ): SlackRepository = RealSlackRepository(
+        apiService = api,
         jsonSerializer = jsonSerializer
     )
 }

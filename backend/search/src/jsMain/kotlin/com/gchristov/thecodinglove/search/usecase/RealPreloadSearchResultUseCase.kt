@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.search.usecase
 
 import arrow.core.Either
+import arrow.core.flatMap
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
@@ -15,40 +16,51 @@ class RealPreloadSearchResultUseCase(
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
 ) : PreloadSearchResultUseCase {
-    override suspend operator fun invoke(searchSessionId: String): Either<SearchError, Unit> =
-        withContext(dispatcher) {
-            val searchSession = searchRepository
-                .getSearchSession(searchSessionId)
-                ?: return@withContext Either.Left(SearchError.SessionNotFound)
-            searchWithHistoryUseCase(
-                query = searchSession.query,
-                totalPosts = searchSession.totalPosts,
-                searchHistory = searchSession.searchHistory,
-            )
-                .fold(
-                    ifLeft = {
-                        if (it is SearchError.Exhausted) {
-                            // Only clear the preloaded post and let session search deal with
-                            // updating the history
-                            searchSession.clearPreloadedPost(searchRepository)
+    override suspend operator fun invoke(
+        searchSessionId: String
+    ): Either<SearchError, Unit> = withContext(dispatcher) {
+        searchRepository
+            .getSearchSession(searchSessionId)
+            .mapLeft { SearchError.SessionNotFound }
+            .flatMap { searchSession ->
+                searchWithHistoryUseCase(
+                    query = searchSession.query,
+                    totalPosts = searchSession.totalPosts,
+                    searchHistory = searchSession.searchHistory,
+                ).fold(
+                    ifLeft = { searchError ->
+                        when (searchError) {
+                            is SearchError.Exhausted -> {
+                                // Only clear the preloaded post and let session search deal with
+                                // updating the history
+                                searchSession
+                                    .clearPreloadedPost(searchRepository)
+                                    // TODO: Consider better error type
+                                    .mapLeft { SearchError.SessionNotFound }
+                                    .flatMap { Either.Left(searchError) }
+                            }
+
+                            else -> Either.Left(searchError)
                         }
-                        Either.Left(it)
                     },
                     ifRight = { searchResult ->
-                        searchSession.insertPreloadedPost(
-                            searchResult = searchResult,
-                            searchRepository = searchRepository
-                        )
-                        Either.Right(Unit)
+                        searchSession
+                            .insertPreloadedPost(
+                                searchResult = searchResult,
+                                searchRepository = searchRepository
+                            )
+                            // TODO: Consider better error type
+                            .mapLeft { SearchError.SessionNotFound }
                     }
                 )
-        }
+            }
+    }
 }
 
 private suspend fun SearchSession.insertPreloadedPost(
     searchResult: SearchWithHistoryUseCase.Result,
     searchRepository: SearchRepository
-) {
+): Either<Throwable, Unit> {
     val updatedSearchSession = copy(
         totalPosts = searchResult.totalPosts,
         searchHistory = searchHistory.toMutableMap().apply {
@@ -60,10 +72,8 @@ private suspend fun SearchSession.insertPreloadedPost(
         },
         preloadedPost = searchResult.post
     )
-    searchRepository.saveSearchSession(updatedSearchSession)
+    return searchRepository.saveSearchSession(updatedSearchSession)
 }
 
-private suspend fun SearchSession.clearPreloadedPost(searchRepository: SearchRepository) {
-    val updatedSearchSession = copy(preloadedPost = null)
-    searchRepository.saveSearchSession(updatedSearchSession)
-}
+private suspend fun SearchSession.clearPreloadedPost(searchRepository: SearchRepository) =
+    searchRepository.saveSearchSession(copy(preloadedPost = null))

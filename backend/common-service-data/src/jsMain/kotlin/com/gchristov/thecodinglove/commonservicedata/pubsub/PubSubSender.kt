@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.commonservicedata.pubsub
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -15,8 +16,10 @@ inline fun <reified T> PubSubSender.sendMessage(
     topic: String,
     body: T,
     jsonSerializer: Json
-) {
-    sendMessage(topic = topic, body = jsonSerializer.encodeToString(body))
+): Either<Throwable, Unit> = try {
+    Either.Right(sendMessage(topic = topic, body = jsonSerializer.encodeToString(body)))
+} catch (error: Throwable) {
+    Either.Left(error)
 }
 
 internal class RealPubSubSender(private val projectId: String) : PubSubSender {

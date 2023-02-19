@@ -1,6 +1,8 @@
 package com.gchristov.thecodinglove.slack
 
 import arrow.core.Either
+import arrow.core.flatMap
+import arrow.core.leftIfNull
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
@@ -38,21 +40,16 @@ class SlackSlashCommandApiService(
         verifySlackRequestUseCase(request)
     } else {
         Either.Right(Unit)
-    }.map {
-        try {
-            val apiCommand: ApiSlackSlashCommand =
-                requireNotNull(request.bodyAsJson(jsonSerializer))
-            publishSlashCommandMessage(apiCommand)
-            slackRepository.sendProcessingMessage(
-                text = ":mag: Hang tight, we're finding your GIF...",
-                response = response
-            )
-        } catch (error: Throwable) {
-            sendError(
-                error = error,
-                response = response
-            )
-        }
+    }.flatMap {
+        request.bodyAsJson<ApiSlackSlashCommand>(jsonSerializer)
+            .leftIfNull(default = { Exception("Request body is null") })
+            .flatMap { slashCommand ->
+                publishSlashCommandMessage(slashCommand)
+                slackRepository.sendProcessingMessage(
+                    text = "🔎 Hang tight, we're finding your GIF...",
+                    response = response
+                )
+            }
     }
 
     private fun publishSlashCommandMessage(slackSlashCommand: ApiSlackSlashCommand) {

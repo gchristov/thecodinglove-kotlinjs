@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.commonservicedata.api
 
+import arrow.core.Either
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -13,7 +14,11 @@ interface ApiRequest {
 
 inline fun <reified T> ApiRequest.bodyAsJson(
     jsonSerializer: Json
-): T? = body?.let { jsonSerializer.decodeFromString<T>(string = JSON.stringify(it)) }
+): Either<Throwable, T?> = try {
+    Either.Right(body?.let { jsonSerializer.decodeFromString<T>(string = JSON.stringify(it)) })
+} catch (error: Throwable) {
+    Either.Left(error)
+}
 
 interface ApiParameterMap {
     operator fun <T> get(key: String): T?
@@ -34,13 +39,16 @@ inline fun <reified T> ApiResponse.sendJson(
     status: Int = 200,
     data: T,
     jsonSerializer: Json
-) {
+): Either<Throwable, Unit> = try {
     status(status)
     setHeader(
         header = "Content-Type",
         value = "application/json"
     )
     send(jsonSerializer.encodeToString(data))
+    Either.Right(Unit)
+} catch (error: Throwable) {
+    Either.Left(error)
 }
 
 internal fun FirebaseFunctionsHttpsRequest.toApiRequest() = object : ApiRequest {

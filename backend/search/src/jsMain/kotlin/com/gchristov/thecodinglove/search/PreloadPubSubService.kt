@@ -1,6 +1,8 @@
 package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
+import arrow.core.flatMap
+import arrow.core.leftIfNull
 import com.gchristov.thecodinglove.commonservice.PubSubService
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
@@ -21,15 +23,10 @@ class PreloadPubSubService(
         exports.preloadPubSub = registerForPubSubCallbacks()
     }
 
-    override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> {
-        return try {
-            val topicMessage =
-                requireNotNull(message.bodyAsJson<PreloadPubSubMessage>(jsonSerializer))
-            preloadSearchResultUseCase(searchSessionId = topicMessage.searchSessionId)
-        } catch (error: Throwable) {
-            Either.Left(error)
-        }
-    }
+    override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> =
+        message.bodyAsJson<PreloadPubSubMessage>(jsonSerializer)
+            .leftIfNull(default = { Exception("Message body is null") })
+            .flatMap { preloadSearchResultUseCase(searchSessionId = it.searchSessionId) }
 
     companion object {
         const val Topic = "preloadPubSub"

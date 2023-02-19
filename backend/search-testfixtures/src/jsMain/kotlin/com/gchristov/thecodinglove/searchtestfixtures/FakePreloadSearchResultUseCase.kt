@@ -20,6 +20,13 @@ class FakePreloadSearchResultUseCase(
         return searchResponse.execute(invocationResult)
     }
 
+    fun assertNotInvoked() {
+        assertEquals(
+            expected = 0,
+            actual = invocations
+        )
+    }
+
     fun assertInvokedOnce() {
         assertEquals(
             expected = 1,
