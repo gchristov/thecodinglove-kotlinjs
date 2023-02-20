@@ -5,6 +5,7 @@ import com.gchristov.thecodinglove.kmpcommontest.FakeResponse
 import com.gchristov.thecodinglove.kmpcommontest.execute
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.Post
+import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -33,13 +34,15 @@ class FakeSearchRepository(
         return Either.Right(searchResponse.execute(pages?.get(page) ?: emptyList()))
     }
 
-    override suspend fun getSearchSession(id: String): SearchSession? {
+    override suspend fun getSearchSession(id: String): Either<Throwable, SearchSession> {
         searchSessionGetCalled = true
-        return searchSessionResponse.execute(searchSession)
+        return searchSession?.let { Either.Right(searchSessionResponse.execute(it)) }
+            ?: Either.Left(SearchError.SessionNotFound)
     }
 
-    override suspend fun saveSearchSession(searchSession: SearchSession) {
+    override suspend fun saveSearchSession(searchSession: SearchSession): Either<Throwable, Unit> {
         lastSavedSession = searchSession
+        return Either.Right(Unit)
     }
 
     fun assertSessionFetched() {

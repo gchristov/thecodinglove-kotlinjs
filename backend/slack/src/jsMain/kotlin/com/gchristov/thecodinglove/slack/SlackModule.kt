@@ -1,8 +1,11 @@
 package com.gchristov.thecodinglove.slack
 
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.slack.usecase.RealVerifySlackRequestUseCase
+import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import kotlinx.coroutines.Dispatchers
@@ -20,10 +23,20 @@ object SlackModule : DiModule() {
         builder.apply {
             bindProvider { provideVerifySlackRequestUseCase(slackConfig = instance()) }
             bindSingleton {
-                provideSlackSlashCommandService(
+                provideSlackSlashCommandApiService(
                     apiServiceRegister = instance(),
                     jsonSerializer = instance(),
-                    verifySlackRequestUseCase = instance()
+                    verifySlackRequestUseCase = instance(),
+                    slackRepository = instance(),
+                    slackConfig = instance(),
+                    pubSubSender = instance()
+                )
+            }
+            bindSingleton {
+                provideSlackSlashCommandPubSubService(
+                    pubSubServiceRegister = instance(),
+                    jsonSerializer = instance(),
+                    slackRepository = instance()
                 )
             }
         }
@@ -37,13 +50,29 @@ object SlackModule : DiModule() {
         clock = Clock.System
     )
 
-    private fun provideSlackSlashCommandService(
+    private fun provideSlackSlashCommandApiService(
         apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
-        verifySlackRequestUseCase: VerifySlackRequestUseCase
+        verifySlackRequestUseCase: VerifySlackRequestUseCase,
+        slackRepository: SlackRepository,
+        slackConfig: SlackConfig,
+        pubSubSender: PubSubSender,
     ): SlackSlashCommandApiService = SlackSlashCommandApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
-        verifySlackRequestUseCase = verifySlackRequestUseCase
+        verifySlackRequestUseCase = verifySlackRequestUseCase,
+        slackRepository = slackRepository,
+        slackConfig = slackConfig,
+        pubSubSender = pubSubSender
+    )
+
+    private fun provideSlackSlashCommandPubSubService(
+        pubSubServiceRegister: PubSubServiceRegister,
+        jsonSerializer: Json,
+        slackRepository: SlackRepository
+    ): SlackSlashCommandPubSubService = SlackSlashCommandPubSubService(
+        pubSubServiceRegister = pubSubServiceRegister,
+        jsonSerializer = jsonSerializer,
+        slackRepository = slackRepository
     )
 }

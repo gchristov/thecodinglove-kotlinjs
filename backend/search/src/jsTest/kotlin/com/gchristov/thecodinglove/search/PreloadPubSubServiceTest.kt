@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PreloadPubSubServiceTest {
@@ -52,6 +53,20 @@ class PreloadPubSubServiceTest {
             expected = Either.Left(SearchError.Empty),
             actual = actualResult
         )
+    }
+
+    @Test
+    fun handleMessageParseError(): TestResult = runBlockingTest(
+        preloadPubSubMessage = null,
+        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty)
+    ) { service, preloadUseCase, message, register ->
+        val actualResult = service.handleMessage(message)
+        register.assertNotInvoked()
+        preloadUseCase.assertNotInvoked()
+        assertTrue {
+            actualResult.isLeft() &&
+                    (actualResult as Either.Left).value.message == "Message body is null"
+        }
     }
 
     private fun runBlockingTest(

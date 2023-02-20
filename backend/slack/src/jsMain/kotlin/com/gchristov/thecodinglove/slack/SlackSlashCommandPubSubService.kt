@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.search
+package com.gchristov.thecodinglove.slack
 
 import arrow.core.Either
 import arrow.core.flatMap
@@ -8,27 +8,34 @@ import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.bodyAsJson
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
-import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
+import com.gchristov.thecodinglove.slackdata.SlackRepository
+import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
+import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubMessage
 import kotlinx.serialization.json.Json
 
-class PreloadPubSubService(
+class SlackSlashCommandPubSubService(
     pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
-    private val preloadSearchResultUseCase: PreloadSearchResultUseCase
+    private val slackRepository: SlackRepository
 ) : PubSubService(pubSubServiceRegister = pubSubServiceRegister) {
     override fun topic(): String = Topic
 
     override fun register() {
-        exports.preloadPubSub = registerForPubSubCallbacks()
+        exports.slackSlashCommandPubSub = registerForPubSubCallbacks()
     }
 
     override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> =
-        message.bodyAsJson<PreloadPubSubMessage>(jsonSerializer)
+        message.bodyAsJson<SlackSlashCommandPubSubMessage>(jsonSerializer)
             .leftIfNull(default = { Exception("Message body is null") })
-            .flatMap { preloadSearchResultUseCase(searchSessionId = it.searchSessionId) }
+            .flatMap {
+                // TODO: This is temporary to prove functionality
+                slackRepository.sendMessage(
+                    messageUrl = it.responseUrl,
+                    message = ApiSlackMessage.ApiProcessing(text = it.text)
+                )
+            }
 
     companion object {
-        const val Topic = "preloadPubSub"
+        const val Topic = "slackSlashCommandPubSub"
     }
 }

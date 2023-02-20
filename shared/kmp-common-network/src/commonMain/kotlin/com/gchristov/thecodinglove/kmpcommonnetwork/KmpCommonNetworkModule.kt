@@ -23,6 +23,7 @@ object KmpCommonNetworkModule : DiModule() {
 
     private fun provideJsonSerializer(): Json = Json {
         ignoreUnknownKeys = true
+        encodeDefaults = true
     }
 
     private fun provideHttpClient(jsonSerializer: Json) = HttpClient {

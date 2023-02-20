@@ -8,3 +8,4 @@ echo FIREBASE_GCM_SENDER_ID="$FIREBASE_GCM_SENDER_ID" >> ./local.properties
 echo FIREBASE_APPLICATION_ID="$FIREBASE_APPLICATION_ID" >> ./local.properties
 echo GCP_SA_KEY="$GCP_SA_KEY" >> ./local.properties
 echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./local.properties
+echo SLACK_REQUEST_VERIFICATION_ENABLED="$SLACK_REQUEST_VERIFICATION_ENABLED" >> ./local.properties

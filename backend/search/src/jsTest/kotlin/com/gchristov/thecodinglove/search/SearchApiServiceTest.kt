@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiResponse
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiServiceRegister
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSender
+import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
 import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchApiRequest
@@ -38,8 +39,6 @@ class SearchApiServiceTest {
             searchSessionId = TestSearchSessionId,
             query = TestSearchQuery
         )
-        val expectedPreloadPubSubMessage =
-            PreloadPubSubService.buildPubSubMessage(TestSearchSessionId)
         return runBlockingTest(
             searchSessionId = null,
             searchWithSessionInvocationResult = Either.Right(expectedResult)
@@ -54,8 +53,8 @@ class SearchApiServiceTest {
                 SearchWithSessionUseCase.Type.NewSession(query = TestSearchQuery)
             )
             pubSubSender.assertEquals(
-                topic = expectedPreloadPubSubMessage.topic,
-                body = Json.encodeToString(expectedPreloadPubSubMessage)
+                topic = PreloadPubSubService.Topic,
+                body = Json.encodeToString(PreloadPubSubMessage(TestSearchSessionId))
             )
             response.assertEquals(
                 header = "Content-Type",
@@ -75,8 +74,6 @@ class SearchApiServiceTest {
             searchSessionId = TestSearchSessionId,
             query = TestSearchQuery
         )
-        val expectedPreloadPubSubMessage =
-            PreloadPubSubService.buildPubSubMessage(TestSearchSessionId)
         return runBlockingTest(
             searchSessionId = TestSearchSessionId,
             searchQuery = TestSearchQuery,
@@ -95,8 +92,8 @@ class SearchApiServiceTest {
                 )
             )
             pubSubSender.assertEquals(
-                topic = expectedPreloadPubSubMessage.topic,
-                body = Json.encodeToString(expectedPreloadPubSubMessage)
+                topic = PreloadPubSubService.Topic,
+                body = Json.encodeToString(PreloadPubSubMessage(TestSearchSessionId))
             )
             response.assertEquals(
                 header = "Content-Type",

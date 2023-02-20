@@ -3,10 +3,7 @@ package com.gchristov.thecodinglove.searchdata
 import arrow.core.Either
 import com.gchristov.thecodinglove.htmlparse.HtmlPostParser
 import com.gchristov.thecodinglove.searchdata.api.ApiSearchSession
-import com.gchristov.thecodinglove.searchdata.model.Post
-import com.gchristov.thecodinglove.searchdata.model.SearchSession
-import com.gchristov.thecodinglove.searchdata.model.toPost
-import com.gchristov.thecodinglove.searchdata.model.toSearchSession
+import com.gchristov.thecodinglove.searchdata.model.*
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.statement.*
 
@@ -18,9 +15,9 @@ interface SearchRepository {
         query: String
     ): Either<Throwable, List<Post>>
 
-    suspend fun getSearchSession(id: String): SearchSession?
+    suspend fun getSearchSession(id: String): Either<Throwable, SearchSession>
 
-    suspend fun saveSearchSession(searchSession: SearchSession)
+    suspend fun saveSearchSession(searchSession: SearchSession): Either<Throwable, Unit>
 }
 
 internal class RealSearchRepository(
@@ -28,47 +25,58 @@ internal class RealSearchRepository(
     private val htmlPostParser: HtmlPostParser,
     private val firebaseFirestore: FirebaseFirestore
 ) : SearchRepository {
-    override suspend fun getTotalPosts(query: String): Either<Throwable, Int> {
+    override suspend fun getTotalPosts(query: String): Either<Throwable, Int> = try {
         val response = apiService.search(
             // First page should always exist if there are results
             page = 1,
             query = query
         ).bodyAsText()
-        return htmlPostParser.parseTotalPosts(response)
+        htmlPostParser.parseTotalPosts(response)
+    } catch (error: Throwable) {
+        Either.Left(error)
     }
 
     override suspend fun search(
         page: Int,
         query: String
-    ): Either<Throwable, List<Post>> {
+    ): Either<Throwable, List<Post>> = try {
         val response = apiService.search(
             page = page,
             query = query
         ).bodyAsText()
-        return htmlPostParser.parsePosts(response).map { posts -> posts.map { it.toPost() } }
+        htmlPostParser.parsePosts(response).map { posts -> posts.map { it.toPost() } }
+    } catch (error: Throwable) {
+        Either.Left(error)
     }
 
-    override suspend fun getSearchSession(id: String): SearchSession? {
+    override suspend fun getSearchSession(id: String): Either<Throwable, SearchSession> = try {
         val document = firebaseFirestore
             .collection("searchSession")
             .document(id)
             .get()
-        return if (document.exists) {
+        if (document.exists) {
             val apiSearchSession: ApiSearchSession = document.data()
-            apiSearchSession.toSearchSession()
+            Either.Right(apiSearchSession.toSearchSession())
         } else {
-            null
+            Either.Left(SearchError.SessionNotFound)
         }
+    } catch (error: Throwable) {
+        Either.Left(error)
     }
 
-    override suspend fun saveSearchSession(searchSession: SearchSession) {
-        val document = firebaseFirestore
-            .collection("searchSession")
-            .document(searchSession.id)
-        document.set(
-            data = searchSession.toSearchSession(),
-            encodeDefaults = true,
-            merge = true
-        )
-    }
+    override suspend fun saveSearchSession(searchSession: SearchSession): Either<Throwable, Unit> =
+        try {
+            val document = firebaseFirestore
+                .collection("searchSession")
+                .document(searchSession.id)
+            Either.Right(
+                document.set(
+                    data = searchSession.toSearchSession(),
+                    encodeDefaults = true,
+                    merge = true
+                )
+            )
+        } catch (error: Throwable) {
+            Either.Left(error)
+        }
 }
