@@ -41,22 +41,25 @@ class SlackSlashCommandApiService(
     } else {
         Either.Right(Unit)
     }.flatMap {
+        // TODO: Remove
+        println(JSON.stringify(request.body))
         request.bodyAsJson<ApiSlackSlashCommand>(jsonSerializer)
             .leftIfNull(default = { Exception("Request body is null") })
             .flatMap { slashCommand ->
                 publishSlashCommandMessage(slashCommand)
-                slackRepository.sendProcessingMessage(
-                    text = "🔎 Hang tight, we're finding your GIF...",
-                    response = response
-                )
+                    .flatMap {
+                        slackRepository.sendProcessingMessage(
+                            text = "🔎 Hang tight, we're finding your GIF...",
+                            response = response
+                        )
+                    }
             }
     }
 
-    private fun publishSlashCommandMessage(slackSlashCommand: ApiSlackSlashCommand) {
+    private fun publishSlashCommandMessage(slackSlashCommand: ApiSlackSlashCommand) =
         pubSubSender.sendMessage(
             topic = SlackSlashCommandPubSubService.Topic,
             body = slackSlashCommand.toPubSubMessage(),
             jsonSerializer = jsonSerializer
         )
-    }
 }
