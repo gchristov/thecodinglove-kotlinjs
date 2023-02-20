@@ -36,6 +36,7 @@ object SlackModule : DiModule() {
                 provideSlackSlashCommandPubSubService(
                     pubSubServiceRegister = instance(),
                     jsonSerializer = instance(),
+                    slackRepository = instance()
                 )
             }
         }
@@ -68,8 +69,10 @@ object SlackModule : DiModule() {
     private fun provideSlackSlashCommandPubSubService(
         pubSubServiceRegister: PubSubServiceRegister,
         jsonSerializer: Json,
+        slackRepository: SlackRepository
     ): SlackSlashCommandPubSubService = SlackSlashCommandPubSubService(
         pubSubServiceRegister = pubSubServiceRegister,
         jsonSerializer = jsonSerializer,
+        slackRepository = slackRepository
     )
 }
