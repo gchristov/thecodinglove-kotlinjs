@@ -32,6 +32,21 @@ internal class RealPubSubSender(private val projectId: String) : PubSubSender {
                     "topic: $topic\n" +
                     "body: $body"
         )
-        GoogleCloudPubSub(projectId).topic(topic).publish(Buffer.from(body))
+        GoogleCloudPubSub(projectId).topic(
+            name = topic,
+            options = js(
+                """{
+                    batching: {
+                    maxMessages: 1
+                }
+                }"""
+            )
+        ).publish(Buffer.from(body))
+    }
+}
+
+private val DefaultPubSubOptions = GoogleGloudPubSubPublishOptions().apply {
+    batching = GoogleGloudPubSubBatchOptions().apply {
+        maxMessages = 1
     }
 }
