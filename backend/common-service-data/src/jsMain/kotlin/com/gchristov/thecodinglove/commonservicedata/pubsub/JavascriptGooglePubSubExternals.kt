@@ -4,23 +4,13 @@
 package com.gchristov.thecodinglove.commonservicedata.pubsub
 
 import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
+import kotlin.js.Promise
 
 @JsName("PubSub")
 internal external class GoogleCloudPubSub(projectId: String) {
-    fun topic(
-        name: String,
-        options: dynamic
-    ): GoogleGloudPubSubTopic
+    fun topic(name: String): GoogleCloudPubSubTopic
 }
 
-internal external class GoogleGloudPubSubPublishOptions {
-    var batching: GoogleGloudPubSubBatchOptions?
-}
-
-internal external class GoogleGloudPubSubBatchOptions {
-    var maxMessages: Int
-}
-
-internal external class GoogleGloudPubSubTopic {
-    fun publish(message: Buffer)
+internal external class GoogleCloudPubSubTopic {
+    fun publish(message: Buffer): Promise<String>
 }
