@@ -51,6 +51,18 @@ inline fun <reified T> ApiResponse.sendJson(
     Either.Left(error)
 }
 
+fun ApiResponse.sendEmpty(status: Int = 200): Either<Throwable, Unit> = try {
+    status(status)
+    setHeader(
+        header = "Content-Type",
+        value = "application/json"
+    )
+    send("")
+    Either.Right(Unit)
+} catch (error: Throwable) {
+    Either.Left(error)
+}
+
 internal fun FirebaseFunctionsHttpsRequest.toApiRequest() = object : ApiRequest {
     override val headers: ApiParameterMap = this@toApiRequest.headers.toApiParametersMap()
     override val query: ApiParameterMap = this@toApiRequest.query.toApiParametersMap()

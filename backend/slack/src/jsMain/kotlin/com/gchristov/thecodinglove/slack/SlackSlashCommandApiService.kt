@@ -4,14 +4,10 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.leftIfNull
 import com.gchristov.thecodinglove.commonservice.ApiService
-import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
-import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
-import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
-import com.gchristov.thecodinglove.commonservicedata.api.bodyAsJson
+import com.gchristov.thecodinglove.commonservicedata.api.*
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
-import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.toPubSubMessage
@@ -22,7 +18,6 @@ class SlackSlashCommandApiService(
     apiServiceRegister: ApiServiceRegister,
     private val jsonSerializer: Json,
     private val verifySlackRequestUseCase: VerifySlackRequestUseCase,
-    private val slackRepository: SlackRepository,
     private val slackConfig: SlackConfig,
     private val pubSubSender: PubSubSender,
 ) : ApiService(
@@ -41,17 +36,13 @@ class SlackSlashCommandApiService(
     } else {
         Either.Right(Unit)
     }.flatMap {
-        // TODO: Remove
         println(JSON.stringify(request.body))
         request.bodyAsJson<ApiSlackSlashCommand>(jsonSerializer)
             .leftIfNull(default = { Exception("Request body is null") })
             .flatMap { slashCommand ->
                 publishSlashCommandMessage(slashCommand)
                     .flatMap {
-                        slackRepository.sendProcessingMessage(
-                            text = "🔎 Hang tight, we're finding your GIF...",
-                            response = response
-                        )
+                        response.sendEmpty()
                     }
             }
     }

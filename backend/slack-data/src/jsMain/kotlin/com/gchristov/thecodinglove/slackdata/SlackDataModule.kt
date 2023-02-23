@@ -3,7 +3,6 @@ package com.gchristov.thecodinglove.slackdata
 import com.gchristov.thecodinglove.kmpcommondi.DiModule
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import io.ktor.client.*
-import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
@@ -16,10 +15,7 @@ object SlackDataModule : DiModule() {
             bindSingleton { provideSlackApi(client = instance()) }
             bindSingleton { provideSlackConfig() }
             bindSingleton {
-                provideSlackRepository(
-                    api = instance(),
-                    jsonSerializer = instance()
-                )
+                provideSlackRepository(api = instance())
             }
         }
     }
@@ -33,10 +29,8 @@ object SlackDataModule : DiModule() {
     )
 
     private fun provideSlackRepository(
-        api: SlackApi,
-        jsonSerializer: Json
+        api: SlackApi
     ): SlackRepository = RealSlackRepository(
-        apiService = api,
-        jsonSerializer = jsonSerializer
+        apiService = api
     )
 }

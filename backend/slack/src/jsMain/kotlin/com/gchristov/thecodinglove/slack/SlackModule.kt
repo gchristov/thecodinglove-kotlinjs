@@ -27,7 +27,6 @@ object SlackModule : DiModule() {
                     apiServiceRegister = instance(),
                     jsonSerializer = instance(),
                     verifySlackRequestUseCase = instance(),
-                    slackRepository = instance(),
                     slackConfig = instance(),
                     pubSubSender = instance()
                 )
@@ -54,14 +53,12 @@ object SlackModule : DiModule() {
         apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
         verifySlackRequestUseCase: VerifySlackRequestUseCase,
-        slackRepository: SlackRepository,
         slackConfig: SlackConfig,
         pubSubSender: PubSubSender,
     ): SlackSlashCommandApiService = SlackSlashCommandApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         verifySlackRequestUseCase = verifySlackRequestUseCase,
-        slackRepository = slackRepository,
         slackConfig = slackConfig,
         pubSubSender = pubSubSender
     )

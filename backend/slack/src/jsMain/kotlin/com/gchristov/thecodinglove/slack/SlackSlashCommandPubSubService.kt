@@ -11,6 +11,7 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.bodyAsJson
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubMessage
+import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 
 class SlackSlashCommandPubSubService(
@@ -27,12 +28,18 @@ class SlackSlashCommandPubSubService(
     override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> =
         message.bodyAsJson<SlackSlashCommandPubSubMessage>(jsonSerializer)
             .leftIfNull(default = { Exception("Message body is null") })
-            .flatMap {
-                // TODO: This is temporary to prove functionality
+            .flatMap { slashCommand ->
                 slackRepository.sendMessage(
-                    messageUrl = it.responseUrl,
-                    message = ApiSlackMessage.ApiProcessing(text = it.text)
-                )
+                    channelUrl = slashCommand.responseUrl,
+                    message = ApiSlackMessage.ApiProcessing(text = "🔎 Hang tight, we're finding your GIF...")
+                ).flatMap {
+                    // TODO: This is temporary to prove functionality
+                    delay(1000)
+                    slackRepository.sendMessage(
+                        channelUrl = slashCommand.responseUrl,
+                        message = ApiSlackMessage.ApiProcessing(text = slashCommand.text)
+                    )
+                }
             }
 
     companion object {
