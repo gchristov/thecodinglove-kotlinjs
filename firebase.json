@@ -15,10 +15,6 @@
       {
         "source": "/api/search",
         "function": "search"
-      },
-      {
-        "source": "/api/slack/slashcommand",
-        "function": "slackSlashCommand"
       }
     ]
   },
