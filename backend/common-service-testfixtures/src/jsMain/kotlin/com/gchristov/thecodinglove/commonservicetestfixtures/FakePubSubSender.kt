@@ -8,7 +8,7 @@ class FakePubSubSender : PubSubSender {
     private var lastBody: String? = null
     private var invocations = 0
 
-    override fun sendMessage(
+    override suspend fun sendMessage(
         topic: String,
         body: String
     ) {

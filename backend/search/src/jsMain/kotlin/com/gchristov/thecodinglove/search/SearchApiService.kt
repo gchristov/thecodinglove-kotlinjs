@@ -44,7 +44,7 @@ class SearchApiService(
                 }
         }
 
-    private fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
+    private suspend fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
         topic = PreloadPubSubService.Topic,
         body = PreloadPubSubMessage(searchSessionId),
         jsonSerializer = jsonSerializer

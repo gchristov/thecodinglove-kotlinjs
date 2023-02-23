@@ -27,12 +27,7 @@ class RealVerifySlackRequestUseCase(
                     ?: return@withContext Either.Left(VerifySlackRequestUseCase.Error.MissingTimestamp)
                 val signature: String = request.headers["x-slack-signature"]
                     ?: return@withContext Either.Left(VerifySlackRequestUseCase.Error.MissingSignature)
-                println(
-                    "Verifying Slack request\n" +
-                            "timestamp: $timestamp\n" +
-                            "signature: $signature\n" +
-                            "body: ${request.rawBody}"
-                )
+                println("Verifying Slack request: timestamp=$timestamp, signature=$signature, body=${request.rawBody}")
 
                 verifyTimestamp(
                     timestamp = timestamp,
