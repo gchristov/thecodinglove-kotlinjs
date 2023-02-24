@@ -5,19 +5,21 @@ import arrow.core.flatMap
 import arrow.core.leftIfNull
 import com.gchristov.thecodinglove.commonservice.PubSubService
 import com.gchristov.thecodinglove.commonservicedata.exports
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
-import com.gchristov.thecodinglove.commonservicedata.pubsub.bodyAsJson
+import com.gchristov.thecodinglove.commonservicedata.pubsub.*
+import com.gchristov.thecodinglove.search.PreloadPubSubService
+import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
+import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubMessage
-import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 
 class SlackSlashCommandPubSubService(
     pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
-    private val slackRepository: SlackRepository
+    private val slackRepository: SlackRepository,
+    private val pubSubSender: PubSubSender,
+    private val searchWithSessionUseCase: SearchWithSessionUseCase,
 ) : PubSubService(pubSubServiceRegister = pubSubServiceRegister) {
     override fun topic(): String = Topic
 
@@ -33,14 +35,25 @@ class SlackSlashCommandPubSubService(
                     channelUrl = slashCommand.responseUrl,
                     message = ApiSlackMessage.ApiProcessing(text = "🔎 Hang tight, we're finding your GIF...")
                 ).flatMap {
-                    // TODO: This is temporary to prove functionality
-                    delay(1000)
-                    slackRepository.sendMessage(
-                        channelUrl = slashCommand.responseUrl,
-                        message = ApiSlackMessage.ApiProcessing(text = slashCommand.text)
-                    )
+                    searchWithSessionUseCase(
+                        SearchWithSessionUseCase.Type.NewSession(query = slashCommand.text)
+                    ).flatMap { searchResult ->
+                        publishPreloadMessage(searchResult.searchSessionId)
+                            .flatMap {
+                                slackRepository.sendMessage(
+                                    channelUrl = slashCommand.responseUrl,
+                                    message = ApiSlackMessage.ApiProcessing(text = searchResult.post.url)
+                                )
+                            }
+                    }
                 }
             }
+
+    private suspend fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
+        topic = PreloadPubSubService.Topic,
+        body = PreloadPubSubMessage(searchSessionId),
+        jsonSerializer = jsonSerializer
+    )
 
     companion object {
         const val Topic = "slackSlashCommandPubSub"
