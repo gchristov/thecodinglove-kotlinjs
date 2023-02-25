@@ -1,81 +1,132 @@
 package com.gchristov.thecodinglove.slackdata.api
 
+import com.benasher44.uuid.uuid4
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class ApiSlackMessage {
-    abstract val text: String?
-    abstract val responseType: String
-    abstract val replaceOriginal: Boolean
-    abstract val deleteOriginal: Boolean
-
+data class ApiSlackMessage(
+    @SerialName("text") val text: String?,
+    @SerialName("user_id") val userId: String?,
+    @SerialName("channel") val channelId: String?,
+    @SerialName("response_url") val responseUrl: String?,
+    @SerialName("response_type") val responseType: String,
+    @SerialName("team") val teamId: String?,
+    @SerialName("as_user") val asUser: Boolean,
+    @SerialName("replace_original") val replaceOriginal: Boolean,
+    @SerialName("delete_original") val deleteOriginal: Boolean,
+    @SerialName("attachments") val attachments: List<ApiAttachment>?,
+) {
     @Serializable
-    data class ApiProcessing(
-        @SerialName("text") override val text: String,
-        @SerialName("response_type") override val responseType: String = "ephemeral",
-        @SerialName("replace_original") override val replaceOriginal: Boolean = true,
-        @SerialName("delete_original") override val deleteOriginal: Boolean = false,
-    ) : ApiSlackMessage()
+    data class ApiAttachment(
+        @SerialName("title") val title: String?,
+        @SerialName("title_link") val titleLink: String?,
+        @SerialName("text") val text: String?,
+        @SerialName("image_url") val imageUrl: String?,
+        @SerialName("footer") val footer: String?,
+        @SerialName("callback_id") val callbackId: String,
+        @SerialName("color") val color: String?,
+        @SerialName("actions") val actions: List<ApiAction>,
+    ) {
+        @Serializable
+        data class ApiAction(
+            @SerialName("name") val name: String,
+            @SerialName("text") val text: String,
+            @SerialName("type") val type: String,
+            @SerialName("value") val value: String?,
+            @SerialName("url") val url: String?,
+            @SerialName("style") val style: String?,
+        )
+    }
 }
 
-//@Serializable
-//data class ApiAttachment(
-//    @SerialName("title")
-//    val title: String,
-//    @SerialName("title_link")
-//    val titleLink: String,
-//    @SerialName("text")
-//    val text: String,
-//    @SerialName("image_url")
-//    val imageUrl: String,
-//    @SerialName("footer")
-//    val footer: String = "Posted using /codinglove",
-//    @SerialName("callback_id")
-//    // This is needed but unused
-//    val callbackId: String = uuid4().toString(),
-//    @SerialName("color")
-//    val color: String = "#1e1e1e",
-//    @SerialName("actions")
-//    val actions: List<ApiAction> = emptyList(),
-//) {
-//    @Serializable
-//    data class ApiAction(
-//        @SerialName("name")
-//        val name: String,
-//        @SerialName("text")
-//        val text: String,
-//        @SerialName("type")
-//        val type: String,
-//        @SerialName("value")
-//        val value: String,
-//        @SerialName("url")
-//        val url: String,
-//        @SerialName("style")
-//        val style: String,
-//    )
-//}
-//
-//@Serializable
-//private data class Old(
-//    @SerialName("text")
-//    val text: String? = null,
-//    @SerialName("user_id")
-//    val userId: String? = null,
-//    @SerialName("channel")
-//    val channelId: String? = null,
-//    @SerialName("response_url")
-//    val responseUrl: String? = null,
-//    @SerialName("response_type")
-//    val responseType: String,
-//    @SerialName("team")
-//    val teamId: String? = null,
-//    @SerialName("as_user")
-//    val asUser: Boolean = true,
-//    @SerialName("replace_original")
-//    val replaceOriginal: Boolean = true,
-//    @SerialName("delete_original")
-//    val deleteOriginal: Boolean = false,
-//    @SerialName("attachments")
-//    val attachments: List<ApiAttachment> = emptyList(),
-//)
+enum class ApiActionName(val value: String) {
+    SEND("send"),
+    SHUFFLE("shuffle"),
+    CANCEL("cancel");
+}
+
+object ApiSlackMessageFactory {
+    private const val ButtonType = "button"
+    private const val PrimaryButtonStyle = "primary"
+
+    fun processingMessage() = ApiSlackMessage(
+        text = "🔎 Hang tight, we're finding your GIF...",
+        userId = null,
+        channelId = null,
+        responseType = "ephemeral",
+        responseUrl = null,
+        teamId = null,
+        asUser = false,
+        replaceOriginal = true,
+        deleteOriginal = false,
+        attachments = null,
+    )
+
+    fun searchResultMessage(
+        searchQuery: String,
+        searchResults: Int,
+        attachmentTitle: String,
+        attachmentUrl: String,
+        attachmentImageUrl: String,
+    ) = ApiSlackMessage(
+        text = "$searchQuery - ($searchResults result${if (searchResults == 1) "" else "s"} found)",
+        userId = null,
+        channelId = null,
+        responseType = "ephemeral",
+        responseUrl = null,
+        teamId = null,
+        asUser = false,
+        replaceOriginal = true,
+        deleteOriginal = false,
+        attachments = listOf(
+            attachment(
+                title = attachmentTitle,
+                url = attachmentUrl,
+                imageUrl = attachmentImageUrl,
+                actions = listOf(
+                    ApiSlackMessage.ApiAttachment.ApiAction(
+                        name = ApiActionName.SEND.value,
+                        text = "Send",
+                        type = ButtonType,
+                        value = "send",
+                        url = null,
+                        style = PrimaryButtonStyle,
+                    ),
+                    ApiSlackMessage.ApiAttachment.ApiAction(
+                        name = ApiActionName.SHUFFLE.value,
+                        text = "Shuffle",
+                        type = ButtonType,
+                        value = "shuffle",
+                        url = null,
+                        style = null,
+                    ),
+                    ApiSlackMessage.ApiAttachment.ApiAction(
+                        name = ApiActionName.CANCEL.value,
+                        text = "Cancel",
+                        type = ButtonType,
+                        value = "cancel",
+                        url = null,
+                        style = null,
+                    )
+                ),
+            )
+        ),
+    )
+
+    private fun attachment(
+        title: String,
+        url: String,
+        imageUrl: String,
+        actions: List<ApiSlackMessage.ApiAttachment.ApiAction>,
+    ) = ApiSlackMessage.ApiAttachment(
+        title = title,
+        titleLink = url,
+        text = null,
+        imageUrl = imageUrl,
+        footer = "Posted using /codinglove",
+        callbackId = uuid4().toString(),
+        color = "#1e1e1e",
+        actions = actions,
+    )
+}

@@ -10,7 +10,7 @@ import com.gchristov.thecodinglove.search.PreloadPubSubService
 import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
-import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
+import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
 import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubMessage
 import kotlinx.serialization.json.Json
 
@@ -33,7 +33,7 @@ class SlackSlashCommandPubSubService(
             .flatMap { slashCommand ->
                 slackRepository.sendMessage(
                     channelUrl = slashCommand.responseUrl,
-                    message = ApiSlackMessage.ApiProcessing(text = "🔎 Hang tight, we're finding your GIF...")
+                    message = ApiSlackMessageFactory.processingMessage()
                 ).flatMap {
                     searchWithSessionUseCase(
                         SearchWithSessionUseCase.Type.NewSession(query = slashCommand.text)
@@ -42,7 +42,13 @@ class SlackSlashCommandPubSubService(
                             .flatMap {
                                 slackRepository.sendMessage(
                                     channelUrl = slashCommand.responseUrl,
-                                    message = ApiSlackMessage.ApiProcessing(text = searchResult.post.url)
+                                    message = ApiSlackMessageFactory.searchResultMessage(
+                                        searchQuery = searchResult.query,
+                                        searchResults = searchResult.totalPosts,
+                                        attachmentTitle = searchResult.post.title,
+                                        attachmentUrl = searchResult.post.url,
+                                        attachmentImageUrl = searchResult.post.imageUrl
+                                    )
                                 )
                             }
                     }
