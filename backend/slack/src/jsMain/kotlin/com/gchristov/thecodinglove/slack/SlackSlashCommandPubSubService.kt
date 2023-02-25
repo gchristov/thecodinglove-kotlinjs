@@ -45,6 +45,7 @@ class SlackSlashCommandPubSubService(
                                     message = ApiSlackMessageFactory.searchResultMessage(
                                         searchQuery = searchResult.query,
                                         searchResults = searchResult.totalPosts,
+                                        searchSessionId = searchResult.searchSessionId,
                                         attachmentTitle = searchResult.post.title,
                                         attachmentUrl = searchResult.post.url,
                                         attachmentImageUrl = searchResult.post.imageUrl
