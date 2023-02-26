@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slack
+package com.gchristov.thecodinglove.slack.slashcommand
 
 import arrow.core.Either
 import arrow.core.flatMap

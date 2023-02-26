@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.slack.usecase
+package com.gchristov.thecodinglove.slack
 
 import arrow.core.Either
 import arrow.core.flatMap
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
+import com.gchristov.thecodinglove.slackdata.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
-import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import diglol.crypto.Hmac
 import diglol.encoding.encodeHexToString
 import kotlinx.coroutines.CoroutineDispatcher
