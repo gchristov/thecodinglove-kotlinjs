@@ -1,20 +1,20 @@
-package com.gchristov.thecodinglove.slack
+package com.gchristov.thecodinglove.slack.interactivity
 
 import arrow.core.Either
 import arrow.core.flatMap
-import arrow.core.leftIfNull
 import com.gchristov.thecodinglove.commonservice.ApiService
-import com.gchristov.thecodinglove.commonservicedata.api.*
+import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
+import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
+import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
+import com.gchristov.thecodinglove.commonservicedata.api.sendEmpty
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
-import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
+import com.gchristov.thecodinglove.slackdata.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
-import com.gchristov.thecodinglove.slackdata.domain.toPubSubMessage
-import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import kotlinx.serialization.json.Json
 
-class SlackSlashCommandApiService(
+class SlackInteractivityApiService(
     apiServiceRegister: ApiServiceRegister,
     private val jsonSerializer: Json,
     private val verifySlackRequestUseCase: VerifySlackRequestUseCase,
@@ -25,7 +25,7 @@ class SlackSlashCommandApiService(
     jsonSerializer = jsonSerializer
 ) {
     override fun register() {
-        exports.slackSlashCommand = registerForApiCallbacks()
+        exports.slackInteractivity = registerForApiCallbacks()
     }
 
     override suspend fun handleRequest(
@@ -37,20 +37,16 @@ class SlackSlashCommandApiService(
         Either.Right(Unit)
     }.flatMap {
         println(JSON.stringify(request.body))
-        request.bodyAsJson<ApiSlackSlashCommand>(jsonSerializer)
-            .leftIfNull(default = { Exception("Request body is null") })
-            .flatMap { slashCommand ->
-                publishSlashCommandMessage(slashCommand)
-                    .flatMap {
-                        response.sendEmpty()
-                    }
+        publishInteractivityMessage()
+            .flatMap {
+                response.sendEmpty()
             }
     }
 
-    private suspend fun publishSlashCommandMessage(slackSlashCommand: ApiSlackSlashCommand) =
+    private suspend fun publishInteractivityMessage() =
         pubSubSender.sendMessage(
-            topic = SlackSlashCommandPubSubService.Topic,
-            body = slackSlashCommand.toPubSubMessage(),
+            topic = SlackInteractivityPubSubService.Topic,
+            body = "",
             jsonSerializer = jsonSerializer
         )
 }

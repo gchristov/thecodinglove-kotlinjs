@@ -13,8 +13,10 @@ import com.gchristov.thecodinglove.search.SearchApiService
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slack.SlackModule
-import com.gchristov.thecodinglove.slack.SlackSlashCommandApiService
-import com.gchristov.thecodinglove.slack.SlackSlashCommandPubSubService
+import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityApiService
+import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubService
+import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandApiService
+import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubService
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
 
 fun main() {
@@ -44,4 +46,6 @@ private fun setupServices() {
     DiGraph.inject<PreloadPubSubService>().register()
     DiGraph.inject<SlackSlashCommandApiService>().register()
     DiGraph.inject<SlackSlashCommandPubSubService>().register()
+    DiGraph.inject<SlackInteractivityApiService>().register()
+    DiGraph.inject<SlackInteractivityPubSubService>().register()
 }

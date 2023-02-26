@@ -33,12 +33,12 @@ class SearchApiService(
         request: ApiRequest,
         response: ApiResponse
     ): Either<Throwable, Unit> = searchWithSessionUseCase(request.toSearchType())
-        .flatMap { result ->
-            publishPreloadMessage(result.searchSessionId)
+        .flatMap { searchResult ->
+            publishPreloadMessage(searchResult.searchSessionId)
                 .flatMap {
                     // TODO: Needs correct response mapping
                     response.sendJson(
-                        data = result.toSearchResult(),
+                        data = searchResult.toSearchResult(),
                         jsonSerializer = jsonSerializer
                     )
                 }

@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slackdata.usecase
+package com.gchristov.thecodinglove.slackdata
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
