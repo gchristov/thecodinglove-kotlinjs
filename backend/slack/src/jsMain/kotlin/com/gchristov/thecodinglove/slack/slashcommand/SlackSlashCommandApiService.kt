@@ -47,10 +47,10 @@ class SlackSlashCommandApiService(
             }
     }
 
-    private suspend fun publishSlashCommandMessage(slackSlashCommand: ApiSlackSlashCommand) =
+    private suspend fun publishSlashCommandMessage(slashCommand: ApiSlackSlashCommand) =
         pubSubSender.sendMessage(
             topic = SlackSlashCommandPubSubService.Topic,
-            body = slackSlashCommand.toPubSubMessage(),
+            body = slashCommand.toPubSubMessage(),
             jsonSerializer = jsonSerializer
         )
 }

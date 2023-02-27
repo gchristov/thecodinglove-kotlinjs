@@ -11,6 +11,7 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
 import com.gchristov.thecodinglove.slackdata.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackInteractivity
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
+import com.gchristov.thecodinglove.slackdata.domain.toPubSubMessage
 import kotlinx.serialization.json.Json
 
 class SlackInteractivityApiService(
@@ -39,17 +40,17 @@ class SlackInteractivityApiService(
         request.decodeBodyFromJson<ApiSlackInteractivity>(jsonSerializer)
             .leftIfNull(default = { Exception("Request body is null") })
             .flatMap { interactivity ->
-                println(interactivity)
-                publishInteractivityMessage()
+                publishInteractivityMessage(interactivity)
                     .flatMap {
                         response.sendEmpty()
                     }
             }
     }
 
-    private suspend fun publishInteractivityMessage() = pubSubSender.sendMessage(
-        topic = SlackInteractivityPubSubService.Topic,
-        body = "",
-        jsonSerializer = jsonSerializer
-    )
+    private suspend fun publishInteractivityMessage(interactivity: ApiSlackInteractivity) =
+        pubSubSender.sendMessage(
+            topic = SlackInteractivityPubSubService.Topic,
+            body = interactivity.toPubSubMessage(),
+            jsonSerializer = jsonSerializer
+        )
 }

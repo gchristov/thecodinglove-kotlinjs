@@ -12,10 +12,10 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class ApiSlackInteractivity(
-    @SerialName("payload") @Serializable(with = PayloadSerializer::class) val payload: ApiSlackInteractivePayload,
+    @SerialName("payload") @Serializable(with = PayloadSerializer::class) val payload: ApiSlackInteractivityPayload,
 ) {
     @Serializable
-    sealed class ApiSlackInteractivePayload {
+    sealed class ApiSlackInteractivityPayload {
         @Serializable
         @SerialName("interactive_message")
         data class ApiInteractiveMessage(
@@ -25,7 +25,7 @@ data class ApiSlackInteractivity(
             @SerialName("channel") val channel: ApiChannel,
             @SerialName("user") val user: ApiUser,
             @SerialName("response_url") val responseUrl: String,
-        ) : ApiSlackInteractivePayload() {
+        ) : ApiSlackInteractivityPayload() {
             @Serializable
             data class ApiAction(
                 @SerialName("name") val name: String,
@@ -55,19 +55,19 @@ data class ApiSlackInteractivity(
 
 // Payload is encoded as application/x-www-form-urlencoded
 // https://api.slack.com/legacy/message-buttons
-private object PayloadSerializer : KSerializer<ApiSlackInteractivity.ApiSlackInteractivePayload> {
+private object PayloadSerializer : KSerializer<ApiSlackInteractivity.ApiSlackInteractivityPayload> {
     private val jsonSerializer = DiGraph.inject<Json>()
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
-        serialName = "ApiSlackInteractivity.ApiSlackInteractivePayload",
+        serialName = "ApiSlackInteractivity.ApiSlackInteractivityPayload",
         kind = PrimitiveKind.STRING
     )
 
-    override fun deserialize(decoder: Decoder): ApiSlackInteractivity.ApiSlackInteractivePayload =
+    override fun deserialize(decoder: Decoder): ApiSlackInteractivity.ApiSlackInteractivityPayload =
         jsonSerializer.decodeFromString(decoder.decodeString())
 
     override fun serialize(
         encoder: Encoder,
-        value: ApiSlackInteractivity.ApiSlackInteractivePayload
+        value: ApiSlackInteractivity.ApiSlackInteractivityPayload
     ) {
         encoder.encodeString(jsonSerializer.encodeToString(value))
     }
