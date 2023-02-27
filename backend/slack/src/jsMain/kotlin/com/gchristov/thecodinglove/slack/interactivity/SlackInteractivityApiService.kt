@@ -10,7 +10,6 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
 import com.gchristov.thecodinglove.slackdata.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackInteractivity
-import com.gchristov.thecodinglove.slackdata.api.toPayload
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import kotlinx.serialization.json.Json
 
@@ -39,8 +38,6 @@ class SlackInteractivityApiService(
         println(request.rawBody)
         request.decodeBodyFromJson<ApiSlackInteractivity>(jsonSerializer)
             .leftIfNull(default = { Exception("Request body is null") })
-            .flatMap { it.toPayload(jsonSerializer) }
-            .leftIfNull(default = { Exception("Payload is invalid") })
             .flatMap { interactivity ->
                 println(interactivity)
                 publishInteractivityMessage()

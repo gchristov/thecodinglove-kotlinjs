@@ -1,5 +1,7 @@
 package com.gchristov.thecodinglove.searchdata.api
 
+import com.gchristov.thecodinglove.kmpcommondi.DiGraph
+import com.gchristov.thecodinglove.kmpcommondi.inject
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -10,39 +12,39 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class ApiSearchSession(
-    val id: String,
-    val query: String,
-    val totalPosts: Int?,
+    @SerialName("id") val id: String,
+    @SerialName("query") val query: String,
+    @SerialName("total_posts") val totalPosts: Int?,
     // Firebase doesn't like Map<Int, List<Int>> and throws ClassCastException
-    val searchHistory: Map<String, List<Int>>,
-    val currentPost: ApiPost?,
-    val preloadedPost: ApiPost?,
-    @Serializable(with = SessionStateSerializer::class)
-    val state: State
+    @SerialName("search_history") val searchHistory: Map<String, List<Int>>,
+    @SerialName("current_post") val currentPost: ApiPost?,
+    @SerialName("preloaded_post") val preloadedPost: ApiPost?,
+    @SerialName("state") @Serializable(with = SessionStateSerializer::class) val state: ApiState
 ) {
     @Serializable
-    sealed class State {
+    sealed class ApiState {
         @Serializable
         @SerialName("searching")
-        object Searching : State()
+        object ApiSearching : ApiState()
     }
 }
 
-// Out-of-the-box sealed class serialization is a bit iffy, so this is a workaround to store it as String.
-private object SessionStateSerializer : KSerializer<ApiSearchSession.State> {
+// There's currently an issue with Firebase serialization of sealed classes.
+// https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/343
+private object SessionStateSerializer : KSerializer<ApiSearchSession.ApiState> {
+    private val jsonSerializer = DiGraph.inject<Json>()
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
-        serialName = "ApiSearchSession.State",
+        serialName = "ApiSearchSession.ApiState",
         kind = PrimitiveKind.STRING
     )
 
-    override fun deserialize(decoder: Decoder): ApiSearchSession.State {
-        return Json.decodeFromString(decoder.decodeString())
-    }
+    override fun deserialize(decoder: Decoder): ApiSearchSession.ApiState =
+        jsonSerializer.decodeFromString(decoder.decodeString())
 
     override fun serialize(
         encoder: Encoder,
-        value: ApiSearchSession.State
+        value: ApiSearchSession.ApiState
     ) {
-        encoder.encodeString(Json.encodeToString(value))
+        encoder.encodeString(jsonSerializer.encodeToString(value))
     }
 }

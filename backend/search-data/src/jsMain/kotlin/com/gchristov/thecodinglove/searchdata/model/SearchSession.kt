@@ -34,8 +34,8 @@ internal fun ApiSearchSession.toSearchSession() = SearchSession(
     state = state.toSearchSessionState()
 )
 
-private fun ApiSearchSession.State.toSearchSessionState() = when (this) {
-    is ApiSearchSession.State.Searching -> SearchSession.State.Searching
+private fun ApiSearchSession.ApiState.toSearchSessionState() = when (this) {
+    is ApiSearchSession.ApiState.ApiSearching -> SearchSession.State.Searching
 }
 
 internal fun SearchSession.toSearchSession() = ApiSearchSession(
@@ -55,5 +55,5 @@ internal fun SearchSession.toSearchSession() = ApiSearchSession(
 )
 
 private fun SearchSession.State.toSearchSessionState() = when (this) {
-    is SearchSession.State.Searching -> ApiSearchSession.State.Searching
+    is SearchSession.State.Searching -> ApiSearchSession.ApiState.ApiSearching
 }
