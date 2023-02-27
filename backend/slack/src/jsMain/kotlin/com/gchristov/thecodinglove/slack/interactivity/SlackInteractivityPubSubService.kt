@@ -1,13 +1,17 @@
 package com.gchristov.thecodinglove.slack.interactivity
 
 import arrow.core.Either
+import arrow.core.flatMap
+import arrow.core.leftIfNull
 import com.gchristov.thecodinglove.commonservice.PubSubService
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
+import com.gchristov.thecodinglove.commonservicedata.pubsub.bodyAsJson
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
+import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
 import kotlinx.serialization.json.Json
 
 class SlackInteractivityPubSubService(
@@ -24,7 +28,12 @@ class SlackInteractivityPubSubService(
     }
 
     override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> =
-        Either.Right(Unit)
+        message.bodyAsJson<SlackInteractivityPubSubMessage>(jsonSerializer)
+            .leftIfNull(default = { Exception("Message body is null") })
+            .flatMap { interactivity ->
+                println(interactivity)
+                Either.Right(Unit)
+            }
 
     companion object {
         const val Topic = "slackInteractivityPubSub"
