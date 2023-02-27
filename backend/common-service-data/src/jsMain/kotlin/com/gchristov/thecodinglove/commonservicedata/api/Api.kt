@@ -12,9 +12,11 @@ interface ApiRequest {
     val rawBody: String?
 }
 
-inline fun <reified T> ApiRequest.bodyAsJson(
+inline fun <reified T> ApiRequest.decodeBodyFromJson(
     jsonSerializer: Json
 ): Either<Throwable, T?> = try {
+    // Body is decoded as per the following Firebase specs
+    // https://firebase.google.com/docs/functions/http-events#read_values_from_the_request
     Either.Right(body?.let { jsonSerializer.decodeFromString<T>(string = JSON.stringify(it)) })
 } catch (error: Throwable) {
     Either.Left(error)

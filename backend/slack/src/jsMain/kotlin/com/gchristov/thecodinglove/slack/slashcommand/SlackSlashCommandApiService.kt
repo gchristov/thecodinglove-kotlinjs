@@ -36,8 +36,8 @@ class SlackSlashCommandApiService(
     } else {
         Either.Right(Unit)
     }.flatMap {
-        println(JSON.stringify(request.body))
-        request.bodyAsJson<ApiSlackSlashCommand>(jsonSerializer)
+        println(request.rawBody)
+        request.decodeBodyFromJson<ApiSlackSlashCommand>(jsonSerializer)
             .leftIfNull(default = { Exception("Request body is null") })
             .flatMap { slashCommand ->
                 publishSlashCommandMessage(slashCommand)

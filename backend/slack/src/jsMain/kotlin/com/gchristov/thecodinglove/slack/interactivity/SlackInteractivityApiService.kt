@@ -2,15 +2,15 @@ package com.gchristov.thecodinglove.slack.interactivity
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.leftIfNull
 import com.gchristov.thecodinglove.commonservice.ApiService
-import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
-import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
-import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
-import com.gchristov.thecodinglove.commonservicedata.api.sendEmpty
+import com.gchristov.thecodinglove.commonservicedata.api.*
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
 import com.gchristov.thecodinglove.slackdata.VerifySlackRequestUseCase
+import com.gchristov.thecodinglove.slackdata.api.ApiSlackInteractivity
+import com.gchristov.thecodinglove.slackdata.api.toPayload
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import kotlinx.serialization.json.Json
 
@@ -36,17 +36,23 @@ class SlackInteractivityApiService(
     } else {
         Either.Right(Unit)
     }.flatMap {
-        println(JSON.stringify(request.body))
-        publishInteractivityMessage()
-            .flatMap {
-                response.sendEmpty()
+        println(request.rawBody)
+        request.decodeBodyFromJson<ApiSlackInteractivity>(jsonSerializer)
+            .leftIfNull(default = { Exception("Request body is null") })
+            .flatMap { it.toPayload(jsonSerializer) }
+            .leftIfNull(default = { Exception("Payload is invalid") })
+            .flatMap { interactivity ->
+                println(interactivity)
+                publishInteractivityMessage()
+                    .flatMap {
+                        response.sendEmpty()
+                    }
             }
     }
 
-    private suspend fun publishInteractivityMessage() =
-        pubSubSender.sendMessage(
-            topic = SlackInteractivityPubSubService.Topic,
-            body = "",
-            jsonSerializer = jsonSerializer
-        )
+    private suspend fun publishInteractivityMessage() = pubSubSender.sendMessage(
+        topic = SlackInteractivityPubSubService.Topic,
+        body = "",
+        jsonSerializer = jsonSerializer
+    )
 }
