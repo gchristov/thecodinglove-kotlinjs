@@ -60,7 +60,7 @@ class SearchApiServiceTest {
                 header = "Content-Type",
                 headerValue = "application/json",
                 data = """
-                        {"searchSessionId":"session_123","query":"test","post":{"title":"post","url":"url","imageUrl":"imageUrl"},"totalPosts":1}
+                        {"search_session_id":"session_123","query":"test","post":{"title":"post","url":"url","image_url":"imageUrl"},"total_posts":1}
                        """.trimIndent(),
                 status = 200
             )
@@ -99,7 +99,7 @@ class SearchApiServiceTest {
                 header = "Content-Type",
                 headerValue = "application/json",
                 data = """
-                        {"searchSessionId":"session_123","query":"test","post":{"title":"post","url":"url","imageUrl":"imageUrl"},"totalPosts":1}
+                        {"search_session_id":"session_123","query":"test","post":{"title":"post","url":"url","image_url":"imageUrl"},"total_posts":1}
                        """.trimIndent(),
                 status = 200
             )
