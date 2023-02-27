@@ -35,16 +35,12 @@ abstract class ApiService(
                 request = request,
                 response = response
             ).fold(
-                ifLeft = { error ->
-                    // TODO: Tidy up
-                    println(error)
+                ifLeft = {
                     sendError(
-                        error = error,
+                        error = it,
                         response = response
                     ).fold(
-                        ifLeft = {
-                            println(it)
-                        },
+                        ifLeft = {},
                         ifRight = {
                             // TODO: Add some request metrics in here
                         }
