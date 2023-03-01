@@ -9,3 +9,5 @@ echo FIREBASE_APPLICATION_ID="$FIREBASE_APPLICATION_ID" >> ./local.properties
 echo GCP_SA_KEY="$GCP_SA_KEY" >> ./local.properties
 echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./local.properties
 echo SLACK_REQUEST_VERIFICATION_ENABLED="$SLACK_REQUEST_VERIFICATION_ENABLED" >> ./local.properties
+echo APP_LOG_LEVEL="$APP_LOG_LEVEL" >> ./local.properties
+echo APP_NETWORK_LOG_LEVEL="$APP_NETWORK_LOG_LEVEL" >> ./local.properties

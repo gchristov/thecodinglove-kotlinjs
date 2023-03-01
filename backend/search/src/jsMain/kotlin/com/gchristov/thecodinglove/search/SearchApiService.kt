@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
 import arrow.core.flatMap
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
@@ -19,11 +20,13 @@ import kotlinx.serialization.json.Json
 class SearchApiService(
     apiServiceRegister: ApiServiceRegister,
     private val jsonSerializer: Json,
+    private val log: Logger,
     private val pubSubSender: PubSubSender,
     private val searchWithSessionUseCase: SearchWithSessionUseCase,
 ) : ApiService(
     apiServiceRegister = apiServiceRegister,
-    jsonSerializer = jsonSerializer
+    jsonSerializer = jsonSerializer,
+    log = log
 ) {
     override fun register() {
         exports.search = registerForApiCallbacks()
@@ -39,7 +42,8 @@ class SearchApiService(
                     // TODO: Needs correct response mapping
                     response.sendJson(
                         data = searchResult.toSearchResult(),
-                        jsonSerializer = jsonSerializer
+                        jsonSerializer = jsonSerializer,
+                        log = log
                     )
                 }
         }
@@ -47,7 +51,8 @@ class SearchApiService(
     private suspend fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
         topic = PreloadPubSubService.Topic,
         body = PreloadPubSubMessage(searchSessionId),
-        jsonSerializer = jsonSerializer
+        jsonSerializer = jsonSerializer,
+        log = log
     )
 }
 

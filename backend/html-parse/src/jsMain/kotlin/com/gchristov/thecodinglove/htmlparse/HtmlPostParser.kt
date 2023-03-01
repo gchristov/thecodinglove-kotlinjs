@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.htmlparse
 
 import arrow.core.Either
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.htmlparsedata.HtmlPost
 import com.gchristov.thecodinglove.kmpcommonkotlin.requireModule
 import kotlinx.coroutines.CoroutineDispatcher
@@ -12,7 +13,10 @@ interface HtmlPostParser {
     suspend fun parsePosts(content: String): Either<Throwable, List<HtmlPost>>
 }
 
-internal class RealHtmlPostParser(private val dispatcher: CoroutineDispatcher) : HtmlPostParser {
+internal class RealHtmlPostParser(
+    private val dispatcher: CoroutineDispatcher,
+    private val log: Logger,
+) : HtmlPostParser {
     override suspend fun parseTotalPosts(content: String): Either<Throwable, Int> =
         withContext(dispatcher) {
             try {
@@ -21,6 +25,7 @@ internal class RealHtmlPostParser(private val dispatcher: CoroutineDispatcher) :
                 val count = (resultsCountNode.text as? String)?.toInt() ?: 0
                 Either.Right(count)
             } catch (error: Throwable) {
+                log.e(error) { error.message ?: "Error during total posts parse" }
                 Either.Left(error)
             }
         }
@@ -49,6 +54,7 @@ internal class RealHtmlPostParser(private val dispatcher: CoroutineDispatcher) :
                 }
                 Either.Right(posts)
             } catch (error: Throwable) {
+                log.e(error) { error.message ?: "Error during post parse" }
                 Either.Left(error)
             }
         }

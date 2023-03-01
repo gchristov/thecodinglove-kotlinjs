@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slack.slashcommand
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.leftIfNull
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.*
 import com.gchristov.thecodinglove.commonservicedata.exports
@@ -17,12 +18,14 @@ import kotlinx.serialization.json.Json
 class SlackSlashCommandApiService(
     apiServiceRegister: ApiServiceRegister,
     private val jsonSerializer: Json,
+    private val log: Logger,
     private val verifySlackRequestUseCase: VerifySlackRequestUseCase,
     private val slackConfig: SlackConfig,
     private val pubSubSender: PubSubSender,
 ) : ApiService(
     apiServiceRegister = apiServiceRegister,
-    jsonSerializer = jsonSerializer
+    jsonSerializer = jsonSerializer,
+    log = log,
 ) {
     override fun register() {
         exports.slackSlashCommand = registerForApiCallbacks()
@@ -36,13 +39,15 @@ class SlackSlashCommandApiService(
     } else {
         Either.Right(Unit)
     }.flatMap {
-        println(request.rawBody)
-        request.decodeBodyFromJson<ApiSlackSlashCommand>(jsonSerializer)
+        request.decodeBodyFromJson<ApiSlackSlashCommand>(
+            jsonSerializer = jsonSerializer,
+            log = log
+        )
             .leftIfNull(default = { Exception("Request body is null") })
             .flatMap { slashCommand ->
                 publishSlashCommandMessage(slashCommand)
                     .flatMap {
-                        response.sendEmpty()
+                        response.sendEmpty(log = log)
                     }
             }
     }
@@ -51,6 +56,7 @@ class SlackSlashCommandApiService(
         pubSubSender.sendMessage(
             topic = SlackSlashCommandPubSubService.Topic,
             body = slashCommand.toPubSubMessage(),
-            jsonSerializer = jsonSerializer
+            jsonSerializer = jsonSerializer,
+            log = log
         )
 }

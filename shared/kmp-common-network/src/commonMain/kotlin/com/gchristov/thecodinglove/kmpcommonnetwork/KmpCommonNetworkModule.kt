@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.kmpcommonnetwork
 
-import com.gchristov.thecodinglove.kmpcommondi.DiModule
+import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -33,7 +33,11 @@ object KmpCommonNetworkModule : DiModule() {
         }
         install(Logging) {
             logger = Logger.SIMPLE
-            level = LogLevel.INFO
+            level = when (BuildKonfig.APP_NETWORK_LOG_LEVEL) {
+                "all" -> LogLevel.ALL
+                "info" -> LogLevel.INFO
+                else -> LogLevel.NONE
+            }
         }
     }
 }

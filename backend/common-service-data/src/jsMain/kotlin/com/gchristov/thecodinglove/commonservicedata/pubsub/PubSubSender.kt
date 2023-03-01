@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.commonservicedata.pubsub
 
 import arrow.core.Either
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
 import kotlinx.coroutines.await
 import kotlinx.serialization.encodeToString
@@ -16,23 +17,28 @@ interface PubSubSender {
 suspend inline fun <reified T> PubSubSender.sendMessage(
     topic: String,
     body: T,
-    jsonSerializer: Json
+    jsonSerializer: Json,
+    log: Logger
 ): Either<Throwable, Unit> = try {
     Either.Right(sendMessage(topic = topic, body = jsonSerializer.encodeToString(body)))
 } catch (error: Throwable) {
+    log.e(error) { error.message ?: "Error during PubSub message send" }
     Either.Left(error)
 }
 
-internal class RealPubSubSender(private val projectId: String) : PubSubSender {
+internal class RealPubSubSender(
+    private val log: Logger,
+    private val projectId: String
+) : PubSubSender {
     override suspend fun sendMessage(
         topic: String,
         body: String
     ) {
-        println("Sending PubSub message: topic=$topic, body=$body")
+        log.d("Sending PubSub message: topic=$topic, body=$body")
         val messageId = GoogleCloudPubSub(projectId)
             .topic(topic)
             .publish(Buffer.from(body))
             .await()
-        println("PubSub message sent: id=$messageId")
+        log.d("PubSub message sent: id=$messageId")
     }
 }

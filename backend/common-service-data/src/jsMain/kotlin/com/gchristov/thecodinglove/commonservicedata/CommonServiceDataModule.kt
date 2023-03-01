@@ -1,12 +1,13 @@
 package com.gchristov.thecodinglove.commonservicedata
 
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.api.RealApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.RealPubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.RealPubSubServiceRegister
-import com.gchristov.thecodinglove.kmpcommondi.DiModule
+import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import dev.gitlive.firebase.FirebaseOptions
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
@@ -19,7 +20,12 @@ object CommonServiceDataModule : DiModule() {
         builder.apply {
             bindSingleton { provideApiServiceRegister() }
             bindSingleton { providePubSubServiceRegister() }
-            bindSingleton { providePubSubSender(options = instance()) }
+            bindSingleton {
+                providePubSubSender(
+                    log = instance(),
+                    options = instance()
+                )
+            }
         }
     }
 
@@ -28,6 +34,10 @@ object CommonServiceDataModule : DiModule() {
     private fun providePubSubServiceRegister(): PubSubServiceRegister = RealPubSubServiceRegister()
 
     private fun providePubSubSender(
+        log: Logger,
         options: FirebaseOptions
-    ): PubSubSender = RealPubSubSender(projectId = requireNotNull(options.projectId))
+    ): PubSubSender = RealPubSubSender(
+        log = log,
+        projectId = requireNotNull(options.projectId)
+    )
 }

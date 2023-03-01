@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.search
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubServiceRegister
+import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
 import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
 import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchtestfixtures.*
@@ -82,6 +83,7 @@ class PreloadPubSubServiceTest {
         val service = PreloadPubSubService(
             pubSubServiceRegister = register,
             jsonSerializer = Json,
+            log = FakeLogger,
             preloadSearchResultUseCase = preloadSearchResultUseCase
         )
         testBlock(service, preloadSearchResultUseCase, message, register)

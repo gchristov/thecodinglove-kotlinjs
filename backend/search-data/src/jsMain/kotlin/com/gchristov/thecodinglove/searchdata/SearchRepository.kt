@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.searchdata
 
 import arrow.core.Either
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.htmlparse.HtmlPostParser
 import com.gchristov.thecodinglove.searchdata.api.ApiSearchSession
 import com.gchristov.thecodinglove.searchdata.model.*
@@ -23,7 +24,8 @@ interface SearchRepository {
 internal class RealSearchRepository(
     private val apiService: SearchApi,
     private val htmlPostParser: HtmlPostParser,
-    private val firebaseFirestore: FirebaseFirestore
+    private val firebaseFirestore: FirebaseFirestore,
+    private val log: Logger,
 ) : SearchRepository {
     override suspend fun getTotalPosts(query: String): Either<Throwable, Int> = try {
         val response = apiService.search(
@@ -33,6 +35,7 @@ internal class RealSearchRepository(
         ).bodyAsText()
         htmlPostParser.parseTotalPosts(response)
     } catch (error: Throwable) {
+        log.e(error) { error.message ?: "Error during finding total posts" }
         Either.Left(error)
     }
 
@@ -46,6 +49,7 @@ internal class RealSearchRepository(
         ).bodyAsText()
         htmlPostParser.parsePosts(response).map { posts -> posts.map { it.toPost() } }
     } catch (error: Throwable) {
+        log.e(error) { error.message ?: "Error during search" }
         Either.Left(error)
     }
 
@@ -61,6 +65,7 @@ internal class RealSearchRepository(
             Either.Left(SearchError.SessionNotFound)
         }
     } catch (error: Throwable) {
+        log.e(error) { error.message ?: "Error during finding search session" }
         Either.Left(error)
     }
 
@@ -77,6 +82,7 @@ internal class RealSearchRepository(
                 )
             )
         } catch (error: Throwable) {
+            log.e(error) { error.message ?: "Error during saving search session" }
             Either.Left(error)
         }
 }

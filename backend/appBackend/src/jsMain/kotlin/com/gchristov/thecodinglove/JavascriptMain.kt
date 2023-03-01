@@ -2,11 +2,11 @@ package com.gchristov.thecodinglove
 
 import com.gchristov.thecodinglove.commonservicedata.CommonServiceDataModule
 import com.gchristov.thecodinglove.htmlparse.HtmlParseModule
-import com.gchristov.thecodinglove.kmpcommondi.DiGraph
-import com.gchristov.thecodinglove.kmpcommondi.KmpCommonDiModule
-import com.gchristov.thecodinglove.kmpcommondi.inject
-import com.gchristov.thecodinglove.kmpcommondi.registerModules
 import com.gchristov.thecodinglove.kmpcommonfirebase.KmpCommonFirebaseModule
+import com.gchristov.thecodinglove.kmpcommonkotlin.KmpCommonKotlinModule
+import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
+import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
+import com.gchristov.thecodinglove.kmpcommonkotlin.di.registerModules
 import com.gchristov.thecodinglove.kmpcommonnetwork.KmpCommonNetworkModule
 import com.gchristov.thecodinglove.search.PreloadPubSubService
 import com.gchristov.thecodinglove.search.SearchApiService
@@ -28,7 +28,7 @@ private fun setupDi() {
     // Add all modules that should participate in dependency injection for this app
     DiGraph.registerModules(
         listOf(
-            KmpCommonDiModule.module,
+            KmpCommonKotlinModule.module,
             KmpCommonFirebaseModule.module,
             KmpCommonNetworkModule.module,
             CommonServiceDataModule.module,
