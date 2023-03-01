@@ -33,7 +33,11 @@ object KmpCommonNetworkModule : DiModule() {
         }
         install(Logging) {
             logger = Logger.SIMPLE
-            level = LogLevel.INFO
+            level = when (BuildKonfig.APP_NETWORK_LOG_LEVEL) {
+                "all" -> LogLevel.ALL
+                "info" -> LogLevel.INFO
+                else -> LogLevel.NONE
+            }
         }
     }
 }

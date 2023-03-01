@@ -19,7 +19,13 @@ object KmpCommonKotlinModule : DiModule() {
 
     private fun provideLogger(): Logger = Logger(
         config = StaticConfig(
-            minSeverity = Severity.Debug,
+            minSeverity = when (BuildKonfig.APP_LOG_LEVEL) {
+                "debug" -> Severity.Debug
+                "verbose" -> Severity.Verbose
+                "error" -> Severity.Error
+                "info" -> Severity.Info
+                else -> Severity.Info
+            },
             logWriterList = listOf(CommonWriter())
         )
     )
