@@ -18,7 +18,7 @@ import kotlinx.serialization.json.Json
 class SlackInteractivityApiService(
     apiServiceRegister: ApiServiceRegister,
     private val jsonSerializer: Json,
-    log: Logger,
+    private val log: Logger,
     private val verifySlackRequestUseCase: VerifySlackRequestUseCase,
     private val slackConfig: SlackConfig,
     private val pubSubSender: PubSubSender,
@@ -39,12 +39,15 @@ class SlackInteractivityApiService(
     } else {
         Either.Right(Unit)
     }.flatMap {
-        request.decodeBodyFromJson<ApiSlackInteractivity>(jsonSerializer)
+        request.decodeBodyFromJson<ApiSlackInteractivity>(
+            jsonSerializer = jsonSerializer,
+            log = log
+        )
             .leftIfNull(default = { Exception("Request body is null") })
             .flatMap { interactivity ->
                 publishInteractivityMessage(interactivity)
                     .flatMap {
-                        response.sendEmpty()
+                        response.sendEmpty(log = log)
                     }
             }
     }
@@ -53,6 +56,7 @@ class SlackInteractivityApiService(
         pubSubSender.sendMessage(
             topic = SlackInteractivityPubSubService.Topic,
             body = interactivity.toPubSubMessage(),
-            jsonSerializer = jsonSerializer
+            jsonSerializer = jsonSerializer,
+            log = log
         )
 }

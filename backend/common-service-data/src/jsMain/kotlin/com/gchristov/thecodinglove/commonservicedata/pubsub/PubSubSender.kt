@@ -17,10 +17,12 @@ interface PubSubSender {
 suspend inline fun <reified T> PubSubSender.sendMessage(
     topic: String,
     body: T,
-    jsonSerializer: Json
+    jsonSerializer: Json,
+    log: Logger
 ): Either<Throwable, Unit> = try {
     Either.Right(sendMessage(topic = topic, body = jsonSerializer.encodeToString(body)))
 } catch (error: Throwable) {
+    log.e(error) { error.message ?: "Error during PubSub message send" }
     Either.Left(error)
 }
 

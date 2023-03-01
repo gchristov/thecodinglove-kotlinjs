@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.slackdata
 
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import io.ktor.client.*
@@ -15,7 +16,10 @@ object SlackDataModule : DiModule() {
             bindSingleton { provideSlackApi(client = instance()) }
             bindSingleton { provideSlackConfig() }
             bindSingleton {
-                provideSlackRepository(api = instance())
+                provideSlackRepository(
+                    api = instance(),
+                    log = instance()
+                )
             }
         }
     }
@@ -29,8 +33,10 @@ object SlackDataModule : DiModule() {
     )
 
     private fun provideSlackRepository(
-        api: SlackApi
+        api: SlackApi,
+        log: Logger
     ): SlackRepository = RealSlackRepository(
-        apiService = api
+        apiService = api,
+        log = log
     )
 }

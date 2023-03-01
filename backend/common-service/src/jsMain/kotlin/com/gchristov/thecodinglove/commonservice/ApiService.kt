@@ -65,7 +65,8 @@ abstract class ApiService(
     ) = response.sendJson(
         status = 400,
         data = error.toError(),
-        jsonSerializer = jsonSerializer
+        jsonSerializer = jsonSerializer,
+        log = log
     )
 }
 

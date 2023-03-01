@@ -9,7 +9,7 @@ import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
-import com.gchristov.thecodinglove.commonservicedata.pubsub.bodyAsJson
+import com.gchristov.thecodinglove.commonservicedata.pubsub.decodeBodyFromJson
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
@@ -33,7 +33,10 @@ class SlackInteractivityPubSubService(
     }
 
     override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> =
-        message.bodyAsJson<SlackInteractivityPubSubMessage>(jsonSerializer)
+        message.decodeBodyFromJson<SlackInteractivityPubSubMessage>(
+            jsonSerializer = jsonSerializer,
+            log = log
+        )
             .leftIfNull(default = { Exception("Message body is null") })
             .flatMap { interactivity ->
                 log.d(interactivity.toString())

@@ -18,7 +18,7 @@ import kotlinx.serialization.json.Json
 class SlackSlashCommandPubSubService(
     pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
-    log: Logger,
+    private val log: Logger,
     private val slackRepository: SlackRepository,
     private val pubSubSender: PubSubSender,
     private val searchWithSessionUseCase: SearchWithSessionUseCase,
@@ -33,7 +33,10 @@ class SlackSlashCommandPubSubService(
     }
 
     override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> =
-        message.bodyAsJson<SlackSlashCommandPubSubMessage>(jsonSerializer)
+        message.decodeBodyFromJson<SlackSlashCommandPubSubMessage>(
+            jsonSerializer = jsonSerializer,
+            log = log
+        )
             .leftIfNull(default = { Exception("Message body is null") })
             .flatMap { slashCommand ->
                 slackRepository.sendMessage(
@@ -64,7 +67,8 @@ class SlackSlashCommandPubSubService(
     private suspend fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
         topic = PreloadPubSubService.Topic,
         body = PreloadPubSubMessage(searchSessionId),
-        jsonSerializer = jsonSerializer
+        jsonSerializer = jsonSerializer,
+        log = log
     )
 
     companion object {

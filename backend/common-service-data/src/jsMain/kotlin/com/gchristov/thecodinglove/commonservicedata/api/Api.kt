@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.commonservicedata.api
 
 import arrow.core.Either
+import co.touchlab.kermit.Logger
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -15,10 +16,12 @@ interface ApiRequest {
 // Body is decoded as per the following Firebase specs
 // https://firebase.google.com/docs/functions/http-events#read_values_from_the_request
 inline fun <reified T> ApiRequest.decodeBodyFromJson(
-    jsonSerializer: Json
+    jsonSerializer: Json,
+    log: Logger
 ): Either<Throwable, T?> = try {
     Either.Right(body?.let { jsonSerializer.decodeFromString<T>(string = JSON.stringify(it)) })
 } catch (error: Throwable) {
+    log.e(error) { error.message ?: "Error during API request body decode" }
     Either.Left(error)
 }
 
@@ -40,7 +43,8 @@ interface ApiResponse {
 inline fun <reified T> ApiResponse.sendJson(
     status: Int = 200,
     data: T,
-    jsonSerializer: Json
+    jsonSerializer: Json,
+    log: Logger
 ): Either<Throwable, Unit> = try {
     status(status)
     setHeader(
@@ -50,10 +54,14 @@ inline fun <reified T> ApiResponse.sendJson(
     send(jsonSerializer.encodeToString(data))
     Either.Right(Unit)
 } catch (error: Throwable) {
+    log.e(error) { error.message ?: "Error during API response send" }
     Either.Left(error)
 }
 
-fun ApiResponse.sendEmpty(status: Int = 200): Either<Throwable, Unit> = try {
+fun ApiResponse.sendEmpty(
+    status: Int = 200,
+    log: Logger
+): Either<Throwable, Unit> = try {
     status(status)
     setHeader(
         header = "Content-Type",
@@ -62,6 +70,7 @@ fun ApiResponse.sendEmpty(status: Int = 200): Either<Throwable, Unit> = try {
     send("")
     Either.Right(Unit)
 } catch (error: Throwable) {
+    log.e(error) { error.message ?: "Error during API empty response send" }
     Either.Left(error)
 }
 

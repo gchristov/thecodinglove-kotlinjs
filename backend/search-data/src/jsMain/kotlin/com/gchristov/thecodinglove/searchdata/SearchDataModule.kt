@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.searchdata
 
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.htmlparse.HtmlPostParser
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
@@ -19,7 +20,8 @@ object SearchDataModule : DiModule() {
                 provideSearchRepository(
                     api = instance(),
                     htmlPostParser = instance(),
-                    firebaseFirestore = instance()
+                    firebaseFirestore = instance(),
+                    log = instance()
                 )
             }
             bindSingleton { provideSearchConfig() }
@@ -31,11 +33,13 @@ object SearchDataModule : DiModule() {
     private fun provideSearchRepository(
         api: SearchApi,
         htmlPostParser: HtmlPostParser,
-        firebaseFirestore: FirebaseFirestore
+        firebaseFirestore: FirebaseFirestore,
+        log: Logger
     ): SearchRepository = RealSearchRepository(
         apiService = api,
         htmlPostParser = htmlPostParser,
-        firebaseFirestore = firebaseFirestore
+        firebaseFirestore = firebaseFirestore,
+        log = log
     )
 
     private fun provideSearchConfig(): SearchConfig = SearchConfig(postsPerPage = 4)

@@ -20,7 +20,7 @@ import kotlinx.serialization.json.Json
 class SearchApiService(
     apiServiceRegister: ApiServiceRegister,
     private val jsonSerializer: Json,
-    log: Logger,
+    private val log: Logger,
     private val pubSubSender: PubSubSender,
     private val searchWithSessionUseCase: SearchWithSessionUseCase,
 ) : ApiService(
@@ -42,7 +42,8 @@ class SearchApiService(
                     // TODO: Needs correct response mapping
                     response.sendJson(
                         data = searchResult.toSearchResult(),
-                        jsonSerializer = jsonSerializer
+                        jsonSerializer = jsonSerializer,
+                        log = log
                     )
                 }
         }
@@ -50,7 +51,8 @@ class SearchApiService(
     private suspend fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
         topic = PreloadPubSubService.Topic,
         body = PreloadPubSubMessage(searchSessionId),
-        jsonSerializer = jsonSerializer
+        jsonSerializer = jsonSerializer,
+        log = log
     )
 }
 

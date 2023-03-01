@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slackdata
 
 import arrow.core.Either
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 
 interface SlackRepository {
@@ -10,7 +11,10 @@ interface SlackRepository {
     ): Either<Throwable, Unit>
 }
 
-internal class RealSlackRepository(private val apiService: SlackApi) : SlackRepository {
+internal class RealSlackRepository(
+    private val apiService: SlackApi,
+    private val log: Logger,
+) : SlackRepository {
     override suspend fun sendMessage(
         channelUrl: String,
         message: ApiSlackMessage
@@ -21,6 +25,7 @@ internal class RealSlackRepository(private val apiService: SlackApi) : SlackRepo
         )
         Either.Right(Unit)
     } catch (error: Throwable) {
+        log.e(error) { error.message ?: "Error during message send" }
         Either.Left(error)
     }
 }
