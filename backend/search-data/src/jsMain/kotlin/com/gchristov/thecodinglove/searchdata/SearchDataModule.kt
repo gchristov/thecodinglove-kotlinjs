@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.searchdata
 
 import com.gchristov.thecodinglove.htmlparse.HtmlPostParser
-import com.gchristov.thecodinglove.kmpcommondi.DiModule
+import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.*

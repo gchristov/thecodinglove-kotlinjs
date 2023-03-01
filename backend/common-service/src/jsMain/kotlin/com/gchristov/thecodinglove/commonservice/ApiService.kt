@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.commonservice
 
 import arrow.core.Either
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
@@ -14,7 +15,8 @@ import kotlin.coroutines.CoroutineContext
 
 abstract class ApiService(
     private val apiServiceRegister: ApiServiceRegister,
-    private val jsonSerializer: Json
+    private val jsonSerializer: Json,
+    private val log: Logger,
 ) : CoroutineScope {
 
     private val job = Job()
@@ -31,19 +33,19 @@ abstract class ApiService(
 
     protected fun registerForApiCallbacks() = apiServiceRegister.register { request, response ->
         launch {
+            request.rawBody?.let { log.d("Received API request with body: rawBody=$it") }
             handleRequest(
                 request = request,
                 response = response
             ).fold(
-                ifLeft = { error ->
-                    // TODO: Tidy up
-                    println(error)
+                ifLeft = { handleError ->
+                    log.e(handleError) { handleError.message ?: "Error handling request" }
                     sendError(
-                        error = error,
+                        error = handleError,
                         response = response
                     ).fold(
-                        ifLeft = {
-                            println(it)
+                        ifLeft = { sendError ->
+                            log.e(sendError) { sendError.message ?: "Error sending error response" }
                         },
                         ifRight = {
                             // TODO: Add some request metrics in here

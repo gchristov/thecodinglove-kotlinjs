@@ -19,6 +19,11 @@ class Deps {
         val pubSub = NpmDependency("@google-cloud/pubsub", "3.3.0")
     }
 
+    object Kermit {
+        private const val kermitVersion = "1.2.2"
+        const val logger = "co.touchlab:kermit:$kermitVersion"
+    }
+
     object Kodein {
         const val di = "org.kodein.di:kodein-di:7.15.0"
     }

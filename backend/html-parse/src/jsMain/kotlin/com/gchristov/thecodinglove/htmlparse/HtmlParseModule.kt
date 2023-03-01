@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.htmlparse
 
-import com.gchristov.thecodinglove.kmpcommondi.DiModule
+import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
 import org.kodein.di.bindProvider

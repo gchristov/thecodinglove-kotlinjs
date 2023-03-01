@@ -1,9 +1,10 @@
 package com.gchristov.thecodinglove.search
 
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
-import com.gchristov.thecodinglove.kmpcommondi.DiModule
+import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.search.usecase.RealPreloadSearchResultUseCase
 import com.gchristov.thecodinglove.search.usecase.RealSearchWithHistoryUseCase
 import com.gchristov.thecodinglove.search.usecase.RealSearchWithSessionUseCase
@@ -46,14 +47,16 @@ object SearchModule : DiModule() {
                 provideSearchApiService(
                     apiServiceRegister = instance(),
                     jsonSerializer = instance(),
+                    log = instance(),
                     pubSubSender = instance(),
-                    searchWithSessionUseCase = instance()
+                    searchWithSessionUseCase = instance(),
                 )
             }
             bindSingleton {
                 providePreloadPubSubService(
                     pubSubServiceRegister = instance(),
                     jsonSerializer = instance(),
+                    log = instance(),
                     preloadSearchResultUseCase = instance()
                 )
             }
@@ -90,11 +93,13 @@ object SearchModule : DiModule() {
     private fun provideSearchApiService(
         apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
+        log: Logger,
         pubSubSender: PubSubSender,
         searchWithSessionUseCase: SearchWithSessionUseCase
     ): SearchApiService = SearchApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
+        log = log,
         pubSubSender = pubSubSender,
         searchWithSessionUseCase = searchWithSessionUseCase
     )
@@ -102,10 +107,12 @@ object SearchModule : DiModule() {
     private fun providePreloadPubSubService(
         pubSubServiceRegister: PubSubServiceRegister,
         jsonSerializer: Json,
+        log: Logger,
         preloadSearchResultUseCase: PreloadSearchResultUseCase
     ): PreloadPubSubService = PreloadPubSubService(
         pubSubServiceRegister = pubSubServiceRegister,
         jsonSerializer = jsonSerializer,
+        log = log,
         preloadSearchResultUseCase = preloadSearchResultUseCase
     )
 }

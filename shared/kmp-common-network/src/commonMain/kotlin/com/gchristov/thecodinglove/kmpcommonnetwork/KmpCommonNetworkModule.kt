@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.kmpcommonnetwork
 
-import com.gchristov.thecodinglove.kmpcommondi.DiModule
+import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*

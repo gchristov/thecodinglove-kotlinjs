@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.search
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.leftIfNull
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.PubSubService
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
@@ -15,8 +16,12 @@ import kotlinx.serialization.json.Json
 class PreloadPubSubService(
     pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
+    log: Logger,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase
-) : PubSubService(pubSubServiceRegister = pubSubServiceRegister) {
+) : PubSubService(
+    pubSubServiceRegister = pubSubServiceRegister,
+    log = log,
+) {
     override fun topic(): String = Topic
 
     override fun register() {

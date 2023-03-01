@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slack.slashcommand
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.leftIfNull
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.PubSubService
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.*
@@ -17,10 +18,14 @@ import kotlinx.serialization.json.Json
 class SlackSlashCommandPubSubService(
     pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
+    log: Logger,
     private val slackRepository: SlackRepository,
     private val pubSubSender: PubSubSender,
     private val searchWithSessionUseCase: SearchWithSessionUseCase,
-) : PubSubService(pubSubServiceRegister = pubSubServiceRegister) {
+) : PubSubService(
+    pubSubServiceRegister = pubSubServiceRegister,
+    log = log,
+) {
     override fun topic(): String = Topic
 
     override fun register() {

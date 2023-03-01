@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.kmpcommondi
+package com.gchristov.thecodinglove.kmpcommonkotlin.di
 
 import org.kodein.di.DI
 import org.kodein.di.direct

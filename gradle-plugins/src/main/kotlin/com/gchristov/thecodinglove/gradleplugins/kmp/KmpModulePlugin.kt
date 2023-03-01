@@ -13,7 +13,6 @@ class KmpModulePlugin : Plugin<Project> {
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
             sourceSets.maybeCreate("commonMain").dependencies {
                 implementation(project(":kmp-common-kotlin"))
-                implementation(project(":kmp-common-di"))
                 implementation(project(":kmp-common-test"))
             }
             sourceSets.maybeCreate("commonTest").dependencies {

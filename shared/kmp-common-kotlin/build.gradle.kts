@@ -8,6 +8,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                api(Deps.Kodein.di)
+                api(Deps.Kermit.logger)
                 api(Deps.Kotlin.coroutinesCore)
                 api(Deps.Kotlin.dateTime)
                 api(Deps.Kotlin.serialization)
