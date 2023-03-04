@@ -5,13 +5,10 @@ import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
-import com.gchristov.thecodinglove.searchdata.SearchRepository
-import com.gchristov.thecodinglove.searchdata.model.SearchConfig
-import com.gchristov.thecodinglove.searchdata.usecase.*
-import kotlinx.coroutines.Dispatchers
+import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
@@ -20,24 +17,6 @@ object SearchModule : DiModule() {
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
-            bindProvider {
-                provideSearchWithHistoryUseCase(
-                    searchRepository = instance(),
-                    searchConfig = instance()
-                )
-            }
-            bindProvider {
-                provideSearchWithSessionUseCase(
-                    searchRepository = instance(),
-                    searchWithHistoryUseCase = instance(),
-                )
-            }
-            bindProvider {
-                providePreloadSearchResultUseCase(
-                    searchRepository = instance(),
-                    searchWithHistoryUseCase = instance(),
-                )
-            }
             bindSingleton {
                 provideSearchApiService(
                     apiServiceRegister = instance(),
@@ -57,33 +36,6 @@ object SearchModule : DiModule() {
             }
         }
     }
-
-    private fun provideSearchWithHistoryUseCase(
-        searchRepository: SearchRepository,
-        searchConfig: SearchConfig
-    ): SearchWithHistoryUseCase = RealSearchWithHistoryUseCase(
-        dispatcher = Dispatchers.Default,
-        searchRepository = searchRepository,
-        searchConfig = searchConfig
-    )
-
-    private fun provideSearchWithSessionUseCase(
-        searchRepository: SearchRepository,
-        searchWithHistoryUseCase: SearchWithHistoryUseCase
-    ): SearchWithSessionUseCase = RealSearchWithSessionUseCase(
-        dispatcher = Dispatchers.Default,
-        searchRepository = searchRepository,
-        searchWithHistoryUseCase = searchWithHistoryUseCase
-    )
-
-    private fun providePreloadSearchResultUseCase(
-        searchRepository: SearchRepository,
-        searchWithHistoryUseCase: SearchWithHistoryUseCase
-    ): PreloadSearchResultUseCase = RealPreloadSearchResultUseCase(
-        dispatcher = Dispatchers.Default,
-        searchRepository = searchRepository,
-        searchWithHistoryUseCase = searchWithHistoryUseCase
-    )
 
     private fun provideSearchApiService(
         apiServiceRegister: ApiServiceRegister,

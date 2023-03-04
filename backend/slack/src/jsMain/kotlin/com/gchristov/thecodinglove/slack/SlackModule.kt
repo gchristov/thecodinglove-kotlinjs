@@ -10,15 +10,12 @@ import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityApiServ
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubService
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandApiService
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubService
-import com.gchristov.thecodinglove.slackdata.RealVerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
-import com.gchristov.thecodinglove.slackdata.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
-import kotlinx.coroutines.Dispatchers
-import kotlinx.datetime.Clock
+import com.gchristov.thecodinglove.slackdata.usecase.CancelSlackSearchUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
@@ -27,12 +24,6 @@ object SlackModule : DiModule() {
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
-            bindProvider {
-                provideVerifySlackRequestUseCase(
-                    slackConfig = instance(),
-                    log = instance()
-                )
-            }
             bindSingleton {
                 provideSlackSlashCommandApiService(
                     apiServiceRegister = instance(),
@@ -68,23 +59,12 @@ object SlackModule : DiModule() {
                     pubSubServiceRegister = instance(),
                     jsonSerializer = instance(),
                     log = instance(),
-                    slackRepository = instance(),
-                    pubSubSender = instance(),
-                    searchWithSessionUseCase = instance()
+                    searchWithSessionUseCase = instance(),
+                    cancelSlackSearchUseCase = instance(),
                 )
             }
         }
     }
-
-    private fun provideVerifySlackRequestUseCase(
-        slackConfig: SlackConfig,
-        log: Logger,
-    ): VerifySlackRequestUseCase = RealVerifySlackRequestUseCase(
-        dispatcher = Dispatchers.Default,
-        slackConfig = slackConfig,
-        clock = Clock.System,
-        log = log
-    )
 
     private fun provideSlackSlashCommandApiService(
         apiServiceRegister: ApiServiceRegister,
@@ -138,15 +118,13 @@ object SlackModule : DiModule() {
         pubSubServiceRegister: PubSubServiceRegister,
         jsonSerializer: Json,
         log: Logger,
-        slackRepository: SlackRepository,
-        pubSubSender: PubSubSender,
-        searchWithSessionUseCase: SearchWithSessionUseCase
+        searchWithSessionUseCase: SearchWithSessionUseCase,
+        cancelSlackSearchUseCase: CancelSlackSearchUseCase,
     ): SlackInteractivityPubSubService = SlackInteractivityPubSubService(
         pubSubServiceRegister = pubSubServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
-        slackRepository = slackRepository,
-        pubSubSender = pubSubSender,
-        searchWithSessionUseCase = searchWithSessionUseCase
+        searchWithSessionUseCase = searchWithSessionUseCase,
+        cancelSlackSearchUseCase = cancelSlackSearchUseCase,
     )
 }
