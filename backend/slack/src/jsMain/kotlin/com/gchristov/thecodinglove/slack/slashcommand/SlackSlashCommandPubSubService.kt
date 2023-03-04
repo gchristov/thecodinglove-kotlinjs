@@ -40,7 +40,7 @@ class SlackSlashCommandPubSubService(
             .leftIfNull(default = { Exception("Message body is null") })
             .flatMap { slashCommand ->
                 slackRepository.sendMessage(
-                    channelUrl = slashCommand.responseUrl,
+                    messageUrl = slashCommand.responseUrl,
                     message = ApiSlackMessageFactory.processingMessage()
                 ).flatMap {
                     searchWithSessionUseCase(
@@ -49,7 +49,7 @@ class SlackSlashCommandPubSubService(
                         publishPreloadMessage(searchResult.searchSessionId)
                             .flatMap {
                                 slackRepository.sendMessage(
-                                    channelUrl = slashCommand.responseUrl,
+                                    messageUrl = slashCommand.responseUrl,
                                     message = ApiSlackMessageFactory.searchResultMessage(
                                         searchQuery = searchResult.query,
                                         searchResults = searchResult.totalPosts,

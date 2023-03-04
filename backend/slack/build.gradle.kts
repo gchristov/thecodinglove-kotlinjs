@@ -6,7 +6,7 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(projects.slackData)
+                api(projects.slackData)
                 implementation(projects.search)
             }
         }

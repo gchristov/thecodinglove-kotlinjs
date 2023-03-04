@@ -45,6 +45,10 @@ class FakeSearchRepository(
         return Either.Right(Unit)
     }
 
+    override suspend fun deleteSearchSession(id: String): Either<Throwable, Unit> {
+        TODO("Not yet implemented")
+    }
+
     fun assertSessionFetched() {
         assertTrue(searchSessionGetCalled)
     }

@@ -19,6 +19,8 @@ interface SearchRepository {
     suspend fun getSearchSession(id: String): Either<Throwable, SearchSession>
 
     suspend fun saveSearchSession(searchSession: SearchSession): Either<Throwable, Unit>
+
+    suspend fun deleteSearchSession(id: String): Either<Throwable, Unit>
 }
 
 internal class RealSearchRepository(
@@ -55,7 +57,7 @@ internal class RealSearchRepository(
 
     override suspend fun getSearchSession(id: String): Either<Throwable, SearchSession> = try {
         val document = firebaseFirestore
-            .collection("searchSession")
+            .collection(SearchSessionCollection)
             .document(id)
             .get()
         if (document.exists) {
@@ -72,7 +74,7 @@ internal class RealSearchRepository(
     override suspend fun saveSearchSession(searchSession: SearchSession): Either<Throwable, Unit> =
         try {
             val document = firebaseFirestore
-                .collection("searchSession")
+                .collection(SearchSessionCollection)
                 .document(searchSession.id)
             Either.Right(
                 document.set(
@@ -85,4 +87,17 @@ internal class RealSearchRepository(
             log.e(error) { error.message ?: "Error during saving search session" }
             Either.Left(error)
         }
+
+    override suspend fun deleteSearchSession(id: String): Either<Throwable, Unit> = try {
+        firebaseFirestore
+            .collection(SearchSessionCollection)
+            .document(id)
+            .delete()
+        Either.Right(Unit)
+    } catch (error: Throwable) {
+        log.e(error) { error.message ?: "Error during finding search session" }
+        Either.Left(error)
+    }
 }
+
+private const val SearchSessionCollection = "searchSession"

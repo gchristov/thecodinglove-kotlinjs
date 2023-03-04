@@ -6,7 +6,7 @@ import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 
 interface SlackRepository {
     suspend fun sendMessage(
-        channelUrl: String,
+        messageUrl: String,
         message: ApiSlackMessage
     ): Either<Throwable, Unit>
 }
@@ -16,11 +16,11 @@ internal class RealSlackRepository(
     private val log: Logger,
 ) : SlackRepository {
     override suspend fun sendMessage(
-        channelUrl: String,
+        messageUrl: String,
         message: ApiSlackMessage
     ) = try {
         apiService.sendMessage(
-            messageUrl = channelUrl,
+            messageUrl = messageUrl,
             message = message
         )
         Either.Right(Unit)

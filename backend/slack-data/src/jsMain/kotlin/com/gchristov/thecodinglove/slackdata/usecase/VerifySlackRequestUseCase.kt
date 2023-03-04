@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slackdata
+package com.gchristov.thecodinglove.slackdata.usecase
 
 import arrow.core.Either
 import arrow.core.flatMap

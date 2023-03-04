@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.slack
 import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
-import com.gchristov.thecodinglove.slackdata.RealVerifySlackRequestUseCase
-import com.gchristov.thecodinglove.slackdata.VerifySlackRequestUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.RealVerifySlackRequestUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slacktestfixtures.FakeSlackApiRequest
 import kotlinx.coroutines.ExperimentalCoroutinesApi

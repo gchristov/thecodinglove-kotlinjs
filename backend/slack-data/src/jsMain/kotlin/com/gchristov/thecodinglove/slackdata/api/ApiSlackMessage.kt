@@ -40,7 +40,7 @@ data class ApiSlackMessage(
     }
 }
 
-enum class ApiActionName(val value: String) {
+enum class ApiSlackActionName(val value: String) {
     SEND("send"),
     SHUFFLE("shuffle"),
     CANCEL("cancel");
@@ -60,6 +60,19 @@ object ApiSlackMessageFactory {
         asUser = false,
         replaceOriginal = true,
         deleteOriginal = false,
+        attachments = null,
+    )
+
+    fun cancelMessage() = ApiSlackMessage(
+        text = null,
+        userId = null,
+        channelId = null,
+        responseType = "ephemeral",
+        responseUrl = null,
+        teamId = null,
+        asUser = false,
+        replaceOriginal = true,
+        deleteOriginal = true,
         attachments = null,
     )
 
@@ -87,7 +100,7 @@ object ApiSlackMessageFactory {
                 imageUrl = attachmentImageUrl,
                 actions = listOf(
                     ApiSlackMessage.ApiAttachment.ApiAction(
-                        name = ApiActionName.SEND.value,
+                        name = ApiSlackActionName.SEND.value,
                         text = "Send",
                         type = ButtonType,
                         value = searchSessionId,
@@ -95,7 +108,7 @@ object ApiSlackMessageFactory {
                         style = PrimaryButtonStyle,
                     ),
                     ApiSlackMessage.ApiAttachment.ApiAction(
-                        name = ApiActionName.SHUFFLE.value,
+                        name = ApiSlackActionName.SHUFFLE.value,
                         text = "Shuffle",
                         type = ButtonType,
                         value = searchSessionId,
@@ -103,7 +116,7 @@ object ApiSlackMessageFactory {
                         style = null,
                     ),
                     ApiSlackMessage.ApiAttachment.ApiAction(
-                        name = ApiActionName.CANCEL.value,
+                        name = ApiSlackActionName.CANCEL.value,
                         text = "Cancel",
                         type = ButtonType,
                         value = searchSessionId,
