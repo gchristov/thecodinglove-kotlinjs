@@ -5,6 +5,7 @@ import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.searchdata.model.Post
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
 import com.gchristov.thecodinglove.searchdata.model.SearchError
+import com.gchristov.thecodinglove.searchdata.usecase.RealSearchWithHistoryUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.contains
 import com.gchristov.thecodinglove.searchdata.usecase.insert
