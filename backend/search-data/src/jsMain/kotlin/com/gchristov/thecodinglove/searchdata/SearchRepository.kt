@@ -95,7 +95,7 @@ internal class RealSearchRepository(
             .delete()
         Either.Right(Unit)
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during finding search session" }
+        log.e(error) { error.message ?: "Error during deleting search session" }
         Either.Left(error)
     }
 }
