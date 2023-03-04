@@ -5,14 +5,9 @@ import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
-import com.gchristov.thecodinglove.search.usecase.RealPreloadSearchResultUseCase
-import com.gchristov.thecodinglove.search.usecase.RealSearchWithHistoryUseCase
-import com.gchristov.thecodinglove.search.usecase.RealSearchWithSessionUseCase
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
-import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI

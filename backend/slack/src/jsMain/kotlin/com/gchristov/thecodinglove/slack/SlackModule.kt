@@ -10,6 +10,7 @@ import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityApiServ
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubService
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandApiService
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubService
+import com.gchristov.thecodinglove.slackdata.RealVerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
