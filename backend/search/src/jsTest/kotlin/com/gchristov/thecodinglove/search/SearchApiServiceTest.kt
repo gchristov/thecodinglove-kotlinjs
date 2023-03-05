@@ -87,10 +87,7 @@ class SearchApiServiceTest {
             register.assertNotInvoked()
             searchUseCase.assertInvokedOnce()
             searchUseCase.assertSearchType(
-                SearchWithSessionUseCase.Type.WithSessionId(
-                    query = TestSearchQuery,
-                    sessionId = TestSearchSessionId
-                )
+                SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
             )
             pubSubSender.assertEquals(
                 topic = PreloadPubSubService.Topic,

@@ -35,10 +35,7 @@ class RealSearchWithSessionUseCaseTest {
 
     @Test
     fun searchWithSessionIdReturnsPreloadedPost(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.WithSessionId(
-            query = TestSearchQuery,
-            sessionId = TestSearchSessionId
-        )
+        val searchType = SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
         val searchWithHistoryResult = Either.Right(
             SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
         )
@@ -83,10 +80,7 @@ class RealSearchWithSessionUseCaseTest {
 
     @Test
     fun searchWithSessionIdReusesSession(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.WithSessionId(
-            query = TestSearchQuery,
-            sessionId = TestSearchSessionId
-        )
+        val searchType = SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
         val searchWithHistoryResult = Either.Right(
             SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
         )
@@ -125,10 +119,7 @@ class RealSearchWithSessionUseCaseTest {
 
     @Test
     fun searchWithExhaustedResultClearsSearchSessionHistoryAndRetries(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.WithSessionId(
-            query = TestSearchQuery,
-            sessionId = TestSearchSessionId
-        )
+        val searchType = SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
         val searchWithHistoryResults = listOf(
             Either.Left(SearchError.Exhausted),
             Either.Left(SearchError.Empty)
@@ -161,10 +152,7 @@ class RealSearchWithSessionUseCaseTest {
 
     @Test
     fun searchUpdatesSessionAndReturnsValidResult(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.WithSessionId(
-            sessionId = TestSearchSessionId,
-            query = TestSearchQuery
-        )
+        val searchType = SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
         val searchWithHistoryResult = SearchWithHistoryResultCreator.validResult(
             query = TestSearchQuery
         )

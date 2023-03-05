@@ -14,16 +14,8 @@ interface SearchWithSessionUseCase {
     suspend operator fun invoke(type: Type): Either<SearchError, Result>
 
     sealed class Type {
-        abstract val query: String
-
-        data class WithSessionId(
-            override val query: String,
-            val sessionId: String
-        ) : Type()
-
-        data class NewSession(
-            override val query: String,
-        ) : Type()
+        data class WithSessionId(val sessionId: String) : Type()
+        data class NewSession(val query: String) : Type()
     }
 
     data class Result(

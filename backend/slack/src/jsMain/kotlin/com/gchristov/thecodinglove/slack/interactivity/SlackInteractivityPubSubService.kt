@@ -6,21 +6,22 @@ import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.PubSubService
 import com.gchristov.thecodinglove.commonservicedata.exports
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
-import com.gchristov.thecodinglove.commonservicedata.pubsub.decodeBodyFromJson
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.commonservicedata.pubsub.*
+import com.gchristov.thecodinglove.search.PreloadPubSubService
+import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackActionName
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
 import com.gchristov.thecodinglove.slackdata.usecase.CancelSlackSearchUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.ShuffleSlackSearchUseCase
 import kotlinx.serialization.json.Json
 
 class SlackInteractivityPubSubService(
     pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
     private val log: Logger,
-    private val searchWithSessionUseCase: SearchWithSessionUseCase,
+    private val shuffleSlackSearchUseCase: ShuffleSlackSearchUseCase,
     private val cancelSlackSearchUseCase: CancelSlackSearchUseCase,
+    private val pubSubSender: PubSubSender,
 ) : PubSubService(
     pubSubServiceRegister = pubSubServiceRegister,
     log = log,
@@ -45,8 +46,14 @@ class SlackInteractivityPubSubService(
             }
 
     private suspend fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.handle(): Either<Throwable, Unit> {
+        val shuffleAction = shuffleAction()
         val cancelAction = cancelAction()
         return when {
+            shuffleAction != null -> shuffleSlackSearchUseCase.invoke(
+                messageUrl = responseUrl,
+                searchSessionId = shuffleAction.value
+            ).flatMap { publishPreloadMessage(shuffleAction.value) }
+
             cancelAction != null -> cancelSlackSearchUseCase.invoke(
                 messageUrl = responseUrl,
                 searchSessionId = cancelAction.value
@@ -56,10 +63,20 @@ class SlackInteractivityPubSubService(
         }
     }
 
+    private suspend fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
+        topic = PreloadPubSubService.Topic,
+        body = PreloadPubSubMessage(searchSessionId),
+        jsonSerializer = jsonSerializer,
+        log = log
+    )
+
     companion object {
         const val Topic = "slackInteractivityPubSub"
     }
 }
+
+private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.shuffleAction() =
+    actions.find { it.name == ApiSlackActionName.SHUFFLE.value }
 
 private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.cancelAction() =
     actions.find { it.name == ApiSlackActionName.CANCEL.value }

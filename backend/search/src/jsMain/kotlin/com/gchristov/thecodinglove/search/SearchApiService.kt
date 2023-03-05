@@ -60,10 +60,7 @@ private fun ApiRequest.toSearchType(): SearchWithSessionUseCase.Type {
     val searchQuery: String = query["searchQuery"] ?: "release"
     val searchSessionId: String? = query["searchSessionId"]
     return searchSessionId?.let {
-        SearchWithSessionUseCase.Type.WithSessionId(
-            query = searchQuery,
-            sessionId = it
-        )
+        SearchWithSessionUseCase.Type.WithSessionId(sessionId = it)
     } ?: SearchWithSessionUseCase.Type.NewSession(searchQuery)
 }
 

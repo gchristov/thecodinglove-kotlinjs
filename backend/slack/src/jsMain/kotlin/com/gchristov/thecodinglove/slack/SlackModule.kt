@@ -13,6 +13,7 @@ import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubSer
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.CancelSlackSearchUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.ShuffleSlackSearchUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
@@ -59,8 +60,9 @@ object SlackModule : DiModule() {
                     pubSubServiceRegister = instance(),
                     jsonSerializer = instance(),
                     log = instance(),
-                    searchWithSessionUseCase = instance(),
+                    shuffleSlackSearchUseCase = instance(),
                     cancelSlackSearchUseCase = instance(),
+                    pubSubSender = instance(),
                 )
             }
         }
@@ -118,13 +120,15 @@ object SlackModule : DiModule() {
         pubSubServiceRegister: PubSubServiceRegister,
         jsonSerializer: Json,
         log: Logger,
-        searchWithSessionUseCase: SearchWithSessionUseCase,
+        shuffleSlackSearchUseCase: ShuffleSlackSearchUseCase,
         cancelSlackSearchUseCase: CancelSlackSearchUseCase,
+        pubSubSender: PubSubSender,
     ): SlackInteractivityPubSubService = SlackInteractivityPubSubService(
         pubSubServiceRegister = pubSubServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
-        searchWithSessionUseCase = searchWithSessionUseCase,
+        shuffleSlackSearchUseCase = shuffleSlackSearchUseCase,
         cancelSlackSearchUseCase = cancelSlackSearchUseCase,
+        pubSubSender = pubSubSender
     )
 }
