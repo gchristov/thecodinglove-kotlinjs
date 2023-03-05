@@ -15,6 +15,11 @@ kotlin {
                 implementation(projects.searchData)
             }
         }
+        val jsTest by getting {
+            dependencies {
+                implementation(projects.slackTestfixtures)
+            }
+        }
     }
 }
 

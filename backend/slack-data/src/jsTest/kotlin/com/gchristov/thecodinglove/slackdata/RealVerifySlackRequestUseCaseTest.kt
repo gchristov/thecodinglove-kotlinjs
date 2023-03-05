@@ -1,11 +1,11 @@
-package com.gchristov.thecodinglove.slack
+package com.gchristov.thecodinglove.slackdata
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
+import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.RealVerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
-import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slacktestfixtures.FakeSlackApiRequest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
@@ -20,7 +20,11 @@ class RealVerifySlackRequestUseCaseTest {
     @Test
     fun verifyWithMissingTimestampReturnsError(): TestResult {
         return runBlockingTest { useCase ->
-            val actualResult = useCase.invoke(FakeSlackApiRequest(fakeTimestamp = null))
+            val actualResult = useCase.invoke(
+                FakeSlackApiRequest(
+                    fakeTimestamp = null
+                )
+            )
             assertEquals(
                 expected = Either.Left(VerifySlackRequestUseCase.Error.MissingTimestamp),
                 actual = actualResult
@@ -31,7 +35,11 @@ class RealVerifySlackRequestUseCaseTest {
     @Test
     fun verifyWithInvalidTimestampReturnsError(): TestResult {
         return runBlockingTest { useCase ->
-            val actualResult = useCase.invoke(FakeSlackApiRequest(fakeTimestamp = "timestamp"))
+            val actualResult = useCase.invoke(
+                FakeSlackApiRequest(
+                    fakeTimestamp = "timestamp"
+                )
+            )
             assertEquals(
                 expected = Either.Left(VerifySlackRequestUseCase.Error.Other("Invalid number format: 'timestamp'")),
                 actual = actualResult
@@ -93,7 +101,8 @@ class RealVerifySlackRequestUseCaseTest {
         return runBlockingTest { useCase ->
             val actualResult = useCase.invoke(
                 FakeSlackApiRequest(
-                    fakeTimestamp = TestClock.now().toEpochMilliseconds().toString(),
+                    fakeTimestamp = TestClock.now()
+                        .toEpochMilliseconds().toString(),
                     fakeSignature = "v0=afd7e1dbff43bfdd7860f4da361f593eff602833c931adc9ac02fa6b16d3c5e2",
                     fakeRawBody = "Test body 2"
                 )
@@ -110,7 +119,8 @@ class RealVerifySlackRequestUseCaseTest {
         return runBlockingTest { useCase ->
             val actualResult = useCase.invoke(
                 FakeSlackApiRequest(
-                    fakeTimestamp = TestClock.now().toEpochMilliseconds().toString(),
+                    fakeTimestamp = TestClock.now()
+                        .toEpochMilliseconds().toString(),
                     fakeSignature = "v0=afd7e1dbff43bfdd7860f4da361f593eff602833c931adc9ac02fa6b16d3c5e2",
                     fakeRawBody = "Test body"
                 )
