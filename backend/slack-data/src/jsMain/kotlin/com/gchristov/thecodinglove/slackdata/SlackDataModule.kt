@@ -3,11 +3,9 @@ package com.gchristov.thecodinglove.slackdata
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.SearchRepository
+import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
-import com.gchristov.thecodinglove.slackdata.usecase.CancelSlackSearchUseCase
-import com.gchristov.thecodinglove.slackdata.usecase.RealCancelSlackSearchUseCase
-import com.gchristov.thecodinglove.slackdata.usecase.RealVerifySlackRequestUseCase
-import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.*
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
@@ -40,6 +38,13 @@ object SlackDataModule : DiModule() {
                     log = instance(),
                     slackRepository = instance(),
                     searchRepository = instance(),
+                )
+            }
+            bindProvider {
+                provideShuffleSlackSearchUseCase(
+                    log = instance(),
+                    searchWithSessionUseCase = instance(),
+                    slackRepository = instance(),
                 )
             }
         }
@@ -79,6 +84,17 @@ object SlackDataModule : DiModule() {
         dispatcher = Dispatchers.Default,
         log = log,
         searchRepository = searchRepository,
+        slackRepository = slackRepository
+    )
+
+    private fun provideShuffleSlackSearchUseCase(
+        log: Logger,
+        searchWithSessionUseCase: SearchWithSessionUseCase,
+        slackRepository: SlackRepository,
+    ): ShuffleSlackSearchUseCase = RealShuffleSlackSearchUseCase(
+        dispatcher = Dispatchers.Default,
+        log = log,
+        searchWithSessionUseCase = searchWithSessionUseCase,
         slackRepository = slackRepository
     )
 }
