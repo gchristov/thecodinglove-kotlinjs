@@ -12,7 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealPreloadSearchResultUseCaseTest2 {
+class RealPreloadSearchResultUseCaseTest {
     @Test
     fun preloadWithMissingSessionReturnsSessionNotFound(): TestResult {
         return runBlockingTest(searchSession = null) { useCase, searchRepository, searchWithHistoryUseCase ->

@@ -1,12 +1,9 @@
-package com.gchristov.thecodinglove.search.usecase
+package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
-import com.gchristov.thecodinglove.searchdata.usecase.RealSearchWithSessionUseCase
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithHistoryUseCase
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
@@ -18,7 +15,8 @@ import kotlin.test.assertEquals
 class RealSearchWithSessionUseCaseTest {
     @Test
     fun searchWithNewSessionCreatesNewSession(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.NewSession(query = TestSearchQuery)
+        val searchType =
+            SearchWithSessionUseCase.Type.NewSession(query = TestSearchQuery)
         val searchWithHistoryResult = Either.Right(
             SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
         )
@@ -35,7 +33,8 @@ class RealSearchWithSessionUseCaseTest {
 
     @Test
     fun searchWithSessionIdReturnsPreloadedPost(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
+        val searchType =
+            SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
         val searchWithHistoryResult = Either.Right(
             SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
         )
@@ -80,7 +79,8 @@ class RealSearchWithSessionUseCaseTest {
 
     @Test
     fun searchWithSessionIdReusesSession(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
+        val searchType =
+            SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
         val searchWithHistoryResult = Either.Right(
             SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
         )
@@ -101,7 +101,8 @@ class RealSearchWithSessionUseCaseTest {
 
     @Test
     fun searchWithEmptyResultReturnsEmpty(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.NewSession(query = TestSearchQuery)
+        val searchType =
+            SearchWithSessionUseCase.Type.NewSession(query = TestSearchQuery)
         val searchWithHistoryResult = Either.Left(SearchError.Empty)
 
         return runBlockingTest(
@@ -119,7 +120,8 @@ class RealSearchWithSessionUseCaseTest {
 
     @Test
     fun searchWithExhaustedResultClearsSearchSessionHistoryAndRetries(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
+        val searchType =
+            SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
         val searchWithHistoryResults = listOf(
             Either.Left(SearchError.Exhausted),
             Either.Left(SearchError.Empty)
@@ -152,7 +154,8 @@ class RealSearchWithSessionUseCaseTest {
 
     @Test
     fun searchUpdatesSessionAndReturnsValidResult(): TestResult {
-        val searchType = SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
+        val searchType =
+            SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
         val searchWithHistoryResult = SearchWithHistoryResultCreator.validResult(
             query = TestSearchQuery
         )
