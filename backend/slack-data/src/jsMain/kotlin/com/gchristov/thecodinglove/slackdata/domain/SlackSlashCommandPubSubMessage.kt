@@ -27,3 +27,5 @@ fun ApiSlackSlashCommand.toPubSubMessage() = SlackSlashCommandPubSubMessage(
     text = text,
     responseUrl = responseUrl
 )
+
+const val SlackSlashCommandPubSubTopic = "slackSlashCommandPubSub"

@@ -35,7 +35,7 @@ object SearchDataModule : DiModule() {
                 )
             }
             bindProvider {
-                provideSearchWithSessionUseCase(
+                provideSearchUseCase(
                     searchRepository = instance(),
                     searchWithHistoryUseCase = instance(),
                 )
@@ -74,10 +74,10 @@ object SearchDataModule : DiModule() {
         searchConfig = searchConfig
     )
 
-    private fun provideSearchWithSessionUseCase(
+    private fun provideSearchUseCase(
         searchRepository: SearchRepository,
         searchWithHistoryUseCase: SearchWithHistoryUseCase
-    ): SearchWithSessionUseCase = RealSearchWithSessionUseCase(
+    ): SearchUseCase = RealSearchUseCase(
         dispatcher = Dispatchers.Default,
         searchRepository = searchRepository,
         searchWithHistoryUseCase = searchWithHistoryUseCase

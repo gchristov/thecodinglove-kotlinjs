@@ -6,7 +6,7 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
@@ -23,7 +23,7 @@ object SearchModule : DiModule() {
                     jsonSerializer = instance(),
                     log = instance(),
                     pubSubSender = instance(),
-                    searchWithSessionUseCase = instance(),
+                    searchUseCase = instance(),
                 )
             }
             bindSingleton {
@@ -42,13 +42,13 @@ object SearchModule : DiModule() {
         jsonSerializer: Json,
         log: Logger,
         pubSubSender: PubSubSender,
-        searchWithSessionUseCase: SearchWithSessionUseCase
+        searchUseCase: SearchUseCase
     ): SearchApiService = SearchApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
         pubSubSender = pubSubSender,
-        searchWithSessionUseCase = searchWithSessionUseCase
+        searchUseCase = searchUseCase
     )
 
     private fun providePreloadPubSubService(

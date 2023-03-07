@@ -7,12 +7,13 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.PubSubService
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.*
-import com.gchristov.thecodinglove.search.PreloadPubSubService
 import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubTopic
+import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
 import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubMessage
+import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubTopic
 import kotlinx.serialization.json.Json
 
 class SlackSlashCommandPubSubService(
@@ -21,12 +22,12 @@ class SlackSlashCommandPubSubService(
     private val log: Logger,
     private val slackRepository: SlackRepository,
     private val pubSubSender: PubSubSender,
-    private val searchWithSessionUseCase: SearchWithSessionUseCase,
+    private val searchUseCase: SearchUseCase,
 ) : PubSubService(
     pubSubServiceRegister = pubSubServiceRegister,
     log = log,
 ) {
-    override fun topic(): String = Topic
+    override fun topic(): String = SlackSlashCommandPubSubTopic
 
     override fun register() {
         exports.slackSlashCommandPubSub = registerForPubSubCallbacks()
@@ -43,8 +44,8 @@ class SlackSlashCommandPubSubService(
                     messageUrl = slashCommand.responseUrl,
                     message = ApiSlackMessageFactory.processingMessage()
                 ).flatMap {
-                    searchWithSessionUseCase(
-                        SearchWithSessionUseCase.Type.NewSession(query = slashCommand.text)
+                    searchUseCase(
+                        SearchUseCase.Type.NewSession(query = slashCommand.text)
                     ).flatMap { searchResult ->
                         publishPreloadMessage(searchResult.searchSessionId)
                             .flatMap {
@@ -65,13 +66,9 @@ class SlackSlashCommandPubSubService(
             }
 
     private suspend fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
-        topic = PreloadPubSubService.Topic,
+        topic = PreloadPubSubTopic,
         body = PreloadPubSubMessage(searchSessionId),
         jsonSerializer = jsonSerializer,
         log = log
     )
-
-    companion object {
-        const val Topic = "slackSlashCommandPubSub"
-    }
 }

@@ -6,11 +6,12 @@ import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiServiceRegis
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSender
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
 import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
+import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubTopic
 import com.gchristov.thecodinglove.searchdata.model.SearchError
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchApiRequest
-import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchWithSessionUseCase
-import com.gchristov.thecodinglove.searchtestfixtures.SearchWithSessionResultCreator
+import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchUseCase
+import com.gchristov.thecodinglove.searchtestfixtures.SearchResultCreator
 import io.ktor.client.engine.js.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
@@ -28,7 +29,7 @@ class SearchApiServiceTest {
     fun register(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
-        searchWithSessionInvocationResult = Either.Left(SearchError.Empty)
+        searchInvocationResult = Either.Left(SearchError.Empty)
     ) { service, _, _, _, _, register ->
         service.register()
         register.assertInvokedOnce()
@@ -36,13 +37,13 @@ class SearchApiServiceTest {
 
     @Test
     fun handleRequestSuccess(): TestResult {
-        val expectedResult = SearchWithSessionResultCreator.validResult(
+        val expectedResult = SearchResultCreator.validResult(
             searchSessionId = TestSearchSessionId,
             query = TestSearchQuery
         )
         return runBlockingTest(
             searchSessionId = null,
-            searchWithSessionInvocationResult = Either.Right(expectedResult)
+            searchInvocationResult = Either.Right(expectedResult)
         ) { service, pubSubSender, searchUseCase, request, response, register ->
             val actualResult = service.handleRequest(
                 request = request,
@@ -51,10 +52,10 @@ class SearchApiServiceTest {
             register.assertNotInvoked()
             searchUseCase.assertInvokedOnce()
             searchUseCase.assertSearchType(
-                SearchWithSessionUseCase.Type.NewSession(query = TestSearchQuery)
+                SearchUseCase.Type.NewSession(query = TestSearchQuery)
             )
             pubSubSender.assertEquals(
-                topic = PreloadPubSubService.Topic,
+                topic = PreloadPubSubTopic,
                 body = Json.encodeToString(PreloadPubSubMessage(TestSearchSessionId))
             )
             response.assertEquals(
@@ -71,14 +72,14 @@ class SearchApiServiceTest {
 
     @Test
     fun handleRequestSuccessWithSessionId(): TestResult {
-        val expectedResult = SearchWithSessionResultCreator.validResult(
+        val expectedResult = SearchResultCreator.validResult(
             searchSessionId = TestSearchSessionId,
             query = TestSearchQuery
         )
         return runBlockingTest(
             searchSessionId = TestSearchSessionId,
             searchQuery = TestSearchQuery,
-            searchWithSessionInvocationResult = Either.Right(expectedResult)
+            searchInvocationResult = Either.Right(expectedResult)
         ) { service, pubSubSender, searchUseCase, request, response, register ->
             val actualResult = service.handleRequest(
                 request = request,
@@ -87,10 +88,10 @@ class SearchApiServiceTest {
             register.assertNotInvoked()
             searchUseCase.assertInvokedOnce()
             searchUseCase.assertSearchType(
-                SearchWithSessionUseCase.Type.WithSessionId(TestSearchSessionId)
+                SearchUseCase.Type.WithSessionId(TestSearchSessionId)
             )
             pubSubSender.assertEquals(
-                topic = PreloadPubSubService.Topic,
+                topic = PreloadPubSubTopic,
                 body = Json.encodeToString(PreloadPubSubMessage(TestSearchSessionId))
             )
             response.assertEquals(
@@ -109,7 +110,7 @@ class SearchApiServiceTest {
     fun handleRequestError(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
-        searchWithSessionInvocationResult = Either.Left(SearchError.Empty)
+        searchInvocationResult = Either.Left(SearchError.Empty)
     ) { service, pubSubSender, searchUseCase, request, response, register ->
         val actualResult = service.handleRequest(
             request = request,
@@ -127,12 +128,12 @@ class SearchApiServiceTest {
     private fun runBlockingTest(
         searchSessionId: String? = TestSearchSessionId,
         searchQuery: String? = TestSearchQuery,
-        searchWithSessionInvocationResult: Either<SearchError, SearchWithSessionUseCase.Result>,
-        testBlock: suspend (SearchApiService, FakePubSubSender, FakeSearchWithSessionUseCase, FakeSearchApiRequest, FakeApiResponse, FakeApiServiceRegister) -> Unit
+        searchInvocationResult: Either<SearchError, SearchUseCase.Result>,
+        testBlock: suspend (SearchApiService, FakePubSubSender, FakeSearchUseCase, FakeSearchApiRequest, FakeApiResponse, FakeApiServiceRegister) -> Unit
     ): TestResult = runTest {
         val pubSubSender = FakePubSubSender()
-        val searchWithSessionUseCase = FakeSearchWithSessionUseCase(
-            invocationResult = searchWithSessionInvocationResult
+        val searchUseCase = FakeSearchUseCase(
+            invocationResult = searchInvocationResult
         )
         val request = FakeSearchApiRequest(
             fakeSearchSessionId = searchSessionId,
@@ -145,9 +146,9 @@ class SearchApiServiceTest {
             jsonSerializer = Json,
             log = FakeLogger,
             pubSubSender = pubSubSender,
-            searchWithSessionUseCase = searchWithSessionUseCase
+            searchUseCase = searchUseCase
         )
-        testBlock(service, pubSubSender, searchWithSessionUseCase, request, response, register)
+        testBlock(service, pubSubSender, searchUseCase, request, response, register)
     }
 }
 
