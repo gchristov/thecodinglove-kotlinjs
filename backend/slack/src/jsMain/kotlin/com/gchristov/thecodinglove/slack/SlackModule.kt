@@ -5,7 +5,7 @@ import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityApiService
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubService
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandApiService
@@ -42,7 +42,7 @@ object SlackModule : DiModule() {
                     log = instance(),
                     slackRepository = instance(),
                     pubSubSender = instance(),
-                    searchWithSessionUseCase = instance()
+                    searchUseCase = instance()
                 )
             }
             bindSingleton {
@@ -90,14 +90,14 @@ object SlackModule : DiModule() {
         log: Logger,
         slackRepository: SlackRepository,
         pubSubSender: PubSubSender,
-        searchWithSessionUseCase: SearchWithSessionUseCase
+        searchUseCase: SearchUseCase
     ): SlackSlashCommandPubSubService = SlackSlashCommandPubSubService(
         pubSubServiceRegister = pubSubServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
         slackRepository = slackRepository,
         pubSubSender = pubSubSender,
-        searchWithSessionUseCase = searchWithSessionUseCase
+        searchUseCase = searchUseCase
     )
 
     private fun provideSlackInteractivityApiService(

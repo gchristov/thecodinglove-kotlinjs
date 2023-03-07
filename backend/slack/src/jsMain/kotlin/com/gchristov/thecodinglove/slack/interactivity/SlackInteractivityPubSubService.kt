@@ -7,10 +7,11 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.PubSubService
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.*
-import com.gchristov.thecodinglove.search.PreloadPubSubService
 import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
+import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubTopic
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackActionName
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
+import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubTopic
 import com.gchristov.thecodinglove.slackdata.usecase.CancelSlackSearchUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.ShuffleSlackSearchUseCase
 import kotlinx.serialization.json.Json
@@ -26,7 +27,7 @@ class SlackInteractivityPubSubService(
     pubSubServiceRegister = pubSubServiceRegister,
     log = log,
 ) {
-    override fun topic(): String = Topic
+    override fun topic(): String = SlackInteractivityPubSubTopic
 
     override fun register() {
         exports.slackInteractivityPubSub = registerForPubSubCallbacks()
@@ -64,15 +65,11 @@ class SlackInteractivityPubSubService(
     }
 
     private suspend fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
-        topic = PreloadPubSubService.Topic,
+        topic = PreloadPubSubTopic,
         body = PreloadPubSubMessage(searchSessionId),
         jsonSerializer = jsonSerializer,
         log = log
     )
-
-    companion object {
-        const val Topic = "slackInteractivityPubSub"
-    }
 }
 
 private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.shuffleAction() =

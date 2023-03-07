@@ -10,6 +10,7 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.decodeBodyFromJson
 import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
+import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubTopic
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import kotlinx.serialization.json.Json
 
@@ -22,7 +23,7 @@ class PreloadPubSubService(
     pubSubServiceRegister = pubSubServiceRegister,
     log = log,
 ) {
-    override fun topic(): String = Topic
+    override fun topic(): String = PreloadPubSubTopic
 
     override fun register() {
         exports.preloadPubSub = registerForPubSubCallbacks()
@@ -35,8 +36,4 @@ class PreloadPubSubService(
         )
             .leftIfNull(default = { Exception("Message body is null") })
             .flatMap { preloadSearchResultUseCase(searchSessionId = it.searchSessionId) }
-
-    companion object {
-        const val Topic = "preloadPubSub"
-    }
 }

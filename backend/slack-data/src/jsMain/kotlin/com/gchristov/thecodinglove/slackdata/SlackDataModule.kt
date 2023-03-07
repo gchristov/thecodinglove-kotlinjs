@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.slackdata
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.SearchRepository
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.*
 import io.ktor.client.*
@@ -43,7 +43,7 @@ object SlackDataModule : DiModule() {
             bindProvider {
                 provideShuffleSlackSearchUseCase(
                     log = instance(),
-                    searchWithSessionUseCase = instance(),
+                    searchUseCase = instance(),
                     slackRepository = instance(),
                 )
             }
@@ -89,12 +89,12 @@ object SlackDataModule : DiModule() {
 
     private fun provideShuffleSlackSearchUseCase(
         log: Logger,
-        searchWithSessionUseCase: SearchWithSessionUseCase,
+        searchUseCase: SearchUseCase,
         slackRepository: SlackRepository,
     ): ShuffleSlackSearchUseCase = RealShuffleSlackSearchUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
-        searchWithSessionUseCase = searchWithSessionUseCase,
+        searchUseCase = searchUseCase,
         slackRepository = slackRepository
     )
 }

@@ -11,6 +11,7 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
+import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubTopic
 import com.gchristov.thecodinglove.slackdata.domain.toPubSubMessage
 import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import kotlinx.serialization.json.Json
@@ -54,7 +55,7 @@ class SlackSlashCommandApiService(
 
     private suspend fun publishSlashCommandMessage(slashCommand: ApiSlackSlashCommand) =
         pubSubSender.sendMessage(
-            topic = SlackSlashCommandPubSubService.Topic,
+            topic = SlackSlashCommandPubSubTopic,
             body = slashCommand.toPubSubMessage(),
             jsonSerializer = jsonSerializer,
             log = log

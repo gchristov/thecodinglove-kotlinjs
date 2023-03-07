@@ -9,10 +9,11 @@ import com.gchristov.thecodinglove.commonservicedata.api.*
 import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
-import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackInteractivity
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
+import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubTopic
 import com.gchristov.thecodinglove.slackdata.domain.toPubSubMessage
+import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import kotlinx.serialization.json.Json
 
 class SlackInteractivityApiService(
@@ -54,7 +55,7 @@ class SlackInteractivityApiService(
 
     private suspend fun publishInteractivityMessage(interactivity: ApiSlackInteractivity) =
         pubSubSender.sendMessage(
-            topic = SlackInteractivityPubSubService.Topic,
+            topic = SlackInteractivityPubSubTopic,
             body = interactivity.toPubSubMessage(),
             jsonSerializer = jsonSerializer,
             log = log

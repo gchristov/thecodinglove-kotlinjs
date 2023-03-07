@@ -10,7 +10,7 @@ import com.gchristov.thecodinglove.searchdata.model.SearchSession
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-interface SearchWithSessionUseCase {
+interface SearchUseCase {
     suspend operator fun invoke(type: Type): Either<SearchError, Result>
 
     sealed class Type {
@@ -26,14 +26,14 @@ interface SearchWithSessionUseCase {
     )
 }
 
-class RealSearchWithSessionUseCase(
+class RealSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
-) : SearchWithSessionUseCase {
+) : SearchUseCase {
     override suspend operator fun invoke(
-        type: SearchWithSessionUseCase.Type
-    ): Either<SearchError, SearchWithSessionUseCase.Result> = withContext(dispatcher) {
+        type: SearchUseCase.Type
+    ): Either<SearchError, SearchUseCase.Result> = withContext(dispatcher) {
         type
             .getSearchSession(searchRepository)
             .flatMap { searchSession ->
@@ -47,7 +47,7 @@ class RealSearchWithSessionUseCase(
                         // TODO: Consider better error type
                         .mapLeft { SearchError.SessionNotFound }
                         .map {
-                            SearchWithSessionUseCase.Result(
+                            SearchUseCase.Result(
                                 searchSessionId = searchSession.id,
                                 query = searchSession.query,
                                 post = preloadedPost,
@@ -83,7 +83,7 @@ class RealSearchWithSessionUseCase(
                                 // TODO: Consider better error type
                                 .mapLeft { SearchError.SessionNotFound }
                                 .map {
-                                    SearchWithSessionUseCase.Result(
+                                    SearchUseCase.Result(
                                         searchSessionId = searchSession.id,
                                         query = searchResult.query,
                                         post = searchResult.post,
@@ -97,10 +97,10 @@ class RealSearchWithSessionUseCase(
     }
 }
 
-private suspend fun SearchWithSessionUseCase.Type.getSearchSession(
+private suspend fun SearchUseCase.Type.getSearchSession(
     searchRepository: SearchRepository
 ): Either<SearchError, SearchSession> = when (this) {
-    is SearchWithSessionUseCase.Type.NewSession -> Either.Right(
+    is SearchUseCase.Type.NewSession -> Either.Right(
         SearchSession(
             id = uuid4().toString(),
             query = this.query,
@@ -112,7 +112,7 @@ private suspend fun SearchWithSessionUseCase.Type.getSearchSession(
         )
     )
 
-    is SearchWithSessionUseCase.Type.WithSessionId -> searchRepository
+    is SearchUseCase.Type.WithSessionId -> searchRepository
         .getSearchSession(this.sessionId)
         .mapLeft { SearchError.SessionNotFound }
 }

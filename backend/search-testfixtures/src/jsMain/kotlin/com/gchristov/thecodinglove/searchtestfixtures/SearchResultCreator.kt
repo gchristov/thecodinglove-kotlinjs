@@ -1,12 +1,12 @@
 package com.gchristov.thecodinglove.searchtestfixtures
 
-import com.gchristov.thecodinglove.searchdata.usecase.SearchWithSessionUseCase
+import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 
-object SearchWithSessionResultCreator {
+object SearchResultCreator {
     fun validResult(
         searchSessionId: String,
         query: String
-    ) = SearchWithSessionUseCase.Result(
+    ) = SearchUseCase.Result(
         searchSessionId = searchSessionId,
         query = query,
         post = PostCreator.defaultPost(),

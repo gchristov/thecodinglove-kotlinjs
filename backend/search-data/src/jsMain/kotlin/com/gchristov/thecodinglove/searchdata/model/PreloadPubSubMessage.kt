@@ -6,3 +6,5 @@ import kotlinx.serialization.Serializable
 data class PreloadPubSubMessage(
     val searchSessionId: String
 )
+
+const val PreloadPubSubTopic = "preloadPubSub"
