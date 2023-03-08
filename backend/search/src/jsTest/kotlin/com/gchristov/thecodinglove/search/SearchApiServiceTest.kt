@@ -3,10 +3,7 @@ package com.gchristov.thecodinglove.search
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiResponse
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiServiceRegister
-import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSender
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
-import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubMessage
-import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubTopic
 import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchApiRequest
@@ -16,7 +13,6 @@ import io.ktor.client.engine.js.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.kodein.di.bindings.ErasedContext.value
 import kotlin.test.Test
@@ -30,7 +26,7 @@ class SearchApiServiceTest {
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchError.Empty)
-    ) { service, _, _, _, _, register ->
+    ) { service, _, _, _, register ->
         service.register()
         register.assertInvokedOnce()
     }
@@ -44,7 +40,7 @@ class SearchApiServiceTest {
         return runBlockingTest(
             searchSessionId = null,
             searchInvocationResult = Either.Right(expectedResult)
-        ) { service, pubSubSender, searchUseCase, request, response, register ->
+        ) { service, searchUseCase, request, response, register ->
             val actualResult = service.handleRequest(
                 request = request,
                 response = response
@@ -53,10 +49,6 @@ class SearchApiServiceTest {
             searchUseCase.assertInvokedOnce()
             searchUseCase.assertSearchType(
                 SearchUseCase.Type.NewSession(query = TestSearchQuery)
-            )
-            pubSubSender.assertEquals(
-                topic = PreloadSearchPubSubTopic,
-                body = Json.encodeToString(PreloadSearchPubSubMessage(TestSearchSessionId))
             )
             response.assertEquals(
                 header = "Content-Type",
@@ -80,7 +72,7 @@ class SearchApiServiceTest {
             searchSessionId = TestSearchSessionId,
             searchQuery = TestSearchQuery,
             searchInvocationResult = Either.Right(expectedResult)
-        ) { service, pubSubSender, searchUseCase, request, response, register ->
+        ) { service, searchUseCase, request, response, register ->
             val actualResult = service.handleRequest(
                 request = request,
                 response = response
@@ -89,10 +81,6 @@ class SearchApiServiceTest {
             searchUseCase.assertInvokedOnce()
             searchUseCase.assertSearchType(
                 SearchUseCase.Type.WithSessionId(TestSearchSessionId)
-            )
-            pubSubSender.assertEquals(
-                topic = PreloadSearchPubSubTopic,
-                body = Json.encodeToString(PreloadSearchPubSubMessage(TestSearchSessionId))
             )
             response.assertEquals(
                 header = "Content-Type",
@@ -111,14 +99,13 @@ class SearchApiServiceTest {
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchError.Empty)
-    ) { service, pubSubSender, searchUseCase, request, response, register ->
+    ) { service, searchUseCase, request, response, register ->
         val actualResult = service.handleRequest(
             request = request,
             response = response
         )
         register.assertNotInvoked()
         searchUseCase.assertInvokedOnce()
-        pubSubSender.assertNotInvoked()
         assertEquals(
             expected = Either.Left(SearchError.Empty),
             actual = actualResult
@@ -129,9 +116,8 @@ class SearchApiServiceTest {
         searchSessionId: String? = TestSearchSessionId,
         searchQuery: String? = TestSearchQuery,
         searchInvocationResult: Either<SearchError, SearchUseCase.Result>,
-        testBlock: suspend (SearchApiService, FakePubSubSender, FakeSearchUseCase, FakeSearchApiRequest, FakeApiResponse, FakeApiServiceRegister) -> Unit
+        testBlock: suspend (SearchApiService, FakeSearchUseCase, FakeSearchApiRequest, FakeApiResponse, FakeApiServiceRegister) -> Unit
     ): TestResult = runTest {
-        val pubSubSender = FakePubSubSender()
         val searchUseCase = FakeSearchUseCase(
             invocationResult = searchInvocationResult
         )
@@ -147,7 +133,7 @@ class SearchApiServiceTest {
             log = FakeLogger,
             searchUseCase = searchUseCase
         )
-        testBlock(service, pubSubSender, searchUseCase, request, response, register)
+        testBlock(service, searchUseCase, request, response, register)
     }
 }
 
