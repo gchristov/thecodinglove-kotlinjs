@@ -2,7 +2,6 @@ package com.gchristov.thecodinglove.search
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
@@ -22,7 +21,6 @@ object SearchModule : DiModule() {
                     apiServiceRegister = instance(),
                     jsonSerializer = instance(),
                     log = instance(),
-                    pubSubSender = instance(),
                     searchUseCase = instance(),
                 )
             }
@@ -41,13 +39,11 @@ object SearchModule : DiModule() {
         apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
         log: Logger,
-        pubSubSender: PubSubSender,
         searchUseCase: SearchUseCase
     ): SearchApiService = SearchApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
-        pubSubSender = pubSubSender,
         searchUseCase = searchUseCase
     )
 

@@ -6,9 +6,9 @@ import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.PubSubService
 import com.gchristov.thecodinglove.commonservicedata.exports
-import com.gchristov.thecodinglove.commonservicedata.pubsub.*
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubTopic
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
+import com.gchristov.thecodinglove.commonservicedata.pubsub.decodeBodyFromJson
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackActionName
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubTopic
@@ -22,7 +22,6 @@ class SlackInteractivityPubSubService(
     private val log: Logger,
     private val shuffleSlackSearchUseCase: ShuffleSlackSearchUseCase,
     private val cancelSlackSearchUseCase: CancelSlackSearchUseCase,
-    private val pubSubSender: PubSubSender,
 ) : PubSubService(
     pubSubServiceRegister = pubSubServiceRegister,
     log = log,
@@ -53,7 +52,7 @@ class SlackInteractivityPubSubService(
             shuffleAction != null -> shuffleSlackSearchUseCase.invoke(
                 messageUrl = responseUrl,
                 searchSessionId = shuffleAction.value
-            ).flatMap { publishPreloadMessage(shuffleAction.value) }
+            )
 
             cancelAction != null -> cancelSlackSearchUseCase.invoke(
                 messageUrl = responseUrl,
@@ -63,13 +62,6 @@ class SlackInteractivityPubSubService(
             else -> Either.Left(Throwable("Unsupported interactivity message action"))
         }
     }
-
-    private suspend fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
-        topic = PreloadPubSubTopic,
-        body = PreloadPubSubMessage(searchSessionId),
-        jsonSerializer = jsonSerializer,
-        log = log
-    )
 }
 
 private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.shuffleAction() =

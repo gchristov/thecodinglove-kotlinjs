@@ -1,13 +1,16 @@
 package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSender
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
 import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.model.SearchSession
 import com.gchristov.thecodinglove.searchtestfixtures.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -194,6 +197,7 @@ class RealSearchUseCaseTest {
         searchSession: SearchSession?,
         testBlock: suspend (SearchUseCase, FakeSearchRepository, FakeSearchWithHistoryUseCase) -> Unit
     ): TestResult = runTest {
+        val pubSubSender = FakePubSubSender()
         val searchInvocationResults = singleSearchWithHistoryInvocationResult?.let { listOf(it) }
             ?: multiSearchWithHistoryInvocationResults
             ?: emptyList()
@@ -204,7 +208,10 @@ class RealSearchUseCaseTest {
         val useCase = RealSearchUseCase(
             dispatcher = FakeCoroutineDispatcher,
             searchRepository = searchRepository,
-            searchWithHistoryUseCase = searchWithHistoryUseCase
+            searchWithHistoryUseCase = searchWithHistoryUseCase,
+            jsonSerializer = Json,
+            log = FakeLogger,
+            pubSubSender = pubSubSender,
         )
         testBlock(useCase, searchRepository, searchWithHistoryUseCase)
     }

@@ -2,13 +2,15 @@ package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import arrow.core.flatMap
+import co.touchlab.kermit.Logger
 import com.benasher44.uuid.uuid4
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
+import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
 import com.gchristov.thecodinglove.searchdata.SearchRepository
-import com.gchristov.thecodinglove.searchdata.model.Post
-import com.gchristov.thecodinglove.searchdata.model.SearchError
-import com.gchristov.thecodinglove.searchdata.model.SearchSession
+import com.gchristov.thecodinglove.searchdata.model.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
 interface SearchUseCase {
     suspend operator fun invoke(type: Type): Either<SearchError, Result>
@@ -30,71 +32,90 @@ class RealSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
+    private val pubSubSender: PubSubSender,
+    private val log: Logger,
+    private val jsonSerializer: Json,
 ) : SearchUseCase {
     override suspend operator fun invoke(
         type: SearchUseCase.Type
     ): Either<SearchError, SearchUseCase.Result> = withContext(dispatcher) {
-        type
-            .getSearchSession(searchRepository)
-            .flatMap { searchSession ->
-                val preloadedPost = searchSession.preloadedPost
-                if (preloadedPost != null) {
-                    // If a post is preloaded, use it right away
-                    searchSession.usePreloadedPost(
-                        preloadedPost = preloadedPost,
-                        searchRepository = searchRepository
-                    )
-                        // TODO: Consider better error type
-                        .mapLeft { SearchError.SessionNotFound }
-                        .map {
-                            SearchUseCase.Result(
-                                searchSessionId = searchSession.id,
-                                query = searchSession.query,
-                                post = preloadedPost,
-                                totalPosts = searchSession.totalPosts ?: 0
-                            )
-                        }
-                } else {
-                    // Else, run normal search
-                    searchWithHistoryUseCase(
-                        query = searchSession.query,
-                        totalPosts = searchSession.totalPosts,
-                        searchHistory = searchSession.searchHistory,
-                    ).fold(
-                        ifLeft = { searchError ->
-                            when (searchError) {
-                                is SearchError.Exhausted -> {
-                                    searchSession
-                                        .clearExhaustedHistory(searchRepository)
-                                        // TODO: Consider better error type
-                                        .mapLeft { SearchError.SessionNotFound }
-                                        .flatMap { invoke(type = type) }
-                                }
-
-                                else -> Either.Left(searchError)
-                            }
-                        },
-                        ifRight = { searchResult ->
-                            searchSession
-                                .insertCurrentPost(
-                                    searchResult = searchResult,
-                                    searchRepository = searchRepository
-                                )
-                                // TODO: Consider better error type
-                                .mapLeft { SearchError.SessionNotFound }
-                                .map {
-                                    SearchUseCase.Result(
-                                        searchSessionId = searchSession.id,
-                                        query = searchResult.query,
-                                        post = searchResult.post,
-                                        totalPosts = searchResult.totalPosts
-                                    )
-                                }
-                        }
-                    )
-                }
+        search(type)
+            .flatMap { searchResult ->
+                publishSearchPreloadMessage(searchResult.searchSessionId)
+                    .flatMap {
+                        Either.Right(searchResult)
+                    }
             }
     }
+
+    private suspend fun search(type: SearchUseCase.Type) = type
+        .getSearchSession(searchRepository)
+        .flatMap { searchSession ->
+            val preloadedPost = searchSession.preloadedPost
+            if (preloadedPost != null) {
+                // If a post is preloaded, use it right away
+                searchSession.usePreloadedPost(
+                    preloadedPost = preloadedPost,
+                    searchRepository = searchRepository
+                )
+                    // TODO: Consider better error type
+                    .mapLeft { SearchError.SessionNotFound }
+                    .map {
+                        SearchUseCase.Result(
+                            searchSessionId = searchSession.id,
+                            query = searchSession.query,
+                            post = preloadedPost,
+                            totalPosts = searchSession.totalPosts ?: 0
+                        )
+                    }
+            } else {
+                // Else, run normal search
+                searchWithHistoryUseCase(
+                    query = searchSession.query,
+                    totalPosts = searchSession.totalPosts,
+                    searchHistory = searchSession.searchHistory,
+                ).fold(
+                    ifLeft = { searchError ->
+                        when (searchError) {
+                            is SearchError.Exhausted -> {
+                                searchSession
+                                    .clearExhaustedHistory(searchRepository)
+                                    // TODO: Consider better error type
+                                    .mapLeft { SearchError.SessionNotFound }
+                                    .flatMap { invoke(type = type) }
+                            }
+
+                            else -> Either.Left(searchError)
+                        }
+                    },
+                    ifRight = { searchResult ->
+                        searchSession
+                            .insertCurrentPost(
+                                searchResult = searchResult,
+                                searchRepository = searchRepository
+                            )
+                            // TODO: Consider better error type
+                            .mapLeft { SearchError.SessionNotFound }
+                            .map {
+                                SearchUseCase.Result(
+                                    searchSessionId = searchSession.id,
+                                    query = searchResult.query,
+                                    post = searchResult.post,
+                                    totalPosts = searchResult.totalPosts
+                                )
+                            }
+                    }
+                )
+            }
+        }
+
+    private suspend fun publishSearchPreloadMessage(searchSessionId: String) =
+        pubSubSender.sendMessage(
+            topic = PreloadPubSubTopic,
+            body = PreloadPubSubMessage(searchSessionId),
+            jsonSerializer = jsonSerializer,
+            log = log
+        ).mapLeft { SearchError.SessionNotFound }
 }
 
 private suspend fun SearchUseCase.Type.getSearchSession(

@@ -145,7 +145,6 @@ class SearchApiServiceTest {
             apiServiceRegister = register,
             jsonSerializer = Json,
             log = FakeLogger,
-            pubSubSender = pubSubSender,
             searchUseCase = searchUseCase
         )
         testBlock(service, pubSubSender, searchUseCase, request, response, register)
