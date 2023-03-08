@@ -37,6 +37,27 @@ class RealSearchUseCaseTest {
     }
 
     @Test
+    fun searchWithSessionIdReusesSession(): TestResult {
+        val searchType = SearchUseCase.Type.WithSessionId(TestSearchSessionId)
+        val searchWithHistoryResult = Either.Right(
+            SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
+        )
+        val searchSession = SearchSessionCreator.searchSession(
+            id = TestSearchSessionId,
+            query = TestSearchQuery
+        )
+
+        return runBlockingTest(
+            singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
+            searchSession = searchSession,
+        ) { useCase, _, searchRepository, searchWithHistoryUseCase ->
+            useCase.invoke(type = searchType)
+            searchWithHistoryUseCase.assertInvokedOnce()
+            searchRepository.assertSessionFetched()
+        }
+    }
+
+    @Test
     fun searchWithSessionIdReturnsPreloadedPostAndPreloads(): TestResult {
         val searchType = SearchUseCase.Type.WithSessionId(TestSearchSessionId)
         val searchWithHistoryResult = Either.Right(
@@ -82,27 +103,6 @@ class RealSearchUseCaseTest {
                 topic = PreloadSearchPubSubTopic,
                 body = Json.encodeToString(PreloadSearchPubSubMessage(TestSearchSessionId))
             )
-        }
-    }
-
-    @Test
-    fun searchWithSessionIdReusesSession(): TestResult {
-        val searchType = SearchUseCase.Type.WithSessionId(TestSearchSessionId)
-        val searchWithHistoryResult = Either.Right(
-            SearchWithHistoryResultCreator.validResult(query = TestSearchQuery)
-        )
-        val searchSession = SearchSessionCreator.searchSession(
-            id = TestSearchSessionId,
-            query = TestSearchQuery
-        )
-
-        return runBlockingTest(
-            singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
-            searchSession = searchSession,
-        ) { useCase, _, searchRepository, searchWithHistoryUseCase ->
-            useCase.invoke(type = searchType)
-            searchWithHistoryUseCase.assertInvokedOnce()
-            searchRepository.assertSessionFetched()
         }
     }
 
