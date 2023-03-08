@@ -25,7 +25,7 @@ object SearchModule : DiModule() {
                 )
             }
             bindSingleton {
-                providePreloadPubSubService(
+                providePreloadSearchPubSubService(
                     pubSubServiceRegister = instance(),
                     jsonSerializer = instance(),
                     log = instance(),
@@ -47,12 +47,12 @@ object SearchModule : DiModule() {
         searchUseCase = searchUseCase
     )
 
-    private fun providePreloadPubSubService(
+    private fun providePreloadSearchPubSubService(
         pubSubServiceRegister: PubSubServiceRegister,
         jsonSerializer: Json,
         log: Logger,
         preloadSearchResultUseCase: PreloadSearchResultUseCase
-    ): PreloadPubSubService = PreloadPubSubService(
+    ): PreloadSearchPubSubService = PreloadSearchPubSubService(
         pubSubServiceRegister = pubSubServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,

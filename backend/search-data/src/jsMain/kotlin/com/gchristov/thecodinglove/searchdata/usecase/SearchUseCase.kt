@@ -111,8 +111,8 @@ class RealSearchUseCase(
 
     private suspend fun publishSearchPreloadMessage(searchSessionId: String) =
         pubSubSender.sendMessage(
-            topic = PreloadPubSubTopic,
-            body = PreloadPubSubMessage(searchSessionId),
+            topic = PreloadSearchPubSubTopic,
+            body = PreloadSearchPubSubMessage(searchSessionId),
             jsonSerializer = jsonSerializer,
             log = log
         ).mapLeft { SearchError.SessionNotFound }

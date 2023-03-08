@@ -5,8 +5,8 @@ import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiResponse
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiServiceRegister
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSender
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubTopic
+import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubMessage
+import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubTopic
 import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchApiRequest
@@ -55,8 +55,8 @@ class SearchApiServiceTest {
                 SearchUseCase.Type.NewSession(query = TestSearchQuery)
             )
             pubSubSender.assertEquals(
-                topic = PreloadPubSubTopic,
-                body = Json.encodeToString(PreloadPubSubMessage(TestSearchSessionId))
+                topic = PreloadSearchPubSubTopic,
+                body = Json.encodeToString(PreloadSearchPubSubMessage(TestSearchSessionId))
             )
             response.assertEquals(
                 header = "Content-Type",
@@ -91,8 +91,8 @@ class SearchApiServiceTest {
                 SearchUseCase.Type.WithSessionId(TestSearchSessionId)
             )
             pubSubSender.assertEquals(
-                topic = PreloadPubSubTopic,
-                body = Json.encodeToString(PreloadPubSubMessage(TestSearchSessionId))
+                topic = PreloadSearchPubSubTopic,
+                body = Json.encodeToString(PreloadSearchPubSubMessage(TestSearchSessionId))
             )
             response.assertEquals(
                 header = "Content-Type",

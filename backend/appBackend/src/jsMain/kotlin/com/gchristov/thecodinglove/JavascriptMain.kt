@@ -8,7 +8,7 @@ import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.registerModules
 import com.gchristov.thecodinglove.kmpcommonnetwork.KmpCommonNetworkModule
-import com.gchristov.thecodinglove.search.PreloadPubSubService
+import com.gchristov.thecodinglove.search.PreloadSearchPubSubService
 import com.gchristov.thecodinglove.search.SearchApiService
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
@@ -43,7 +43,7 @@ private fun setupDi() {
 
 private fun setupServices() {
     DiGraph.inject<SearchApiService>().register()
-    DiGraph.inject<PreloadPubSubService>().register()
+    DiGraph.inject<PreloadSearchPubSubService>().register()
     DiGraph.inject<SlackSlashCommandApiService>().register()
     DiGraph.inject<SlackSlashCommandPubSubService>().register()
     DiGraph.inject<SlackInteractivityApiService>().register()
