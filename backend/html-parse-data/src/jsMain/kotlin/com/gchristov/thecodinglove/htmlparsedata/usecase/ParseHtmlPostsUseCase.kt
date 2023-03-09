@@ -1,39 +1,25 @@
-package com.gchristov.thecodinglove.htmlparsedata
+package com.gchristov.thecodinglove.htmlparsedata.usecase
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.htmlparsedata.HtmlPost
 import com.gchristov.thecodinglove.kmpcommonkotlin.requireModule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 interface ParseHtmlPostsUseCase {
-    suspend fun parseTotalPosts(content: String): Either<Throwable, Int>
-
-    suspend fun parsePosts(content: String): Either<Throwable, List<HtmlPost>>
+    suspend operator fun invoke(html: String): Either<Throwable, List<HtmlPost>>
 }
 
 internal class RealParseHtmlPostsUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
 ) : ParseHtmlPostsUseCase {
-    override suspend fun parseTotalPosts(content: String): Either<Throwable, Int> =
-        withContext(dispatcher) {
-            try {
-                val root = acquireRootNode(content)
-                val resultsCountNode = root.querySelectorAll(TotalPostsSelector)[0]
-                val count = (resultsCountNode.text as? String)?.toInt() ?: 0
-                Either.Right(count)
-            } catch (error: Throwable) {
-                log.e(error) { error.message ?: "Error during total posts parse" }
-                Either.Left(error)
-            }
-        }
-
-    override suspend fun parsePosts(content: String): Either<Throwable, List<HtmlPost>> =
+    override suspend operator fun invoke(html: String): Either<Throwable, List<HtmlPost>> =
         withContext(dispatcher) {
             try {
                 val posts = mutableListOf<HtmlPost>()
-                val root = acquireRootNode(content)
+                val root = acquireRootNode(html)
                 val postNodes = root.querySelectorAll(PostSelector)
                 val numPosts = postNodes.length as Int
                 for (i in 0 until numPosts) {
@@ -94,6 +80,5 @@ internal class RealParseHtmlPostsUseCase(
     }
 }
 
-private const val TotalPostsSelector = "span[class='results-number']"
 private const val PostSelector = "article[class*='index-blog-post']"
 private const val PostContentSelector = "div[class*='blog-post-content']"

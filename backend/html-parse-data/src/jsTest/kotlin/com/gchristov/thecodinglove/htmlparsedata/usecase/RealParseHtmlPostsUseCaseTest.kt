@@ -1,6 +1,7 @@
-package com.gchristov.thecodinglove.htmlparsedata
+package com.gchristov.thecodinglove.htmlparsedata.usecase
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.htmlparsedata.HtmlPost
 import com.gchristov.thecodinglove.htmlparsetestfixtures.HtmlCreator
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
@@ -8,28 +9,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ParseHtmlPostsUseCaseTest {
-    @Test
-    fun parseTotalPosts() = runBlockingTest { parser ->
-        val actualCount = parser.parseTotalPosts(HtmlCreator.defaultHtml())
-        assertEquals(
-            expected = Either.Right(314),
-            actual = actualCount
-        )
-    }
-
-    @Test
-    fun parseInvalidTotalPosts() = runBlockingTest { parser ->
-        val actualCount = parser.parseTotalPosts(HtmlCreator.invalidResultsCountHtml())
-        assertTrue { actualCount.isLeft() }
-    }
-
+class RealParseHtmlPostsUseCaseTest {
     @Test
     fun parsePosts() = runBlockingTest { parser ->
-        val actualPosts = parser.parsePosts(HtmlCreator.defaultHtml())
+        val actualPosts = parser(HtmlCreator.defaultHtml())
         assertEquals(
             expected = Either.Right(TestActualPostList),
             actual = actualPosts
@@ -38,7 +23,7 @@ class ParseHtmlPostsUseCaseTest {
 
     @Test
     fun parseInvalidPosts() = runBlockingTest { parser ->
-        val actualPosts = parser.parsePosts(HtmlCreator.invalidHtml())
+        val actualPosts = parser(HtmlCreator.invalidHtml())
         assertEquals(
             expected = Either.Right(emptyList()),
             actual = actualPosts
