@@ -1,22 +1,21 @@
-package com.gchristov.thecodinglove.htmlparse
+package com.gchristov.thecodinglove.htmlparsedata
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.htmlparsedata.HtmlPost
 import com.gchristov.thecodinglove.kmpcommonkotlin.requireModule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-interface HtmlPostParser {
+interface ParseHtmlPostsUseCase {
     suspend fun parseTotalPosts(content: String): Either<Throwable, Int>
 
     suspend fun parsePosts(content: String): Either<Throwable, List<HtmlPost>>
 }
 
-internal class RealHtmlPostParser(
+internal class RealParseHtmlPostsUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
-) : HtmlPostParser {
+) : ParseHtmlPostsUseCase {
     override suspend fun parseTotalPosts(content: String): Either<Throwable, Int> =
         withContext(dispatcher) {
             try {

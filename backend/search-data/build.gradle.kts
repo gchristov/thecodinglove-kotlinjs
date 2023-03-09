@@ -8,7 +8,7 @@ kotlin {
             dependencies {
                 implementation(projects.kmpCommonFirebase)
                 implementation(projects.commonServiceData)
-                implementation(projects.htmlParse)
+                implementation(projects.htmlParseData)
             }
         }
         val jsTest by getting {

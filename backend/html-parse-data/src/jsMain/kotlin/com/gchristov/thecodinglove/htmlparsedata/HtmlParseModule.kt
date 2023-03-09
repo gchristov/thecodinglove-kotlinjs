@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.htmlparse
+package com.gchristov.thecodinglove.htmlparsedata
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
@@ -7,8 +7,8 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.instance
 
-object HtmlParseModule : DiModule() {
-    override fun name() = "htmlparse"
+object HtmlParseDataModule : DiModule() {
+    override fun name() = "html-parse-data"
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
@@ -16,7 +16,9 @@ object HtmlParseModule : DiModule() {
         }
     }
 
-    private fun provideHtmlPostParser(log: Logger): HtmlPostParser = RealHtmlPostParser(
+    private fun provideHtmlPostParser(
+        log: Logger
+    ): ParseHtmlPostsUseCase = RealParseHtmlPostsUseCase(
         dispatcher = Dispatchers.Default,
         log = log
     )

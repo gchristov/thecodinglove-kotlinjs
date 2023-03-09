@@ -10,7 +10,6 @@ val projects = listOf(
     "backend/common-service-data",
     "backend/common-service-testfixtures",
     "backend/firebasefunctions",
-    "backend/html-parse",
     "backend/html-parse-data",
     "backend/html-parse-testfixtures",
     "backend/search",

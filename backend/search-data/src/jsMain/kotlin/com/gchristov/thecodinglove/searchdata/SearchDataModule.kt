@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.searchdata
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
-import com.gchristov.thecodinglove.htmlparse.HtmlPostParser
+import com.gchristov.thecodinglove.htmlparsedata.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
 import com.gchristov.thecodinglove.searchdata.usecase.*
@@ -16,7 +16,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
 object SearchDataModule : DiModule() {
-    override fun name() = "kmp-search-data"
+    override fun name() = "search-data"
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
@@ -24,7 +24,7 @@ object SearchDataModule : DiModule() {
             bindSingleton {
                 provideSearchRepository(
                     api = instance(),
-                    htmlPostParser = instance(),
+                    parseHtmlPostsUseCase = instance(),
                     firebaseFirestore = instance(),
                     log = instance()
                 )
@@ -58,12 +58,12 @@ object SearchDataModule : DiModule() {
 
     private fun provideSearchRepository(
         api: SearchApi,
-        htmlPostParser: HtmlPostParser,
+        parseHtmlPostsUseCase: ParseHtmlPostsUseCase,
         firebaseFirestore: FirebaseFirestore,
         log: Logger
     ): SearchRepository = RealSearchRepository(
         apiService = api,
-        htmlPostParser = htmlPostParser,
+        parseHtmlPostsUseCase = parseHtmlPostsUseCase,
         firebaseFirestore = firebaseFirestore,
         log = log
     )

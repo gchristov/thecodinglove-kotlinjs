@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove
 
 import com.gchristov.thecodinglove.commonservicedata.CommonServiceDataModule
-import com.gchristov.thecodinglove.htmlparse.HtmlParseModule
+import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
 import com.gchristov.thecodinglove.kmpcommonfirebase.KmpCommonFirebaseModule
 import com.gchristov.thecodinglove.kmpcommonkotlin.KmpCommonKotlinModule
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
@@ -32,7 +32,7 @@ private fun setupDi() {
             KmpCommonFirebaseModule.module,
             KmpCommonNetworkModule.module,
             CommonServiceDataModule.module,
-            HtmlParseModule.module,
+            HtmlParseDataModule.module,
             SearchModule.module,
             SearchDataModule.module,
             SlackModule.module,

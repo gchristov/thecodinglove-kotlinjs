@@ -1,7 +1,6 @@
-package com.gchristov.thecodinglove.htmlparse
+package com.gchristov.thecodinglove.htmlparsedata
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.htmlparsedata.HtmlPost
 import com.gchristov.thecodinglove.htmlparsetestfixtures.HtmlCreator
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
@@ -12,7 +11,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class HtmlPostParserTest {
+class ParseHtmlPostsUseCaseTest {
     @Test
     fun parseTotalPosts() = runBlockingTest { parser ->
         val actualCount = parser.parseTotalPosts(HtmlCreator.defaultHtml())
@@ -46,9 +45,9 @@ class HtmlPostParserTest {
         )
     }
 
-    private fun runBlockingTest(testBlock: suspend (HtmlPostParser) -> Unit) =
+    private fun runBlockingTest(testBlock: suspend (ParseHtmlPostsUseCase) -> Unit) =
         runTest {
-            val parser = RealHtmlPostParser(
+            val parser = RealParseHtmlPostsUseCase(
                 dispatcher = FakeCoroutineDispatcher,
                 log = FakeLogger
             )
