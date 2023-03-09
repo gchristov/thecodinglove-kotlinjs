@@ -47,6 +47,13 @@ object SlackDataModule : DiModule() {
                     slackRepository = instance(),
                 )
             }
+            bindProvider {
+                provideSendSlackSearchUseCase(
+                    log = instance(),
+                    searchRepository = instance(),
+                    slackRepository = instance(),
+                )
+            }
         }
     }
 
@@ -95,6 +102,17 @@ object SlackDataModule : DiModule() {
         dispatcher = Dispatchers.Default,
         log = log,
         searchUseCase = searchUseCase,
+        slackRepository = slackRepository
+    )
+
+    private fun provideSendSlackSearchUseCase(
+        log: Logger,
+        searchRepository: SearchRepository,
+        slackRepository: SlackRepository,
+    ): SendSlackSearchUseCase = RealSendSlackSearchUseCase(
+        dispatcher = Dispatchers.Default,
+        log = log,
+        searchRepository = searchRepository,
         slackRepository = slackRepository
     )
 }

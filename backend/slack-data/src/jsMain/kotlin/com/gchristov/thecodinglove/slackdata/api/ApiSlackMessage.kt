@@ -128,6 +128,31 @@ object ApiSlackMessageFactory {
         ),
     )
 
+    fun searchPostMessage(
+        searchQuery: String,
+        attachmentTitle: String,
+        attachmentUrl: String,
+        attachmentImageUrl: String,
+    ) = ApiSlackMessage(
+        text = searchQuery,
+        userId = null,
+        channelId = null,
+        responseType = "in_channel",
+        responseUrl = null,
+        teamId = null,
+        asUser = false,
+        replaceOriginal = true,
+        deleteOriginal = false,
+        attachments = listOf(
+            attachment(
+                title = attachmentTitle,
+                url = attachmentUrl,
+                imageUrl = attachmentImageUrl,
+                actions = emptyList(),
+            )
+        ),
+    )
+
     private fun attachment(
         title: String,
         url: String,
