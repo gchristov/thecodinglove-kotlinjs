@@ -13,6 +13,7 @@ import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubSer
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.CancelSlackSearchUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.SendSlackSearchUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.ShuffleSlackSearchUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
 import kotlinx.serialization.json.Json
@@ -59,6 +60,7 @@ object SlackModule : DiModule() {
                     pubSubServiceRegister = instance(),
                     jsonSerializer = instance(),
                     log = instance(),
+                    sendSlackSearchUseCase = instance(),
                     shuffleSlackSearchUseCase = instance(),
                     cancelSlackSearchUseCase = instance(),
                 )
@@ -116,12 +118,14 @@ object SlackModule : DiModule() {
         pubSubServiceRegister: PubSubServiceRegister,
         jsonSerializer: Json,
         log: Logger,
+        sendSlackSearchUseCase: SendSlackSearchUseCase,
         shuffleSlackSearchUseCase: ShuffleSlackSearchUseCase,
         cancelSlackSearchUseCase: CancelSlackSearchUseCase,
     ): SlackInteractivityPubSubService = SlackInteractivityPubSubService(
         pubSubServiceRegister = pubSubServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
+        sendSlackSearchUseCase = sendSlackSearchUseCase,
         shuffleSlackSearchUseCase = shuffleSlackSearchUseCase,
         cancelSlackSearchUseCase = cancelSlackSearchUseCase,
     )

@@ -13,6 +13,7 @@ import com.gchristov.thecodinglove.slackdata.api.ApiSlackActionName
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubTopic
 import com.gchristov.thecodinglove.slackdata.usecase.CancelSlackSearchUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.SendSlackSearchUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.ShuffleSlackSearchUseCase
 import kotlinx.serialization.json.Json
 
@@ -20,6 +21,7 @@ class SlackInteractivityPubSubService(
     pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
     private val log: Logger,
+    private val sendSlackSearchUseCase: SendSlackSearchUseCase,
     private val shuffleSlackSearchUseCase: ShuffleSlackSearchUseCase,
     private val cancelSlackSearchUseCase: CancelSlackSearchUseCase,
 ) : PubSubService(
@@ -46,9 +48,15 @@ class SlackInteractivityPubSubService(
             }
 
     private suspend fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.handle(): Either<Throwable, Unit> {
+        val sendAction = sendAction()
         val shuffleAction = shuffleAction()
         val cancelAction = cancelAction()
         return when {
+            sendAction != null -> sendSlackSearchUseCase.invoke(
+                messageUrl = responseUrl,
+                searchSessionId = sendAction.value
+            )
+
             shuffleAction != null -> shuffleSlackSearchUseCase.invoke(
                 messageUrl = responseUrl,
                 searchSessionId = shuffleAction.value
@@ -63,6 +71,9 @@ class SlackInteractivityPubSubService(
         }
     }
 }
+
+private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.sendAction() =
+    actions.find { it.name == ApiSlackActionName.SEND.value }
 
 private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.shuffleAction() =
     actions.find { it.name == ApiSlackActionName.SHUFFLE.value }
