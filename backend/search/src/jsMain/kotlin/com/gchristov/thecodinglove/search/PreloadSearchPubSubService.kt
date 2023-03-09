@@ -9,12 +9,12 @@ import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.decodeBodyFromJson
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubTopic
+import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubMessage
+import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubTopic
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import kotlinx.serialization.json.Json
 
-class PreloadPubSubService(
+class PreloadSearchPubSubService(
     pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
     private val log: Logger,
@@ -23,14 +23,14 @@ class PreloadPubSubService(
     pubSubServiceRegister = pubSubServiceRegister,
     log = log,
 ) {
-    override fun topic(): String = PreloadPubSubTopic
+    override fun topic(): String = PreloadSearchPubSubTopic
 
     override fun register() {
-        exports.preloadPubSub = registerForPubSubCallbacks()
+        exports.preloadSearchPubSub = registerForPubSubCallbacks()
     }
 
     override suspend fun handleMessage(message: PubSubMessage): Either<Throwable, Unit> =
-        message.decodeBodyFromJson<PreloadPubSubMessage>(
+        message.decodeBodyFromJson<PreloadSearchPubSubMessage>(
             jsonSerializer = jsonSerializer,
             log = log
         )

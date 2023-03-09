@@ -1,14 +1,14 @@
 package com.gchristov.thecodinglove
 
 import com.gchristov.thecodinglove.commonservicedata.CommonServiceDataModule
-import com.gchristov.thecodinglove.htmlparse.HtmlParseModule
+import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
 import com.gchristov.thecodinglove.kmpcommonfirebase.KmpCommonFirebaseModule
 import com.gchristov.thecodinglove.kmpcommonkotlin.KmpCommonKotlinModule
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.registerModules
 import com.gchristov.thecodinglove.kmpcommonnetwork.KmpCommonNetworkModule
-import com.gchristov.thecodinglove.search.PreloadPubSubService
+import com.gchristov.thecodinglove.search.PreloadSearchPubSubService
 import com.gchristov.thecodinglove.search.SearchApiService
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
@@ -32,7 +32,7 @@ private fun setupDi() {
             KmpCommonFirebaseModule.module,
             KmpCommonNetworkModule.module,
             CommonServiceDataModule.module,
-            HtmlParseModule.module,
+            HtmlParseDataModule.module,
             SearchModule.module,
             SearchDataModule.module,
             SlackModule.module,
@@ -43,7 +43,7 @@ private fun setupDi() {
 
 private fun setupServices() {
     DiGraph.inject<SearchApiService>().register()
-    DiGraph.inject<PreloadPubSubService>().register()
+    DiGraph.inject<PreloadSearchPubSubService>().register()
     DiGraph.inject<SlackSlashCommandApiService>().register()
     DiGraph.inject<SlackSlashCommandPubSubService>().register()
     DiGraph.inject<SlackInteractivityApiService>().register()

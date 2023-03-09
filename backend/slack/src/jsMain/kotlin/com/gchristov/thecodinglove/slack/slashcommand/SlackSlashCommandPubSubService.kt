@@ -6,9 +6,9 @@ import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.PubSubService
 import com.gchristov.thecodinglove.commonservicedata.exports
-import com.gchristov.thecodinglove.commonservicedata.pubsub.*
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubTopic
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
+import com.gchristov.thecodinglove.commonservicedata.pubsub.decodeBodyFromJson
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
@@ -21,7 +21,6 @@ class SlackSlashCommandPubSubService(
     private val jsonSerializer: Json,
     private val log: Logger,
     private val slackRepository: SlackRepository,
-    private val pubSubSender: PubSubSender,
     private val searchUseCase: SearchUseCase,
 ) : PubSubService(
     pubSubServiceRegister = pubSubServiceRegister,
@@ -47,28 +46,18 @@ class SlackSlashCommandPubSubService(
                     searchUseCase(
                         SearchUseCase.Type.NewSession(query = slashCommand.text)
                     ).flatMap { searchResult ->
-                        publishPreloadMessage(searchResult.searchSessionId)
-                            .flatMap {
-                                slackRepository.sendMessage(
-                                    messageUrl = slashCommand.responseUrl,
-                                    message = ApiSlackMessageFactory.searchResultMessage(
-                                        searchQuery = searchResult.query,
-                                        searchResults = searchResult.totalPosts,
-                                        searchSessionId = searchResult.searchSessionId,
-                                        attachmentTitle = searchResult.post.title,
-                                        attachmentUrl = searchResult.post.url,
-                                        attachmentImageUrl = searchResult.post.imageUrl
-                                    )
-                                )
-                            }
+                        slackRepository.sendMessage(
+                            messageUrl = slashCommand.responseUrl,
+                            message = ApiSlackMessageFactory.searchResultMessage(
+                                searchQuery = searchResult.query,
+                                searchResults = searchResult.totalPosts,
+                                searchSessionId = searchResult.searchSessionId,
+                                attachmentTitle = searchResult.post.title,
+                                attachmentUrl = searchResult.post.url,
+                                attachmentImageUrl = searchResult.post.imageUrl
+                            )
+                        )
                     }
                 }
             }
-
-    private suspend fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
-        topic = PreloadPubSubTopic,
-        body = PreloadPubSubMessage(searchSessionId),
-        jsonSerializer = jsonSerializer,
-        log = log
-    )
 }

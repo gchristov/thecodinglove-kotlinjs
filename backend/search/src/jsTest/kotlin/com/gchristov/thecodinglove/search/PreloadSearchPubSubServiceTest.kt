@@ -4,7 +4,7 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubMessage
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubServiceRegister
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
+import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubMessage
 import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchtestfixtures.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,10 +16,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class PreloadPubSubServiceTest {
+class PreloadSearchPubSubServiceTest {
     @Test
     fun register(): TestResult = runBlockingTest(
-        preloadPubSubMessage = null,
+        preloadSearchPubSubMessage = null,
         preloadSearchResultInvocationResult = Either.Left(SearchError.Empty)
     ) { service, _, _, register ->
         service.register()
@@ -28,7 +28,7 @@ class PreloadPubSubServiceTest {
 
     @Test
     fun handleMessageSuccess(): TestResult = runBlockingTest(
-        preloadPubSubMessage = PreloadPubSubCreator.defaultMessage(),
+        preloadSearchPubSubMessage = PreloadSearchPubSubCreator.defaultMessage(),
         preloadSearchResultInvocationResult = Either.Right(Unit)
     ) { service, preloadUseCase, message, register ->
         val actualResult = service.handleMessage(message)
@@ -43,7 +43,7 @@ class PreloadPubSubServiceTest {
 
     @Test
     fun handleMessageError(): TestResult = runBlockingTest(
-        preloadPubSubMessage = PreloadPubSubCreator.defaultMessage(),
+        preloadSearchPubSubMessage = PreloadSearchPubSubCreator.defaultMessage(),
         preloadSearchResultInvocationResult = Either.Left(SearchError.Empty)
     ) { service, preloadUseCase, message, register ->
         val actualResult = service.handleMessage(message)
@@ -58,7 +58,7 @@ class PreloadPubSubServiceTest {
 
     @Test
     fun handleMessageParseError(): TestResult = runBlockingTest(
-        preloadPubSubMessage = null,
+        preloadSearchPubSubMessage = null,
         preloadSearchResultInvocationResult = Either.Left(SearchError.Empty)
     ) { service, preloadUseCase, message, register ->
         val actualResult = service.handleMessage(message)
@@ -71,16 +71,16 @@ class PreloadPubSubServiceTest {
     }
 
     private fun runBlockingTest(
-        preloadPubSubMessage: PreloadPubSubMessage?,
+        preloadSearchPubSubMessage: PreloadSearchPubSubMessage?,
         preloadSearchResultInvocationResult: Either<SearchError, Unit>,
-        testBlock: suspend (PreloadPubSubService, FakePreloadSearchResultUseCase, PubSubMessage, FakePubSubServiceRegister) -> Unit
+        testBlock: suspend (PreloadSearchPubSubService, FakePreloadSearchResultUseCase, PubSubMessage, FakePubSubServiceRegister) -> Unit
     ): TestResult = runTest {
         val preloadSearchResultUseCase = FakePreloadSearchResultUseCase(
             invocationResult = preloadSearchResultInvocationResult
         )
-        val message = FakePreloadPubSubMessage(message = preloadPubSubMessage)
+        val message = FakePreloadSearchPubSubMessage(message = preloadSearchPubSubMessage)
         val register = FakePubSubServiceRegister()
-        val service = PreloadPubSubService(
+        val service = PreloadSearchPubSubService(
             pubSubServiceRegister = register,
             jsonSerializer = Json,
             log = FakeLogger,

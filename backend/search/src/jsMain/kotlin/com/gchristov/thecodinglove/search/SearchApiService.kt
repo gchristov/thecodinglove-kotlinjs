@@ -9,12 +9,8 @@ import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.api.sendJson
 import com.gchristov.thecodinglove.commonservicedata.exports
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
-import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
 import com.gchristov.thecodinglove.searchdata.api.ApiSearchResult
 import com.gchristov.thecodinglove.searchdata.api.toPost
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubMessage
-import com.gchristov.thecodinglove.searchdata.model.PreloadPubSubTopic
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import kotlinx.serialization.json.Json
 
@@ -22,7 +18,6 @@ class SearchApiService(
     apiServiceRegister: ApiServiceRegister,
     private val jsonSerializer: Json,
     private val log: Logger,
-    private val pubSubSender: PubSubSender,
     private val searchUseCase: SearchUseCase,
 ) : ApiService(
     apiServiceRegister = apiServiceRegister,
@@ -38,22 +33,12 @@ class SearchApiService(
         response: ApiResponse
     ): Either<Throwable, Unit> = searchUseCase(request.toSearchType())
         .flatMap { searchResult ->
-            publishPreloadMessage(searchResult.searchSessionId)
-                .flatMap {
-                    response.sendJson(
-                        data = searchResult.toSearchResult(),
-                        jsonSerializer = jsonSerializer,
-                        log = log
-                    )
-                }
+            response.sendJson(
+                data = searchResult.toSearchResult(),
+                jsonSerializer = jsonSerializer,
+                log = log
+            )
         }
-
-    private suspend fun publishPreloadMessage(searchSessionId: String) = pubSubSender.sendMessage(
-        topic = PreloadPubSubTopic,
-        body = PreloadPubSubMessage(searchSessionId),
-        jsonSerializer = jsonSerializer,
-        log = log
-    )
 }
 
 private fun ApiRequest.toSearchType(): SearchUseCase.Type {

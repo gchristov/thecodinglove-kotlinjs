@@ -41,7 +41,6 @@ object SlackModule : DiModule() {
                     jsonSerializer = instance(),
                     log = instance(),
                     slackRepository = instance(),
-                    pubSubSender = instance(),
                     searchUseCase = instance()
                 )
             }
@@ -62,7 +61,6 @@ object SlackModule : DiModule() {
                     log = instance(),
                     shuffleSlackSearchUseCase = instance(),
                     cancelSlackSearchUseCase = instance(),
-                    pubSubSender = instance(),
                 )
             }
         }
@@ -89,14 +87,12 @@ object SlackModule : DiModule() {
         jsonSerializer: Json,
         log: Logger,
         slackRepository: SlackRepository,
-        pubSubSender: PubSubSender,
         searchUseCase: SearchUseCase
     ): SlackSlashCommandPubSubService = SlackSlashCommandPubSubService(
         pubSubServiceRegister = pubSubServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
         slackRepository = slackRepository,
-        pubSubSender = pubSubSender,
         searchUseCase = searchUseCase
     )
 
@@ -122,13 +118,11 @@ object SlackModule : DiModule() {
         log: Logger,
         shuffleSlackSearchUseCase: ShuffleSlackSearchUseCase,
         cancelSlackSearchUseCase: CancelSlackSearchUseCase,
-        pubSubSender: PubSubSender,
     ): SlackInteractivityPubSubService = SlackInteractivityPubSubService(
         pubSubServiceRegister = pubSubServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
         shuffleSlackSearchUseCase = shuffleSlackSearchUseCase,
         cancelSlackSearchUseCase = cancelSlackSearchUseCase,
-        pubSubSender = pubSubSender
     )
 }

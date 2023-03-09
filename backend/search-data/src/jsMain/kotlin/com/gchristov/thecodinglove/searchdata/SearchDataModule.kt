@@ -1,20 +1,23 @@
 package com.gchristov.thecodinglove.searchdata
 
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.htmlparse.HtmlPostParser
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
+import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
+import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
 import com.gchristov.thecodinglove.searchdata.usecase.*
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
 object SearchDataModule : DiModule() {
-    override fun name() = "kmp-search-data"
+    override fun name() = "search-data"
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
@@ -22,7 +25,8 @@ object SearchDataModule : DiModule() {
             bindSingleton {
                 provideSearchRepository(
                     api = instance(),
-                    htmlPostParser = instance(),
+                    parseHtmlTotalPostsUseCase = instance(),
+                    parseHtmlPostsUseCase = instance(),
                     firebaseFirestore = instance(),
                     log = instance()
                 )
@@ -38,6 +42,9 @@ object SearchDataModule : DiModule() {
                 provideSearchUseCase(
                     searchRepository = instance(),
                     searchWithHistoryUseCase = instance(),
+                    pubSubSender = instance(),
+                    log = instance(),
+                    jsonSerializer = instance(),
                 )
             }
             bindProvider {
@@ -53,12 +60,14 @@ object SearchDataModule : DiModule() {
 
     private fun provideSearchRepository(
         api: SearchApi,
-        htmlPostParser: HtmlPostParser,
+        parseHtmlTotalPostsUseCase: ParseHtmlTotalPostsUseCase,
+        parseHtmlPostsUseCase: ParseHtmlPostsUseCase,
         firebaseFirestore: FirebaseFirestore,
         log: Logger
     ): SearchRepository = RealSearchRepository(
         apiService = api,
-        htmlPostParser = htmlPostParser,
+        parseHtmlTotalPostsUseCase = parseHtmlTotalPostsUseCase,
+        parseHtmlPostsUseCase = parseHtmlPostsUseCase,
         firebaseFirestore = firebaseFirestore,
         log = log
     )
@@ -76,11 +85,17 @@ object SearchDataModule : DiModule() {
 
     private fun provideSearchUseCase(
         searchRepository: SearchRepository,
-        searchWithHistoryUseCase: SearchWithHistoryUseCase
+        searchWithHistoryUseCase: SearchWithHistoryUseCase,
+        pubSubSender: PubSubSender,
+        log: Logger,
+        jsonSerializer: Json,
     ): SearchUseCase = RealSearchUseCase(
         dispatcher = Dispatchers.Default,
         searchRepository = searchRepository,
-        searchWithHistoryUseCase = searchWithHistoryUseCase
+        searchWithHistoryUseCase = searchWithHistoryUseCase,
+        pubSubSender = pubSubSender,
+        log = log,
+        jsonSerializer = jsonSerializer,
     )
 
     private fun providePreloadSearchResultUseCase(

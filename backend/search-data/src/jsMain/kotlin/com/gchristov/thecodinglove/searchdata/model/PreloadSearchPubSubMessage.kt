@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.searchdata.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PreloadPubSubMessage(
+data class PreloadSearchPubSubMessage(
     val searchSessionId: String
 )
 
-const val PreloadPubSubTopic = "preloadPubSub"
+const val PreloadSearchPubSubTopic = "preloadSearchPubSub"

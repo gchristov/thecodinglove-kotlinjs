@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.htmlparse
+package com.gchristov.thecodinglove.htmlparsedata.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.htmlparsedata.HtmlPost
@@ -9,28 +9,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class HtmlPostParserTest {
-    @Test
-    fun parseTotalPosts() = runBlockingTest { parser ->
-        val actualCount = parser.parseTotalPosts(HtmlCreator.defaultHtml())
-        assertEquals(
-            expected = Either.Right(314),
-            actual = actualCount
-        )
-    }
-
-    @Test
-    fun parseInvalidTotalPosts() = runBlockingTest { parser ->
-        val actualCount = parser.parseTotalPosts(HtmlCreator.invalidResultsCountHtml())
-        assertTrue { actualCount.isLeft() }
-    }
-
+class RealParseHtmlPostsUseCaseTest {
     @Test
     fun parsePosts() = runBlockingTest { parser ->
-        val actualPosts = parser.parsePosts(HtmlCreator.defaultHtml())
+        val actualPosts = parser(HtmlCreator.defaultHtml())
         assertEquals(
             expected = Either.Right(TestActualPostList),
             actual = actualPosts
@@ -39,16 +23,16 @@ class HtmlPostParserTest {
 
     @Test
     fun parseInvalidPosts() = runBlockingTest { parser ->
-        val actualPosts = parser.parsePosts(HtmlCreator.invalidHtml())
+        val actualPosts = parser(HtmlCreator.invalidHtml())
         assertEquals(
             expected = Either.Right(emptyList()),
             actual = actualPosts
         )
     }
 
-    private fun runBlockingTest(testBlock: suspend (HtmlPostParser) -> Unit) =
+    private fun runBlockingTest(testBlock: suspend (ParseHtmlPostsUseCase) -> Unit) =
         runTest {
-            val parser = RealHtmlPostParser(
+            val parser = RealParseHtmlPostsUseCase(
                 dispatcher = FakeCoroutineDispatcher,
                 log = FakeLogger
             )
