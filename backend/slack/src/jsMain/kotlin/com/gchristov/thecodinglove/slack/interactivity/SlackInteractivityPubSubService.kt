@@ -74,10 +74,10 @@ class SlackInteractivityPubSubService(
 }
 
 private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.sendAction() =
-    actions.find { it.name == ApiSlackActionName.SEND.value }
+    actions.find { it.name == ApiSlackActionName.SEND.apiValue }
 
 private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.shuffleAction() =
-    actions.find { it.name == ApiSlackActionName.SHUFFLE.value }
+    actions.find { it.name == ApiSlackActionName.SHUFFLE.apiValue }
 
 private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.cancelAction() =
-    actions.find { it.name == ApiSlackActionName.CANCEL.value }
+    actions.find { it.name == ApiSlackActionName.CANCEL.apiValue }

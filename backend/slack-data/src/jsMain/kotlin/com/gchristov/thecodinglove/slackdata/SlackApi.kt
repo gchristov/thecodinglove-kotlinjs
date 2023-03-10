@@ -12,6 +12,7 @@ internal class SlackApi(private val client: HttpClient) {
         message: ApiSlackMessage
     ): HttpResponse = client.post(responseUrl) {
         contentType(ContentType.Application.Json)
+        accept(ContentType.Application.Json)
         setBody(message)
     }
 
@@ -19,10 +20,9 @@ internal class SlackApi(private val client: HttpClient) {
         authToken: String,
         message: ApiSlackMessage
     ): HttpResponse = client.post("https://slack.com/api/chat.postMessage") {
-        headers {
-            set(name = "Authorization", value = "Bearer $authToken")
-        }
+        bearerAuth(authToken)
         contentType(ContentType.Application.Json)
+        accept(ContentType.Application.Json)
         setBody(message)
     }
 }
