@@ -5,8 +5,13 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 
 interface SlackRepository {
-    suspend fun sendMessage(
-        messageUrl: String,
+    suspend fun replyWithMessage(
+        responseUrl: String,
+        message: ApiSlackMessage
+    ): Either<Throwable, Unit>
+
+    suspend fun postMessage(
+        authToken: String,
         message: ApiSlackMessage
     ): Either<Throwable, Unit>
 }
@@ -15,17 +20,31 @@ internal class RealSlackRepository(
     private val apiService: SlackApi,
     private val log: Logger,
 ) : SlackRepository {
-    override suspend fun sendMessage(
-        messageUrl: String,
+    override suspend fun replyWithMessage(
+        responseUrl: String,
         message: ApiSlackMessage
     ) = try {
-        apiService.sendMessage(
-            messageUrl = messageUrl,
+        apiService.replyWithMessage(
+            responseUrl = responseUrl,
             message = message
         )
         Either.Right(Unit)
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during message send" }
+        log.e(error) { error.message ?: "Error during message reply" }
+        Either.Left(error)
+    }
+
+    override suspend fun postMessage(
+        authToken: String,
+        message: ApiSlackMessage
+    ) = try {
+        apiService.postMessage(
+            authToken = authToken,
+            message = message
+        )
+        Either.Right(Unit)
+    } catch (error: Throwable) {
+        log.e(error) { error.message ?: "Error during message post" }
         Either.Left(error)
     }
 }

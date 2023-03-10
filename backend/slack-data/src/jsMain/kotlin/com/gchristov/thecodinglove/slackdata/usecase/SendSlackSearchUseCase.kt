@@ -11,7 +11,8 @@ import kotlinx.coroutines.withContext
 
 interface SendSlackSearchUseCase {
     suspend operator fun invoke(
-        messageUrl: String,
+        channelId: String,
+        responseUrl: String,
         searchSessionId: String,
     ): Either<Throwable, Unit>
 }
@@ -23,23 +24,33 @@ class RealSendSlackSearchUseCase(
     private val slackRepository: SlackRepository,
 ) : SendSlackSearchUseCase {
     override suspend operator fun invoke(
-        messageUrl: String,
+        channelId: String,
+        responseUrl: String,
         searchSessionId: String,
     ): Either<Throwable, Unit> = withContext(dispatcher) {
         log.d("Obtaining search session: searchSessionId=$searchSessionId")
         searchRepository.getSearchSession(searchSessionId)
             .flatMap { searchSession ->
-                slackRepository.sendMessage(
-                    messageUrl = messageUrl,
-                    message = ApiSlackMessageFactory.searchPostMessage(
-                        searchQuery = searchSession.query,
-                        attachmentTitle = searchSession.currentPost!!.title,
-                        attachmentUrl = searchSession.currentPost!!.url,
-                        attachmentImageUrl = searchSession.currentPost!!.imageUrl
-                    )
+                log.d("Cancelling previous Slack message: responseUrl=$responseUrl")
+                slackRepository.replyWithMessage(
+                    responseUrl = responseUrl,
+                    message = ApiSlackMessageFactory.cancelMessage()
                 ).flatMap {
-                    log.d("Deleting search session: searchSessionId=$searchSessionId")
-                    searchRepository.deleteSearchSession(searchSessionId)
+                    log.d("Posting search result: searchSessionId=$searchSessionId")
+                    slackRepository.postMessage(
+                        authToken = "TOKEN",
+                        message = ApiSlackMessageFactory.searchPostMessage(
+                            searchQuery = searchSession.query,
+                            attachmentTitle = searchSession.currentPost!!.title,
+                            attachmentUrl = searchSession.currentPost!!.url,
+                            attachmentImageUrl = searchSession.currentPost!!.imageUrl,
+                            channelId = channelId,
+                        )
+                    ).flatMap {
+                        // TODO: Should we track session state here?
+                        log.d("Deleting search session: searchSessionId=$searchSessionId")
+                        searchRepository.deleteSearchSession(searchSessionId)
+                    }
                 }
             }
     }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 
 interface ShuffleSlackSearchUseCase {
     suspend operator fun invoke(
-        messageUrl: String,
+        responseUrl: String,
         searchSessionId: String,
     ): Either<Throwable, Unit>
 }
@@ -23,15 +23,15 @@ class RealShuffleSlackSearchUseCase(
     private val slackRepository: SlackRepository,
 ) : ShuffleSlackSearchUseCase {
     override suspend operator fun invoke(
-        messageUrl: String,
+        responseUrl: String,
         searchSessionId: String,
     ): Either<Throwable, Unit> = withContext(dispatcher) {
         log.d("Shuffling search result: searchSessionId=$searchSessionId")
         searchUseCase.invoke(SearchUseCase.Type.WithSessionId(searchSessionId))
             .flatMap { searchResult ->
-                log.d("Sending Slack response: messageUrl=$messageUrl")
-                slackRepository.sendMessage(
-                    messageUrl = messageUrl,
+                log.d("Sending Slack response: responseUrl=$responseUrl")
+                slackRepository.replyWithMessage(
+                    responseUrl = responseUrl,
                     message = ApiSlackMessageFactory.searchResultMessage(
                         searchQuery = searchResult.query,
                         searchResults = searchResult.totalPosts,
