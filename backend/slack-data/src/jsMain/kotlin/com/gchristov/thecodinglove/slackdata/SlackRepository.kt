@@ -3,6 +3,9 @@ package com.gchristov.thecodinglove.slackdata
 import arrow.core.Either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
+import com.gchristov.thecodinglove.slackdata.api.ApiSlackResponse
+import io.ktor.client.call.*
+import io.ktor.client.statement.*
 
 interface SlackRepository {
     suspend fun replyWithMessage(
@@ -24,11 +27,15 @@ internal class RealSlackRepository(
         responseUrl: String,
         message: ApiSlackMessage
     ) = try {
-        apiService.replyWithMessage(
+        val slackResponse = apiService.replyWithMessage(
             responseUrl = responseUrl,
             message = message
-        )
-        Either.Right(Unit)
+        ).bodyAsText()
+        if (slackResponse.lowercase() == "ok") {
+            Either.Right(Unit)
+        } else {
+            throw Exception(slackResponse)
+        }
     } catch (error: Throwable) {
         log.e(error) { error.message ?: "Error during message reply" }
         Either.Left(error)
@@ -38,11 +45,15 @@ internal class RealSlackRepository(
         authToken: String,
         message: ApiSlackMessage
     ) = try {
-        apiService.postMessage(
+        val slackResponse: ApiSlackResponse = apiService.postMessage(
             authToken = authToken,
             message = message
-        )
-        Either.Right(Unit)
+        ).body()
+        if (slackResponse.ok) {
+            Either.Right(Unit)
+        } else {
+            throw Exception(slackResponse.error)
+        }
     } catch (error: Throwable) {
         log.e(error) { error.message ?: "Error during message post" }
         Either.Left(error)

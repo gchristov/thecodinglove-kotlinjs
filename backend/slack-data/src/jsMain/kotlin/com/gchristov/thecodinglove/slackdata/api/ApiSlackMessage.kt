@@ -39,10 +39,15 @@ data class ApiSlackMessage(
     }
 }
 
-enum class ApiSlackActionName(val value: String) {
+enum class ApiSlackActionName(val apiValue: String) {
     SEND("send"),
     SHUFFLE("shuffle"),
-    CANCEL("cancel");
+    CANCEL("cancel"),
+}
+
+private enum class ApiSlackMessageResponseType(val apiValue: String) {
+    EPHEMERAL("ephemeral"),
+    IN_CHANNEL("in_channel"),
 }
 
 object ApiSlackMessageFactory {
@@ -53,7 +58,7 @@ object ApiSlackMessageFactory {
         text = "🔎 Hang tight, we're finding your GIF...",
         userId = null,
         channelId = null,
-        responseType = "ephemeral",
+        responseType = ApiSlackMessageResponseType.EPHEMERAL.apiValue,
         responseUrl = null,
         teamId = null,
         replaceOriginal = true,
@@ -65,7 +70,7 @@ object ApiSlackMessageFactory {
         text = null,
         userId = null,
         channelId = null,
-        responseType = "ephemeral",
+        responseType = ApiSlackMessageResponseType.EPHEMERAL.apiValue,
         responseUrl = null,
         teamId = null,
         replaceOriginal = true,
@@ -84,7 +89,7 @@ object ApiSlackMessageFactory {
         text = "$searchQuery - ($searchResults result${if (searchResults == 1) "" else "s"} found)",
         userId = null,
         channelId = null,
-        responseType = "ephemeral",
+        responseType = ApiSlackMessageResponseType.EPHEMERAL.apiValue,
         responseUrl = null,
         teamId = null,
         replaceOriginal = true,
@@ -96,7 +101,7 @@ object ApiSlackMessageFactory {
                 imageUrl = attachmentImageUrl,
                 actions = listOf(
                     ApiSlackMessage.ApiAttachment.ApiAction(
-                        name = ApiSlackActionName.SEND.value,
+                        name = ApiSlackActionName.SEND.apiValue,
                         text = "Send",
                         type = ButtonType,
                         value = searchSessionId,
@@ -104,7 +109,7 @@ object ApiSlackMessageFactory {
                         style = PrimaryButtonStyle,
                     ),
                     ApiSlackMessage.ApiAttachment.ApiAction(
-                        name = ApiSlackActionName.SHUFFLE.value,
+                        name = ApiSlackActionName.SHUFFLE.apiValue,
                         text = "Shuffle",
                         type = ButtonType,
                         value = searchSessionId,
@@ -112,7 +117,7 @@ object ApiSlackMessageFactory {
                         style = null,
                     ),
                     ApiSlackMessage.ApiAttachment.ApiAction(
-                        name = ApiSlackActionName.CANCEL.value,
+                        name = ApiSlackActionName.CANCEL.apiValue,
                         text = "Cancel",
                         type = ButtonType,
                         value = searchSessionId,
@@ -134,7 +139,7 @@ object ApiSlackMessageFactory {
         text = searchQuery,
         userId = null,
         channelId = channelId,
-        responseType = "in_channel",
+        responseType = ApiSlackMessageResponseType.IN_CHANNEL.apiValue,
         responseUrl = null,
         teamId = null,
         replaceOriginal = false,
