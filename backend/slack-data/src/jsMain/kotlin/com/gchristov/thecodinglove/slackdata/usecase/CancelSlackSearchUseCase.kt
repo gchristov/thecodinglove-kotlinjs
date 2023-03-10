@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 
 interface CancelSlackSearchUseCase {
     suspend operator fun invoke(
-        messageUrl: String,
+        responseUrl: String,
         searchSessionId: String,
     ): Either<Throwable, Unit>
 }
@@ -23,12 +23,12 @@ class RealCancelSlackSearchUseCase(
     private val slackRepository: SlackRepository,
 ) : CancelSlackSearchUseCase {
     override suspend operator fun invoke(
-        messageUrl: String,
+        responseUrl: String,
         searchSessionId: String,
     ): Either<Throwable, Unit> = withContext(dispatcher) {
-        log.d("Cancelling Slack message: messageUrl=$messageUrl")
-        slackRepository.sendMessage(
-            messageUrl = messageUrl,
+        log.d("Cancelling Slack message: responseUrl=$responseUrl")
+        slackRepository.replyWithMessage(
+            responseUrl = responseUrl,
             message = ApiSlackMessageFactory.cancelMessage()
         ).flatMap {
             log.d("Deleting search session: searchSessionId=$searchSessionId")
