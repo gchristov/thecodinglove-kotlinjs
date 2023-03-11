@@ -9,7 +9,7 @@ import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-interface SendSlackSearchUseCase {
+interface SlackSendSearchUseCase {
     suspend operator fun invoke(
         channelId: String,
         responseUrl: String,
@@ -17,12 +17,12 @@ interface SendSlackSearchUseCase {
     ): Either<Throwable, Unit>
 }
 
-class RealSendSlackSearchUseCase(
+class RealSlackSendSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
     private val searchRepository: SearchRepository,
     private val slackRepository: SlackRepository,
-) : SendSlackSearchUseCase {
+) : SlackSendSearchUseCase {
     override suspend operator fun invoke(
         channelId: String,
         responseUrl: String,

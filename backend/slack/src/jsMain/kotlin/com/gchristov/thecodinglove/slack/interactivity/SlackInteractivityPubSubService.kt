@@ -12,18 +12,18 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.decodeBodyFromJson
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackActionName
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubTopic
-import com.gchristov.thecodinglove.slackdata.usecase.CancelSlackSearchUseCase
-import com.gchristov.thecodinglove.slackdata.usecase.SendSlackSearchUseCase
-import com.gchristov.thecodinglove.slackdata.usecase.ShuffleSlackSearchUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.SlackCancelSearchUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.SlackSendSearchUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.SlackShuffleSearchUseCase
 import kotlinx.serialization.json.Json
 
 class SlackInteractivityPubSubService(
     pubSubServiceRegister: PubSubServiceRegister,
     private val jsonSerializer: Json,
     private val log: Logger,
-    private val sendSlackSearchUseCase: SendSlackSearchUseCase,
-    private val shuffleSlackSearchUseCase: ShuffleSlackSearchUseCase,
-    private val cancelSlackSearchUseCase: CancelSlackSearchUseCase,
+    private val slackSendSearchUseCase: SlackSendSearchUseCase,
+    private val slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
+    private val slackCancelSearchUseCase: SlackCancelSearchUseCase,
 ) : PubSubService(
     pubSubServiceRegister = pubSubServiceRegister,
     log = log,
@@ -52,18 +52,18 @@ class SlackInteractivityPubSubService(
         val shuffleAction = shuffleAction()
         val cancelAction = cancelAction()
         return when {
-            sendAction != null -> sendSlackSearchUseCase.invoke(
+            sendAction != null -> slackSendSearchUseCase.invoke(
                 channelId = channel.id,
                 responseUrl = responseUrl,
                 searchSessionId = sendAction.value
             )
 
-            shuffleAction != null -> shuffleSlackSearchUseCase.invoke(
+            shuffleAction != null -> slackShuffleSearchUseCase.invoke(
                 responseUrl = responseUrl,
                 searchSessionId = shuffleAction.value
             )
 
-            cancelAction != null -> cancelSlackSearchUseCase.invoke(
+            cancelAction != null -> slackCancelSearchUseCase.invoke(
                 responseUrl = responseUrl,
                 searchSessionId = cancelAction.value
             )

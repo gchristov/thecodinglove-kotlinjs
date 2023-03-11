@@ -28,29 +28,36 @@ object SlackDataModule : DiModule() {
                 )
             }
             bindProvider {
-                provideVerifySlackRequestUseCase(
+                provideSlackVerifyRequestUseCase(
                     slackConfig = instance(),
                     log = instance()
                 )
             }
             bindProvider {
-                provideCancelSlackSearchUseCase(
+                provideSlackCancelSearchUseCase(
                     log = instance(),
                     slackRepository = instance(),
                     searchRepository = instance(),
                 )
             }
             bindProvider {
-                provideShuffleSlackSearchUseCase(
+                provideSlackShuffleSearchUseCase(
                     log = instance(),
                     searchUseCase = instance(),
                     slackRepository = instance(),
                 )
             }
             bindProvider {
-                provideSendSlackSearchUseCase(
+                provideSlackSendSearchUseCase(
                     log = instance(),
                     searchRepository = instance(),
+                    slackRepository = instance(),
+                )
+            }
+            bindProvider {
+                provideSlackAuthUserUseCase(
+                    slackConfig = instance(),
+                    log = instance(),
                     slackRepository = instance(),
                 )
             }
@@ -62,7 +69,9 @@ object SlackDataModule : DiModule() {
     private fun provideSlackConfig(): SlackConfig = SlackConfig(
         signingSecret = BuildKonfig.SLACK_SIGNING_SECRET,
         timestampValidityMinutes = 5,
-        requestVerificationEnabled = BuildKonfig.SLACK_REQUEST_VERIFICATION_ENABLED
+        requestVerificationEnabled = BuildKonfig.SLACK_REQUEST_VERIFICATION_ENABLED,
+        clientId = BuildKonfig.SLACK_CLIENT_ID,
+        clientSecret = BuildKonfig.SLACK_CLIENT_SECRET,
     )
 
     private fun provideSlackRepository(
@@ -73,46 +82,57 @@ object SlackDataModule : DiModule() {
         log = log
     )
 
-    private fun provideVerifySlackRequestUseCase(
+    private fun provideSlackVerifyRequestUseCase(
         slackConfig: SlackConfig,
         log: Logger,
-    ): VerifySlackRequestUseCase = RealVerifySlackRequestUseCase(
+    ): SlackVerifyRequestUseCase = RealSlackVerifyRequestUseCase(
         dispatcher = Dispatchers.Default,
         slackConfig = slackConfig,
         clock = Clock.System,
         log = log
     )
 
-    private fun provideCancelSlackSearchUseCase(
+    private fun provideSlackCancelSearchUseCase(
         log: Logger,
         searchRepository: SearchRepository,
         slackRepository: SlackRepository,
-    ): CancelSlackSearchUseCase = RealCancelSlackSearchUseCase(
+    ): SlackCancelSearchUseCase = RealSlackCancelSearchUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
         searchRepository = searchRepository,
         slackRepository = slackRepository
     )
 
-    private fun provideShuffleSlackSearchUseCase(
+    private fun provideSlackShuffleSearchUseCase(
         log: Logger,
         searchUseCase: SearchUseCase,
         slackRepository: SlackRepository,
-    ): ShuffleSlackSearchUseCase = RealShuffleSlackSearchUseCase(
+    ): SlackShuffleSearchUseCase = RealSlackShuffleSearchUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
         searchUseCase = searchUseCase,
         slackRepository = slackRepository
     )
 
-    private fun provideSendSlackSearchUseCase(
+    private fun provideSlackSendSearchUseCase(
         log: Logger,
         searchRepository: SearchRepository,
         slackRepository: SlackRepository,
-    ): SendSlackSearchUseCase = RealSendSlackSearchUseCase(
+    ): SlackSendSearchUseCase = RealSlackSendSearchUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
         searchRepository = searchRepository,
         slackRepository = slackRepository
+    )
+
+    private fun provideSlackAuthUserUseCase(
+        slackConfig: SlackConfig,
+        log: Logger,
+        slackRepository: SlackRepository,
+    ): SlackAuthUserUseCase = RealSlackAuthUserUseCase(
+        dispatcher = Dispatchers.Default,
+        slackConfig = slackConfig,
+        log = log,
+        slackRepository = slackRepository,
     )
 }

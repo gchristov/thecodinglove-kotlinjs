@@ -9,19 +9,19 @@ import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-interface ShuffleSlackSearchUseCase {
+interface SlackShuffleSearchUseCase {
     suspend operator fun invoke(
         responseUrl: String,
         searchSessionId: String,
     ): Either<Throwable, Unit>
 }
 
-class RealShuffleSlackSearchUseCase(
+class RealSlackShuffleSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
     private val searchUseCase: SearchUseCase,
     private val slackRepository: SlackRepository,
-) : ShuffleSlackSearchUseCase {
+) : SlackShuffleSearchUseCase {
     override suspend operator fun invoke(
         responseUrl: String,
         searchSessionId: String,

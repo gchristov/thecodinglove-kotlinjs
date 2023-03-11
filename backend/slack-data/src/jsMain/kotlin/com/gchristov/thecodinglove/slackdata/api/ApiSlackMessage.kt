@@ -5,6 +5,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class ApiSlackPostMessageResponse(
+    @SerialName("ok") val ok: Boolean,
+    @SerialName("error") val error: String?,
+)
+
+@Serializable
 data class ApiSlackMessage(
     @SerialName("text") val text: String?,
     @SerialName("user_id") val userId: String?,

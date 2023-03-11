@@ -13,14 +13,14 @@ import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubTopic
 import com.gchristov.thecodinglove.slackdata.domain.toPubSubMessage
-import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.SlackVerifyRequestUseCase
 import kotlinx.serialization.json.Json
 
 class SlackSlashCommandApiService(
     apiServiceRegister: ApiServiceRegister,
     private val jsonSerializer: Json,
     private val log: Logger,
-    private val verifySlackRequestUseCase: VerifySlackRequestUseCase,
+    private val slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
     private val slackConfig: SlackConfig,
     private val pubSubSender: PubSubSender,
 ) : ApiService(
@@ -36,7 +36,7 @@ class SlackSlashCommandApiService(
         request: ApiRequest,
         response: ApiResponse
     ): Either<Throwable, Unit> = if (slackConfig.requestVerificationEnabled) {
-        verifySlackRequestUseCase(request)
+        slackVerifyRequestUseCase(request)
     } else {
         Either.Right(Unit)
     }.flatMap {

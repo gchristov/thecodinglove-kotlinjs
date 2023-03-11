@@ -2,12 +2,19 @@ package com.gchristov.thecodinglove.slackdata
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthResponse
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
-import com.gchristov.thecodinglove.slackdata.api.ApiSlackResponse
+import com.gchristov.thecodinglove.slackdata.api.ApiSlackPostMessageResponse
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 
 interface SlackRepository {
+    suspend fun authUser(
+        code: String,
+        clientId: String,
+        clientSecret: String,
+    ): Either<Throwable, Unit>
+
     suspend fun replyWithMessage(
         responseUrl: String,
         message: ApiSlackMessage
@@ -23,6 +30,26 @@ internal class RealSlackRepository(
     private val apiService: SlackApi,
     private val log: Logger,
 ) : SlackRepository {
+    override suspend fun authUser(
+        code: String,
+        clientId: String,
+        clientSecret: String
+    ) = try {
+        val slackResponse: ApiSlackAuthResponse = apiService.authUser(
+            code = code,
+            clientId = clientId,
+            clientSecret = clientSecret
+        ).body()
+        if (slackResponse.ok) {
+            Either.Right(Unit)
+        } else {
+            throw Exception(slackResponse.error)
+        }
+    } catch (error: Throwable) {
+        log.e(error) { error.message ?: "Error during authosize" }
+        Either.Left(error)
+    }
+
     override suspend fun replyWithMessage(
         responseUrl: String,
         message: ApiSlackMessage
@@ -45,7 +72,7 @@ internal class RealSlackRepository(
         authToken: String,
         message: ApiSlackMessage
     ) = try {
-        val slackResponse: ApiSlackResponse = apiService.postMessage(
+        val slackResponse: ApiSlackPostMessageResponse = apiService.postMessage(
             authToken = authToken,
             message = message
         ).body()
