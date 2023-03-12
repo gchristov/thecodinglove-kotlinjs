@@ -10,7 +10,7 @@ import com.gchristov.thecodinglove.commonservicedata.exports
 import com.gchristov.thecodinglove.slackdata.usecase.SlackAuthUserUseCase
 import kotlinx.serialization.json.Json
 
-class SlackAuthUserApiService(
+class SlackAuthApiService(
     apiServiceRegister: ApiServiceRegister,
     jsonSerializer: Json,
     log: Logger,

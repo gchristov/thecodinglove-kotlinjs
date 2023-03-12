@@ -46,7 +46,7 @@ internal class RealSlackRepository(
             throw Exception(slackResponse.error)
         }
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during authosize" }
+        log.e(error) { error.message ?: "Error during user auth" }
         Either.Left(error)
     }
 

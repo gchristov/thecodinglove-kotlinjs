@@ -12,7 +12,7 @@ interface SlackAuthUserUseCase {
     suspend operator fun invoke(
         code: String?,
         searchSessionId: String?,
-    ): Either<Throwable, Unit>
+    ): Either<Error, Unit>
 
     sealed class Error(message: String? = null) : Throwable(message) {
         object Cancelled : Error()
@@ -29,8 +29,8 @@ class RealSlackAuthUserUseCase(
     override suspend fun invoke(
         code: String?,
         searchSessionId: String?
-    ): Either<Throwable, Unit> = withContext(dispatcher) {
-        log.d("Processing Slack auth request: code=$code, searchSessionId=$searchSessionId")
+    ): Either<SlackAuthUserUseCase.Error, Unit> = withContext(dispatcher) {
+        log.d("Processing Slack user auth request: code=$code, searchSessionId=$searchSessionId")
         if (code.isNullOrEmpty()) {
             log.d("Auth cancelled")
             Either.Left(SlackAuthUserUseCase.Error.Cancelled)
@@ -39,11 +39,14 @@ class RealSlackAuthUserUseCase(
                 code = code,
                 clientId = slackConfig.clientId,
                 clientSecret = slackConfig.signingSecret
-            ).flatMap { authResponse ->
-                log.d("Persisting user token")
-                // TODO: Persist user token
-                Either.Right(Unit)
-            }
+            )
+                .mapLeft { SlackAuthUserUseCase.Error.Other(it.message) }
+                .flatMap { authResponse ->
+                    log.d("Persisting user token")
+                    // TODO: Persist user token
+                    println(authResponse)
+                    Either.Right(Unit)
+                }
         }
     }
 }

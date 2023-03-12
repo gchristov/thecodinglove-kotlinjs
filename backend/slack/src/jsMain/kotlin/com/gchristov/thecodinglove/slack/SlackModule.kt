@@ -6,7 +6,7 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
-import com.gchristov.thecodinglove.slack.auth.SlackAuthUserApiService
+import com.gchristov.thecodinglove.slack.auth.SlackAuthApiService
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityApiService
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubService
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandApiService
@@ -141,7 +141,7 @@ object SlackModule : DiModule() {
         jsonSerializer: Json,
         log: Logger,
         slackAuthUserUseCase: SlackAuthUserUseCase,
-    ): SlackAuthUserApiService = SlackAuthUserApiService(
+    ): SlackAuthApiService = SlackAuthApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
