@@ -38,7 +38,7 @@ class RealSlackAuthUserUseCase(
             slackRepository.authUser(
                 code = code,
                 clientId = slackConfig.clientId,
-                clientSecret = slackConfig.signingSecret
+                clientSecret = slackConfig.clientSecret
             )
                 .mapLeft { SlackAuthUserUseCase.Error.Other(it.message) }
                 .flatMap { authResponse ->
