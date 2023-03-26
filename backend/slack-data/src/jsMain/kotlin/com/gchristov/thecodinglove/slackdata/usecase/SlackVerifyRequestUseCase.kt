@@ -14,8 +14,8 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.plus
 
-interface VerifySlackRequestUseCase {
-    suspend operator fun invoke(request: ApiRequest): Either<Throwable, Unit>
+interface SlackVerifyRequestUseCase {
+    suspend operator fun invoke(request: ApiRequest): Either<Error, Unit>
 
     sealed class Error(message: String? = null) : Throwable(message) {
         object MissingTimestamp : Error()
@@ -26,20 +26,20 @@ interface VerifySlackRequestUseCase {
     }
 }
 
-class RealVerifySlackRequestUseCase(
+class RealSlackVerifyRequestUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val slackConfig: SlackConfig,
     private val clock: Clock,
     private val log: Logger,
-) : VerifySlackRequestUseCase {
-    override suspend fun invoke(request: ApiRequest): Either<VerifySlackRequestUseCase.Error, Unit> =
+) : SlackVerifyRequestUseCase {
+    override suspend fun invoke(request: ApiRequest): Either<SlackVerifyRequestUseCase.Error, Unit> =
         withContext(dispatcher) {
             try {
                 val timestamp: Long = request.headers.get<String>("x-slack-request-timestamp")
                     ?.toLong()
-                    ?: return@withContext Either.Left(VerifySlackRequestUseCase.Error.MissingTimestamp)
+                    ?: return@withContext Either.Left(SlackVerifyRequestUseCase.Error.MissingTimestamp)
                 val signature: String = request.headers["x-slack-signature"]
-                    ?: return@withContext Either.Left(VerifySlackRequestUseCase.Error.MissingSignature)
+                    ?: return@withContext Either.Left(SlackVerifyRequestUseCase.Error.MissingSignature)
                 log.d("Verifying Slack request: timestamp=$timestamp, signature=$signature, body=${request.rawBody}")
 
                 verifyTimestamp(
@@ -56,7 +56,7 @@ class RealVerifySlackRequestUseCase(
                 }
             } catch (error: Throwable) {
                 log.e(error) { error.message ?: "Error during Slack request verification" }
-                Either.Left(VerifySlackRequestUseCase.Error.Other(error.message))
+                Either.Left(SlackVerifyRequestUseCase.Error.Other(error.message))
             }
         }
 
@@ -64,13 +64,13 @@ class RealVerifySlackRequestUseCase(
         timestamp: Long,
         validityMinutes: Int,
         clock: Clock
-    ): Either<VerifySlackRequestUseCase.Error, Unit> {
+    ): Either<SlackVerifyRequestUseCase.Error, Unit> {
         val timestampInstant = Instant.fromEpochSeconds(timestamp).plus(
             value = validityMinutes,
             unit = DateTimeUnit.MINUTE
         )
         return if (timestampInstant < clock.now()) {
-            Either.Left(VerifySlackRequestUseCase.Error.TooOld)
+            Either.Left(SlackVerifyRequestUseCase.Error.TooOld)
         } else {
             Either.Right(Unit)
         }
@@ -81,7 +81,7 @@ class RealVerifySlackRequestUseCase(
         signature: String,
         rawBody: String?,
         signingSecret: String
-    ): Either<VerifySlackRequestUseCase.Error, Unit> {
+    ): Either<SlackVerifyRequestUseCase.Error, Unit> {
         val baseString = "$Version:$timestamp:$rawBody"
         val data = baseString.encodeToByteArray()
         val key = signingSecret.encodeToByteArray()
@@ -98,7 +98,7 @@ class RealVerifySlackRequestUseCase(
         ) {
             Either.Right(Unit)
         } else {
-            Either.Left(VerifySlackRequestUseCase.Error.SignatureMismatch)
+            Either.Left(SlackVerifyRequestUseCase.Error.SignatureMismatch)
         }
     }
 }

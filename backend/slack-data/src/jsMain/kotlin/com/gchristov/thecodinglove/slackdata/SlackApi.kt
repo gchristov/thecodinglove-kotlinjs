@@ -7,6 +7,15 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 
 internal class SlackApi(private val client: HttpClient) {
+    suspend fun authUser(
+        code: String,
+        clientId: String,
+        clientSecret: String,
+    ): HttpResponse =
+        client.get("https://slack.com/api/oauth.v2.access?code=$code&client_id=$clientId&client_secret=$clientSecret") {
+            accept(ContentType.Application.Json)
+        }
+
     suspend fun replyWithMessage(
         responseUrl: String,
         message: ApiSlackMessage

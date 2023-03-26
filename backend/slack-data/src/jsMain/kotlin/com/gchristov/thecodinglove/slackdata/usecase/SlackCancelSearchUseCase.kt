@@ -9,19 +9,19 @@ import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-interface CancelSlackSearchUseCase {
+interface SlackCancelSearchUseCase {
     suspend operator fun invoke(
         responseUrl: String,
         searchSessionId: String,
     ): Either<Throwable, Unit>
 }
 
-class RealCancelSlackSearchUseCase(
+class RealSlackCancelSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
     private val searchRepository: SearchRepository,
     private val slackRepository: SlackRepository,
-) : CancelSlackSearchUseCase {
+) : SlackCancelSearchUseCase {
     override suspend operator fun invoke(
         responseUrl: String,
         searchSessionId: String,

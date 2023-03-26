@@ -13,6 +13,7 @@ import com.gchristov.thecodinglove.search.SearchApiService
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slack.SlackModule
+import com.gchristov.thecodinglove.slack.auth.SlackAuthApiService
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityApiService
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubService
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandApiService
@@ -48,4 +49,5 @@ private fun setupServices() {
     DiGraph.inject<SlackSlashCommandPubSubService>().register()
     DiGraph.inject<SlackInteractivityApiService>().register()
     DiGraph.inject<SlackInteractivityPubSubService>().register()
+    DiGraph.inject<SlackAuthApiService>().register()
 }

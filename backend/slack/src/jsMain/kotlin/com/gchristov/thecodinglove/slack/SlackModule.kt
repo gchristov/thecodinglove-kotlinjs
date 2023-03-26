@@ -6,16 +6,14 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
+import com.gchristov.thecodinglove.slack.auth.SlackAuthApiService
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityApiService
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubService
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandApiService
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubService
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
-import com.gchristov.thecodinglove.slackdata.usecase.CancelSlackSearchUseCase
-import com.gchristov.thecodinglove.slackdata.usecase.SendSlackSearchUseCase
-import com.gchristov.thecodinglove.slackdata.usecase.ShuffleSlackSearchUseCase
-import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.*
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
@@ -31,7 +29,7 @@ object SlackModule : DiModule() {
                     apiServiceRegister = instance(),
                     jsonSerializer = instance(),
                     log = instance(),
-                    verifySlackRequestUseCase = instance(),
+                    slackVerifyRequestUseCase = instance(),
                     slackConfig = instance(),
                     pubSubSender = instance()
                 )
@@ -50,7 +48,7 @@ object SlackModule : DiModule() {
                     apiServiceRegister = instance(),
                     jsonSerializer = instance(),
                     log = instance(),
-                    verifySlackRequestUseCase = instance(),
+                    slackVerifyRequestUseCase = instance(),
                     slackConfig = instance(),
                     pubSubSender = instance()
                 )
@@ -60,9 +58,17 @@ object SlackModule : DiModule() {
                     pubSubServiceRegister = instance(),
                     jsonSerializer = instance(),
                     log = instance(),
-                    sendSlackSearchUseCase = instance(),
-                    shuffleSlackSearchUseCase = instance(),
-                    cancelSlackSearchUseCase = instance(),
+                    slackSendSearchUseCase = instance(),
+                    slackShuffleSearchUseCase = instance(),
+                    slackCancelSearchUseCase = instance(),
+                )
+            }
+            bindSingleton {
+                provideSlackAuthUserApiService(
+                    apiServiceRegister = instance(),
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    slackAuthUserUseCase = instance(),
                 )
             }
         }
@@ -72,14 +78,14 @@ object SlackModule : DiModule() {
         apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
         log: Logger,
-        verifySlackRequestUseCase: VerifySlackRequestUseCase,
+        slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
         slackConfig: SlackConfig,
         pubSubSender: PubSubSender,
     ): SlackSlashCommandApiService = SlackSlashCommandApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
-        verifySlackRequestUseCase = verifySlackRequestUseCase,
+        slackVerifyRequestUseCase = slackVerifyRequestUseCase,
         slackConfig = slackConfig,
         pubSubSender = pubSubSender
     )
@@ -102,14 +108,14 @@ object SlackModule : DiModule() {
         apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
         log: Logger,
-        verifySlackRequestUseCase: VerifySlackRequestUseCase,
+        slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
         slackConfig: SlackConfig,
         pubSubSender: PubSubSender,
     ): SlackInteractivityApiService = SlackInteractivityApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
-        verifySlackRequestUseCase = verifySlackRequestUseCase,
+        slackVerifyRequestUseCase = slackVerifyRequestUseCase,
         slackConfig = slackConfig,
         pubSubSender = pubSubSender
     )
@@ -118,15 +124,27 @@ object SlackModule : DiModule() {
         pubSubServiceRegister: PubSubServiceRegister,
         jsonSerializer: Json,
         log: Logger,
-        sendSlackSearchUseCase: SendSlackSearchUseCase,
-        shuffleSlackSearchUseCase: ShuffleSlackSearchUseCase,
-        cancelSlackSearchUseCase: CancelSlackSearchUseCase,
+        slackSendSearchUseCase: SlackSendSearchUseCase,
+        slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
+        slackCancelSearchUseCase: SlackCancelSearchUseCase,
     ): SlackInteractivityPubSubService = SlackInteractivityPubSubService(
         pubSubServiceRegister = pubSubServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
-        sendSlackSearchUseCase = sendSlackSearchUseCase,
-        shuffleSlackSearchUseCase = shuffleSlackSearchUseCase,
-        cancelSlackSearchUseCase = cancelSlackSearchUseCase,
+        slackSendSearchUseCase = slackSendSearchUseCase,
+        slackShuffleSearchUseCase = slackShuffleSearchUseCase,
+        slackCancelSearchUseCase = slackCancelSearchUseCase,
+    )
+
+    private fun provideSlackAuthUserApiService(
+        apiServiceRegister: ApiServiceRegister,
+        jsonSerializer: Json,
+        log: Logger,
+        slackAuthUserUseCase: SlackAuthUserUseCase,
+    ): SlackAuthApiService = SlackAuthApiService(
+        apiServiceRegister = apiServiceRegister,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        slackAuthUserUseCase = slackAuthUserUseCase,
     )
 }

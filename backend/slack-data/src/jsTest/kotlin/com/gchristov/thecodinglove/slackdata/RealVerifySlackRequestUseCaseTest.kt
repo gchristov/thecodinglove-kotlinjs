@@ -4,8 +4,8 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
-import com.gchristov.thecodinglove.slackdata.usecase.RealVerifySlackRequestUseCase
-import com.gchristov.thecodinglove.slackdata.usecase.VerifySlackRequestUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.RealSlackVerifyRequestUseCase
+import com.gchristov.thecodinglove.slackdata.usecase.SlackVerifyRequestUseCase
 import com.gchristov.thecodinglove.slacktestfixtures.FakeSlackApiRequest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
@@ -22,7 +22,7 @@ class RealVerifySlackRequestUseCaseTest {
         return runBlockingTest { useCase ->
             val actualResult = useCase.invoke(FakeSlackApiRequest(fakeTimestamp = null))
             assertEquals(
-                expected = Either.Left(VerifySlackRequestUseCase.Error.MissingTimestamp),
+                expected = Either.Left(SlackVerifyRequestUseCase.Error.MissingTimestamp),
                 actual = actualResult
             )
         }
@@ -33,7 +33,7 @@ class RealVerifySlackRequestUseCaseTest {
         return runBlockingTest { useCase ->
             val actualResult = useCase.invoke(FakeSlackApiRequest(fakeTimestamp = "timestamp"))
             assertEquals(
-                expected = Either.Left(VerifySlackRequestUseCase.Error.Other("Invalid number format: 'timestamp'")),
+                expected = Either.Left(SlackVerifyRequestUseCase.Error.Other("Invalid number format: 'timestamp'")),
                 actual = actualResult
             )
         }
@@ -49,7 +49,7 @@ class RealVerifySlackRequestUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(VerifySlackRequestUseCase.Error.MissingSignature),
+                expected = Either.Left(SlackVerifyRequestUseCase.Error.MissingSignature),
                 actual = actualResult
             )
         }
@@ -65,7 +65,7 @@ class RealVerifySlackRequestUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(VerifySlackRequestUseCase.Error.TooOld),
+                expected = Either.Left(SlackVerifyRequestUseCase.Error.TooOld),
                 actual = actualResult
             )
         }
@@ -82,7 +82,7 @@ class RealVerifySlackRequestUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(VerifySlackRequestUseCase.Error.SignatureMismatch),
+                expected = Either.Left(SlackVerifyRequestUseCase.Error.SignatureMismatch),
                 actual = actualResult
             )
         }
@@ -99,7 +99,7 @@ class RealVerifySlackRequestUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(VerifySlackRequestUseCase.Error.SignatureMismatch),
+                expected = Either.Left(SlackVerifyRequestUseCase.Error.SignatureMismatch),
                 actual = actualResult
             )
         }
@@ -122,14 +122,16 @@ class RealVerifySlackRequestUseCaseTest {
         }
     }
 
-    private fun runBlockingTest(testBlock: suspend (VerifySlackRequestUseCase) -> Unit): TestResult =
+    private fun runBlockingTest(testBlock: suspend (SlackVerifyRequestUseCase) -> Unit): TestResult =
         runTest {
-            val useCase = RealVerifySlackRequestUseCase(
+            val useCase = RealSlackVerifyRequestUseCase(
                 dispatcher = FakeCoroutineDispatcher,
                 slackConfig = SlackConfig(
                     signingSecret = TestSigningSecret,
                     timestampValidityMinutes = TestTimestampValidityInMinutes,
-                    requestVerificationEnabled = true
+                    requestVerificationEnabled = true,
+                    clientId = TestClientId,
+                    clientSecret = TestClientSecret,
                 ),
                 clock = TestClock,
                 log = FakeLogger
@@ -140,6 +142,8 @@ class RealVerifySlackRequestUseCaseTest {
 
 private const val TestSigningSecret = "12345678901234567890"
 private const val TestTimestampValidityInMinutes = 5
+private const val TestClientId = "client_1"
+private const val TestClientSecret = "client_secret_1"
 private val TestClock = object : Clock {
     override fun now(): Instant = Instant.fromEpochMilliseconds(1675611196847)
 }

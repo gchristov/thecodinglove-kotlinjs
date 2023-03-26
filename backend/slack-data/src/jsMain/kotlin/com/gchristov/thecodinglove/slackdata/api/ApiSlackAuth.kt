@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiSlackResponse(
+data class ApiSlackAuthResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("error") val error: String?,
 )

@@ -6,6 +6,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
@@ -21,9 +22,11 @@ object KmpCommonNetworkModule : DiModule() {
         }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     private fun provideJsonSerializer(): Json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
+        explicitNulls = false
     }
 
     private fun provideHttpClient(jsonSerializer: Json) = HttpClient {
