@@ -25,7 +25,7 @@ class SearchApiService(
     log = log
 ) {
     override fun register() {
-        exports.search = registerForApiCallbacks()
+        exports.searchApi = registerForApiCallbacks()
     }
 
     override suspend fun handleRequest(
