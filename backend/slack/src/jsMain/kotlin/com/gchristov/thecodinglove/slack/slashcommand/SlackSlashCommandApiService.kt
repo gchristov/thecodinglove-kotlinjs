@@ -29,7 +29,7 @@ class SlackSlashCommandApiService(
     log = log,
 ) {
     override fun register() {
-        exports.slackSlashCommand = registerForApiCallbacks()
+        exports.slackSlashCommandApi = registerForApiCallbacks()
     }
 
     override suspend fun handleRequest(

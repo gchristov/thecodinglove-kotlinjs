@@ -29,7 +29,7 @@ class SlackInteractivityApiService(
     log = log,
 ) {
     override fun register() {
-        exports.slackInteractivity = registerForApiCallbacks()
+        exports.slackInteractivityApi = registerForApiCallbacks()
     }
 
     override suspend fun handleRequest(

@@ -23,7 +23,7 @@ class SlackAuthApiService(
     log = log,
 ) {
     override fun register() {
-        exports.slackAuth = registerForApiCallbacks()
+        exports.slackAuthApi = registerForApiCallbacks()
     }
 
     override suspend fun handleRequest(
