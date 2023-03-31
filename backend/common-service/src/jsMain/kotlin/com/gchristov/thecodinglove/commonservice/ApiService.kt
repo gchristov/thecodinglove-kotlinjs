@@ -28,6 +28,16 @@ abstract class ApiService(
         response: ApiResponse
     ): Either<Throwable, Unit>
 
+    open fun handleError(
+        error: Throwable,
+        response: ApiResponse
+    ): Either<Throwable, Unit> = response.sendJson(
+        status = 400,
+        data = error.toError(),
+        jsonSerializer = jsonSerializer,
+        log = log
+    )
+
     override val coroutineContext: CoroutineContext
         get() = job
 
@@ -40,7 +50,7 @@ abstract class ApiService(
             ).fold(
                 ifLeft = { handleError ->
                     log.e(handleError) { handleError.message ?: "Error handling request" }
-                    sendError(
+                    handleError(
                         error = handleError,
                         response = response
                     ).fold(
@@ -58,16 +68,6 @@ abstract class ApiService(
             )
         }
     }
-
-    private fun sendError(
-        error: Throwable,
-        response: ApiResponse
-    ) = response.sendJson(
-        status = 400,
-        data = error.toError(),
-        jsonSerializer = jsonSerializer,
-        log = log
-    )
 }
 
 @Serializable

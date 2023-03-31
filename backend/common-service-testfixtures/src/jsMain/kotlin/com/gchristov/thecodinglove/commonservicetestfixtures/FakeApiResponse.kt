@@ -8,6 +8,7 @@ class FakeApiResponse : ApiResponse {
     private var lastHeaderValue: String? = null
     private var lastData: String? = null
     private var lastStatus: Int? = null
+    private var lastRedirectPath: String? = null
 
     override fun setHeader(
         header: String,
@@ -23,6 +24,10 @@ class FakeApiResponse : ApiResponse {
 
     override fun status(status: Int) {
         lastStatus = status
+    }
+
+    override fun redirect(path: String) {
+        lastRedirectPath = path
     }
 
     fun assertEquals(

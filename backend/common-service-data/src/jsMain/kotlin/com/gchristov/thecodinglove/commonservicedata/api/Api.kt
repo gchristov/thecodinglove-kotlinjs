@@ -38,6 +38,8 @@ interface ApiResponse {
     fun send(data: String)
 
     fun status(status: Int)
+
+    fun redirect(path: String)
 }
 
 inline fun <reified T> ApiResponse.sendJson(
@@ -95,6 +97,8 @@ internal fun FirebaseFunctionsHttpsResponse.toApiResponse() = object : ApiRespon
     override fun status(status: Int) {
         this@toApiResponse.status(status)
     }
+
+    override fun redirect(path: String) = this@toApiResponse.redirect(path)
 }
 
 private fun FirebaseFunctionsHttpsParameterMap.toApiParametersMap() = object : ApiParameterMap {
