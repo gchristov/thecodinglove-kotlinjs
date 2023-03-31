@@ -43,9 +43,9 @@ class RealSlackAuthUserUseCase(
                 .mapLeft { SlackAuthUserUseCase.Error.Other(it.message) }
                 .flatMap { authResponse ->
                     log.d("Persisting user token")
-                    // TODO: Persist user token
-                    println(authResponse)
-                    Either.Right(Unit)
+                    slackRepository
+                        .saveAuthToken(authResponse)
+                        .mapLeft { SlackAuthUserUseCase.Error.Other(it.message) }
                 }
         }
     }

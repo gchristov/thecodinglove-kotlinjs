@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slackdata.domain
 
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthResponse
+import com.gchristov.thecodinglove.slackdata.db.DbSlackAuthToken
 
 data class SlackAuthToken(
     val userId: String,
@@ -16,4 +17,12 @@ internal fun ApiSlackAuthResponse.toAuthToken() = SlackAuthToken(
     token = requireNotNull(authedUser).accessToken,
     teamId = requireNotNull(team).id,
     teamName = requireNotNull(team).name,
+)
+
+internal fun DbSlackAuthToken.toAuthToken() = SlackAuthToken(
+    userId = userId,
+    scope = scope,
+    token = token,
+    teamId = teamId,
+    teamName = teamName,
 )

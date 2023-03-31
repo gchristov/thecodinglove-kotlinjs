@@ -5,8 +5,11 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthResponse
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackPostMessageResponse
+import com.gchristov.thecodinglove.slackdata.db.DbSlackAuthToken
+import com.gchristov.thecodinglove.slackdata.db.toAuthToken
 import com.gchristov.thecodinglove.slackdata.domain.SlackAuthToken
 import com.gchristov.thecodinglove.slackdata.domain.toAuthToken
+import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 
@@ -16,6 +19,12 @@ interface SlackRepository {
         clientId: String,
         clientSecret: String,
     ): Either<Throwable, SlackAuthToken>
+
+    suspend fun getAuthToken(userId: String): Either<Throwable, SlackAuthToken>
+
+    suspend fun saveAuthToken(token: SlackAuthToken): Either<Throwable, Unit>
+
+    suspend fun deleteAuthToken(userId: String): Either<Throwable, Unit>
 
     suspend fun replyWithMessage(
         responseUrl: String,
@@ -31,6 +40,7 @@ interface SlackRepository {
 internal class RealSlackRepository(
     private val apiService: SlackApi,
     private val log: Logger,
+    private val firebaseFirestore: FirebaseFirestore,
 ) : SlackRepository {
     override suspend fun authUser(
         code: String,
@@ -49,6 +59,49 @@ internal class RealSlackRepository(
         }
     } catch (error: Throwable) {
         log.e(error) { error.message ?: "Error during user auth" }
+        Either.Left(error)
+    }
+
+    override suspend fun getAuthToken(userId: String): Either<Throwable, SlackAuthToken> = try {
+        val document = firebaseFirestore
+            .collection(AuthTokenCollection)
+            .document(userId)
+            .get()
+        if (document.exists) {
+            val dbAuthToken: DbSlackAuthToken = document.data()
+            Either.Right(dbAuthToken.toAuthToken())
+        } else {
+            Either.Left(Exception("Slack auth token not found"))
+        }
+    } catch (error: Throwable) {
+        log.e(error) { error.message ?: "Error during finding Slack auth token" }
+        Either.Left(error)
+    }
+
+    override suspend fun saveAuthToken(token: SlackAuthToken): Either<Throwable, Unit> = try {
+        val document = firebaseFirestore
+            .collection(AuthTokenCollection)
+            .document(token.userId)
+        Either.Right(
+            document.set(
+                data = token.toAuthToken(),
+                encodeDefaults = true,
+                merge = true
+            )
+        )
+    } catch (error: Throwable) {
+        log.e(error) { error.message ?: "Error during saving Slack auth token" }
+        Either.Left(error)
+    }
+
+    override suspend fun deleteAuthToken(userId: String): Either<Throwable, Unit> = try {
+        firebaseFirestore
+            .collection(AuthTokenCollection)
+            .document(userId)
+            .delete()
+        Either.Right(Unit)
+    } catch (error: Throwable) {
+        log.e(error) { error.message ?: "Error during deleting Slack auth token" }
         Either.Left(error)
     }
 
@@ -88,3 +141,5 @@ internal class RealSlackRepository(
         Either.Left(error)
     }
 }
+
+private const val AuthTokenCollection = "slack_auth_token"

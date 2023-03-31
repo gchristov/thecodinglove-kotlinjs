@@ -103,4 +103,4 @@ internal class RealSearchRepository(
     }
 }
 
-private const val SearchSessionCollection = "searchSession"
+private const val SearchSessionCollection = "search_session"
