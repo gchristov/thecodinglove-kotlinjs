@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.searchdata.model
 
 import com.gchristov.thecodinglove.htmlparsedata.HtmlPost
-import com.gchristov.thecodinglove.searchdata.api.ApiPost
+import com.gchristov.thecodinglove.searchdata.db.DbPost
 
 data class Post(
     val title: String,
@@ -15,7 +15,7 @@ internal fun HtmlPost.toPost() = Post(
     imageUrl = imageUrl
 )
 
-internal fun ApiPost.toPost() = Post(
+internal fun DbPost.toPost() = Post(
     title = title,
     url = url,
     imageUrl = imageUrl

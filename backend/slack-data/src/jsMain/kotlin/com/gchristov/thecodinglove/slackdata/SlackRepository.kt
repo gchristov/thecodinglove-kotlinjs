@@ -5,6 +5,8 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthResponse
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackPostMessageResponse
+import com.gchristov.thecodinglove.slackdata.domain.SlackAuthToken
+import com.gchristov.thecodinglove.slackdata.domain.toAuthToken
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 
@@ -13,7 +15,7 @@ interface SlackRepository {
         code: String,
         clientId: String,
         clientSecret: String,
-    ): Either<Throwable, Unit>
+    ): Either<Throwable, SlackAuthToken>
 
     suspend fun replyWithMessage(
         responseUrl: String,
@@ -41,7 +43,7 @@ internal class RealSlackRepository(
             clientSecret = clientSecret
         ).body()
         if (slackResponse.ok) {
-            Either.Right(Unit)
+            Either.Right(slackResponse.toAuthToken())
         } else {
             throw Exception(slackResponse.error)
         }
