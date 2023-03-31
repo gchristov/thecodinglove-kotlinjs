@@ -31,4 +31,6 @@ internal external class FirebaseFunctionsHttpsResponse {
     fun send(data: String)
 
     fun status(status: Int): FirebaseFunctionsHttpsResponse
+
+    fun redirect(path: String)
 }

@@ -14,7 +14,11 @@
     "rewrites": [
       {
         "source": "/api/search",
-        "function": "search"
+        "function": "searchApi"
+      },
+      {
+        "source": "/api/slack/auth",
+        "function": "slackAuthApi"
       }
     ]
   },
