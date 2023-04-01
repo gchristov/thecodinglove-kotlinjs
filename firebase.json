@@ -19,6 +19,10 @@
       {
         "source": "/api/slack/auth",
         "function": "slackAuthApi"
+      },
+      {
+        "source": "/api/slack/event",
+        "function": "slackEventApi"
       }
     ]
   },
