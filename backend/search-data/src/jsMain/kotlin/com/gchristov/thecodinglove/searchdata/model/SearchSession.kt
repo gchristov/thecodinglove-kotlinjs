@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove.searchdata.model
 
-import com.gchristov.thecodinglove.searchdata.api.ApiSearchSession
-import com.gchristov.thecodinglove.searchdata.api.toPost
+import com.gchristov.thecodinglove.searchdata.db.DbSearchSession
 
 data class SearchSession(
     val id: String,
@@ -18,7 +17,7 @@ data class SearchSession(
     }
 }
 
-internal fun ApiSearchSession.toSearchSession() = SearchSession(
+internal fun DbSearchSession.toSearchSession() = SearchSession(
     id = id,
     query = query,
     totalPosts = totalPosts,
@@ -34,26 +33,6 @@ internal fun ApiSearchSession.toSearchSession() = SearchSession(
     state = state.toSearchSessionState()
 )
 
-private fun ApiSearchSession.ApiState.toSearchSessionState() = when (this) {
-    is ApiSearchSession.ApiState.ApiSearching -> SearchSession.State.Searching
-}
-
-internal fun SearchSession.toSearchSession() = ApiSearchSession(
-    id = id,
-    query = query,
-    totalPosts = totalPosts,
-    searchHistory = mutableMapOf<String, List<Int>>().apply {
-        searchHistory.keys.forEach { page ->
-            searchHistory[page]?.let { itemIndex ->
-                put(page.toString(), itemIndex)
-            }
-        }
-    },
-    currentPost = currentPost?.toPost(),
-    preloadedPost = preloadedPost?.toPost(),
-    state = state.toSearchSessionState()
-)
-
-private fun SearchSession.State.toSearchSessionState() = when (this) {
-    is SearchSession.State.Searching -> ApiSearchSession.ApiState.ApiSearching
+private fun DbSearchSession.DbState.toSearchSessionState() = when (this) {
+    is DbSearchSession.DbState.DbSearching -> SearchSession.State.Searching
 }

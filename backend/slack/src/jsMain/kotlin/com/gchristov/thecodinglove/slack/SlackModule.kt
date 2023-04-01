@@ -68,7 +68,7 @@ object SlackModule : DiModule() {
                     apiServiceRegister = instance(),
                     jsonSerializer = instance(),
                     log = instance(),
-                    slackAuthUserUseCase = instance(),
+                    slackAuthUseCase = instance(),
                 )
             }
         }
@@ -140,11 +140,11 @@ object SlackModule : DiModule() {
         apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
         log: Logger,
-        slackAuthUserUseCase: SlackAuthUserUseCase,
+        slackAuthUseCase: SlackAuthUseCase,
     ): SlackAuthApiService = SlackAuthApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
-        slackAuthUserUseCase = slackAuthUserUseCase,
+        slackAuthUseCase = slackAuthUseCase,
     )
 }

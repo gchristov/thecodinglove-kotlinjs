@@ -4,7 +4,8 @@ import arrow.core.Either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
-import com.gchristov.thecodinglove.searchdata.api.ApiSearchSession
+import com.gchristov.thecodinglove.searchdata.db.DbSearchSession
+import com.gchristov.thecodinglove.searchdata.db.toSearchSession
 import com.gchristov.thecodinglove.searchdata.model.*
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.statement.*
@@ -63,8 +64,8 @@ internal class RealSearchRepository(
             .document(id)
             .get()
         if (document.exists) {
-            val apiSearchSession: ApiSearchSession = document.data()
-            Either.Right(apiSearchSession.toSearchSession())
+            val dbSearchSession: DbSearchSession = document.data()
+            Either.Right(dbSearchSession.toSearchSession())
         } else {
             Either.Left(SearchError.SessionNotFound)
         }
@@ -102,4 +103,4 @@ internal class RealSearchRepository(
     }
 }
 
-private const val SearchSessionCollection = "searchSession"
+private const val SearchSessionCollection = "search_session"

@@ -6,6 +6,7 @@ import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.*
+import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
@@ -24,7 +25,8 @@ object SlackDataModule : DiModule() {
             bindSingleton {
                 provideSlackRepository(
                     api = instance(),
-                    log = instance()
+                    log = instance(),
+                    firebaseFirestore = instance(),
                 )
             }
             bindProvider {
@@ -55,7 +57,7 @@ object SlackDataModule : DiModule() {
                 )
             }
             bindProvider {
-                provideSlackAuthUserUseCase(
+                provideSlackAuthUseCase(
                     slackConfig = instance(),
                     log = instance(),
                     slackRepository = instance(),
@@ -76,10 +78,12 @@ object SlackDataModule : DiModule() {
 
     private fun provideSlackRepository(
         api: SlackApi,
-        log: Logger
+        log: Logger,
+        firebaseFirestore: FirebaseFirestore,
     ): SlackRepository = RealSlackRepository(
         apiService = api,
-        log = log
+        log = log,
+        firebaseFirestore = firebaseFirestore
     )
 
     private fun provideSlackVerifyRequestUseCase(
@@ -125,11 +129,11 @@ object SlackDataModule : DiModule() {
         slackRepository = slackRepository
     )
 
-    private fun provideSlackAuthUserUseCase(
+    private fun provideSlackAuthUseCase(
         slackConfig: SlackConfig,
         log: Logger,
         slackRepository: SlackRepository,
-    ): SlackAuthUserUseCase = RealSlackAuthUserUseCase(
+    ): SlackAuthUseCase = RealSlackAuthUseCase(
         dispatcher = Dispatchers.Default,
         slackConfig = slackConfig,
         log = log,
