@@ -77,6 +77,8 @@ object SlackModule : DiModule() {
                     apiServiceRegister = instance(),
                     jsonSerializer = instance(),
                     log = instance(),
+                    slackVerifyRequestUseCase = instance(),
+                    slackConfig = instance(),
                 )
             }
         }
@@ -160,9 +162,13 @@ object SlackModule : DiModule() {
         apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
         log: Logger,
+        slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
+        slackConfig: SlackConfig,
     ): SlackEventApiService = SlackEventApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
+        slackVerifyRequestUseCase = slackVerifyRequestUseCase,
+        slackConfig = slackConfig,
     )
 }

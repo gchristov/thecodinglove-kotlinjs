@@ -44,11 +44,11 @@ class SlackSlashCommandApiService(
             jsonSerializer = jsonSerializer,
             log = log
         )
-            .leftIfNull(default = { Exception("Request body is null") })
+            .leftIfNull(default = { Exception("Request body is invalid") })
             .flatMap { slashCommand ->
                 publishSlashCommandMessage(slashCommand)
                     .flatMap {
-                        response.sendEmpty(log = log)
+                        response.sendEmptyJson(log = log)
                     }
             }
     }

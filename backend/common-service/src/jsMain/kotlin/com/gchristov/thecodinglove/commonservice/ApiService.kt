@@ -23,7 +23,7 @@ abstract class ApiService(
     open suspend fun handleRequest(
         request: ApiRequest,
         response: ApiResponse
-    ): Either<Throwable, Unit> = response.sendEmpty(log = log)
+    ): Either<Throwable, Unit> = response.sendEmptyJson(log = log)
 
     open fun handleError(
         error: Throwable,
