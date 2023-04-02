@@ -16,12 +16,9 @@ data class ApiSlackInteractivity(
 ) {
     @Serializable
     sealed class ApiSlackInteractivityPayload {
-        abstract val type: String
-
         @Serializable
         @SerialName("interactive_message")
         data class ApiInteractiveMessage(
-            @SerialName("type") override val type: String,
             @SerialName("actions") val actions: List<ApiAction>,
             @SerialName("team") val team: ApiTeam,
             @SerialName("channel") val channel: ApiChannel,

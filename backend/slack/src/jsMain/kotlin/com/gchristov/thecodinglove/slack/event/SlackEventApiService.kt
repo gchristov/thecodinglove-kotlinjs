@@ -11,6 +11,7 @@ import com.gchristov.thecodinglove.slackdata.api.ApiSlackEvent
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackEvent
 import com.gchristov.thecodinglove.slackdata.domain.toEvent
+import com.gchristov.thecodinglove.slackdata.usecase.SlackRevokeTokensUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.SlackVerifyRequestUseCase
 import kotlinx.serialization.json.Json
 
@@ -20,6 +21,7 @@ class SlackEventApiService(
     private val log: Logger,
     private val slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
     private val slackConfig: SlackConfig,
+    private val slackRevokeTokensUseCase: SlackRevokeTokensUseCase,
 ) : ApiService(
     apiServiceRegister = apiServiceRegister,
     jsonSerializer = jsonSerializer,
@@ -43,16 +45,22 @@ class SlackEventApiService(
         )
             .leftIfNull(default = { Exception("Request body is invalid") })
             .flatMap {
-                val event = it.toEvent()
-                when (event) {
+                when (val event = it.toEvent()) {
                     is SlackEvent.UrlVerification -> event.handle(response)
+                    is SlackEvent.Callback -> event.handle(response)
                 }
             }
     }
 
-    private fun SlackEvent.UrlVerification.handle(response: ApiResponse): Either<Throwable, Unit> =
-        response.sendText(
-            text = challenge,
-            log = log,
-        )
+    private fun SlackEvent.UrlVerification.handle(response: ApiResponse) = response.sendText(
+        text = challenge,
+        log = log,
+    )
+
+    private suspend fun SlackEvent.Callback.handle(response: ApiResponse) =
+        when (val typedEvent = event) {
+            is SlackEvent.Callback.Event.TokensRevoked -> slackRevokeTokensUseCase(typedEvent).flatMap {
+                response.sendEmptyJson(log = log)
+            }
+        }
 }

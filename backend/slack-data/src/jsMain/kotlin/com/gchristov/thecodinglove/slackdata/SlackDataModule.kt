@@ -63,6 +63,12 @@ object SlackDataModule : DiModule() {
                     slackRepository = instance(),
                 )
             }
+            bindProvider {
+                provideSlackRevokeTokensUseCase(
+                    log = instance(),
+                    slackRepository = instance(),
+                )
+            }
         }
     }
 
@@ -136,6 +142,15 @@ object SlackDataModule : DiModule() {
     ): SlackAuthUseCase = RealSlackAuthUseCase(
         dispatcher = Dispatchers.Default,
         slackConfig = slackConfig,
+        log = log,
+        slackRepository = slackRepository,
+    )
+
+    private fun provideSlackRevokeTokensUseCase(
+        log: Logger,
+        slackRepository: SlackRepository,
+    ): SlackRevokeTokensUseCase = RealSlackRevokeTokensUseCase(
+        dispatcher = Dispatchers.Default,
         log = log,
         slackRepository = slackRepository,
     )

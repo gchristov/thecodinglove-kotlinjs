@@ -4,7 +4,7 @@ import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthResponse
 import com.gchristov.thecodinglove.slackdata.db.DbSlackAuthToken
 
 data class SlackAuthToken(
-    val userId: String,
+    val id: String,
     val scope: String,
     val token: String,
     val teamId: String,
@@ -12,15 +12,15 @@ data class SlackAuthToken(
 )
 
 internal fun ApiSlackAuthResponse.toAuthToken() = SlackAuthToken(
-    userId = requireNotNull(authedUser).id,
-    scope = requireNotNull(authedUser).scope,
-    token = requireNotNull(authedUser).accessToken,
+    id = requireNotNull(authedUser).id,
+    scope = authedUser.scope,
+    token = authedUser.accessToken,
     teamId = requireNotNull(team).id,
-    teamName = requireNotNull(team).name,
+    teamName = team.name,
 )
 
 internal fun DbSlackAuthToken.toAuthToken() = SlackAuthToken(
-    userId = userId,
+    id = id,
     scope = scope,
     token = token,
     teamId = teamId,

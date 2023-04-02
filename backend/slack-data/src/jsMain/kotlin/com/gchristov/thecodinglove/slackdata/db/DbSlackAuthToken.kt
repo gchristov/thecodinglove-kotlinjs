@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DbSlackAuthToken(
-    @SerialName("user_id") val userId: String,
+    @SerialName("id") val id: String,
     @SerialName("scope") val scope: String,
     @SerialName("token") val token: String,
     @SerialName("team_id") val teamId: String,
@@ -14,7 +14,7 @@ data class DbSlackAuthToken(
 )
 
 internal fun SlackAuthToken.toAuthToken() = DbSlackAuthToken(
-    userId = userId,
+    id = id,
     scope = scope,
     token = token,
     teamId = teamId,
