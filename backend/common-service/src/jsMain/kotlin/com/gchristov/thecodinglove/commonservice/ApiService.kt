@@ -2,10 +2,7 @@ package com.gchristov.thecodinglove.commonservice
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
-import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
-import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
-import com.gchristov.thecodinglove.commonservicedata.api.sendJson
+import com.gchristov.thecodinglove.commonservicedata.api.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -23,10 +20,10 @@ abstract class ApiService(
 
     abstract fun register()
 
-    abstract suspend fun handleRequest(
+    open suspend fun handleRequest(
         request: ApiRequest,
         response: ApiResponse
-    ): Either<Throwable, Unit>
+    ): Either<Throwable, Unit> = response.sendEmptyJson(log = log)
 
     open fun handleError(
         error: Throwable,

@@ -7,6 +7,7 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegiste
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.auth.SlackAuthApiService
+import com.gchristov.thecodinglove.slack.event.SlackEventApiService
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityApiService
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubService
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandApiService
@@ -64,11 +65,21 @@ object SlackModule : DiModule() {
                 )
             }
             bindSingleton {
-                provideSlackAuthUserApiService(
+                provideSlackAuthApiService(
                     apiServiceRegister = instance(),
                     jsonSerializer = instance(),
                     log = instance(),
                     slackAuthUseCase = instance(),
+                )
+            }
+            bindSingleton {
+                provideSlackEventApiService(
+                    apiServiceRegister = instance(),
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    slackVerifyRequestUseCase = instance(),
+                    slackConfig = instance(),
+                    slackRevokeTokensUseCase = instance(),
                 )
             }
         }
@@ -136,7 +147,7 @@ object SlackModule : DiModule() {
         slackCancelSearchUseCase = slackCancelSearchUseCase,
     )
 
-    private fun provideSlackAuthUserApiService(
+    private fun provideSlackAuthApiService(
         apiServiceRegister: ApiServiceRegister,
         jsonSerializer: Json,
         log: Logger,
@@ -146,5 +157,21 @@ object SlackModule : DiModule() {
         jsonSerializer = jsonSerializer,
         log = log,
         slackAuthUseCase = slackAuthUseCase,
+    )
+
+    private fun provideSlackEventApiService(
+        apiServiceRegister: ApiServiceRegister,
+        jsonSerializer: Json,
+        log: Logger,
+        slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
+        slackConfig: SlackConfig,
+        slackRevokeTokensUseCase: SlackRevokeTokensUseCase,
+    ): SlackEventApiService = SlackEventApiService(
+        apiServiceRegister = apiServiceRegister,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        slackVerifyRequestUseCase = slackVerifyRequestUseCase,
+        slackConfig = slackConfig,
+        slackRevokeTokensUseCase = slackRevokeTokensUseCase,
     )
 }

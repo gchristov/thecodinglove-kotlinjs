@@ -56,11 +56,11 @@ inline fun <reified T> ApiResponse.sendJson(
     send(jsonSerializer.encodeToString(data))
     Either.Right(Unit)
 } catch (error: Throwable) {
-    log.e(error) { error.message ?: "Error during API response send" }
+    log.e(error) { error.message ?: "Error during API JSON response send" }
     Either.Left(error)
 }
 
-fun ApiResponse.sendEmpty(
+fun ApiResponse.sendEmptyJson(
     status: Int = 200,
     log: Logger
 ): Either<Throwable, Unit> = try {
@@ -69,10 +69,27 @@ fun ApiResponse.sendEmpty(
         header = "Content-Type",
         value = "application/json"
     )
-    send("")
+    send("{}")
     Either.Right(Unit)
 } catch (error: Throwable) {
-    log.e(error) { error.message ?: "Error during API empty response send" }
+    log.e(error) { error.message ?: "Error during API empty JSON response send" }
+    Either.Left(error)
+}
+
+fun ApiResponse.sendText(
+    status: Int = 200,
+    text: String,
+    log: Logger
+): Either<Throwable, Unit> = try {
+    status(status)
+    setHeader(
+        header = "Content-Type",
+        value = "text/plain"
+    )
+    send(text)
+    Either.Right(Unit)
+} catch (error: Throwable) {
+    log.e(error) { error.message ?: "Error during API text response send" }
     Either.Left(error)
 }
 

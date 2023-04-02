@@ -20,11 +20,11 @@ interface SlackRepository {
         clientSecret: String,
     ): Either<Throwable, SlackAuthToken>
 
-    suspend fun getAuthToken(userId: String): Either<Throwable, SlackAuthToken>
+    suspend fun getAuthToken(tokenId: String): Either<Throwable, SlackAuthToken>
 
     suspend fun saveAuthToken(token: SlackAuthToken): Either<Throwable, Unit>
 
-    suspend fun deleteAuthToken(userId: String): Either<Throwable, Unit>
+    suspend fun deleteAuthToken(tokenId: String): Either<Throwable, Unit>
 
     suspend fun replyWithMessage(
         responseUrl: String,
@@ -62,10 +62,10 @@ internal class RealSlackRepository(
         Either.Left(error)
     }
 
-    override suspend fun getAuthToken(userId: String): Either<Throwable, SlackAuthToken> = try {
+    override suspend fun getAuthToken(tokenId: String): Either<Throwable, SlackAuthToken> = try {
         val document = firebaseFirestore
             .collection(AuthTokenCollection)
-            .document(userId)
+            .document(tokenId)
             .get()
         if (document.exists) {
             val dbAuthToken: DbSlackAuthToken = document.data()
@@ -81,7 +81,7 @@ internal class RealSlackRepository(
     override suspend fun saveAuthToken(token: SlackAuthToken): Either<Throwable, Unit> = try {
         val document = firebaseFirestore
             .collection(AuthTokenCollection)
-            .document(token.userId)
+            .document(token.id)
         Either.Right(
             document.set(
                 data = token.toAuthToken(),
@@ -94,10 +94,10 @@ internal class RealSlackRepository(
         Either.Left(error)
     }
 
-    override suspend fun deleteAuthToken(userId: String): Either<Throwable, Unit> = try {
+    override suspend fun deleteAuthToken(tokenId: String): Either<Throwable, Unit> = try {
         firebaseFirestore
             .collection(AuthTokenCollection)
-            .document(userId)
+            .document(tokenId)
             .delete()
         Either.Right(Unit)
     } catch (error: Throwable) {

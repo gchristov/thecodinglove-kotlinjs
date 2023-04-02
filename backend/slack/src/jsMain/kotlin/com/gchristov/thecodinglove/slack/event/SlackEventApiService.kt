@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slack.slashcommand
+package com.gchristov.thecodinglove.slack.event
 
 import arrow.core.Either
 import arrow.core.flatMap
@@ -7,29 +7,28 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.*
 import com.gchristov.thecodinglove.commonservicedata.exports
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
-import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
-import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
+import com.gchristov.thecodinglove.slackdata.api.ApiSlackEvent
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
-import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubTopic
-import com.gchristov.thecodinglove.slackdata.domain.toPubSubMessage
+import com.gchristov.thecodinglove.slackdata.domain.SlackEvent
+import com.gchristov.thecodinglove.slackdata.domain.toEvent
+import com.gchristov.thecodinglove.slackdata.usecase.SlackRevokeTokensUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.SlackVerifyRequestUseCase
 import kotlinx.serialization.json.Json
 
-class SlackSlashCommandApiService(
+class SlackEventApiService(
     apiServiceRegister: ApiServiceRegister,
     private val jsonSerializer: Json,
     private val log: Logger,
     private val slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
     private val slackConfig: SlackConfig,
-    private val pubSubSender: PubSubSender,
+    private val slackRevokeTokensUseCase: SlackRevokeTokensUseCase,
 ) : ApiService(
     apiServiceRegister = apiServiceRegister,
     jsonSerializer = jsonSerializer,
     log = log,
 ) {
     override fun register() {
-        exports.slackSlashCommandApi = registerForApiCallbacks()
+        exports.slackEventApi = registerForApiCallbacks()
     }
 
     override suspend fun handleRequest(
@@ -40,24 +39,28 @@ class SlackSlashCommandApiService(
     } else {
         Either.Right(Unit)
     }.flatMap {
-        request.decodeBodyFromJson<ApiSlackSlashCommand>(
+        request.decodeBodyFromJson<ApiSlackEvent>(
             jsonSerializer = jsonSerializer,
             log = log
         )
             .leftIfNull(default = { Exception("Request body is invalid") })
-            .flatMap { slashCommand ->
-                publishSlashCommandMessage(slashCommand)
-                    .flatMap {
-                        response.sendEmptyJson(log = log)
-                    }
+            .flatMap {
+                when (val event = it.toEvent()) {
+                    is SlackEvent.UrlVerification -> event.handle(response)
+                    is SlackEvent.Callback -> event.handle(response)
+                }
             }
     }
 
-    private suspend fun publishSlashCommandMessage(slashCommand: ApiSlackSlashCommand) =
-        pubSubSender.sendMessage(
-            topic = SlackSlashCommandPubSubTopic,
-            body = slashCommand.toPubSubMessage(),
-            jsonSerializer = jsonSerializer,
-            log = log
-        )
+    private fun SlackEvent.UrlVerification.handle(response: ApiResponse) = response.sendText(
+        text = challenge,
+        log = log,
+    )
+
+    private suspend fun SlackEvent.Callback.handle(response: ApiResponse) =
+        when (val typedEvent = event) {
+            is SlackEvent.Callback.Event.TokensRevoked -> slackRevokeTokensUseCase(typedEvent).flatMap {
+                response.sendEmptyJson(log = log)
+            }
+        }
 }

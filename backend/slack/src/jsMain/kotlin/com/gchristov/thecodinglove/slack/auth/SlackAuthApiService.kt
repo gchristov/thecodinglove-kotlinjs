@@ -14,7 +14,7 @@ import kotlinx.serialization.json.Json
 class SlackAuthApiService(
     apiServiceRegister: ApiServiceRegister,
     jsonSerializer: Json,
-    private val log: Logger,
+    log: Logger,
     private val slackAuthUseCase: SlackAuthUseCase,
 ) : ApiService(
     apiServiceRegister = apiServiceRegister,

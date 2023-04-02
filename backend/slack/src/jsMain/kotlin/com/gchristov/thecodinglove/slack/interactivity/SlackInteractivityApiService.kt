@@ -44,11 +44,11 @@ class SlackInteractivityApiService(
             jsonSerializer = jsonSerializer,
             log = log
         )
-            .leftIfNull(default = { Exception("Request body is null") })
+            .leftIfNull(default = { Exception("Request body is invalid") })
             .flatMap { interactivity ->
                 publishInteractivityMessage(interactivity)
                     .flatMap {
-                        response.sendEmpty(log = log)
+                        response.sendEmptyJson(log = log)
                     }
             }
     }
