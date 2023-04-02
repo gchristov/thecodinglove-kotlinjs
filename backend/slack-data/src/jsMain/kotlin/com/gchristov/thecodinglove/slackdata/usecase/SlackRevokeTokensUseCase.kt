@@ -23,6 +23,12 @@ class RealSlackRevokeTokensUseCase(
                 addAll(event.tokens.bot ?: emptyList())
             }
             log.d("Processing Slack revoked tokens: tokensIdsToRevoke=$tokensIdsToRevoke")
-            tokensIdsToRevoke.map { slackRepository.deleteAuthToken(it) }.sequence().map {}
+            tokensIdsToRevoke
+                .map {
+                    log.d("Deleting Slack token: id=$it")
+                    slackRepository.deleteAuthToken(it)
+                }
+                .sequence()
+                .map {}
         }
 }
