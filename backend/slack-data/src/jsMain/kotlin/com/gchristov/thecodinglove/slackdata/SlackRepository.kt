@@ -5,6 +5,7 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthResponse
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackPostMessageResponse
+import com.gchristov.thecodinglove.slackdata.api.ApiSlackReplyWithMessageResponse
 import com.gchristov.thecodinglove.slackdata.db.DbSlackAuthToken
 import com.gchristov.thecodinglove.slackdata.db.toAuthToken
 import com.gchristov.thecodinglove.slackdata.domain.SlackAuthToken
@@ -12,6 +13,7 @@ import com.gchristov.thecodinglove.slackdata.domain.toAuthToken
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 
 interface SlackRepository {
     suspend fun authUser(
@@ -112,11 +114,23 @@ internal class RealSlackRepository(
         val slackResponse = apiService.replyWithMessage(
             responseUrl = responseUrl,
             message = message
-        ).bodyAsText()
-        if (slackResponse.lowercase() == "ok") {
-            Either.Right(Unit)
+        )
+        // Sending requests to Slack response URLs currently has an issue where the content type
+        // does not honor the Accept header and we get text/plain, instead of application/json
+        if (slackResponse.contentType()?.match(ContentType.Application.Json) == true) {
+            val jsonResponse: ApiSlackReplyWithMessageResponse = slackResponse.body()
+            if (jsonResponse.ok) {
+                Either.Right(Unit)
+            } else {
+                throw Exception(jsonResponse.error)
+            }
         } else {
-            throw Exception(slackResponse)
+            val textResponse = slackResponse.bodyAsText()
+            if (textResponse.lowercase() == "ok") {
+                Either.Right(Unit)
+            } else {
+                throw Exception(textResponse)
+            }
         }
     } catch (error: Throwable) {
         log.e(error) { error.message ?: "Error during message reply" }
