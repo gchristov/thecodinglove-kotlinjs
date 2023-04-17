@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.slackdata
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
+import com.gchristov.thecodinglove.kmpcommonnetwork.JsonClient
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
@@ -72,7 +73,7 @@ object SlackDataModule : DiModule() {
         }
     }
 
-    private fun provideSlackApi(client: HttpClient) = SlackApi(client)
+    private fun provideSlackApi(client: JsonClient) = SlackApi(client)
 
     private fun provideSlackConfig(): SlackConfig = SlackConfig(
         signingSecret = BuildKonfig.SLACK_SIGNING_SECRET,

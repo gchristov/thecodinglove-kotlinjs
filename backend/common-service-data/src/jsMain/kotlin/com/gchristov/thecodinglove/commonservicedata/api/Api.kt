@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.commonservicedata.api
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger
+import io.ktor.http.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -46,50 +47,57 @@ inline fun <reified T> ApiResponse.sendJson(
     status: Int = 200,
     data: T,
     jsonSerializer: Json,
-    log: Logger
+    log: Logger,
 ): Either<Throwable, Unit> = try {
-    status(status)
-    setHeader(
-        header = "Content-Type",
-        value = "application/json"
+    send(
+        status = status,
+        content = jsonSerializer.encodeToString(data),
+        contentType = ContentType.Application.Json,
+        log = log
     )
-    send(jsonSerializer.encodeToString(data))
     Either.Right(Unit)
 } catch (error: Throwable) {
-    log.e(error) { error.message ?: "Error during API JSON response send" }
-    Either.Left(error)
-}
-
-fun ApiResponse.sendEmptyJson(
-    status: Int = 200,
-    log: Logger
-): Either<Throwable, Unit> = try {
-    status(status)
-    setHeader(
-        header = "Content-Type",
-        value = "application/json"
-    )
-    send("{}")
-    Either.Right(Unit)
-} catch (error: Throwable) {
-    log.e(error) { error.message ?: "Error during API empty JSON response send" }
+    log.e(error) { error.message ?: "Error during API response send" }
     Either.Left(error)
 }
 
 fun ApiResponse.sendText(
     status: Int = 200,
     text: String,
-    log: Logger
+    log: Logger,
+) = send(
+    status = status,
+    content = text,
+    contentType = ContentType.Text.Plain,
+    log = log,
+)
+
+fun ApiResponse.sendEmpty(
+    status: Int = 200,
+    contentType: ContentType = ContentType.Application.Json,
+    log: Logger,
+) = send(
+    status = status,
+    content = "",
+    contentType = contentType,
+    log = log
+)
+
+fun ApiResponse.send(
+    status: Int,
+    content: String,
+    contentType: ContentType,
+    log: Logger,
 ): Either<Throwable, Unit> = try {
     status(status)
     setHeader(
         header = "Content-Type",
-        value = "text/plain"
+        value = contentType.toString()
     )
-    send(text)
+    send(content)
     Either.Right(Unit)
 } catch (error: Throwable) {
-    log.e(error) { error.message ?: "Error during API text response send" }
+    log.e(error) { error.message ?: "Error during API response send" }
     Either.Left(error)
 }
 

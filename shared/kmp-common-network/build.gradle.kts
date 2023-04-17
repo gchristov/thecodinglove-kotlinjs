@@ -27,8 +27,13 @@ buildkonfig {
     defaultConfigs {
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "APP_NETWORK_LOG_LEVEL",
-            value = getLocalSecret(rootProject, "APP_NETWORK_LOG_LEVEL")
+            name = "APP_NETWORK_HTML_LOG_LEVEL",
+            value = getLocalSecret(rootProject, "APP_NETWORK_HTML_LOG_LEVEL")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "APP_NETWORK_JSON_LOG_LEVEL",
+            value = getLocalSecret(rootProject, "APP_NETWORK_JSON_LOG_LEVEL")
         )
     }
 }

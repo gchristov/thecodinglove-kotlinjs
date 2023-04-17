@@ -48,7 +48,7 @@ class SlackInteractivityApiService(
             .flatMap { interactivity ->
                 publishInteractivityMessage(interactivity)
                     .flatMap {
-                        response.sendEmptyJson(log = log)
+                        response.sendEmpty(log = log)
                     }
             }
     }

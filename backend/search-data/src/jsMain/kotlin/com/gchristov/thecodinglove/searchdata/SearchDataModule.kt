@@ -5,10 +5,10 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
+import com.gchristov.thecodinglove.kmpcommonnetwork.HtmlClient
 import com.gchristov.thecodinglove.searchdata.model.SearchConfig
 import com.gchristov.thecodinglove.searchdata.usecase.*
 import dev.gitlive.firebase.firestore.FirebaseFirestore
-import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
@@ -56,7 +56,7 @@ object SearchDataModule : DiModule() {
         }
     }
 
-    private fun provideSearchApi(client: HttpClient) = SearchApi(client)
+    private fun provideSearchApi(client: HtmlClient) = SearchApi(client)
 
     private fun provideSearchRepository(
         api: SearchApi,

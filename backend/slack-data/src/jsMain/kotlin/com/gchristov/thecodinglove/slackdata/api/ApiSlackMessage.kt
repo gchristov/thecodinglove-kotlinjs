@@ -11,6 +11,12 @@ data class ApiSlackPostMessageResponse(
 )
 
 @Serializable
+data class ApiSlackReplyWithMessageResponse(
+    @SerialName("ok") val ok: Boolean,
+    @SerialName("error") val error: String?,
+)
+
+@Serializable
 data class ApiSlackMessage(
     @SerialName("text") val text: String?,
     @SerialName("user_id") val userId: String?,

@@ -18,7 +18,8 @@ object KmpCommonNetworkModule : DiModule() {
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindSingleton { provideJsonSerializer() }
-            bindSingleton { provideHttpClient(jsonSerializer = instance()) }
+            bindSingleton { provideHtmlClient() }
+            bindSingleton { provideJsonClient(serializer = instance()) }
         }
     }
 
@@ -29,14 +30,24 @@ object KmpCommonNetworkModule : DiModule() {
         explicitNulls = false
     }
 
-    private fun provideHttpClient(jsonSerializer: Json) = HttpClient {
-        BrowserUserAgent()
-        install(ContentNegotiation) {
-            json(jsonSerializer)
+    private fun provideHtmlClient() = HtmlClient(
+        provideHttpClient(BuildKonfig.APP_NETWORK_HTML_LOG_LEVEL).config {
+            BrowserUserAgent()
         }
+    )
+
+    private fun provideJsonClient(serializer: Json) = JsonClient(
+        provideHttpClient(BuildKonfig.APP_NETWORK_JSON_LOG_LEVEL).config {
+            install(ContentNegotiation) {
+                json(serializer)
+            }
+        }
+    )
+
+    private fun provideHttpClient(logLevel: String) = HttpClient {
         install(Logging) {
             logger = Logger.SIMPLE
-            level = when (BuildKonfig.APP_NETWORK_LOG_LEVEL) {
+            level = when (logLevel) {
                 "all" -> LogLevel.ALL
                 "info" -> LogLevel.INFO
                 else -> LogLevel.NONE
