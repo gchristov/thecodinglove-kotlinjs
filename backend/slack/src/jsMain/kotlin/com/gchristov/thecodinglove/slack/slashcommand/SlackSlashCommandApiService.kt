@@ -48,7 +48,7 @@ class SlackSlashCommandApiService(
             .flatMap { slashCommand ->
                 publishSlashCommandMessage(slashCommand)
                     .flatMap {
-                        response.sendEmptyJson(log = log)
+                        response.sendEmpty(log = log)
                     }
             }
     }

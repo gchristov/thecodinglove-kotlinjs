@@ -60,7 +60,7 @@ class SlackEventApiService(
     private suspend fun SlackEvent.Callback.handle(response: ApiResponse) =
         when (val typedEvent = event) {
             is SlackEvent.Callback.Event.TokensRevoked -> slackRevokeTokensUseCase(typedEvent).flatMap {
-                response.sendEmptyJson(log = log)
+                response.sendEmpty(log = log)
             }
         }
 }
