@@ -35,6 +35,7 @@ class SlackAuthApiService(
             code = code,
             searchSessionId = searchSessionId,
         ).flatMap {
+            // TODO: CHeck for sessions and resume send action
             response.redirect("/slack/auth/success")
             Either.Right(Unit)
         }
