@@ -55,6 +55,7 @@ object SlackDataModule : DiModule() {
                     log = instance(),
                     searchRepository = instance(),
                     slackRepository = instance(),
+                    slackConfig = instance(),
                 )
             }
             bindProvider {
@@ -129,11 +130,13 @@ object SlackDataModule : DiModule() {
         log: Logger,
         searchRepository: SearchRepository,
         slackRepository: SlackRepository,
+        slackConfig: SlackConfig,
     ): SlackSendSearchUseCase = RealSlackSendSearchUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
         searchRepository = searchRepository,
-        slackRepository = slackRepository
+        slackRepository = slackRepository,
+        slackConfig = slackConfig,
     )
 
     private fun provideSlackAuthUseCase(

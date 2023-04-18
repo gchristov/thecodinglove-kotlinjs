@@ -53,6 +53,8 @@ class SlackInteractivityPubSubService(
         val cancelAction = cancelAction()
         return when {
             sendAction != null -> slackSendSearchUseCase.invoke(
+                userId = user.id,
+                teamId = team.id,
                 channelId = channel.id,
                 responseUrl = responseUrl,
                 searchSessionId = sendAction.value

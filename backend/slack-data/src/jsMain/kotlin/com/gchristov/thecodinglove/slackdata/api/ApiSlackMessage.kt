@@ -141,6 +141,45 @@ object ApiSlackMessageFactory {
         ),
     )
 
+    fun authMessage(
+        searchSessionId: String,
+        teamId: String,
+        clientId: String
+    ) = ApiSlackMessage(
+        text = null,
+        userId = null,
+        channelId = null,
+        responseType = ApiSlackMessageResponseType.EPHEMERAL.apiValue,
+        responseUrl = null,
+        teamId = null,
+        replaceOriginal = true,
+        deleteOriginal = false,
+        attachments = listOf(
+            attachment(
+                text = "The Coding Love GIFs does not have permission to send messages on your behalf yet. Press Authorize and Send below to allow this.",
+                footer = "We'll never post without your permission.",
+                actions = listOf(
+                    ApiSlackMessage.ApiAttachment.ApiAction(
+                        name = ApiSlackActionName.SEND.apiValue,
+                        text = "Authorize and Send",
+                        type = ButtonType,
+                        value = searchSessionId,
+                        url = "https://slack.com/oauth/v2/authorize?client_id=$clientId&user_scope=chat:write&team=$teamId&state=$searchSessionId",
+                        style = PrimaryButtonStyle,
+                    ),
+                    ApiSlackMessage.ApiAttachment.ApiAction(
+                        name = ApiSlackActionName.CANCEL.apiValue,
+                        text = "Cancel",
+                        type = ButtonType,
+                        value = searchSessionId,
+                        url = null,
+                        style = null,
+                    )
+                ),
+            )
+        ),
+    )
+
     fun searchPostMessage(
         searchQuery: String,
         attachmentTitle: String,
@@ -167,16 +206,18 @@ object ApiSlackMessageFactory {
     )
 
     private fun attachment(
-        title: String,
-        url: String,
-        imageUrl: String,
+        title: String? = null,
+        text: String? = null,
+        url: String? = null,
+        footer: String? = "Posted using /codinglove",
+        imageUrl: String? = null,
         actions: List<ApiSlackMessage.ApiAttachment.ApiAction>,
     ) = ApiSlackMessage.ApiAttachment(
         title = title,
         titleLink = url,
-        text = null,
+        text = text,
         imageUrl = imageUrl,
-        footer = "Posted using /codinglove",
+        footer = footer,
         callbackId = uuid4().toString(),
         color = "#1e1e1e",
         actions = actions,
