@@ -27,14 +27,14 @@
     ]
   },
   "emulators": {
-    "functions": {
-      "port": 5001
-    },
     "hosting": {
       "port": 5000
     },
+    "functions": {
+      "port": 5001
+    },
     "pubsub": {
-      "port": 5003
+      "port": 5002
     },
     "ui": {
       "enabled": false
