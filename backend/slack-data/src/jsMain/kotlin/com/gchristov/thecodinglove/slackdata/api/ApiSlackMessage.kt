@@ -51,10 +51,11 @@ data class ApiSlackMessage(
     }
 }
 
-enum class ApiSlackActionName(val apiValue: String) {
-    SEND("send"),
-    SHUFFLE("shuffle"),
-    CANCEL("cancel"),
+enum class ApiSlackActionName(val apiValue: String, val text: String) {
+    AUTH_SEND(apiValue = "auth_send", text = "Authorize and Send"),
+    SEND(apiValue = "send", text = "Send"),
+    SHUFFLE(apiValue = "shuffle", text = "Shuffle"),
+    CANCEL(apiValue = "cancel", text = "Cancel"),
 }
 
 private enum class ApiSlackMessageResponseType(val apiValue: String) {
@@ -63,8 +64,8 @@ private enum class ApiSlackMessageResponseType(val apiValue: String) {
 }
 
 object ApiSlackMessageFactory {
-    private const val ButtonType = "button"
-    private const val PrimaryButtonStyle = "primary"
+    private const val ActionTypeButton = "button"
+    private const val ActionStylePrimary = "primary"
 
     fun processingMessage() = ApiSlackMessage(
         text = "🔎 Hang tight, we're finding your GIF...",
@@ -114,24 +115,24 @@ object ApiSlackMessageFactory {
                 actions = listOf(
                     ApiSlackMessage.ApiAttachment.ApiAction(
                         name = ApiSlackActionName.SEND.apiValue,
-                        text = "Send",
-                        type = ButtonType,
+                        text = ApiSlackActionName.SEND.text,
+                        type = ActionTypeButton,
                         value = searchSessionId,
                         url = null,
-                        style = PrimaryButtonStyle,
+                        style = ActionStylePrimary,
                     ),
                     ApiSlackMessage.ApiAttachment.ApiAction(
                         name = ApiSlackActionName.SHUFFLE.apiValue,
-                        text = "Shuffle",
-                        type = ButtonType,
+                        text = ApiSlackActionName.SHUFFLE.text,
+                        type = ActionTypeButton,
                         value = searchSessionId,
                         url = null,
                         style = null,
                     ),
                     ApiSlackMessage.ApiAttachment.ApiAction(
                         name = ApiSlackActionName.CANCEL.apiValue,
-                        text = "Cancel",
-                        type = ButtonType,
+                        text = ApiSlackActionName.CANCEL.text,
+                        type = ActionTypeButton,
                         value = searchSessionId,
                         url = null,
                         style = null,
@@ -144,7 +145,8 @@ object ApiSlackMessageFactory {
     fun authMessage(
         searchSessionId: String,
         teamId: String,
-        clientId: String
+        clientId: String,
+        state: String,
     ) = ApiSlackMessage(
         text = null,
         userId = null,
@@ -160,17 +162,17 @@ object ApiSlackMessageFactory {
                 footer = "We'll never post without your permission.",
                 actions = listOf(
                     ApiSlackMessage.ApiAttachment.ApiAction(
-                        name = ApiSlackActionName.SEND.apiValue,
-                        text = "Authorize and Send",
-                        type = ButtonType,
-                        value = searchSessionId,
-                        url = "https://slack.com/oauth/v2/authorize?client_id=$clientId&user_scope=chat:write&team=$teamId&state=$searchSessionId",
-                        style = PrimaryButtonStyle,
+                        name = ApiSlackActionName.AUTH_SEND.apiValue,
+                        text = ApiSlackActionName.AUTH_SEND.text,
+                        type = ActionTypeButton,
+                        value = null,
+                        url = "https://slack.com/oauth/v2/authorize?client_id=$clientId&user_scope=chat:write&team=$teamId&state=$state",
+                        style = ActionStylePrimary,
                     ),
                     ApiSlackMessage.ApiAttachment.ApiAction(
                         name = ApiSlackActionName.CANCEL.apiValue,
-                        text = "Cancel",
-                        type = ButtonType,
+                        text = ApiSlackActionName.CANCEL.text,
+                        type = ActionTypeButton,
                         value = searchSessionId,
                         url = null,
                         style = null,

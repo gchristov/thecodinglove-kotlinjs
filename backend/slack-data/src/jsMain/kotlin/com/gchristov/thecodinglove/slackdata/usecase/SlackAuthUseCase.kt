@@ -9,10 +9,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 interface SlackAuthUseCase {
-    suspend operator fun invoke(
-        code: String?,
-        searchSessionId: String?,
-    ): Either<Error, Unit>
+    suspend operator fun invoke(code: String?): Either<Error, Unit>
 
     sealed class Error(message: String? = null) : Throwable(message) {
         object Cancelled : Error()
@@ -26,11 +23,8 @@ class RealSlackAuthUseCase(
     private val log: Logger,
     private val slackRepository: SlackRepository,
 ) : SlackAuthUseCase {
-    override suspend fun invoke(
-        code: String?,
-        searchSessionId: String?
-    ): Either<SlackAuthUseCase.Error, Unit> = withContext(dispatcher) {
-        log.d("Processing Slack user auth request: code=$code, searchSessionId=$searchSessionId")
+    override suspend fun invoke(code: String?): Either<SlackAuthUseCase.Error, Unit> = withContext(dispatcher) {
+        log.d("Processing Slack user auth request: code=$code")
         if (code.isNullOrEmpty()) {
             log.d("Auth cancelled")
             Either.Left(SlackAuthUseCase.Error.Cancelled)
