@@ -70,6 +70,7 @@ object SlackModule : DiModule() {
                     jsonSerializer = instance(),
                     log = instance(),
                     slackAuthUseCase = instance(),
+                    slackSendSearchUseCase = instance(),
                 )
             }
             bindSingleton {
@@ -152,11 +153,13 @@ object SlackModule : DiModule() {
         jsonSerializer: Json,
         log: Logger,
         slackAuthUseCase: SlackAuthUseCase,
+        slackSendSearchUseCase: SlackSendSearchUseCase,
     ): SlackAuthApiService = SlackAuthApiService(
         apiServiceRegister = apiServiceRegister,
         jsonSerializer = jsonSerializer,
         log = log,
         slackAuthUseCase = slackAuthUseCase,
+        slackSendSearchUseCase = slackSendSearchUseCase,
     )
 
     private fun provideSlackEventApiService(

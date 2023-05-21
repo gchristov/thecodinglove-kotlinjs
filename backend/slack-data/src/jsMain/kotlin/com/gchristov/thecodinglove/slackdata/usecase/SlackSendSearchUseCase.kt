@@ -5,10 +5,14 @@ import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.slackdata.SlackRepository
+import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthState
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
+import io.ktor.util.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 interface SlackSendSearchUseCase {
     suspend operator fun invoke(
@@ -26,6 +30,7 @@ class RealSlackSendSearchUseCase(
     private val searchRepository: SearchRepository,
     private val slackRepository: SlackRepository,
     private val slackConfig: SlackConfig,
+    private val jsonSerializer: Json,
 ) : SlackSendSearchUseCase {
     override suspend operator fun invoke(
         userId: String,
@@ -45,6 +50,7 @@ class RealSlackSendSearchUseCase(
                         searchSessionId = searchSessionId,
                         teamId = teamId,
                         clientId = slackConfig.clientId,
+                        channelId = channelId,
                     )
                 },
                 ifRight = {
@@ -64,16 +70,30 @@ class RealSlackSendSearchUseCase(
         searchSessionId: String,
         teamId: String,
         clientId: String,
-    ): Either<Throwable, Unit> {
-        log.d("Asking user to authenticate: userId=$userId")
-        return slackRepository.replyWithMessage(
+        channelId: String,
+    ): Either<Throwable, Unit> = try {
+        val state = jsonSerializer.encodeToString(
+            ApiSlackAuthState(
+                searchSessionId = searchSessionId,
+                channelId = channelId,
+                teamId = teamId,
+                userId = userId,
+                responseUrl = responseUrl
+            )
+        ).encodeBase64()
+        log.d("Asking user to authenticate: userId=$userId, state=$state")
+        slackRepository.replyWithMessage(
             responseUrl = responseUrl,
             message = ApiSlackMessageFactory.authMessage(
                 searchSessionId = searchSessionId,
                 teamId = teamId,
                 clientId = clientId,
+                state = state,
             )
         )
+    } catch (error: Throwable) {
+        log.e(error) { error.message ?: "Error during user authentication" }
+        Either.Left(error)
     }
 
     private suspend fun sendResult(

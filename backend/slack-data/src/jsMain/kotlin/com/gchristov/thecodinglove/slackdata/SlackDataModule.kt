@@ -8,9 +8,9 @@ import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.*
 import dev.gitlive.firebase.firestore.FirebaseFirestore
-import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
+import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
@@ -56,6 +56,7 @@ object SlackDataModule : DiModule() {
                     searchRepository = instance(),
                     slackRepository = instance(),
                     slackConfig = instance(),
+                    jsonSerializer = instance(),
                 )
             }
             bindProvider {
@@ -131,12 +132,14 @@ object SlackDataModule : DiModule() {
         searchRepository: SearchRepository,
         slackRepository: SlackRepository,
         slackConfig: SlackConfig,
+        jsonSerializer: Json,
     ): SlackSendSearchUseCase = RealSlackSendSearchUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
         searchRepository = searchRepository,
         slackRepository = slackRepository,
         slackConfig = slackConfig,
+        jsonSerializer = jsonSerializer,
     )
 
     private fun provideSlackAuthUseCase(
