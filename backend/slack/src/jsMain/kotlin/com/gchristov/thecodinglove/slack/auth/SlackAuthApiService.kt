@@ -38,8 +38,11 @@ class SlackAuthApiService(
         val code: String? = request.query["code"]
         val state: String? = request.query["state"]
         return slackAuthUseCase(code = code).flatMap {
-            response.redirect("/slack/auth/success")
-            state?.let { handleAuthState(it) } ?: Either.Right(Unit)
+            val stateResult = state?.let { handleAuthState(it) } ?: Either.Right(Unit)
+            stateResult.flatMap {
+                response.redirect("/slack/auth/success")
+                Either.Right(Unit)
+            }
         }
     }
 
