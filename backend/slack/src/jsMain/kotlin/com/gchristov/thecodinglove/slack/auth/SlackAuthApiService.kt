@@ -36,7 +36,7 @@ class SlackAuthApiService(
         response: ApiResponse
     ): Either<Throwable, Unit> {
         val code: String? = request.query["code"]
-        val state: String? = request.query["state"]
+        val state = request.query.get<String?>("state").takeIf { !it.isNullOrEmpty() }
         return slackAuthUseCase(code = code).flatMap {
             val stateResult = state?.let { handleAuthState(it) } ?: Either.Right(Unit)
             stateResult.flatMap {
