@@ -8,7 +8,7 @@ import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.api.sendJson
-import com.gchristov.thecodinglove.commonservicedata.exports
+import com.gchristov.thecodinglove.kmpcommonkotlin.exports
 import com.gchristov.thecodinglove.searchdata.api.ApiSearchResult
 import com.gchristov.thecodinglove.searchdata.api.toPost
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase

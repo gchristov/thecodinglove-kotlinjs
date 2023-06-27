@@ -25,3 +25,16 @@ kotlin {
         }
     }
 }
+
+// Copy the output binaries to their final destination
+tasks.named("assemble") {
+    doLast {
+        val sourceDir = file("$buildDir/productionLibrary")
+        val destinationDir = file("$rootDir/build/bin")
+
+        copy {
+            from(sourceDir)
+            into(destinationDir)
+        }
+    }
+}

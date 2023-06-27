@@ -7,7 +7,7 @@ import com.gchristov.thecodinglove.commonservice.ApiService
 import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
 import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
-import com.gchristov.thecodinglove.commonservicedata.exports
+import com.gchristov.thecodinglove.kmpcommonkotlin.exports
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthState
 import com.gchristov.thecodinglove.slackdata.domain.toAuthState
 import com.gchristov.thecodinglove.slackdata.usecase.SlackAuthUseCase
