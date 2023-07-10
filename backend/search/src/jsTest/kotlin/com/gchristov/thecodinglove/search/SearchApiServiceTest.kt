@@ -9,12 +9,10 @@ import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchApiRequest
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.SearchResultCreator
-import io.ktor.client.engine.js.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import org.kodein.di.bindings.ErasedContext.value
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
