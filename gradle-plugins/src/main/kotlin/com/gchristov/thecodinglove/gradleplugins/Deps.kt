@@ -16,7 +16,7 @@ class Deps {
         val firebase = NpmDependency("firebase", "9.17.1")
         val firebaseAdmin = NpmDependency("firebase-admin", "11.5.0")
         val firebaseFunctions = NpmDependency("firebase-functions", "4.2.1")
-        val pubSub = NpmDependency("@google-cloud/pubsub", "3.3.0")
+        val pubSub = NpmDependency("@google-cloud/pubsub", "3.7.1")
     }
 
     object Kermit {

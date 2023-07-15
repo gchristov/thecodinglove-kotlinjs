@@ -7,7 +7,8 @@ interface HttpBackendService {
 
     fun serveStaticContent(localPath: String)
 
-    fun registerGetHandler(
+    fun registerHandler(
+        method: HttpMethod,
         path: String,
         contentType: ContentType = ContentType.Any,
         handler: HttpHandler,

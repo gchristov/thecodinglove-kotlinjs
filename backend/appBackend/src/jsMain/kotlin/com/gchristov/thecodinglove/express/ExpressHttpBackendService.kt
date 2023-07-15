@@ -22,13 +22,20 @@ internal class ExpressHttpBackendService : HttpBackendService {
         app.use(express.static(path.join(__dirname, localPath) as String))
     }
 
-    override fun registerGetHandler(
+    override fun registerHandler(
+        method: HttpMethod,
         path: String,
         contentType: ContentType,
-        handler: HttpHandler,
+        handler: HttpHandler
     ) {
-        app.get(path, contentType.toExpressContentConfig()) { req, res ->
-            handler.handle(ExpressHttpRequest(req), ExpressHttpResponse(res))
+        val contentConfig = contentType.toExpressContentConfig()
+        when (method) {
+            HttpMethod.Get -> app.get(path, contentConfig) { req, res ->
+                handler.handle(ExpressHttpRequest(req), ExpressHttpResponse(res))
+            }
+            HttpMethod.Post -> app.post(path, contentConfig) { req, res ->
+                handler.handle(ExpressHttpRequest(req), ExpressHttpResponse(res))
+            }
         }
     }
 }

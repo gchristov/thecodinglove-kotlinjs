@@ -61,3 +61,4 @@ firebase-debug.log*
 firebase-debug.*.log*
 
 local.properties
+local-credentials-pubsub.json

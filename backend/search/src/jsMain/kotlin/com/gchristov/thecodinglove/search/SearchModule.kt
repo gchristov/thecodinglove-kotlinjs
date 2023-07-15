@@ -32,6 +32,13 @@ object SearchModule : DiModule() {
                 )
             }
             bindSingleton {
+                providePubSubHttpHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    searchUseCase = instance(),
+                )
+            }
+            bindSingleton {
                 providePreloadSearchPubSubService(
                     pubSubServiceRegister = instance(),
                     jsonSerializer = instance(),
@@ -59,6 +66,16 @@ object SearchModule : DiModule() {
         log: Logger,
         searchUseCase: SearchUseCase
     ): SearchHttpHandler = SearchHttpHandler(
+        jsonSerializer = jsonSerializer,
+        log = log,
+        searchUseCase = searchUseCase,
+    )
+
+    private fun providePubSubHttpHandler(
+        jsonSerializer: Json,
+        log: Logger,
+        searchUseCase: SearchUseCase
+    ): PubSubHttpHandler = PubSubHttpHandler(
         jsonSerializer = jsonSerializer,
         log = log,
         searchUseCase = searchUseCase,

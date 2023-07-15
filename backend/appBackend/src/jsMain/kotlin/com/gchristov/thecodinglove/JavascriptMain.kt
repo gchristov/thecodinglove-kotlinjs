@@ -12,6 +12,7 @@ import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.registerModules
 import com.gchristov.thecodinglove.kmpcommonnetwork.KmpCommonNetworkModule
+import com.gchristov.thecodinglove.search.PubSubHttpHandler
 import com.gchristov.thecodinglove.search.SearchHttpHandler
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
@@ -45,7 +46,8 @@ private fun setupServices() {
     val app = ExpressHttpBackendService()
     app.serveStaticContent("web")
 
-    app.registerGetHandler(
+    app.registerHandler(
+        method = HttpMethod.Get,
         path = "/api/test",
         handler = object : HttpHandler {
             override fun handle(
@@ -56,17 +58,26 @@ private fun setupServices() {
             }
         }
     )
-    app.registerGetHandler(
+    app.registerHandler(
+        method = HttpMethod.Get,
         path = "/api/searchJson",
         contentType = ContentType.Application.Json,
         handler = DiGraph.inject<SearchHttpHandler>(),
     )
-    app.registerGetHandler(
+    app.registerHandler(
+        method = HttpMethod.Get,
         path = "/api/searchUrl",
         contentType = ContentType.Application.FormUrlEncoded,
         handler = DiGraph.inject<SearchHttpHandler>(),
     )
-    app.registerGetHandler(
+    app.registerHandler(
+        method = HttpMethod.Post,
+        path = "/pubsub/notifications",
+        contentType = ContentType.Application.Json,
+        handler = DiGraph.inject<PubSubHttpHandler>(),
+    )
+    app.registerHandler(
+        method = HttpMethod.Get,
         path = "*",
         handler = object : HttpHandler {
             override fun handle(

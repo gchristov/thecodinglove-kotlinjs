@@ -29,12 +29,13 @@ kotlin {
 // Copy the output binaries to their final destination
 tasks.named("assemble") {
     doLast {
-        val sourceDir = file("$buildDir/productionLibrary")
-        val destinationDir = file("$rootDir/build/bin")
-
         copy {
-            from(sourceDir)
-            into(destinationDir)
+            from(file("$buildDir/productionLibrary"))
+            into(file("$rootDir/build/bin"))
+        }
+        copy {
+            from(file("$rootDir/local-credentials-pubsub.json"))
+            into(file("$rootDir/build/bin"))
         }
     }
 }

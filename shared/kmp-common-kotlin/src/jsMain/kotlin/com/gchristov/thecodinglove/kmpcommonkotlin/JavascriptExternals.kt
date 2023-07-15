@@ -13,4 +13,6 @@ external object Buffer {
 
 external val __dirname: dynamic
 
-external var exports: dynamic
+external val exports: dynamic
+
+external val process: dynamic
