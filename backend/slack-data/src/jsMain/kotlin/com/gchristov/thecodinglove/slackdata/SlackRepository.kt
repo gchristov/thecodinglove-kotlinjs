@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove.slackdata
 
 import arrow.core.Either
-import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthResponse
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackPostMessageResponse
@@ -41,7 +40,6 @@ interface SlackRepository {
 
 internal class RealSlackRepository(
     private val apiService: SlackApi,
-    private val log: Logger,
     private val firebaseFirestore: FirebaseFirestore,
 ) : SlackRepository {
     override suspend fun authUser(
@@ -60,8 +58,10 @@ internal class RealSlackRepository(
             throw Exception(slackResponse.error)
         }
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during user auth" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during user auth${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 
     override suspend fun getAuthToken(tokenId: String): Either<Throwable, SlackAuthToken> = try {
@@ -76,8 +76,10 @@ internal class RealSlackRepository(
             Either.Left(Exception("Slack auth token not found"))
         }
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during finding Slack auth token" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during finding Slack auth token${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 
     override suspend fun saveAuthToken(token: SlackAuthToken): Either<Throwable, Unit> = try {
@@ -92,8 +94,10 @@ internal class RealSlackRepository(
             )
         )
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during saving Slack auth token" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during saving Slack auth token${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 
     override suspend fun deleteAuthToken(tokenId: String): Either<Throwable, Unit> = try {
@@ -103,8 +107,10 @@ internal class RealSlackRepository(
             .delete()
         Either.Right(Unit)
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during deleting Slack auth token" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during deleting Slack auth token${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 
     override suspend fun replyWithMessage(
@@ -133,8 +139,10 @@ internal class RealSlackRepository(
             }
         }
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during message reply" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during message reply${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 
     override suspend fun postMessage(
@@ -151,8 +159,10 @@ internal class RealSlackRepository(
             throw Exception(slackResponse.error)
         }
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during message post" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during message post${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 }
 

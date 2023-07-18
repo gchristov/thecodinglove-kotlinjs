@@ -40,8 +40,10 @@ internal class RealSearchRepository(
         ).bodyAsText()
         parseHtmlTotalPostsUseCase(responseHtml)
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during finding total posts" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during finding total posts${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 
     override suspend fun search(
@@ -54,8 +56,10 @@ internal class RealSearchRepository(
         ).bodyAsText()
         parseHtmlPostsUseCase(responseHtml).map { posts -> posts.map { it.toPost() } }
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during search" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during search${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 
     override suspend fun getSearchSession(id: String): Either<Throwable, SearchSession> = try {
@@ -70,8 +74,10 @@ internal class RealSearchRepository(
             Either.Left(SearchError.SessionNotFound)
         }
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during finding search session" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during finding search session${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 
     override suspend fun saveSearchSession(searchSession: SearchSession): Either<Throwable, Unit> =
@@ -87,8 +93,10 @@ internal class RealSearchRepository(
                 )
             )
         } catch (error: Throwable) {
-            log.e(error) { error.message ?: "Error during saving search session" }
-            Either.Left(error)
+            Either.Left(Throwable(
+                message = "Error during saving search session${error.message?.let { ": $it" } ?: ""}",
+                cause = error,
+            ))
         }
 
     override suspend fun deleteSearchSession(id: String): Either<Throwable, Unit> = try {
@@ -98,8 +106,10 @@ internal class RealSearchRepository(
             .delete()
         Either.Right(Unit)
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during deleting search session" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during deleting search session${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 }
 

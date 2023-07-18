@@ -55,8 +55,9 @@ class RealSlackVerifyRequestUseCase(
                     )
                 }
             } catch (error: Throwable) {
-                log.e(error) { error.message ?: "Error during Slack request verification" }
-                Either.Left(SlackVerifyRequestUseCase.Error.Other(error.message))
+                Either.Left(SlackVerifyRequestUseCase.Error.Other(
+                    message = "Error during Slack request verification${error.message?.let { ": $it" } ?: ""}",
+                ))
             }
         }
 

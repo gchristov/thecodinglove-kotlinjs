@@ -3,7 +3,6 @@ package com.gchristov.thecodinglove.htmlparsedata.usecase
 import arrow.core.Either
 import com.gchristov.thecodinglove.htmlparsetestfixtures.HtmlCreator
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -30,8 +29,7 @@ class RealParseHtmlTotalPostsUseCaseTest {
     private fun runBlockingTest(testBlock: suspend (ParseHtmlTotalPostsUseCase) -> Unit) =
         runTest {
             val parser = RealParseHtmlTotalPostsUseCase(
-                dispatcher = FakeCoroutineDispatcher,
-                log = FakeLogger
+                dispatcher = FakeCoroutineDispatcher
             )
             testBlock(parser)
         }

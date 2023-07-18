@@ -1,7 +1,6 @@
-package com.gchristov.thecodinglove.commonservice
+package com.gchristov.thecodinglove.commonservicedata.http
 
 import arrow.core.Either
-import co.touchlab.kermit.Logger
 import io.ktor.http.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -25,47 +24,42 @@ inline fun <reified T> HttpResponse.sendJson(
     status: Int = 200,
     data: T,
     jsonSerializer: Json,
-    log: Logger,
 ): Either<Throwable, Unit> = try {
     send(
         status = status,
         content = jsonSerializer.encodeToString(data),
-        contentType = ContentType.Application.Json,
-        log = log
+        contentType = ContentType.Application.Json
     )
     Either.Right(Unit)
 } catch (error: Throwable) {
-    log.e(error) { error.message ?: "Error during API response send" }
-    Either.Left(error)
+    Either.Left(Throwable(
+        message = "Error encoding HTTP response JSON${error.message?.let { ": $it" } ?: ""}",
+        cause = error,
+    ))
 }
 
 fun HttpResponse.sendText(
     status: Int = 200,
     text: String,
-    log: Logger,
 ) = send(
     status = status,
     content = text,
     contentType = ContentType.Text.Plain,
-    log = log,
 )
 
 fun HttpResponse.sendEmpty(
     status: Int = 200,
     contentType: ContentType = ContentType.Application.Json,
-    log: Logger,
 ) = send(
     status = status,
     content = "",
-    contentType = contentType,
-    log = log
+    contentType = contentType
 )
 
 fun HttpResponse.send(
     status: Int,
     content: String,
     contentType: ContentType,
-    log: Logger,
 ): Either<Throwable, Unit> = try {
     status(status)
     setHeader(
@@ -75,6 +69,8 @@ fun HttpResponse.send(
     send(content)
     Either.Right(Unit)
 } catch (error: Throwable) {
-    log.e(error) { error.message ?: "Error during response send" }
-    Either.Left(error)
+    Either.Left(Throwable(
+        message = "Error sending HTTP response${error.message?.let { ": $it" } ?: ""}",
+        cause = error,
+    ))
 }

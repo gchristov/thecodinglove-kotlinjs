@@ -43,7 +43,7 @@ class RealSlackSendSearchUseCase(
         slackRepository.getAuthToken(tokenId = userId)
             .fold(
                 ifLeft = {
-                    log.e(it) { it.message ?: "Error fetching user token" }
+                    log.e(it) { "Error fetching user token${it.message?.let { ": $it" } ?: ""}" }
                     authenticate(
                         userId = userId,
                         responseUrl = responseUrl,
@@ -92,8 +92,10 @@ class RealSlackSendSearchUseCase(
             )
         )
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during user authentication" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during user authentication${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 
     private suspend fun sendResult(

@@ -1,11 +1,8 @@
-package com.gchristov.thecodinglove.express
+package com.gchristov.thecodinglove.commonservice.http
 
-import com.gchristov.thecodinglove.commonservice.HttpRequest
-import com.gchristov.thecodinglove.commonservice.ParameterMap
+import com.gchristov.thecodinglove.commonservicedata.ParameterMap
+import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 
-/*
- * Full implementation: https://github.com/wadejensen/kotlin-nodejs-example
- */
 internal class ExpressHttpRequest(private val req: dynamic) : HttpRequest {
     override val baseURL: String = req.baseUrl as String
     override val hostname: String = req.hostname as String

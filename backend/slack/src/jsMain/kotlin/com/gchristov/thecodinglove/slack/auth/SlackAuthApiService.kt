@@ -78,7 +78,9 @@ class SlackAuthApiService(
             searchSessionId = authState.searchSessionId,
         )
     } catch (error: Throwable) {
-        log.e(error) { error.message ?: "Error during auth state handling" }
-        Either.Left(error)
+        Either.Left(Throwable(
+            message = "Error during auth state handling${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 }

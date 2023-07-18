@@ -1,7 +1,7 @@
-package com.gchristov.thecodinglove.commonservice
+package com.gchristov.thecodinglove.commonservicedata.http
 
 import arrow.core.Either
-import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonservicedata.ParameterMap
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
@@ -20,12 +20,11 @@ interface HttpRequest {
     val bodyString: String?
 }
 
-inline fun <reified T> HttpRequest.decodeBodyFromJson(
-    jsonSerializer: Json,
-    log: Logger
-): Either<Throwable, T?> = try {
+inline fun <reified T> HttpRequest.decodeBodyFromJson(jsonSerializer: Json): Either<Throwable, T?> = try {
     Either.Right(body?.let { jsonSerializer.decodeFromString<T>(string = JSON.stringify(it)) })
 } catch (error: Throwable) {
-    log.e(error) { error.message ?: "Error during HTTP request body decode" }
-    Either.Left(error)
+    Either.Left(Throwable(
+        message = "Error decoding HTTP request body${error.message?.let { ": $it" } ?: ""}",
+        cause = error,
+    ))
 }

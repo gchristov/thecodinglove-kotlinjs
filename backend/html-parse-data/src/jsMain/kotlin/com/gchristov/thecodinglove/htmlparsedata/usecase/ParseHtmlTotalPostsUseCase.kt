@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove.htmlparsedata.usecase
 
 import arrow.core.Either
-import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.kmpcommonkotlin.requireModule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -12,7 +11,6 @@ interface ParseHtmlTotalPostsUseCase {
 
 internal class RealParseHtmlTotalPostsUseCase(
     private val dispatcher: CoroutineDispatcher,
-    private val log: Logger,
 ) : ParseHtmlTotalPostsUseCase {
     override suspend fun invoke(html: String): Either<Throwable, Int> = withContext(dispatcher) {
         try {
@@ -21,8 +19,10 @@ internal class RealParseHtmlTotalPostsUseCase(
             val count = (resultsCountNode.text as? String)?.toInt() ?: 0
             Either.Right(count)
         } catch (error: Throwable) {
-            log.e(error) { error.message ?: "Error during total posts parse" }
-            Either.Left(error)
+            Either.Left(Throwable(
+                message = "Error during total posts parse${error.message?.let { ": $it" } ?: ""}",
+                cause = error,
+            ))
         }
     }
 

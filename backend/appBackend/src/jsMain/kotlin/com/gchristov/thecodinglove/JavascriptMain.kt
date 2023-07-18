@@ -1,10 +1,12 @@
 package com.gchristov.thecodinglove
 
-import com.gchristov.thecodinglove.commonservice.HttpHandler
-import com.gchristov.thecodinglove.commonservice.HttpRequest
-import com.gchristov.thecodinglove.commonservice.HttpResponse
+import arrow.core.Either
+import arrow.core.flatMap
+import arrow.core.sequence
+import com.gchristov.thecodinglove.commonservice.CommonServiceModule
+import com.gchristov.thecodinglove.commonservice.http.HttpService
+import com.gchristov.thecodinglove.commonservice.http.StaticFileHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.CommonServiceDataModule
-import com.gchristov.thecodinglove.express.ExpressHttpBackendService
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
 import com.gchristov.thecodinglove.kmpcommonfirebase.KmpCommonFirebaseModule
 import com.gchristov.thecodinglove.kmpcommonkotlin.KmpCommonKotlinModule
@@ -12,26 +14,35 @@ import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.registerModules
 import com.gchristov.thecodinglove.kmpcommonnetwork.KmpCommonNetworkModule
-import com.gchristov.thecodinglove.search.PubSubHttpHandler
+import com.gchristov.thecodinglove.search.PreloadSearchPubSubHttpHandler
 import com.gchristov.thecodinglove.search.SearchHttpHandler
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slack.SlackModule
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
-import io.ktor.http.*
 
-fun main() {
+suspend fun main() {
     setupDi()
-    setupServices()
+        .flatMap { setupServices() }
+        .flatMap { startServices(it) }
+        .fold(ifLeft = { error ->
+            println("Error starting app${error.message?.let { ": $it" } ?: ""}")
+            error.printStackTrace()
+        }, ifRight = {
+            // TODO: Add start-up metrics
+        })
 }
 
-private fun setupDi() {
-    // Add all modules that should participate in dependency injection
+/**
+ * Setup dependency injection with all participating modules
+ */
+private fun setupDi(): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             KmpCommonKotlinModule.module,
             KmpCommonFirebaseModule.module,
             KmpCommonNetworkModule.module,
+            CommonServiceModule.module,
             CommonServiceDataModule.module,
             HtmlParseDataModule.module,
             SearchModule.module,
@@ -40,65 +51,37 @@ private fun setupDi() {
             SlackDataModule.module,
         )
     )
+    return Either.Right(Unit)
 }
 
-private fun setupServices() {
-    val app = ExpressHttpBackendService()
-    app.serveStaticContent("web")
-
-    app.registerHandler(
-        method = HttpMethod.Get,
-        path = "/api/test",
-        handler = object : HttpHandler {
-            override fun handle(
-                request: HttpRequest,
-                response: HttpResponse,
-            ) {
-                response.send("Hello, World!")
-            }
-        }
-    )
-    app.registerHandler(
-        method = HttpMethod.Get,
-        path = "/api/searchJson",
-        contentType = ContentType.Application.Json,
-        handler = DiGraph.inject<SearchHttpHandler>(),
-    )
-    app.registerHandler(
-        method = HttpMethod.Get,
-        path = "/api/searchUrl",
-        contentType = ContentType.Application.FormUrlEncoded,
-        handler = DiGraph.inject<SearchHttpHandler>(),
-    )
-    app.registerHandler(
-        method = HttpMethod.Post,
-        path = "/pubsub/notifications",
-        contentType = ContentType.Application.Json,
-        handler = DiGraph.inject<PubSubHttpHandler>(),
-    )
-    app.registerHandler(
-        method = HttpMethod.Get,
-        path = "*",
-        handler = object : HttpHandler {
-            override fun handle(
-                request: HttpRequest,
-                response: HttpResponse,
-            ) {
-                response.sendFile(localPath = "web/index.html")
-            }
-        }
-    )
-
-    val port = 8080
-    println("Starting server: port=$port")
-    app.start(port)
-    println("Server started")
-//    DiGraph.inject<SearchApiService>().register()
-//    DiGraph.inject<PreloadSearchPubSubService>().register()
-//    DiGraph.inject<SlackSlashCommandApiService>().register()
-//    DiGraph.inject<SlackSlashCommandPubSubService>().register()
-//    DiGraph.inject<SlackInteractivityApiService>().register()
-//    DiGraph.inject<SlackInteractivityPubSubService>().register()
-//    DiGraph.inject<SlackAuthApiService>().register()
-//    DiGraph.inject<SlackEventApiService>().register()
+/**
+ * Setup services along with their API and HTML handlers.
+ */
+private suspend fun setupServices(): Either<Throwable, List<HttpService>> {
+    val appService = setupAppService()
+    return listOf(appService).sequence()
 }
+
+/**
+ * The main app service handles the static HTML content as well as the public-facing API.
+ */
+private suspend fun setupAppService(): Either<Throwable, HttpService> {
+    val staticWebsiteRoot = "web"
+    val handlers = listOf(
+        DiGraph.inject<SearchHttpHandler>(),
+        DiGraph.inject<PreloadSearchPubSubHttpHandler>(),
+        // Link this last so that API handlers are correctly registered
+        StaticFileHttpHandler("$staticWebsiteRoot/index.html"),
+    )
+    val service = DiGraph.inject<HttpService>()
+    return service.initialise(
+        handlers = handlers,
+        staticWebsiteRoot = staticWebsiteRoot,
+        port = 8080,
+    ).flatMap { Either.Right(service) }
+}
+
+private suspend fun startServices(services: List<HttpService>): Either<Throwable, Unit> = services
+    .map { it.start() }
+    .sequence()
+    .flatMap { Either.Right(Unit) }

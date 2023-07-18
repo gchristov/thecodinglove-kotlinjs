@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.search
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
+import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSub
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
@@ -29,13 +30,15 @@ object SearchModule : DiModule() {
                     jsonSerializer = instance(),
                     log = instance(),
                     searchUseCase = instance(),
+                    pubSub = instance(),
                 )
             }
             bindSingleton {
-                providePubSubHttpHandler(
+                providePreloadSearchPubSubHttpHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     searchUseCase = instance(),
+                    pubSub = instance(),
                 )
             }
             bindSingleton {
@@ -64,21 +67,25 @@ object SearchModule : DiModule() {
     private fun provideSearchHttpHandler(
         jsonSerializer: Json,
         log: Logger,
-        searchUseCase: SearchUseCase
+        searchUseCase: SearchUseCase,
+        pubSub: PubSub,
     ): SearchHttpHandler = SearchHttpHandler(
         jsonSerializer = jsonSerializer,
         log = log,
         searchUseCase = searchUseCase,
+        pubSub = pubSub,
     )
 
-    private fun providePubSubHttpHandler(
+    private fun providePreloadSearchPubSubHttpHandler(
         jsonSerializer: Json,
         log: Logger,
-        searchUseCase: SearchUseCase
-    ): PubSubHttpHandler = PubSubHttpHandler(
+        searchUseCase: SearchUseCase,
+        pubSub: PubSub,
+    ): PreloadSearchPubSubHttpHandler = PreloadSearchPubSubHttpHandler(
         jsonSerializer = jsonSerializer,
         log = log,
         searchUseCase = searchUseCase,
+        pubSub = pubSub,
     )
 
     private fun providePreloadSearchPubSubService(
