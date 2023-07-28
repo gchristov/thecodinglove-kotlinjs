@@ -1,32 +1,34 @@
 package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiResponse
-import com.gchristov.thecodinglove.commonservicetestfixtures.FakeApiServiceRegister
+import com.gchristov.thecodinglove.commonservicetestfixtures.FakeHttpResponse
+import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
 import com.gchristov.thecodinglove.searchdata.model.SearchError
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
-import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchApiRequest
+import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchHttpRequest
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.SearchResultCreator
+import io.ktor.http.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SearchApiServiceTest {
+class SearchHttpHandlerTest {
     @Test
-    fun register(): TestResult = runBlockingTest(
+    fun config(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchError.Empty)
-    ) { service, _, _, _, register ->
-        service.register()
-        register.assertInvokedOnce()
+    ) { handler, _, _, _ ->
+        val config = handler.httpConfig()
+        assertEquals(HttpMethod.Get, config.method)
+        assertEquals("/api/search", config.path)
+        assertEquals(ContentType.Application.Json, config.contentType)
     }
 
     @Test
@@ -38,25 +40,24 @@ class SearchApiServiceTest {
         return runBlockingTest(
             searchSessionId = null,
             searchInvocationResult = Either.Right(expectedResult)
-        ) { service, searchUseCase, request, response, register ->
-            val actualResult = service.handleRequest(
+        ) { handler, searchUseCase, request, response ->
+            handler.handleHttpRequest(
                 request = request,
                 response = response
             )
-            register.assertNotInvoked()
             searchUseCase.assertInvokedOnce()
             searchUseCase.assertSearchType(
                 SearchUseCase.Type.NewSession(query = TestSearchQuery)
             )
             response.assertEquals(
                 header = "Content-Type",
-                headerValue = "application/json",
+                headerValue = ContentType.Application.Json.toString(),
                 data = """
                         {"search_session_id":"session_123","query":"test","post":{"title":"post","url":"url","image_url":"imageUrl"},"total_posts":1}
                        """.trimIndent(),
-                status = 200
+                status = 200,
+                filePath = null,
             )
-            assertTrue { actualResult.isRight() }
         }
     }
 
@@ -70,43 +71,44 @@ class SearchApiServiceTest {
             searchSessionId = TestSearchSessionId,
             searchQuery = TestSearchQuery,
             searchInvocationResult = Either.Right(expectedResult)
-        ) { service, searchUseCase, request, response, register ->
-            val actualResult = service.handleRequest(
+        ) { handler, searchUseCase, request, response ->
+            handler.handleHttpRequest(
                 request = request,
                 response = response
             )
-            register.assertNotInvoked()
             searchUseCase.assertInvokedOnce()
             searchUseCase.assertSearchType(
                 SearchUseCase.Type.WithSessionId(TestSearchSessionId)
             )
             response.assertEquals(
                 header = "Content-Type",
-                headerValue = "application/json",
+                headerValue = ContentType.Application.Json.toString(),
                 data = """
                         {"search_session_id":"session_123","query":"test","post":{"title":"post","url":"url","image_url":"imageUrl"},"total_posts":1}
                        """.trimIndent(),
-                status = 200
+                status = 200,
+                filePath = null,
             )
-            assertTrue { actualResult.isRight() }
         }
     }
 
     @Test
-    fun handleRequestError(): TestResult = runBlockingTest(
+    fun handleError(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchError.Empty)
-    ) { service, searchUseCase, request, response, register ->
-        val actualResult = service.handleRequest(
+    ) { handler, searchUseCase, request, response ->
+        handler.handleHttpRequest(
             request = request,
             response = response
         )
-        register.assertNotInvoked()
         searchUseCase.assertInvokedOnce()
-        assertEquals(
-            expected = Either.Left(SearchError.Empty),
-            actual = actualResult
+        response.assertEquals(
+            header = "Content-Type",
+            headerValue = ContentType.Application.Json.toString(),
+            data = "{\"errorMessage\":\"No results found\"}",
+            status = 400,
+            filePath = null,
         )
     }
 
@@ -114,24 +116,23 @@ class SearchApiServiceTest {
         searchSessionId: String? = TestSearchSessionId,
         searchQuery: String? = TestSearchQuery,
         searchInvocationResult: Either<SearchError, SearchUseCase.Result>,
-        testBlock: suspend (SearchApiService, FakeSearchUseCase, FakeSearchApiRequest, FakeApiResponse, FakeApiServiceRegister) -> Unit
+        testBlock: suspend (SearchHttpHandler, FakeSearchUseCase, FakeSearchHttpRequest, FakeHttpResponse) -> Unit
     ): TestResult = runTest {
         val searchUseCase = FakeSearchUseCase(
             invocationResult = searchInvocationResult
         )
-        val request = FakeSearchApiRequest(
+        val request = FakeSearchHttpRequest(
             fakeSearchSessionId = searchSessionId,
             fakeSearchQuery = searchQuery
         )
-        val response = FakeApiResponse()
-        val register = FakeApiServiceRegister()
-        val service = SearchApiService(
-            apiServiceRegister = register,
+        val response = FakeHttpResponse()
+        val handler = SearchHttpHandler(
+            dispatcher = FakeCoroutineDispatcher,
             jsonSerializer = Json,
             log = FakeLogger,
             searchUseCase = searchUseCase
         )
-        testBlock(service, searchUseCase, request, response, register)
+        testBlock(handler, searchUseCase, request, response)
     }
 }
 

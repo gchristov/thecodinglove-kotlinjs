@@ -42,8 +42,8 @@ class RealSlackSendSearchUseCase(
         log.d("Checking auth token before sending message: userId=$userId")
         slackRepository.getAuthToken(tokenId = userId)
             .fold(
-                ifLeft = {
-                    log.e(it) { "Error fetching user token${it.message?.let { ": $it" } ?: ""}" }
+                ifLeft = { error ->
+                    log.d(error) { "Error fetching user token${error.message?.let { ": $it" } ?: ""}" }
                     authenticate(
                         userId = userId,
                         responseUrl = responseUrl,

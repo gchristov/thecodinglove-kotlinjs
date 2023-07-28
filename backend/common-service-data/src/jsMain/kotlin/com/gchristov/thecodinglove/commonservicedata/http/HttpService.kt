@@ -1,12 +1,9 @@
-package com.gchristov.thecodinglove.commonservice.http
+package com.gchristov.thecodinglove.commonservicedata.http
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
-import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
-import com.gchristov.thecodinglove.commonservicedata.http.sendEmpty
-import com.gchristov.thecodinglove.commonservicedata.http.sendJson
 import io.ktor.http.*
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -27,14 +24,14 @@ interface HttpService {
 interface HttpHandler {
     suspend fun initialise(): Either<Throwable, Unit>
 
-    fun httpConfig(): Config
+    fun httpConfig(): HttpConfig
 
-    fun handle(
+    fun handleHttpRequest(
         request: HttpRequest,
         response: HttpResponse,
     )
 
-    data class Config(
+    data class HttpConfig(
         val method: HttpMethod,
         val path: String,
         val contentType: ContentType,
@@ -42,6 +39,7 @@ interface HttpHandler {
 }
 
 abstract class BaseHttpHandler(
+    private val dispatcher: CoroutineDispatcher,
     private val jsonSerializer: Json,
     private val log: Logger,
 ) : HttpHandler, CoroutineScope {
@@ -51,12 +49,12 @@ abstract class BaseHttpHandler(
     override val coroutineContext: CoroutineContext
         get() = job
 
-    override suspend fun initialise(): Either<Throwable, Unit> = Either.Right(Unit)
-
-    open suspend fun handleAsync(
+    protected abstract suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = response.sendEmpty()
+    ): Either<Throwable, Unit>
+
+    override suspend fun initialise(): Either<Throwable, Unit> = Either.Right(Unit)
 
     open fun handleError(
         error: Throwable,
@@ -67,51 +65,54 @@ abstract class BaseHttpHandler(
         jsonSerializer = jsonSerializer
     )
 
-    override fun handle(
+    override fun handleHttpRequest(
         request: HttpRequest,
         response: HttpResponse,
     ) {
-        launch {
+        launch(dispatcher) {
             request.bodyString?.let { log.d("Received request: bodyString=$it") } ?: log.d("Received request")
             try {
-                handleAsync(
+                handleHttpRequestAsync(
                     request = request,
                     response = response,
                 ).fold(
                     ifLeft = { handlerError ->
-                        log.e(handlerError) { "Error handling async request${handlerError.message?.let { ": $it" } ?: ""}" }
+                        log.e(handlerError) { "Error handling request: trace=${handlerError.stackTraceToString()}" }
                         handleError(
                             error = handlerError,
                             response = response,
                         ).fold(
                             ifLeft = { errorHandlerError ->
-                                log.e(errorHandlerError) { "Error sending error response${errorHandlerError.message?.let { ": $it" } ?: ""}" }
+                                log.e(errorHandlerError) { "Error sending error response: trace=${errorHandlerError.stackTraceToString()}" }
                             },
                             ifRight = {
                                 // TODO: Add some request metrics in here
+                                log.d("Request error sent successfully")
                             }
                         )
                     },
                     ifRight = {
                         // TODO: Add some request metrics in here
+                        log.d("Request handled successfully")
                     }
                 )
             } catch (uncaughtHandlerError: Throwable) {
-                log.e(uncaughtHandlerError) { "Uncaught handler error${uncaughtHandlerError.message?.let { ": $it" } ?: ""}" }
+                log.e(uncaughtHandlerError) { "Uncaught handler error: trace=${uncaughtHandlerError.stackTraceToString()}" }
                 try {
                     handleError(
                         error = uncaughtHandlerError,
                         response = response,
                     ).fold(
                         ifLeft = { errorHandlerError ->
-                            log.e(errorHandlerError) { "Error sending uncaught handler error${errorHandlerError.message?.let { ": $it" } ?: ""}" }
+                            log.e(errorHandlerError) { "Error sending uncaught handler error: trace=${errorHandlerError.stackTraceToString()}" }
                         },
                         ifRight = {
                             // TODO: Add some request metrics in here
+                            log.d("Request uncaught handler error sent successfully")
                         }
                     )
                 } catch (lastResort: Throwable) {
-                    log.e(lastResort) { "Uncaught last resort error${lastResort.message?.let { ": $it" } ?: ""}" }
+                    log.e(lastResort) { "Uncaught last resort error: trace=${lastResort.stackTraceToString()}" }
                 }
             }
         }

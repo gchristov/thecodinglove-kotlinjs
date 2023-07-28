@@ -4,6 +4,8 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.sequence
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
+import com.gchristov.thecodinglove.commonservicedata.http.HttpService
 import com.gchristov.thecodinglove.kmpcommonkotlin.__dirname
 import com.gchristov.thecodinglove.kmpcommonkotlin.requireModule
 import io.ktor.http.*
@@ -66,11 +68,11 @@ private fun HttpHandler.attach(app: dynamic) {
     val contentConfig = handlerConfig.contentType.toExpressContentConfig()
     when (handlerConfig.method) {
         HttpMethod.Get -> app.get(handlerConfig.path, contentConfig) { req, res ->
-            handle(ExpressHttpRequest(req), ExpressHttpResponse(res))
+            handleHttpRequest(ExpressHttpRequest(req), ExpressHttpResponse(res))
         }
 
         HttpMethod.Post -> app.post(handlerConfig.path, contentConfig) { req, res ->
-            handle(ExpressHttpRequest(req), ExpressHttpResponse(res))
+            handleHttpRequest(ExpressHttpRequest(req), ExpressHttpResponse(res))
         }
     }
 }

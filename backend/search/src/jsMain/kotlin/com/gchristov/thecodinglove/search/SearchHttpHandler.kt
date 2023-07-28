@@ -3,59 +3,53 @@ package com.gchristov.thecodinglove.search
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservice.http.BaseHttpHandler
-import com.gchristov.thecodinglove.commonservice.http.HttpHandler
-import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
-import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
-import com.gchristov.thecodinglove.commonservicedata.http.decodeBodyFromJson
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSub
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.publish
+import com.gchristov.thecodinglove.commonservicedata.http.*
+import com.gchristov.thecodinglove.searchdata.api.ApiSearchResult
+import com.gchristov.thecodinglove.searchdata.api.toPost
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import io.ktor.http.*
-import kotlinx.serialization.Serializable
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 
 class SearchHttpHandler(
+    dispatcher: CoroutineDispatcher,
     private val jsonSerializer: Json,
-    private val log: Logger,
+    log: Logger,
     private val searchUseCase: SearchUseCase,
-    private val pubSub: PubSub,
 ) : BaseHttpHandler(
+    dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
     log = log
 ) {
-    override fun httpConfig() = HttpHandler.Config(
+    override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Get,
         path = "/api/search",
         contentType = ContentType.Application.Json,
     )
 
-    override suspend fun handleAsync(
+    override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> {
-        println("QUERY=${request.query.get<String>("test")}")
-        println("HEADER=${request.headers.get<String>("test")}")
-
-        return request.decodeBodyFromJson<BodyTest>(jsonSerializer)
-            .flatMap {
-                println("DECODED_BODY=$it")
-                pubSub
-                    .topic(PreloadSearchPubSubHttpHandler.PubSubTopic)
-                    .publish(
-                        body = it,
-                        jsonSerializer = jsonSerializer,
-                    )
-            }
-            .flatMap { messageId ->
-                println("PubSub message sent: id=$messageId")
-                super.handleAsync(request, response)
-            }
-    }
+    ): Either<Throwable, Unit> = searchUseCase(request.toSearchType())
+        .flatMap { searchResult ->
+            response.sendJson(
+                data = searchResult.toSearchResult(),
+                jsonSerializer = jsonSerializer,
+            )
+        }
 }
 
-@Serializable
-data class BodyTest(
-    val title: String?,
-    val subtitle: String?,
+private fun HttpRequest.toSearchType(): SearchUseCase.Type {
+    val searchQuery: String = query["searchQuery"] ?: "release"
+    val searchSessionId: String? = query["searchSessionId"]
+    return searchSessionId?.let {
+        SearchUseCase.Type.WithSessionId(sessionId = it)
+    } ?: SearchUseCase.Type.NewSession(searchQuery)
+}
+
+private fun SearchUseCase.Result.toSearchResult() = ApiSearchResult(
+    searchSessionId = searchSessionId,
+    query = query,
+    post = post.toPost(),
+    totalPosts = totalPosts
 )

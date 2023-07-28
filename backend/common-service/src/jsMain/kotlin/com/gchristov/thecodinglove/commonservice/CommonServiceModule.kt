@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.commonservice
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.http.ExpressHttpService
-import com.gchristov.thecodinglove.commonservice.http.HttpService
+import com.gchristov.thecodinglove.commonservicedata.http.HttpService
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import org.kodein.di.DI
 import org.kodein.di.bindProvider

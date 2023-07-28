@@ -1,39 +1,35 @@
-package com.gchristov.thecodinglove.commonservice.pubsub
+package com.gchristov.thecodinglove.commonservicedata.pubsub2
 
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservice.http.BaseHttpHandler
-import com.gchristov.thecodinglove.commonservice.http.HttpHandler
-import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
-import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
-import com.gchristov.thecodinglove.commonservicedata.http.decodeBodyFromJson
-import com.gchristov.thecodinglove.commonservicedata.http.sendEmpty
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSub
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.gchristov.thecodinglove.commonservicedata.http.*
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.js.json
 
 interface PubSubHttpHandler : HttpHandler {
-    fun pubSubConfig(): Config
+    fun pubSubConfig(): PubSubConfig
 
-    data class Config(
+    data class PubSubConfig(
         val topic: String,
         val subscription: String,
     )
 }
 
 abstract class BasePubSubHttpHandler(
+    dispatcher: CoroutineDispatcher,
     private val jsonSerializer: Json,
     private val log: Logger,
     private val pubSub: PubSub,
 ) : BaseHttpHandler(
+    dispatcher,
     jsonSerializer = jsonSerializer,
     log = log,
 ), PubSubHttpHandler {
+    protected abstract suspend fun handlePubSubRequestAsync(request: PubSubRequest): Either<Throwable, Unit>
+
     override suspend fun initialise(): Either<Throwable, Unit> {
         val pubSubConfig = pubSubConfig()
         val httpConfig = httpConfig()
@@ -66,34 +62,25 @@ abstract class BasePubSubHttpHandler(
         }
     }
 
-    abstract suspend fun handlePubSubAsync(dataJson: String): Either<Throwable, Unit>
-
     /**
      * Decodes and exposes the PubSub message to subclasses. A success response is always sent to the [response] after
      * the PubSub message has been handled.,
      */
     @ExperimentalEncodingApi
-    override suspend fun handleAsync(
+    override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
     ): Either<Throwable, Unit> {
-        return request.decodeBodyFromJson<PubSubRequest>(jsonSerializer)
+        return request.decodeBodyFromJson(
+            jsonSerializer = jsonSerializer,
+            deserializer = PubSubRequest.serializer(),
+        )
             .flatMap { pubSubRequest ->
                 pubSubRequest?.let {
-                    val decodedData = Base64.decode(it.message.dataBase64).decodeToString()
-                    handlePubSubAsync(decodedData).flatMap {
+                    handlePubSubRequestAsync(it).flatMap {
                         response.sendEmpty()
                     }
                 } ?: Either.Left(Exception("PubSub body missing"))
             }
     }
-}
-
-@Serializable
-private data class PubSubRequest(val message: Message) {
-    @Serializable
-    data class Message(
-        @SerialName("data")
-        val dataBase64: String
-    )
 }

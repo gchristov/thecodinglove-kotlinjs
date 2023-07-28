@@ -1,43 +1,44 @@
 package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
+import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservice.http.HttpHandler
-import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHttpHandler
-import com.gchristov.thecodinglove.commonservice.pubsub.PubSubHttpHandler
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSub
-import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
+import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
+import com.gchristov.thecodinglove.commonservicedata.pubsub2.*
+import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubMessage
+import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubSubscription
+import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubTopic
+import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import io.ktor.http.*
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 class PreloadSearchPubSubHttpHandler(
+    dispatcher: CoroutineDispatcher,
     private val jsonSerializer: Json,
-    private val log: Logger,
-    private val searchUseCase: SearchUseCase,
-    private val pubSub: PubSub,
+    log: Logger,
+    private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
+    pubSub: PubSub,
 ) : BasePubSubHttpHandler(
+    dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
     log = log,
     pubSub = pubSub,
 ) {
-    override fun httpConfig() = HttpHandler.Config(
+    override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
         path = "/pubsub/notifications",
         contentType = ContentType.Application.Json,
     )
 
-    override fun pubSubConfig() = PubSubHttpHandler.Config(
-        topic = PubSubTopic,
-        subscription = PubSubSubscription,
+    override fun pubSubConfig() = PubSubHttpHandler.PubSubConfig(
+        topic = PreloadSearchPubSubTopic,
+        subscription = PreloadSearchPubSubSubscription,
     )
 
-    override suspend fun handlePubSubAsync(dataJson: String): Either<Throwable, Unit> {
-        println("PUBSUB_JSON=$dataJson")
-        return Either.Right(Unit)
-    }
-
-    companion object {
-        const val PubSubTopic = "test-4"
-        private const val PubSubSubscription = "test-sub-4"
-    }
+    @ExperimentalEncodingApi
+    override suspend fun handlePubSubRequestAsync(request: PubSubRequest): Either<Throwable, Unit> =
+        request.decodeMessageFromJson<PreloadSearchPubSubMessage>(jsonSerializer)
+            .flatMap { preloadSearchResultUseCase(searchSessionId = it.searchSessionId) }
 }

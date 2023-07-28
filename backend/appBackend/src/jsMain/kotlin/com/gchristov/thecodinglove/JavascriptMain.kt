@@ -4,9 +4,9 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.sequence
 import com.gchristov.thecodinglove.commonservice.CommonServiceModule
-import com.gchristov.thecodinglove.commonservice.http.HttpService
 import com.gchristov.thecodinglove.commonservice.http.StaticFileHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.CommonServiceDataModule
+import com.gchristov.thecodinglove.commonservicedata.http.HttpService
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
 import com.gchristov.thecodinglove.kmpcommonfirebase.KmpCommonFirebaseModule
 import com.gchristov.thecodinglove.kmpcommonkotlin.KmpCommonKotlinModule

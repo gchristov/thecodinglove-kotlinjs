@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSender
+import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSub
+import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
 import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubMessage
 import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubTopic
 import com.gchristov.thecodinglove.searchdata.model.SearchError
@@ -73,7 +73,7 @@ class RealSearchUseCaseTest {
         return runBlockingTest(
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
             searchSession = searchSession,
-        ) { useCase, pubSubSender, searchRepository, searchWithHistoryUseCase ->
+        ) { useCase, pubSub, searchRepository, searchWithHistoryUseCase ->
             val actualResult = useCase.invoke(type = searchType)
             searchWithHistoryUseCase.assertNotInvoked()
             searchRepository.assertSessionFetched()
@@ -99,9 +99,9 @@ class RealSearchUseCaseTest {
                 ),
                 actual = actualResult
             )
-            pubSubSender.assertEquals(
+            pubSub.assertEquals(
                 topic = PreloadSearchPubSubTopic,
-                body = Json.encodeToString(PreloadSearchPubSubMessage(TestSearchSessionId))
+                message = Buffer.from(Json.encodeToString(PreloadSearchPubSubMessage(TestSearchSessionId)))
             )
         }
     }
@@ -114,14 +114,14 @@ class RealSearchUseCaseTest {
         return runBlockingTest(
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
             searchSession = null,
-        ) { useCase, pubSubSender, _, searchWithHistoryUseCase ->
+        ) { useCase, pubSub, _, searchWithHistoryUseCase ->
             val actualResult = useCase.invoke(searchType)
             searchWithHistoryUseCase.assertInvokedOnce()
             assertEquals(
                 expected = searchWithHistoryResult,
                 actual = actualResult,
             )
-            pubSubSender.assertNotInvoked()
+            pubSub.assertNotInvoked()
         }
     }
 
@@ -178,7 +178,7 @@ class RealSearchUseCaseTest {
         return runBlockingTest(
             singleSearchWithHistoryInvocationResult = Either.Right(searchWithHistoryResult),
             searchSession = searchSession,
-        ) { useCase, pubSubSender, searchRepository, searchWithHistoryUseCase ->
+        ) { useCase, pubSub, searchRepository, searchWithHistoryUseCase ->
             val actualResult = useCase.invoke(searchType)
             searchWithHistoryUseCase.assertInvokedOnce()
             assertEquals(
@@ -196,9 +196,9 @@ class RealSearchUseCaseTest {
                     state = SearchSession.State.Searching
                 )
             )
-            pubSubSender.assertEquals(
+            pubSub.assertEquals(
                 topic = PreloadSearchPubSubTopic,
-                body = Json.encodeToString(PreloadSearchPubSubMessage(TestSearchSessionId))
+                message = Buffer.from(Json.encodeToString(PreloadSearchPubSubMessage(TestSearchSessionId)))
             )
         }
     }
@@ -207,9 +207,9 @@ class RealSearchUseCaseTest {
         singleSearchWithHistoryInvocationResult: Either<SearchError, SearchWithHistoryUseCase.Result>? = null,
         multiSearchWithHistoryInvocationResults: List<Either<SearchError, SearchWithHistoryUseCase.Result>>? = null,
         searchSession: SearchSession?,
-        testBlock: suspend (SearchUseCase, FakePubSubSender, FakeSearchRepository, FakeSearchWithHistoryUseCase) -> Unit
+        testBlock: suspend (SearchUseCase, FakePubSub, FakeSearchRepository, FakeSearchWithHistoryUseCase) -> Unit
     ): TestResult = runTest {
-        val pubSubSender = FakePubSubSender()
+        val pubSub = FakePubSub()
         val searchInvocationResults = singleSearchWithHistoryInvocationResult?.let { listOf(it) }
             ?: multiSearchWithHistoryInvocationResults
             ?: emptyList()
@@ -222,10 +222,9 @@ class RealSearchUseCaseTest {
             searchRepository = searchRepository,
             searchWithHistoryUseCase = searchWithHistoryUseCase,
             jsonSerializer = Json,
-            log = FakeLogger,
-            pubSubSender = pubSubSender,
+            pubSub = pubSub,
         )
-        testBlock(useCase, pubSubSender, searchRepository, searchWithHistoryUseCase)
+        testBlock(useCase, pubSub, searchRepository, searchWithHistoryUseCase)
     }
 }
 
