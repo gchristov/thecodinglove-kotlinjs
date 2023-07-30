@@ -7,5 +7,4 @@ data class PreloadSearchPubSubMessage(
     val searchSessionId: String
 )
 
-const val PreloadSearchPubSubTopic = "test-4"
-const val PreloadSearchPubSubSubscription = "test-sub-4"
+const val PreloadSearchPubSubTopic = "preload_search"

@@ -37,6 +37,6 @@ class FakeSearchHttpRequest(
     @Suppress("UNCHECKED_CAST")
     override fun <T> decodeBodyFromJson(
         jsonSerializer: Json,
-        deserializer: DeserializationStrategy<T>
+        strategy: DeserializationStrategy<T>
     ): Either<Throwable, T?> = Either.Right(body as T)
 }

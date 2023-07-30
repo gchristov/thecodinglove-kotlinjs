@@ -14,11 +14,13 @@ import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.registerModules
 import com.gchristov.thecodinglove.kmpcommonnetwork.KmpCommonNetworkModule
-import com.gchristov.thecodinglove.search.PreloadSearchPubSubHttpHandler
+import com.gchristov.thecodinglove.search.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.SearchHttpHandler
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slack.SlackModule
+import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler
+import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
 
 suspend fun main() {
@@ -69,7 +71,9 @@ private suspend fun setupAppService(): Either<Throwable, HttpService> {
     val staticWebsiteRoot = "web"
     val handlers = listOf(
         DiGraph.inject<SearchHttpHandler>(),
-        DiGraph.inject<PreloadSearchPubSubHttpHandler>(),
+        DiGraph.inject<PreloadSearchPubSubHandler>(),
+        DiGraph.inject<SlackSlashCommandHttpHandler>(),
+        DiGraph.inject<SlackSlashCommandPubSubHandler>(),
         // Link this last so that API handlers are correctly registered
         StaticFileHttpHandler("$staticWebsiteRoot/index.html"),
     )

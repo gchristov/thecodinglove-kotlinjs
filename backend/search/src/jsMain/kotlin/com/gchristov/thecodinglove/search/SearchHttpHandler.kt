@@ -3,7 +3,11 @@ package com.gchristov.thecodinglove.search
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservicedata.http.*
+import com.gchristov.thecodinglove.commonservice.http.BaseHttpHandler
+import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
+import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
+import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
+import com.gchristov.thecodinglove.commonservicedata.http.sendJson
 import com.gchristov.thecodinglove.searchdata.api.ApiSearchResult
 import com.gchristov.thecodinglove.searchdata.api.toPost
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase

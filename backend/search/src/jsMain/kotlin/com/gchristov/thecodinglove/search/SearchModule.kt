@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.search
 
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSub
+import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubSubscription
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
@@ -28,7 +28,7 @@ object SearchModule : DiModule() {
                     jsonSerializer = instance(),
                     log = instance(),
                     preloadSearchResultUseCase = instance(),
-                    pubSub = instance(),
+                    pubSubSubscription = instance(),
                 )
             }
         }
@@ -49,12 +49,12 @@ object SearchModule : DiModule() {
         jsonSerializer: Json,
         log: Logger,
         preloadSearchResultUseCase: PreloadSearchResultUseCase,
-        pubSub: PubSub,
-    ): PreloadSearchPubSubHttpHandler = PreloadSearchPubSubHttpHandler(
+        pubSubSubscription: PubSubSubscription,
+    ): PreloadSearchPubSubHandler = PreloadSearchPubSubHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         preloadSearchResultUseCase = preloadSearchResultUseCase,
-        pubSub = pubSub,
+        pubSubSubscription = pubSubSubscription,
     )
 }

@@ -39,7 +39,7 @@ class SlackInteractivityPubSubService(
             jsonSerializer = jsonSerializer,
             log = log
         )
-            .leftIfNull(default = { Exception("Message body is null") })
+            .leftIfNull { Exception("Message body is null") }
             .flatMap { interactivity ->
                 when (interactivity.payload) {
                     is SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage ->

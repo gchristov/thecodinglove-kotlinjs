@@ -2,43 +2,47 @@ package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.*
+import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubHandler
+import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubRequest
+import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubSubscription
 import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubMessage
-import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubSubscription
 import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubTopic
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
-import kotlin.io.encoding.ExperimentalEncodingApi
 
-class PreloadSearchPubSubHttpHandler(
+class PreloadSearchPubSubHandler(
     dispatcher: CoroutineDispatcher,
     private val jsonSerializer: Json,
     log: Logger,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
-    pubSub: PubSub,
-) : BasePubSubHttpHandler(
+    pubSubSubscription: PubSubSubscription,
+) : BasePubSubHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
     log = log,
-    pubSub = pubSub,
+    pubSubSubscription = pubSubSubscription,
 ) {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
-        path = "/pubsub/notifications",
+        path = "/api/pubsub/search",
         contentType = ContentType.Application.Json,
     )
 
-    override fun pubSubConfig() = PubSubHttpHandler.PubSubConfig(
+    override fun pubSubConfig() = PubSubHandler.PubSubConfig(
         topic = PreloadSearchPubSubTopic,
-        subscription = PreloadSearchPubSubSubscription,
     )
 
-    @ExperimentalEncodingApi
-    override suspend fun handlePubSubRequestAsync(request: PubSubRequest): Either<Throwable, Unit> =
-        request.decodeMessageFromJson<PreloadSearchPubSubMessage>(jsonSerializer)
+    override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =
+        request.decodeBodyFromJson(
+            jsonSerializer = jsonSerializer,
+            strategy = PreloadSearchPubSubMessage.serializer(),
+        )
+            .leftIfNull { Exception("PubSub request body missing") }
             .flatMap { preloadSearchResultUseCase(searchSessionId = it.searchSessionId) }
 }

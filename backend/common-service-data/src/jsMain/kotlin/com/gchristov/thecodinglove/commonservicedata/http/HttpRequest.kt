@@ -21,6 +21,6 @@ interface HttpRequest {
 
     fun <T> decodeBodyFromJson(
         jsonSerializer: Json,
-        deserializer: DeserializationStrategy<T>
+        strategy: DeserializationStrategy<T>
     ): Either<Throwable, T?>
 }

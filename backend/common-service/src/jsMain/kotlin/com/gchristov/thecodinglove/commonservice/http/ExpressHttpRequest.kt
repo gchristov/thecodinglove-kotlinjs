@@ -27,11 +27,11 @@ internal class ExpressHttpRequest(private val req: dynamic) : HttpRequest {
 
     override fun <T> decodeBodyFromJson(
         jsonSerializer: Json,
-        deserializer: DeserializationStrategy<T>
+        strategy: DeserializationStrategy<T>
     ): Either<Throwable, T?> = try {
         // Express exposes "body" as a key-value map based on the middleware installed. To decode it from JSON we simply
         // convert it to String in Javascript, which should behave the same for any kind of content type.
-        Either.Right(body?.let { jsonSerializer.decodeFromString(deserializer, JSON.stringify(it)) })
+        Either.Right(body?.let { jsonSerializer.decodeFromString(strategy, JSON.stringify(it)) })
     } catch (error: Throwable) {
         Either.Left(Throwable(
             message = "Error decoding HTTP request body${error.message?.let { ": $it" } ?: ""}",
