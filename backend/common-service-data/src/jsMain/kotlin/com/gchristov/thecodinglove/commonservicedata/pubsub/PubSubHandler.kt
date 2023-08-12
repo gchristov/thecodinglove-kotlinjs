@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.commonservicedata.pubsub2
+package com.gchristov.thecodinglove.commonservicedata.pubsub
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.Handler

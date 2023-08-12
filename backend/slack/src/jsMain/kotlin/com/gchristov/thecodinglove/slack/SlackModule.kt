@@ -2,8 +2,8 @@ package com.gchristov.thecodinglove.slack
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubPublisher
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubSubscription
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.auth.SlackAuthApiService

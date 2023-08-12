@@ -8,8 +8,8 @@ import com.gchristov.thecodinglove.commonservice.http.BaseHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
 import com.gchristov.thecodinglove.commonservicedata.http.sendEmpty
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubHandler
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubSubscription
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 import kotlin.io.encoding.ExperimentalEncodingApi

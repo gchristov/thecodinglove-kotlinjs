@@ -9,7 +9,7 @@ import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
 import com.gchristov.thecodinglove.commonservicedata.http.sendEmpty
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubPublisher
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubMessage

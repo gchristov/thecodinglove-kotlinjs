@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.search
 
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubSubscription
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase

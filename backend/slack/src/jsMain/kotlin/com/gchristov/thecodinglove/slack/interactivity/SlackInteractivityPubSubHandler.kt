@@ -6,9 +6,9 @@ import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubHandler
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubRequest
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubSubscription
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackActionName
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubTopic

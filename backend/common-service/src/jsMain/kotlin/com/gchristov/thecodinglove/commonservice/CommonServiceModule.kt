@@ -6,8 +6,8 @@ import com.gchristov.thecodinglove.commonservice.pubsub.GoogleCloudPubSubExterna
 import com.gchristov.thecodinglove.commonservice.pubsub.GoogleCloudPubSubPublisher
 import com.gchristov.thecodinglove.commonservice.pubsub.GoogleCloudPubSubSubscription
 import com.gchristov.thecodinglove.commonservicedata.http.HttpService
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubPublisher
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubSubscription
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import org.kodein.di.DI
 import org.kodein.di.bindProvider

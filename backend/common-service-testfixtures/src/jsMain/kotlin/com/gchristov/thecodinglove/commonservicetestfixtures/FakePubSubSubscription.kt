@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.commonservicetestfixtures
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubSubscription
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 
 class FakePubSubSubscription : PubSubSubscription {
     override suspend fun initialise(

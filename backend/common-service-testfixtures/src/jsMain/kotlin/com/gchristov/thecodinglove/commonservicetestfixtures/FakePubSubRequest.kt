@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.commonservicetestfixtures
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubRequest
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json

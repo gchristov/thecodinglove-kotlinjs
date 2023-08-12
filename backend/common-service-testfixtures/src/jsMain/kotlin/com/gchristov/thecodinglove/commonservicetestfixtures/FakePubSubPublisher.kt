@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.commonservicetestfixtures
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubPublisher
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import kotlin.test.assertEquals

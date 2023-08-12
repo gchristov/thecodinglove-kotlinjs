@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.commonservice.pubsub
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubRequest
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

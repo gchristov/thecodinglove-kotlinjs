@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.commonservice.pubsub
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicedata.pubsub2.PubSubPublisher
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
 import com.gchristov.thecodinglove.kmpcommonkotlin.process
 import kotlinx.coroutines.await
