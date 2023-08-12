@@ -17,7 +17,6 @@ import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubTopic
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 class SlackSlashCommandPubSubHandler(
     dispatcher: CoroutineDispatcher,
@@ -42,7 +41,6 @@ class SlackSlashCommandPubSubHandler(
         topic = SlackSlashCommandPubSubTopic,
     )
 
-    @ExperimentalEncodingApi
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =
         request.decodeBodyFromJson(
             jsonSerializer = jsonSerializer,
