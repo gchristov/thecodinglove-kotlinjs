@@ -2,10 +2,8 @@ package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import arrow.core.flatMap
-import co.touchlab.kermit.Logger
 import com.benasher44.uuid.uuid4
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
-import com.gchristov.thecodinglove.commonservicedata.pubsub.sendMessage
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.model.*
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,8 +30,7 @@ class RealSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
-    private val pubSubSender: PubSubSender,
-    private val log: Logger,
+    private val pubSubPublisher: PubSubPublisher,
     private val jsonSerializer: Json,
 ) : SearchUseCase {
     override suspend operator fun invoke(
@@ -109,13 +106,14 @@ class RealSearchUseCase(
             }
         }
 
-    private suspend fun publishSearchPreloadMessage(searchSessionId: String) =
-        pubSubSender.sendMessage(
+    private suspend fun publishSearchPreloadMessage(searchSessionId: String) = pubSubPublisher
+        .publishJson(
             topic = PreloadSearchPubSubTopic,
             body = PreloadSearchPubSubMessage(searchSessionId),
             jsonSerializer = jsonSerializer,
-            log = log
-        ).mapLeft { SearchError.SessionNotFound }
+            strategy = PreloadSearchPubSubMessage.serializer(),
+        )
+        .mapLeft { SearchError.SessionNotFound }
 }
 
 private suspend fun SearchUseCase.Type.getSearchSession(

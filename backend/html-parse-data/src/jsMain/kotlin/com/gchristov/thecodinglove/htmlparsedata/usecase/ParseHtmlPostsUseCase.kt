@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove.htmlparsedata.usecase
 
 import arrow.core.Either
-import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.htmlparsedata.HtmlPost
 import com.gchristov.thecodinglove.kmpcommonkotlin.requireModule
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,7 +12,6 @@ interface ParseHtmlPostsUseCase {
 
 internal class RealParseHtmlPostsUseCase(
     private val dispatcher: CoroutineDispatcher,
-    private val log: Logger,
 ) : ParseHtmlPostsUseCase {
     override suspend operator fun invoke(html: String): Either<Throwable, List<HtmlPost>> =
         withContext(dispatcher) {
@@ -39,8 +37,10 @@ internal class RealParseHtmlPostsUseCase(
                 }
                 Either.Right(posts)
             } catch (error: Throwable) {
-                log.e(error) { error.message ?: "Error during post parse" }
-                Either.Left(error)
+                Either.Left(Throwable(
+                    message = "Error during post parse${error.message?.let { ": $it" } ?: ""}",
+                    cause = error,
+                ))
             }
         }
 

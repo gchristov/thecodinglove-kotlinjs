@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove.searchdata
 
-import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
@@ -27,8 +26,7 @@ object SearchDataModule : DiModule() {
                     api = instance(),
                     parseHtmlTotalPostsUseCase = instance(),
                     parseHtmlPostsUseCase = instance(),
-                    firebaseFirestore = instance(),
-                    log = instance()
+                    firebaseFirestore = instance()
                 )
             }
             bindSingleton { provideSearchConfig() }
@@ -42,8 +40,7 @@ object SearchDataModule : DiModule() {
                 provideSearchUseCase(
                     searchRepository = instance(),
                     searchWithHistoryUseCase = instance(),
-                    pubSubSender = instance(),
-                    log = instance(),
+                    pubSubPublisher = instance(),
                     jsonSerializer = instance(),
                 )
             }
@@ -62,14 +59,12 @@ object SearchDataModule : DiModule() {
         api: SearchApi,
         parseHtmlTotalPostsUseCase: ParseHtmlTotalPostsUseCase,
         parseHtmlPostsUseCase: ParseHtmlPostsUseCase,
-        firebaseFirestore: FirebaseFirestore,
-        log: Logger
+        firebaseFirestore: FirebaseFirestore
     ): SearchRepository = RealSearchRepository(
         apiService = api,
         parseHtmlTotalPostsUseCase = parseHtmlTotalPostsUseCase,
         parseHtmlPostsUseCase = parseHtmlPostsUseCase,
-        firebaseFirestore = firebaseFirestore,
-        log = log
+        firebaseFirestore = firebaseFirestore
     )
 
     private fun provideSearchConfig(): SearchConfig = SearchConfig(postsPerPage = 4)
@@ -86,15 +81,13 @@ object SearchDataModule : DiModule() {
     private fun provideSearchUseCase(
         searchRepository: SearchRepository,
         searchWithHistoryUseCase: SearchWithHistoryUseCase,
-        pubSubSender: PubSubSender,
-        log: Logger,
+        pubSubPublisher: PubSubPublisher,
         jsonSerializer: Json,
     ): SearchUseCase = RealSearchUseCase(
         dispatcher = Dispatchers.Default,
         searchRepository = searchRepository,
         searchWithHistoryUseCase = searchWithHistoryUseCase,
-        pubSubSender = pubSubSender,
-        log = log,
+        pubSubPublisher = pubSubPublisher,
         jsonSerializer = jsonSerializer,
     )
 

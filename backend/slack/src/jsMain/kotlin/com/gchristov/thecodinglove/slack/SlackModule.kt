@@ -1,20 +1,18 @@
 package com.gchristov.thecodinglove.slack
 
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSender
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubServiceRegister
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
-import com.gchristov.thecodinglove.slack.auth.SlackAuthApiService
-import com.gchristov.thecodinglove.slack.event.SlackEventApiService
-import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityApiService
-import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubService
-import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandApiService
-import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubService
+import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
+import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubHandler
+import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler
+import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
@@ -26,47 +24,44 @@ object SlackModule : DiModule() {
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindSingleton {
-                provideSlackSlashCommandApiService(
-                    apiServiceRegister = instance(),
+                provideSlackSlashCommandHttpHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     slackVerifyRequestUseCase = instance(),
                     slackConfig = instance(),
-                    pubSubSender = instance()
+                    pubSubPublisher = instance(),
                 )
             }
             bindSingleton {
-                provideSlackSlashCommandPubSubService(
-                    pubSubServiceRegister = instance(),
+                provideSlackSlashCommandPubSubHttpHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     slackRepository = instance(),
-                    searchUseCase = instance()
+                    searchUseCase = instance(),
+                    pubSubSubscription = instance(),
                 )
             }
             bindSingleton {
-                provideSlackInteractivityApiService(
-                    apiServiceRegister = instance(),
+                provideSlackInteractivityHttpHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     slackVerifyRequestUseCase = instance(),
                     slackConfig = instance(),
-                    pubSubSender = instance()
+                    pubSubPublisher = instance(),
                 )
             }
             bindSingleton {
-                provideSlackInteractivityPubSubService(
-                    pubSubServiceRegister = instance(),
+                provideSlackInteractivityPubSubHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     slackSendSearchUseCase = instance(),
                     slackShuffleSearchUseCase = instance(),
                     slackCancelSearchUseCase = instance(),
+                    pubSubSubscription = instance(),
                 )
             }
             bindSingleton {
-                provideSlackAuthApiService(
-                    apiServiceRegister = instance(),
+                provideSlackAuthHttpHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     slackAuthUseCase = instance(),
@@ -74,8 +69,7 @@ object SlackModule : DiModule() {
                 )
             }
             bindSingleton {
-                provideSlackEventApiService(
-                    apiServiceRegister = instance(),
+                provideSlackEventHttpHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     slackVerifyRequestUseCase = instance(),
@@ -86,91 +80,89 @@ object SlackModule : DiModule() {
         }
     }
 
-    private fun provideSlackSlashCommandApiService(
-        apiServiceRegister: ApiServiceRegister,
+    private fun provideSlackSlashCommandHttpHandler(
         jsonSerializer: Json,
         log: Logger,
         slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
         slackConfig: SlackConfig,
-        pubSubSender: PubSubSender,
-    ): SlackSlashCommandApiService = SlackSlashCommandApiService(
-        apiServiceRegister = apiServiceRegister,
+        pubSubPublisher: PubSubPublisher,
+    ): SlackSlashCommandHttpHandler = SlackSlashCommandHttpHandler(
+        dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         slackVerifyRequestUseCase = slackVerifyRequestUseCase,
         slackConfig = slackConfig,
-        pubSubSender = pubSubSender
+        pubSubPublisher = pubSubPublisher,
     )
 
-    private fun provideSlackSlashCommandPubSubService(
-        pubSubServiceRegister: PubSubServiceRegister,
+    private fun provideSlackSlashCommandPubSubHttpHandler(
         jsonSerializer: Json,
         log: Logger,
         slackRepository: SlackRepository,
-        searchUseCase: SearchUseCase
-    ): SlackSlashCommandPubSubService = SlackSlashCommandPubSubService(
-        pubSubServiceRegister = pubSubServiceRegister,
+        searchUseCase: SearchUseCase,
+        pubSubSubscription: PubSubSubscription,
+    ): SlackSlashCommandPubSubHandler = SlackSlashCommandPubSubHandler(
+        dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         slackRepository = slackRepository,
-        searchUseCase = searchUseCase
+        searchUseCase = searchUseCase,
+        pubSubSubscription = pubSubSubscription,
     )
 
-    private fun provideSlackInteractivityApiService(
-        apiServiceRegister: ApiServiceRegister,
+    private fun provideSlackInteractivityHttpHandler(
         jsonSerializer: Json,
         log: Logger,
         slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
         slackConfig: SlackConfig,
-        pubSubSender: PubSubSender,
-    ): SlackInteractivityApiService = SlackInteractivityApiService(
-        apiServiceRegister = apiServiceRegister,
+        pubSubPublisher: PubSubPublisher,
+    ): SlackInteractivityHttpHandler = SlackInteractivityHttpHandler(
+        dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         slackVerifyRequestUseCase = slackVerifyRequestUseCase,
         slackConfig = slackConfig,
-        pubSubSender = pubSubSender
+        pubSubPublisher = pubSubPublisher,
     )
 
-    private fun provideSlackInteractivityPubSubService(
-        pubSubServiceRegister: PubSubServiceRegister,
+    private fun provideSlackInteractivityPubSubHandler(
         jsonSerializer: Json,
         log: Logger,
         slackSendSearchUseCase: SlackSendSearchUseCase,
         slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
         slackCancelSearchUseCase: SlackCancelSearchUseCase,
-    ): SlackInteractivityPubSubService = SlackInteractivityPubSubService(
-        pubSubServiceRegister = pubSubServiceRegister,
+        pubSubSubscription: PubSubSubscription,
+    ): SlackInteractivityPubSubHandler = SlackInteractivityPubSubHandler(
+        dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         slackSendSearchUseCase = slackSendSearchUseCase,
         slackShuffleSearchUseCase = slackShuffleSearchUseCase,
         slackCancelSearchUseCase = slackCancelSearchUseCase,
+        pubSubSubscription = pubSubSubscription,
     )
 
-    private fun provideSlackAuthApiService(
-        apiServiceRegister: ApiServiceRegister,
+    private fun provideSlackAuthHttpHandler(
         jsonSerializer: Json,
         log: Logger,
         slackAuthUseCase: SlackAuthUseCase,
         slackSendSearchUseCase: SlackSendSearchUseCase,
-    ): SlackAuthApiService = SlackAuthApiService(
-        apiServiceRegister = apiServiceRegister,
+    ): SlackAuthHttpHandler = SlackAuthHttpHandler(
+        dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         slackAuthUseCase = slackAuthUseCase,
         slackSendSearchUseCase = slackSendSearchUseCase,
     )
 
-    private fun provideSlackEventApiService(
-        apiServiceRegister: ApiServiceRegister,
+    private fun provideSlackEventHttpHandler(
         jsonSerializer: Json,
         log: Logger,
         slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
         slackConfig: SlackConfig,
         slackRevokeTokensUseCase: SlackRevokeTokensUseCase,
-    ): SlackEventApiService = SlackEventApiService(
-        apiServiceRegister = apiServiceRegister,
+    ): SlackEventHttpHandler = SlackEventHttpHandler(
+        dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         slackVerifyRequestUseCase = slackVerifyRequestUseCase,

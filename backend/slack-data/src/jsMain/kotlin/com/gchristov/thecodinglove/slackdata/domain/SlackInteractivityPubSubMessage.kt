@@ -84,4 +84,4 @@ private fun ApiSlackInteractivity.ApiSlackInteractivityPayload.ApiInteractiveMes
         name = name
     )
 
-const val SlackInteractivityPubSubTopic = "slackInteractivityPubSub"
+const val SlackInteractivityPubSubTopic = "slack_interactivity"

@@ -26,7 +26,6 @@ object SlackDataModule : DiModule() {
             bindSingleton {
                 provideSlackRepository(
                     api = instance(),
-                    log = instance(),
                     firebaseFirestore = instance(),
                 )
             }
@@ -87,11 +86,9 @@ object SlackDataModule : DiModule() {
 
     private fun provideSlackRepository(
         api: SlackApi,
-        log: Logger,
         firebaseFirestore: FirebaseFirestore,
     ): SlackRepository = RealSlackRepository(
         apiService = api,
-        log = log,
         firebaseFirestore = firebaseFirestore
     )
 

@@ -10,3 +10,9 @@ external object Buffer {
         encoding: dynamic = definedExternally
     ): Buffer
 }
+
+external val __dirname: dynamic
+
+external val exports: dynamic
+
+external val process: dynamic

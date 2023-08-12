@@ -7,4 +7,10 @@ firebase init emulators
 
 [Slack API test hub](https://requestbin.com/r/eny6fd4lflem/2LzxvzhVXCw7p02t82zfRXkAvdF)
 
-Serve local content to the web - `ssh -R 80:localhost:5000 serveo.net`
+Serve local content to the web - `ssh -R codinglove.serveo.net:80:localhost:3000 serveo.net`
+
+[KotlinJS NodeJS example](https://github.com/wadejensen/kotlin-nodejs-example)
+
+[KotlinJS ExpressJS example](https://github.com/chrisnkrueger/kotlin-express)
+
+[KotlinJS external mappings example](https://dev.to/mpetuska/js-in-kotlinjs-c4g)
