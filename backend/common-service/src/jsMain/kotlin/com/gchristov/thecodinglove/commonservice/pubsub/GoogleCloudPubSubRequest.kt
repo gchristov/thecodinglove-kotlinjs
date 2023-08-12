@@ -2,11 +2,11 @@ package com.gchristov.thecodinglove.commonservice.pubsub
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
+import io.ktor.util.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 internal class GoogleCloudPubSubRequest(override val bodyString: String?) : PubSubRequest {
@@ -35,7 +35,7 @@ internal data class GoogleCloudPubSubRequestBody(val message: Message) {
 
 @ExperimentalEncodingApi
 internal fun GoogleCloudPubSubRequestBody.toPubSubRequest(): Either<Throwable, GoogleCloudPubSubRequest> = try {
-    val base64Decoded = Base64.decode(message.dataBase64).decodeToString()
+    val base64Decoded = message.dataBase64.decodeBase64String()
     Either.Right(GoogleCloudPubSubRequest(bodyString = base64Decoded))
 } catch (error: Throwable) {
     Either.Left(Throwable(

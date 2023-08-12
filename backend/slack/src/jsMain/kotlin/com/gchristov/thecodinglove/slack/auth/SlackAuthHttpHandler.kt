@@ -3,37 +3,40 @@ package com.gchristov.thecodinglove.slack.auth
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservice.ApiService
-import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
-import com.gchristov.thecodinglove.commonservicedata.api.ApiResponse
-import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
-import com.gchristov.thecodinglove.kmpcommonkotlin.exports
+import com.gchristov.thecodinglove.commonservice.http.BaseHttpHandler
+import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
+import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
+import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthState
 import com.gchristov.thecodinglove.slackdata.domain.toAuthState
 import com.gchristov.thecodinglove.slackdata.usecase.SlackAuthUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.SlackSendSearchUseCase
+import io.ktor.http.*
 import io.ktor.util.*
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class SlackAuthApiService(
-    apiServiceRegister: ApiServiceRegister,
+class SlackAuthHttpHandler(
+    dispatcher: CoroutineDispatcher,
     private val jsonSerializer: Json,
     private val log: Logger,
     private val slackAuthUseCase: SlackAuthUseCase,
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
-) : ApiService(
-    apiServiceRegister = apiServiceRegister,
+) : BaseHttpHandler(
+    dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
-    log = log,
+    log = log
 ) {
-    override fun register() {
-        exports.slackAuthApi = registerForApiCallbacks()
-    }
+    override fun httpConfig() = HttpHandler.HttpConfig(
+        method = HttpMethod.Get,
+        path = "/api/slack/auth",
+        contentType = ContentType.Application.FormUrlEncoded,
+    )
 
-    override suspend fun handleRequest(
-        request: ApiRequest,
-        response: ApiResponse
+    override suspend fun handleHttpRequestAsync(
+        request: HttpRequest,
+        response: HttpResponse,
     ): Either<Throwable, Unit> {
         val code: String? = request.query["code"]
         val state = request.query.get<String?>("state").takeIf { !it.isNullOrEmpty() }
@@ -48,7 +51,7 @@ class SlackAuthApiService(
 
     override fun handleError(
         error: Throwable,
-        response: ApiResponse
+        response: HttpResponse,
     ): Either<Throwable, Unit> = when (error) {
         is SlackAuthUseCase.Error.Cancelled -> {
             response.redirect("/")
@@ -79,7 +82,7 @@ class SlackAuthApiService(
         )
     } catch (error: Throwable) {
         Either.Left(Throwable(
-            message = "Error during auth state handling${error.message?.let { ": $it" } ?: ""}",
+            message = "Error handling auth state${error.message?.let { ": $it" } ?: ""}",
             cause = error,
         ))
     }

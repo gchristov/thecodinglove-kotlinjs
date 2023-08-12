@@ -19,6 +19,7 @@ import com.gchristov.thecodinglove.search.SearchHttpHandler
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slack.SlackModule
+import com.gchristov.thecodinglove.slack.auth.SlackAuthHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler
@@ -78,6 +79,7 @@ private suspend fun setupAppService(): Either<Throwable, HttpService> {
         DiGraph.inject<SlackSlashCommandPubSubHandler>(),
         DiGraph.inject<SlackInteractivityHttpHandler>(),
         DiGraph.inject<SlackInteractivityPubSubHandler>(),
+        DiGraph.inject<SlackAuthHttpHandler>(),
         // Link this last so that API handlers are correctly registered
         StaticFileHttpHandler("$staticWebsiteRoot/index.html"),
     )

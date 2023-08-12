@@ -6,7 +6,7 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
-import com.gchristov.thecodinglove.slack.auth.SlackAuthApiService
+import com.gchristov.thecodinglove.slack.auth.SlackAuthHttpHandler
 import com.gchristov.thecodinglove.slack.event.SlackEventApiService
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubHandler
@@ -64,8 +64,7 @@ object SlackModule : DiModule() {
                 )
             }
             bindSingleton {
-                provideSlackAuthApiService(
-                    apiServiceRegister = instance(),
+                provideSlackAuthHttpHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     slackAuthUseCase = instance(),
@@ -147,14 +146,13 @@ object SlackModule : DiModule() {
         pubSubSubscription = pubSubSubscription,
     )
 
-    private fun provideSlackAuthApiService(
-        apiServiceRegister: ApiServiceRegister,
+    private fun provideSlackAuthHttpHandler(
         jsonSerializer: Json,
         log: Logger,
         slackAuthUseCase: SlackAuthUseCase,
         slackSendSearchUseCase: SlackSendSearchUseCase,
-    ): SlackAuthApiService = SlackAuthApiService(
-        apiServiceRegister = apiServiceRegister,
+    ): SlackAuthHttpHandler = SlackAuthHttpHandler(
+        dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         slackAuthUseCase = slackAuthUseCase,
