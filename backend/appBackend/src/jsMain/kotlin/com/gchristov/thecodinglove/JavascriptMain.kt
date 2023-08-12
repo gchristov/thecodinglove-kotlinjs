@@ -18,8 +18,8 @@ import com.gchristov.thecodinglove.search.SearchHttpHandler
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slack.SlackModule
-import com.gchristov.thecodinglove.slack.auth.SlackAuthHttpHandler
-import com.gchristov.thecodinglove.slack.event.SlackEventHttpHandler
+import com.gchristov.thecodinglove.slack.SlackAuthHttpHandler
+import com.gchristov.thecodinglove.slack.SlackEventHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler

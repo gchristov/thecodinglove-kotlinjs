@@ -7,4 +7,3 @@ echo "🛠 Build container image" && docker build --tag=$image_tag .
 echo "🏁 Start local tunnel" && (ssh -tt -R codinglove.serveo.net:80:localhost:8080 serveo.net &) && sleep 1
 # --init allows stopping the container with ctrl+c
 echo "🏁 Start container" && echo "" && docker run --init -p 8080:8080 $image_tag
-#echo "🏁 Starting local Firebase emulators..." && firebase emulators:start

@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove.searchdata
 
 import arrow.core.Either
-import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.searchdata.db.DbSearchSession
@@ -30,7 +29,6 @@ internal class RealSearchRepository(
     private val parseHtmlTotalPostsUseCase: ParseHtmlTotalPostsUseCase,
     private val parseHtmlPostsUseCase: ParseHtmlPostsUseCase,
     private val firebaseFirestore: FirebaseFirestore,
-    private val log: Logger,
 ) : SearchRepository {
     override suspend fun getTotalPosts(query: String): Either<Throwable, Int> = try {
         val responseHtml = apiService.search(

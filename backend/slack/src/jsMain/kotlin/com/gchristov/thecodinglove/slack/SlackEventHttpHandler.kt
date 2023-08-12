@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slack.event
+package com.gchristov.thecodinglove.slack
 
 import arrow.core.Either
 import arrow.core.flatMap
