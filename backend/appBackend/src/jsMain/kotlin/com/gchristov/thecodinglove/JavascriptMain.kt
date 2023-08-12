@@ -5,7 +5,6 @@ import arrow.core.flatMap
 import arrow.core.sequence
 import com.gchristov.thecodinglove.commonservice.CommonServiceModule
 import com.gchristov.thecodinglove.commonservice.http.StaticFileHttpHandler
-import com.gchristov.thecodinglove.commonservicedata.CommonServiceDataModule
 import com.gchristov.thecodinglove.commonservicedata.http.HttpService
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
 import com.gchristov.thecodinglove.kmpcommonfirebase.KmpCommonFirebaseModule
@@ -20,6 +19,7 @@ import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slack.SlackModule
 import com.gchristov.thecodinglove.slack.auth.SlackAuthHttpHandler
+import com.gchristov.thecodinglove.slack.event.SlackEventHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler
@@ -48,7 +48,6 @@ private fun setupDi(): Either<Throwable, Unit> {
             KmpCommonFirebaseModule.module,
             KmpCommonNetworkModule.module,
             CommonServiceModule.module,
-            CommonServiceDataModule.module,
             HtmlParseDataModule.module,
             SearchModule.module,
             SearchDataModule.module,
@@ -80,6 +79,7 @@ private suspend fun setupAppService(): Either<Throwable, HttpService> {
         DiGraph.inject<SlackInteractivityHttpHandler>(),
         DiGraph.inject<SlackInteractivityPubSubHandler>(),
         DiGraph.inject<SlackAuthHttpHandler>(),
+        DiGraph.inject<SlackEventHttpHandler>(),
         // Link this last so that API handlers are correctly registered
         StaticFileHttpHandler("$staticWebsiteRoot/index.html"),
     )

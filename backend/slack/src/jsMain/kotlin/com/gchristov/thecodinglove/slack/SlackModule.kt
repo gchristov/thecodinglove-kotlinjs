@@ -1,13 +1,12 @@
 package com.gchristov.thecodinglove.slack
 
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservicedata.api.ApiServiceRegister
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.auth.SlackAuthHttpHandler
-import com.gchristov.thecodinglove.slack.event.SlackEventApiService
+import com.gchristov.thecodinglove.slack.event.SlackEventHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler
@@ -72,8 +71,7 @@ object SlackModule : DiModule() {
                 )
             }
             bindSingleton {
-                provideSlackEventApiService(
-                    apiServiceRegister = instance(),
+                provideSlackEventHttpHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     slackVerifyRequestUseCase = instance(),
@@ -159,15 +157,14 @@ object SlackModule : DiModule() {
         slackSendSearchUseCase = slackSendSearchUseCase,
     )
 
-    private fun provideSlackEventApiService(
-        apiServiceRegister: ApiServiceRegister,
+    private fun provideSlackEventHttpHandler(
         jsonSerializer: Json,
         log: Logger,
         slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
         slackConfig: SlackConfig,
         slackRevokeTokensUseCase: SlackRevokeTokensUseCase,
-    ): SlackEventApiService = SlackEventApiService(
-        apiServiceRegister = apiServiceRegister,
+    ): SlackEventHttpHandler = SlackEventHttpHandler(
+        dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         slackVerifyRequestUseCase = slackVerifyRequestUseCase,
