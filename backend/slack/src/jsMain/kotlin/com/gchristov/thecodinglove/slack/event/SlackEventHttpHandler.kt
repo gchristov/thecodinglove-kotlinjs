@@ -37,22 +37,24 @@ class SlackEventHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = /*if (slackConfig.requestVerificationEnabled) {
+    ): Either<Throwable, Unit> = if (slackConfig.requestVerificationEnabled) {
         slackVerifyRequestUseCase(request)
     } else {
         Either.Right(Unit)
-    }.flatMap {*/
-        request.decodeBodyFromJson(
-            jsonSerializer = jsonSerializer,
-            strategy = ApiSlackEvent.serializer(),
-        )
-            .leftIfNull { Exception("Request body is invalid") }
-            .flatMap {
-                when (val event = it.toEvent()) {
-                    is SlackEvent.UrlVerification -> event.handle(response)
-                    is SlackEvent.Callback -> event.handle(response)
-                }
+    }
+        .flatMap {
+            request.decodeBodyFromJson(
+                jsonSerializer = jsonSerializer,
+                strategy = ApiSlackEvent.serializer(),
+            )
+        }
+        .leftIfNull { Exception("Request body is invalid") }
+        .flatMap {
+            when (val event = it.toEvent()) {
+                is SlackEvent.UrlVerification -> event.handle(response)
+                is SlackEvent.Callback -> event.handle(response)
             }
+        }
 
     private fun SlackEvent.UrlVerification.handle(response: HttpResponse) = response.sendText(text = challenge)
 

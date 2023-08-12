@@ -41,18 +41,20 @@ class SlackSlashCommandHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = /*if (slackConfig.requestVerificationEnabled) {
+    ): Either<Throwable, Unit> = if (slackConfig.requestVerificationEnabled) {
         slackVerifyRequestUseCase(request)
     } else {
         Either.Right(Unit)
-    }.flatMap {*/
-        request.decodeBodyFromJson(
-            jsonSerializer = jsonSerializer,
-            strategy = ApiSlackSlashCommand.serializer(),
-        )
-            .leftIfNull(default = { Exception("Request body is invalid") })
-            .flatMap { publishSlashCommandMessage(it) }
-            .flatMap { response.sendEmpty() }
+    }
+        .flatMap {
+            request.decodeBodyFromJson(
+                jsonSerializer = jsonSerializer,
+                strategy = ApiSlackSlashCommand.serializer(),
+            )
+        }
+        .leftIfNull(default = { Exception("Request body is invalid") })
+        .flatMap { publishSlashCommandMessage(it) }
+        .flatMap { response.sendEmpty() }
 
     private suspend fun publishSlashCommandMessage(slashCommand: ApiSlackSlashCommand) = pubSubPublisher
         .publishJson(

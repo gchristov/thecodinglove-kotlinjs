@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.slackdata.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservicedata.api.ApiRequest
+import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import diglol.crypto.Hmac
 import diglol.encoding.encodeHexToString
@@ -15,7 +15,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.plus
 
 interface SlackVerifyRequestUseCase {
-    suspend operator fun invoke(request: ApiRequest): Either<Error, Unit>
+    suspend operator fun invoke(request: HttpRequest): Either<Error, Unit>
 
     sealed class Error(message: String? = null) : Throwable(message) {
         object MissingTimestamp : Error()
@@ -32,7 +32,7 @@ class RealSlackVerifyRequestUseCase(
     private val clock: Clock,
     private val log: Logger,
 ) : SlackVerifyRequestUseCase {
-    override suspend fun invoke(request: ApiRequest): Either<SlackVerifyRequestUseCase.Error, Unit> =
+    override suspend fun invoke(request: HttpRequest): Either<SlackVerifyRequestUseCase.Error, Unit> =
         withContext(dispatcher) {
             try {
                 val timestamp: Long = request.headers.get<String>("x-slack-request-timestamp")
@@ -40,7 +40,7 @@ class RealSlackVerifyRequestUseCase(
                     ?: return@withContext Either.Left(SlackVerifyRequestUseCase.Error.MissingTimestamp)
                 val signature: String = request.headers["x-slack-signature"]
                     ?: return@withContext Either.Left(SlackVerifyRequestUseCase.Error.MissingSignature)
-                log.d("Verifying Slack request: timestamp=$timestamp, signature=$signature, body=${request.rawBody}")
+                log.d("Verifying Slack request: timestamp=$timestamp, signature=$signature, body=${request.bodyString}")
 
                 verifyTimestamp(
                     timestamp = timestamp,
@@ -50,7 +50,7 @@ class RealSlackVerifyRequestUseCase(
                     verifyRequest(
                         timestamp = timestamp,
                         signature = signature,
-                        rawBody = request.rawBody,
+                        rawBody = request.bodyString,
                         signingSecret = slackConfig.signingSecret
                     )
                 }

@@ -41,18 +41,20 @@ class SlackInteractivityHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = /*if (slackConfig.requestVerificationEnabled) {
+    ): Either<Throwable, Unit> = if (slackConfig.requestVerificationEnabled) {
         slackVerifyRequestUseCase(request)
     } else {
         Either.Right(Unit)
-    }.flatMap {*/
-        request.decodeBodyFromJson(
-            jsonSerializer = jsonSerializer,
-            strategy = ApiSlackInteractivity.serializer(),
-        )
-            .leftIfNull(default = { Exception("Request body is invalid") })
-            .flatMap { publishInteractivityMessage(it) }
-            .flatMap { response.sendEmpty() }
+    }
+        .flatMap {
+            request.decodeBodyFromJson(
+                jsonSerializer = jsonSerializer,
+                strategy = ApiSlackInteractivity.serializer(),
+            )
+        }
+        .leftIfNull(default = { Exception("Request body is invalid") })
+        .flatMap { publishInteractivityMessage(it) }
+        .flatMap { response.sendEmpty() }
 
     private suspend fun publishInteractivityMessage(interactivity: ApiSlackInteractivity) = pubSubPublisher
         .publishJson(
