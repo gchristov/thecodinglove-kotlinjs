@@ -9,13 +9,14 @@ env:
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
-  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
   GCP_SERVICE: cloudrun-test
   GCP_REGION: us-west1
   GCP_REPOSITORY: cloudrun-test-repo
   GCP_REPOSITORY_FORMAT: docker
   GCP_REPOSITORY_IMAGE: cloudrun-test-image
+  GCP_SA_KEY_DEPLOY: ${{ secrets.GCP_SA_KEY_DEPLOY }}
   # Required for build
+  GCP_SA_KEY_PUBSUB: ${{ secrets.GCP_SA_KEY_PUBSUB }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
   FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
   FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
@@ -58,6 +59,7 @@ jobs:
           path: |
             build/bin
             local.properties
+            local-credentials-pubsub.json
       - name: Set up deploy environment
         run: |
           GCP_BUILD_TAG="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_REPOSITORY }}/${{ env.GCP_REPOSITORY_IMAGE }}"
@@ -65,7 +67,7 @@ jobs:
       - name: Set up deploy authentication
         uses: google-github-actions/auth@v1.1.1
         with:
-          credentials_json: ${{ env.GCP_SA_KEY }}
+          credentials_json: ${{ env.GCP_SA_KEY_DEPLOY }}
       - name: Set up deploy cli
         uses: google-github-actions/setup-gcloud@v1.1.1
         with:

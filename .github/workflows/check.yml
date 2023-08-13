@@ -9,6 +9,7 @@ env:
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
   # Required for build
+  GCP_SA_KEY_PUBSUB: ${{ secrets.GCP_SA_KEY_PUBSUB }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
   FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
   FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
@@ -51,6 +52,7 @@ jobs:
           path: |
             build/bin
             local.properties
+            local-credentials-pubsub.json
 
   jsTest:
     runs-on: ubuntu-20.04
