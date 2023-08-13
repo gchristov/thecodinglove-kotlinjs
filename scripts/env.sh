@@ -14,3 +14,4 @@ echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./local.properties
 echo APP_LOG_LEVEL="$APP_LOG_LEVEL" >> ./local.properties
 echo APP_NETWORK_HTML_LOG_LEVEL="$APP_NETWORK_HTML_LOG_LEVEL" >> ./local.properties
 echo APP_NETWORK_JSON_LOG_LEVEL="$APP_NETWORK_JSON_LOG_LEVEL" >> ./local.properties
+echo APP_PUBLIC_URL="$APP_PUBLIC_URL" >> ./local.properties
