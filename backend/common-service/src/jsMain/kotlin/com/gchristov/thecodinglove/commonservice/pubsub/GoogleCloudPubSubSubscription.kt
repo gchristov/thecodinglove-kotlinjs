@@ -30,7 +30,7 @@ internal class GoogleCloudPubSubSubscription(
             log.d("Creating PubSub subscription $subscription")
             pubSubSubscription.create(
                 // TODO: Fix this to use a env variable for the website
-                json("pushEndpoint" to "https://codinglove.serveo.net${httpPath}")
+                json("pushEndpoint" to "https://cloudrun-test-oe6rkpnjrq-uw.a.run.app/$httpPath")
             ).await()
         }
         Either.Right(Unit)
