@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.commonservice.pubsub
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonservice.BuildKonfig
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.kmpcommonkotlin.process
 import kotlinx.coroutines.await
@@ -28,9 +29,11 @@ internal class GoogleCloudPubSubSubscription(
         val pubSubSubscription = pubSubTopic.subscription(subscription)
         if (!pubSubSubscription.exists().await().first()) {
             log.d("Creating PubSub subscription $subscription")
+            val trimmedDomain = BuildKonfig.APP_PUBLIC_URL.removeSuffix("/")
+            val trimmedPath = httpPath.removePrefix("/")
             pubSubSubscription.create(
                 // TODO: Fix this to use a env variable for the website
-                json("pushEndpoint" to "https://cloudrun-test-oe6rkpnjrq-uw.a.run.app/$httpPath")
+                json("pushEndpoint" to "$trimmedDomain$trimmedPath")
             ).await()
         }
         Either.Right(Unit)
