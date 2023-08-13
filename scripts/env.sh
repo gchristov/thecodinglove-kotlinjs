@@ -1,6 +1,6 @@
 # Exports required CI environment secrets to local environment files so that the project can use them
 set -e
-echo GCP_SA_KEY_PUBSUB="$GCP_SA_KEY_PUBSUB" >> ./local-credentials-pubsub.json
+echo "$GCP_SA_KEY_PUBSUB" >> ./local-credentials-pubsub.json
 echo FIREBASE_API_KEY="$FIREBASE_API_KEY" >> ./local.properties
 echo FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN" >> ./local.properties
 echo FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" >> ./local.properties
