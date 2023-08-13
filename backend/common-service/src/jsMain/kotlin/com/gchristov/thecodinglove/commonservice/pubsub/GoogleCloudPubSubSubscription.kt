@@ -10,6 +10,7 @@ import kotlin.js.json
 internal class GoogleCloudPubSubSubscription(
     private val log: Logger,
     private val pubSub: GoogleCloudPubSubExternals.PubSub,
+    private val pubSubDomain: String,
 ) : PubSubSubscription {
     init {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = "local-credentials-pubsub.json"
@@ -30,7 +31,7 @@ internal class GoogleCloudPubSubSubscription(
             log.d("Creating PubSub subscription $subscription")
             pubSubSubscription.create(
                 // TODO: Fix this to use a env variable for the website
-                json("pushEndpoint" to "https://codinglove.serveo.net${httpPath}")
+                json("pushEndpoint" to "$pubSubDomain/$httpPath")
             ).await()
         }
         Either.Right(Unit)

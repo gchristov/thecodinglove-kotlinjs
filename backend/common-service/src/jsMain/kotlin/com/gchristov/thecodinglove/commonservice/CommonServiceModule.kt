@@ -45,5 +45,6 @@ object CommonServiceModule : DiModule() {
     ): PubSubSubscription = GoogleCloudPubSubSubscription(
         log = log,
         pubSub = pubSub,
+        pubSubDomain = BuildKonfig.APP_PUBLIC_URL,
     )
 }
