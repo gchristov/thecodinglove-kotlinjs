@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.kmpcommonnetwork
 
+import com.gchristov.thecodinglove.kmpcommonkotlin.AppConfig
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import io.ktor.client.*
 import io.ktor.client.plugins.*
@@ -18,8 +19,13 @@ object KmpCommonNetworkModule : DiModule() {
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindSingleton { provideJsonSerializer() }
-            bindSingleton { provideHtmlClient() }
-            bindSingleton { provideJsonClient(serializer = instance()) }
+            bindSingleton { provideHtmlClient(appConfig = instance()) }
+            bindSingleton {
+                provideJsonClient(
+                    serializer = instance(),
+                    appConfig = instance(),
+                )
+            }
         }
     }
 
@@ -30,14 +36,17 @@ object KmpCommonNetworkModule : DiModule() {
         explicitNulls = false
     }
 
-    private fun provideHtmlClient() = HtmlClient(
-        provideHttpClient(BuildKonfig.APP_NETWORK_HTML_LOG_LEVEL).config {
+    private fun provideHtmlClient(appConfig: AppConfig) = HtmlClient(
+        provideHttpClient(appConfig.networkHtmlLogLevel).config {
             BrowserUserAgent()
         }
     )
 
-    private fun provideJsonClient(serializer: Json) = JsonClient(
-        provideHttpClient(BuildKonfig.APP_NETWORK_JSON_LOG_LEVEL).config {
+    private fun provideJsonClient(
+        serializer: Json,
+        appConfig: AppConfig,
+    ) = JsonClient(
+        provideHttpClient(appConfig.networkJsonLogLevel).config {
             install(ContentNegotiation) {
                 json(serializer)
             }

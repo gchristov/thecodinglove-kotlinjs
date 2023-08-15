@@ -2,8 +2,8 @@ package com.gchristov.thecodinglove.commonservice.pubsub
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservice.BuildKonfig
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
+import com.gchristov.thecodinglove.kmpcommonkotlin.AppConfig
 import com.gchristov.thecodinglove.kmpcommonkotlin.process
 import kotlinx.coroutines.await
 import kotlin.js.json
@@ -11,6 +11,7 @@ import kotlin.js.json
 internal class GoogleCloudPubSubSubscription(
     private val log: Logger,
     private val pubSub: GoogleCloudPubSubExternals.PubSub,
+    private val appConfig: AppConfig,
 ) : PubSubSubscription {
     init {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = "local-credentials-pubsub.json"
@@ -29,11 +30,11 @@ internal class GoogleCloudPubSubSubscription(
         val pubSubSubscription = pubSubTopic.subscription(subscription)
         if (!pubSubSubscription.exists().await().first()) {
             log.d("Creating PubSub subscription $subscription")
-            val trimmedDomain = BuildKonfig.APP_PUBLIC_URL.removeSuffix("/")
+            val trimmedDomain = appConfig.publicUrl
             val trimmedPath = httpPath.removePrefix("/")
             pubSubSubscription.create(
                 // TODO: Fix this to use a env variable for the website
-                json("pushEndpoint" to "$trimmedDomain$trimmedPath")
+                json("pushEndpoint" to "$trimmedDomain/$trimmedPath")
             ).await()
         }
         Either.Right(Unit)
