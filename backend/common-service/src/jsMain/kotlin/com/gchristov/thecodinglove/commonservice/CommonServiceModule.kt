@@ -8,6 +8,7 @@ import com.gchristov.thecodinglove.commonservice.pubsub.GoogleCloudPubSubSubscri
 import com.gchristov.thecodinglove.commonservicedata.http.HttpService
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
+import com.gchristov.thecodinglove.kmpcommonkotlin.AppConfig
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
@@ -26,6 +27,7 @@ object CommonServiceModule : DiModule() {
                 providePubSubSubscription(
                     log = instance(),
                     pubSub = instance(),
+                    appConfig = instance(),
                 )
             }
         }
@@ -42,8 +44,10 @@ object CommonServiceModule : DiModule() {
     private fun providePubSubSubscription(
         log: Logger,
         pubSub: GoogleCloudPubSubExternals.PubSub,
+        appConfig: AppConfig,
     ): PubSubSubscription = GoogleCloudPubSubSubscription(
         log = log,
         pubSub = pubSub,
+        appConfig = appConfig,
     )
 }
