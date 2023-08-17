@@ -83,8 +83,8 @@ object SlackDataModule : DiModule() {
         requestVerificationEnabled = BuildConfig.SLACK_REQUEST_VERIFICATION_ENABLED,
         clientId = BuildConfig.SLACK_CLIENT_ID,
         clientSecret = BuildConfig.SLACK_CLIENT_SECRET,
-        interactivityPubSubTopic = BuildConfig.SLACK_INTERACTIVITY_PUB_SUB_TOPIC,
-        slashCommandPubSubTopic = BuildConfig.SLACK_SLASH_COMMAND_PUB_SUB_TOPIC,
+        interactivityPubSubTopic = BuildConfig.SLACK_INTERACTIVITY_PUBSUB_TOPIC,
+        slashCommandPubSubTopic = BuildConfig.SLACK_SLASH_COMMAND_PUBSUB_TOPIC,
     )
 
     private fun provideSlackRepository(

@@ -71,7 +71,7 @@ object SearchDataModule : DiModule() {
 
     private fun provideSearchConfig(): SearchConfig = SearchConfig(
         postsPerPage = 4,
-        preloadPubSubTopic = BuildConfig.SEARCH_PRELOAD_PUB_SUB_TOPIC,
+        preloadPubSubTopic = BuildConfig.SEARCH_PRELOAD_PUBSUB_TOPIC,
     )
 
     private fun provideSearchWithHistoryUseCase(

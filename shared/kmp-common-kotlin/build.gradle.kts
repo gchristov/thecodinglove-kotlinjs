@@ -83,13 +83,13 @@ buildkonfig {
         )
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "SLACK_INTERACTIVITY_PUB_SUB_TOPIC",
-            value = getLocalSecret(rootProject, "SLACK_INTERACTIVITY_PUB_SUB_TOPIC")
+            name = "SLACK_INTERACTIVITY_PUBSUB_TOPIC",
+            value = getLocalSecret(rootProject, "SLACK_INTERACTIVITY_PUBSUB_TOPIC")
         )
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "SLACK_SLASH_COMMAND_PUB_SUB_TOPIC",
-            value = getLocalSecret(rootProject, "SLACK_SLASH_COMMAND_PUB_SUB_TOPIC")
+            name = "SLACK_SLASH_COMMAND_PUBSUB_TOPIC",
+            value = getLocalSecret(rootProject, "SLACK_SLASH_COMMAND_PUBSUB_TOPIC")
         )
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
@@ -113,8 +113,8 @@ buildkonfig {
         )
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "SEARCH_PRELOAD_PUB_SUB_TOPIC",
-            value = getLocalSecret(rootProject, "SEARCH_PRELOAD_PUB_SUB_TOPIC")
+            name = "SEARCH_PRELOAD_PUBSUB_TOPIC",
+            value = getLocalSecret(rootProject, "SEARCH_PRELOAD_PUBSUB_TOPIC")
         )
     }
 }
