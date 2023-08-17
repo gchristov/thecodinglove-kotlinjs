@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
@@ -25,12 +26,14 @@ class SlackSlashCommandPubSubHandler(
     private val slackRepository: SlackRepository,
     private val searchUseCase: SearchUseCase,
     pubSubSubscription: PubSubSubscription,
+    pubSubDecoder: PubSubDecoder,
     private val slackConfig: SlackConfig,
 ) : BasePubSubHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
     log = log,
     pubSubSubscription = pubSubSubscription,
+    pubSubDecoder = pubSubDecoder,
 ) {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,

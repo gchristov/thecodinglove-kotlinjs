@@ -2,12 +2,12 @@ package com.gchristov.thecodinglove.commonservice.pubsub
 
 import arrow.core.Either
 import arrow.core.flatMap
-import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservice.http.BaseHttpHandler
+import com.gchristov.thecodinglove.commonservice.BaseHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
 import com.gchristov.thecodinglove.commonservicedata.http.sendEmpty
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,9 +16,10 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 abstract class BasePubSubHandler(
     dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: Json,
+    jsonSerializer: Json,
     log: Logger,
     private val pubSubSubscription: PubSubSubscription,
+    private val pubSubDecoder: PubSubDecoder,
 ) : BaseHttpHandler(
     dispatcher,
     jsonSerializer = jsonSerializer,
@@ -44,12 +45,7 @@ abstract class BasePubSubHandler(
         request: HttpRequest,
         response: HttpResponse,
     ): Either<Throwable, Unit> {
-        return request.decodeBodyFromJson(
-            jsonSerializer = jsonSerializer,
-            strategy = GoogleCloudPubSubRequestBody.serializer(),
-        )
-            .leftIfNull { Exception("PubSub request body missing") }
-            .flatMap { it.toPubSubRequest() }
+        return pubSubDecoder.decode(request)
             .flatMap { handlePubSubRequest(it) }
             .flatMap { response.sendEmpty() }
     }

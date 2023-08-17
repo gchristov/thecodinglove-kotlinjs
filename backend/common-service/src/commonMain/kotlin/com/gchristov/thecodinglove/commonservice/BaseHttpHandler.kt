@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.commonservice.http
+package com.gchristov.thecodinglove.commonservice
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger

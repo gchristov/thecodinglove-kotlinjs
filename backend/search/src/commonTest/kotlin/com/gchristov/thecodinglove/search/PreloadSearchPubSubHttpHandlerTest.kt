@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubDecoder
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSubscription
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
@@ -94,6 +95,7 @@ class PreloadSearchPubSubHttpHandlerTest {
             log = FakeLogger,
             preloadSearchResultUseCase = preloadSearchResultUseCase,
             pubSubSubscription = FakePubSubSubscription(),
+            pubSubDecoder = FakePubSubDecoder(request),
             searchConfig = SearchConfig(
                 postsPerPage = TestSearchPostsPerPage,
                 preloadPubSubTopic = TestPreloadSearchPubSubTopic,
