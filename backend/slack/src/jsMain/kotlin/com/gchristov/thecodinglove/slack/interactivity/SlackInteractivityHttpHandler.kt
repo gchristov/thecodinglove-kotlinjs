@@ -13,7 +13,6 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackInteractivity
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
-import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubTopic
 import com.gchristov.thecodinglove.slackdata.domain.toPubSubMessage
 import com.gchristov.thecodinglove.slackdata.usecase.SlackVerifyRequestUseCase
 import io.ktor.http.*
@@ -58,7 +57,7 @@ class SlackInteractivityHttpHandler(
 
     private suspend fun publishInteractivityMessage(interactivity: ApiSlackInteractivity) = pubSubPublisher
         .publishJson(
-            topic = SlackInteractivityPubSubTopic,
+            topic = slackConfig.interactivityPubSubTopic,
             body = interactivity.toPubSubMessage(),
             jsonSerializer = jsonSerializer,
             strategy = SlackInteractivityPubSubMessage.serializer(),

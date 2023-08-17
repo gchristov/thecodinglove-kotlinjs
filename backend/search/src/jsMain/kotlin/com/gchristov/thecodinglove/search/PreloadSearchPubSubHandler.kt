@@ -9,8 +9,8 @@ import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
-import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubMessage
-import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubTopic
+import com.gchristov.thecodinglove.searchdata.domain.PreloadSearchPubSubMessage
+import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,6 +22,7 @@ class PreloadSearchPubSubHandler(
     log: Logger,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
     pubSubSubscription: PubSubSubscription,
+    private val searchConfig: SearchConfig,
 ) : BasePubSubHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
@@ -35,7 +36,7 @@ class PreloadSearchPubSubHandler(
     )
 
     override fun pubSubConfig() = PubSubHandler.PubSubConfig(
-        topic = PreloadSearchPubSubTopic,
+        topic = searchConfig.preloadPubSubTopic,
     )
 
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =

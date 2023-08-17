@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.searchdata.model
+package com.gchristov.thecodinglove.searchdata.domain
 
 sealed class SearchError(error: String? = null) : Throwable(error) {
     object Empty : SearchError("No results found")

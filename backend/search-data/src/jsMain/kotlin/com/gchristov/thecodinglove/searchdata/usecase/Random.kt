@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.searchdata.model.Post
+import com.gchristov.thecodinglove.searchdata.domain.Post
 import kotlin.math.max
 import kotlin.random.Random
 

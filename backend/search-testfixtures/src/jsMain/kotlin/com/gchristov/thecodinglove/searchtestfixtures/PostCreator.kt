@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.searchtestfixtures
 
-import com.gchristov.thecodinglove.searchdata.model.Post
+import com.gchristov.thecodinglove.searchdata.domain.Post
 
 object PostCreator {
     fun multiPageMultiPostPageSize() = 4

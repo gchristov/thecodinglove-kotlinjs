@@ -12,8 +12,8 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
+import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubMessage
-import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubTopic
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
@@ -25,6 +25,7 @@ class SlackSlashCommandPubSubHandler(
     private val slackRepository: SlackRepository,
     private val searchUseCase: SearchUseCase,
     pubSubSubscription: PubSubSubscription,
+    private val slackConfig: SlackConfig,
 ) : BasePubSubHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
@@ -38,7 +39,7 @@ class SlackSlashCommandPubSubHandler(
     )
 
     override fun pubSubConfig() = PubSubHandler.PubSubConfig(
-        topic = SlackSlashCommandPubSubTopic,
+        topic = slackConfig.slashCommandPubSubTopic,
     )
 
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =

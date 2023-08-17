@@ -3,9 +3,10 @@ package com.gchristov.thecodinglove.searchdata
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
+import com.gchristov.thecodinglove.kmpcommonkotlin.BuildConfig
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.kmpcommonnetwork.HtmlClient
-import com.gchristov.thecodinglove.searchdata.model.SearchConfig
+import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
 import com.gchristov.thecodinglove.searchdata.usecase.*
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +43,7 @@ object SearchDataModule : DiModule() {
                     searchWithHistoryUseCase = instance(),
                     pubSubPublisher = instance(),
                     jsonSerializer = instance(),
+                    searchConfig = instance(),
                 )
             }
             bindProvider {
@@ -67,7 +69,10 @@ object SearchDataModule : DiModule() {
         firebaseFirestore = firebaseFirestore
     )
 
-    private fun provideSearchConfig(): SearchConfig = SearchConfig(postsPerPage = 4)
+    private fun provideSearchConfig(): SearchConfig = SearchConfig(
+        postsPerPage = 4,
+        preloadPubSubTopic = BuildConfig.SEARCH_PRELOAD_PUB_SUB_TOPIC,
+    )
 
     private fun provideSearchWithHistoryUseCase(
         searchRepository: SearchRepository,
@@ -83,12 +88,14 @@ object SearchDataModule : DiModule() {
         searchWithHistoryUseCase: SearchWithHistoryUseCase,
         pubSubPublisher: PubSubPublisher,
         jsonSerializer: Json,
+        searchConfig: SearchConfig,
     ): SearchUseCase = RealSearchUseCase(
         dispatcher = Dispatchers.Default,
         searchRepository = searchRepository,
         searchWithHistoryUseCase = searchWithHistoryUseCase,
         pubSubPublisher = pubSubPublisher,
         jsonSerializer = jsonSerializer,
+        searchConfig = searchConfig,
     )
 
     private fun providePreloadSearchResultUseCase(

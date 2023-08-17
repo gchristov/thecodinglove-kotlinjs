@@ -6,4 +6,6 @@ data class SlackConfig(
     val requestVerificationEnabled: Boolean,
     val clientId: String,
     val clientSecret: String,
+    val interactivityPubSubTopic: String,
+    val slashCommandPubSubTopic: String,
 )

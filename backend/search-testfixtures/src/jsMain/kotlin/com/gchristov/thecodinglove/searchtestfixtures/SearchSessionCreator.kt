@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.searchtestfixtures
 
-import com.gchristov.thecodinglove.searchdata.model.Post
-import com.gchristov.thecodinglove.searchdata.model.SearchSession
+import com.gchristov.thecodinglove.searchdata.domain.Post
+import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 
 object SearchSessionCreator {
     fun searchSession(

@@ -10,8 +10,8 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackActionName
+import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
-import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubTopic
 import com.gchristov.thecodinglove.slackdata.usecase.SlackCancelSearchUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.SlackSendSearchUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.SlackShuffleSearchUseCase
@@ -27,6 +27,7 @@ class SlackInteractivityPubSubHandler(
     private val slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
     private val slackCancelSearchUseCase: SlackCancelSearchUseCase,
     pubSubSubscription: PubSubSubscription,
+    private val slackConfig: SlackConfig,
 ) : BasePubSubHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
@@ -40,7 +41,7 @@ class SlackInteractivityPubSubHandler(
     )
 
     override fun pubSubConfig() = PubSubHandler.PubSubConfig(
-        topic = SlackInteractivityPubSubTopic,
+        topic = slackConfig.interactivityPubSubTopic,
     )
 
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =

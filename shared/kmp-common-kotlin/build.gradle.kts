@@ -83,6 +83,16 @@ buildkonfig {
         )
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "SLACK_INTERACTIVITY_PUB_SUB_TOPIC",
+            value = getLocalSecret(rootProject, "SLACK_INTERACTIVITY_PUB_SUB_TOPIC")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "SLACK_SLASH_COMMAND_PUB_SUB_TOPIC",
+            value = getLocalSecret(rootProject, "SLACK_SLASH_COMMAND_PUB_SUB_TOPIC")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             name = "APP_LOG_LEVEL",
             value = getLocalSecret(rootProject, "APP_LOG_LEVEL")
         )
@@ -100,6 +110,11 @@ buildkonfig {
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             name = "APP_PUBLIC_URL",
             value = getLocalSecret(rootProject, "APP_PUBLIC_URL")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "SEARCH_PRELOAD_PUB_SUB_TOPIC",
+            value = getLocalSecret(rootProject, "SEARCH_PRELOAD_PUB_SUB_TOPIC")
         )
     }
 }

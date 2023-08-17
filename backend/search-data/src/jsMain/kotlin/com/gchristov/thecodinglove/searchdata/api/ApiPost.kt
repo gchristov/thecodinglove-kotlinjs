@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.searchdata.api
 
-import com.gchristov.thecodinglove.searchdata.model.Post
+import com.gchristov.thecodinglove.searchdata.domain.Post
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

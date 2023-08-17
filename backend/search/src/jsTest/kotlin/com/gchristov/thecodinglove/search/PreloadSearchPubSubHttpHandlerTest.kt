@@ -5,9 +5,9 @@ import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSubscription
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
-import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubMessage
-import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubTopic
-import com.gchristov.thecodinglove.searchdata.model.SearchError
+import com.gchristov.thecodinglove.searchdata.domain.PreloadSearchPubSubMessage
+import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
+import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.searchtestfixtures.FakePreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.PreloadSearchPubSubCreator
 import io.ktor.http.*
@@ -38,7 +38,7 @@ class PreloadSearchPubSubHttpHandlerTest {
         preloadSearchResultInvocationResult = Either.Left(SearchError.Empty),
     ) { handler, _, _ ->
         val config = handler.pubSubConfig()
-        assertEquals(PreloadSearchPubSubTopic, config.topic)
+        assertEquals(TestPreloadSearchPubSubTopic, config.topic)
     }
 
     @Test
@@ -94,7 +94,14 @@ class PreloadSearchPubSubHttpHandlerTest {
             log = FakeLogger,
             preloadSearchResultUseCase = preloadSearchResultUseCase,
             pubSubSubscription = FakePubSubSubscription(),
+            searchConfig = SearchConfig(
+                postsPerPage = TestSearchPostsPerPage,
+                preloadPubSubTopic = TestPreloadSearchPubSubTopic,
+            ),
         )
         testBlock(handler, preloadSearchResultUseCase, request)
     }
 }
+
+private const val TestSearchPostsPerPage = 4
+private const val TestPreloadSearchPubSubTopic = "topic_123"
