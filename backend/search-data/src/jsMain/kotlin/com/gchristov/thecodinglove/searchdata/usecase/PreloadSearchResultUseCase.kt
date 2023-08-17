@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.searchdata.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import com.gchristov.thecodinglove.searchdata.SearchRepository
-import com.gchristov.thecodinglove.searchdata.model.SearchError
-import com.gchristov.thecodinglove.searchdata.model.SearchSession
+import com.gchristov.thecodinglove.searchdata.domain.SearchError
+import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 

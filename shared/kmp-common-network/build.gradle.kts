@@ -1,11 +1,7 @@
 import com.gchristov.thecodinglove.gradleplugins.Deps
-import com.gchristov.thecodinglove.gradleplugins.getLocalSecret
-
-val packageId = "com.gchristov.thecodinglove.kmpcommonnetwork"
 
 plugins {
     id("kmp-module-plugin")
-    id("build-config-plugin")
 }
 
 kotlin {
@@ -19,21 +15,5 @@ kotlin {
                 implementation(Deps.Ktor.logback)
             }
         }
-    }
-}
-
-buildkonfig {
-    packageName = packageId
-    defaultConfigs {
-        buildConfigField(
-            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "APP_NETWORK_HTML_LOG_LEVEL",
-            value = getLocalSecret(rootProject, "APP_NETWORK_HTML_LOG_LEVEL")
-        )
-        buildConfigField(
-            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "APP_NETWORK_JSON_LOG_LEVEL",
-            value = getLocalSecret(rootProject, "APP_NETWORK_JSON_LOG_LEVEL")
-        )
     }
 }

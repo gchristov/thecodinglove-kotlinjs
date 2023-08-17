@@ -39,6 +39,7 @@ object SlackModule : DiModule() {
                     slackRepository = instance(),
                     searchUseCase = instance(),
                     pubSubSubscription = instance(),
+                    slackConfig = instance(),
                 )
             }
             bindSingleton {
@@ -58,6 +59,7 @@ object SlackModule : DiModule() {
                     slackShuffleSearchUseCase = instance(),
                     slackCancelSearchUseCase = instance(),
                     pubSubSubscription = instance(),
+                    slackConfig = instance(),
                 )
             }
             bindSingleton {
@@ -101,6 +103,7 @@ object SlackModule : DiModule() {
         slackRepository: SlackRepository,
         searchUseCase: SearchUseCase,
         pubSubSubscription: PubSubSubscription,
+        slackConfig: SlackConfig,
     ): SlackSlashCommandPubSubHandler = SlackSlashCommandPubSubHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
@@ -108,6 +111,7 @@ object SlackModule : DiModule() {
         slackRepository = slackRepository,
         searchUseCase = searchUseCase,
         pubSubSubscription = pubSubSubscription,
+        slackConfig = slackConfig,
     )
 
     private fun provideSlackInteractivityHttpHandler(
@@ -132,6 +136,7 @@ object SlackModule : DiModule() {
         slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
         slackCancelSearchUseCase: SlackCancelSearchUseCase,
         pubSubSubscription: PubSubSubscription,
+        slackConfig: SlackConfig,
     ): SlackInteractivityPubSubHandler = SlackInteractivityPubSubHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
@@ -140,6 +145,7 @@ object SlackModule : DiModule() {
         slackShuffleSearchUseCase = slackShuffleSearchUseCase,
         slackCancelSearchUseCase = slackCancelSearchUseCase,
         pubSubSubscription = pubSubSubscription,
+        slackConfig = slackConfig,
     )
 
     private fun provideSlackAuthHttpHandler(

@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.searchdata.db
 
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
-import com.gchristov.thecodinglove.searchdata.model.SearchSession
+import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor

@@ -1,5 +1,6 @@
 import com.gchristov.thecodinglove.gradleplugins.Deps
-import com.gchristov.thecodinglove.gradleplugins.getLocalSecret
+import java.io.FileInputStream
+import java.util.*
 
 val packageId = "com.gchristov.thecodinglove.kmpcommonkotlin"
 
@@ -28,11 +29,103 @@ kotlin {
 
 buildkonfig {
     packageName = packageId
+    exposeObjectWithName = "BuildConfig"
     defaultConfigs {
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "FIREBASE_API_KEY",
+            value = getLocalSecret(rootProject, "FIREBASE_API_KEY")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "FIREBASE_AUTH_DOMAIN",
+            value = getLocalSecret(rootProject, "FIREBASE_AUTH_DOMAIN")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "FIREBASE_PROJECT_ID",
+            value = getLocalSecret(rootProject, "FIREBASE_PROJECT_ID")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "FIREBASE_STORAGE_BUCKET",
+            value = getLocalSecret(rootProject, "FIREBASE_STORAGE_BUCKET")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "FIREBASE_GCM_SENDER_ID",
+            value = getLocalSecret(rootProject, "FIREBASE_GCM_SENDER_ID")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "FIREBASE_APPLICATION_ID",
+            value = getLocalSecret(rootProject, "FIREBASE_APPLICATION_ID")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "SLACK_SIGNING_SECRET",
+            value = getLocalSecret(rootProject, "SLACK_SIGNING_SECRET")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN,
+            name = "SLACK_REQUEST_VERIFICATION_ENABLED",
+            value = getLocalSecret(rootProject, "SLACK_REQUEST_VERIFICATION_ENABLED")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "SLACK_CLIENT_ID",
+            value = getLocalSecret(rootProject, "SLACK_CLIENT_ID")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "SLACK_CLIENT_SECRET",
+            value = getLocalSecret(rootProject, "SLACK_CLIENT_SECRET")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "SLACK_INTERACTIVITY_PUBSUB_TOPIC",
+            value = getLocalSecret(rootProject, "SLACK_INTERACTIVITY_PUBSUB_TOPIC")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "SLACK_SLASH_COMMAND_PUBSUB_TOPIC",
+            value = getLocalSecret(rootProject, "SLACK_SLASH_COMMAND_PUBSUB_TOPIC")
+        )
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             name = "APP_LOG_LEVEL",
             value = getLocalSecret(rootProject, "APP_LOG_LEVEL")
         )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "APP_NETWORK_HTML_LOG_LEVEL",
+            value = getLocalSecret(rootProject, "APP_NETWORK_HTML_LOG_LEVEL")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "APP_NETWORK_JSON_LOG_LEVEL",
+            value = getLocalSecret(rootProject, "APP_NETWORK_JSON_LOG_LEVEL")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "APP_PUBLIC_URL",
+            value = getLocalSecret(rootProject, "APP_PUBLIC_URL")
+        )
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "SEARCH_PRELOAD_PUBSUB_TOPIC",
+            value = getLocalSecret(rootProject, "SEARCH_PRELOAD_PUBSUB_TOPIC")
+        )
     }
+}
+
+@Suppress("unused")
+fun getLocalSecret(
+    rootProject: Project,
+    key: String
+): String {
+    val propFile = rootProject.file("./local.properties")
+    val properties = Properties()
+    properties.load(FileInputStream(propFile))
+    return properties.getProperty(key)
 }

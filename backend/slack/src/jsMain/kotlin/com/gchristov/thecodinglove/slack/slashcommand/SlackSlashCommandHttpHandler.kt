@@ -13,7 +13,6 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackSlashCommand
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubMessage
-import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubTopic
 import com.gchristov.thecodinglove.slackdata.domain.toPubSubMessage
 import com.gchristov.thecodinglove.slackdata.usecase.SlackVerifyRequestUseCase
 import io.ktor.http.*
@@ -58,7 +57,7 @@ class SlackSlashCommandHttpHandler(
 
     private suspend fun publishSlashCommandMessage(slashCommand: ApiSlackSlashCommand) = pubSubPublisher
         .publishJson(
-            topic = SlackSlashCommandPubSubTopic,
+            topic = slackConfig.slashCommandPubSubTopic,
             body = slashCommand.toPubSubMessage(),
             jsonSerializer = jsonSerializer,
             strategy = SlackSlashCommandPubSubMessage.serializer(),

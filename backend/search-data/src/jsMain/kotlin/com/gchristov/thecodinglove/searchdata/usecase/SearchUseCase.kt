@@ -5,7 +5,7 @@ import arrow.core.flatMap
 import com.benasher44.uuid.uuid4
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.searchdata.SearchRepository
-import com.gchristov.thecodinglove.searchdata.model.*
+import com.gchristov.thecodinglove.searchdata.domain.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -32,16 +32,19 @@ class RealSearchUseCase(
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
     private val pubSubPublisher: PubSubPublisher,
     private val jsonSerializer: Json,
+    private val searchConfig: SearchConfig,
 ) : SearchUseCase {
     override suspend operator fun invoke(
         type: SearchUseCase.Type
     ): Either<SearchError, SearchUseCase.Result> = withContext(dispatcher) {
         search(type)
             .flatMap { searchResult ->
-                publishSearchPreloadMessage(searchResult.searchSessionId)
-                    .flatMap {
-                        Either.Right(searchResult)
-                    }
+                publishSearchPreloadMessage(
+                    searchSessionId = searchResult.searchSessionId,
+                    searchConfig = searchConfig,
+                ).flatMap {
+                    Either.Right(searchResult)
+                }
             }
     }
 
@@ -106,9 +109,12 @@ class RealSearchUseCase(
             }
         }
 
-    private suspend fun publishSearchPreloadMessage(searchSessionId: String) = pubSubPublisher
+    private suspend fun publishSearchPreloadMessage(
+        searchSessionId: String,
+        searchConfig: SearchConfig,
+    ) = pubSubPublisher
         .publishJson(
-            topic = PreloadSearchPubSubTopic,
+            topic = searchConfig.preloadPubSubTopic,
             body = PreloadSearchPubSubMessage(searchSessionId),
             jsonSerializer = jsonSerializer,
             strategy = PreloadSearchPubSubMessage.serializer(),

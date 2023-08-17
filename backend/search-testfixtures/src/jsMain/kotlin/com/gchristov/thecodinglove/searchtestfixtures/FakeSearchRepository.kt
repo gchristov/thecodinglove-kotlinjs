@@ -4,9 +4,9 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.kmpcommontest.FakeResponse
 import com.gchristov.thecodinglove.kmpcommontest.execute
 import com.gchristov.thecodinglove.searchdata.SearchRepository
-import com.gchristov.thecodinglove.searchdata.model.Post
-import com.gchristov.thecodinglove.searchdata.model.SearchError
-import com.gchristov.thecodinglove.searchdata.model.SearchSession
+import com.gchristov.thecodinglove.searchdata.domain.Post
+import com.gchristov.thecodinglove.searchdata.domain.SearchError
+import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

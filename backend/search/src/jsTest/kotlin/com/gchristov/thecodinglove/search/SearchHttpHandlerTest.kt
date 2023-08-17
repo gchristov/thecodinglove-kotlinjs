@@ -4,7 +4,7 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakeHttpResponse
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
-import com.gchristov.thecodinglove.searchdata.model.SearchError
+import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchHttpRequest
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchUseCase

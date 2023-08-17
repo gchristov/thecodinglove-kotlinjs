@@ -3,10 +3,10 @@ package com.gchristov.thecodinglove.searchdata.usecase
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubPublisher
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubMessage
-import com.gchristov.thecodinglove.searchdata.model.PreloadSearchPubSubTopic
-import com.gchristov.thecodinglove.searchdata.model.SearchError
-import com.gchristov.thecodinglove.searchdata.model.SearchSession
+import com.gchristov.thecodinglove.searchdata.domain.PreloadSearchPubSubMessage
+import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
+import com.gchristov.thecodinglove.searchdata.domain.SearchError
+import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import com.gchristov.thecodinglove.searchtestfixtures.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
@@ -98,7 +98,7 @@ class RealSearchUseCaseTest {
                 actual = actualResult
             )
             pubSub.assertEquals(
-                topic = PreloadSearchPubSubTopic,
+                topic = TestPreloadSearchPubSubTopic,
                 message = PreloadSearchPubSubMessage(TestSearchSessionId),
             )
         }
@@ -195,7 +195,7 @@ class RealSearchUseCaseTest {
                 )
             )
             pubSub.assertEquals(
-                topic = PreloadSearchPubSubTopic,
+                topic = TestPreloadSearchPubSubTopic,
                 message = PreloadSearchPubSubMessage(TestSearchSessionId),
             )
         }
@@ -221,6 +221,10 @@ class RealSearchUseCaseTest {
             searchWithHistoryUseCase = searchWithHistoryUseCase,
             jsonSerializer = Json,
             pubSubPublisher = pubSubPublisher,
+            searchConfig = SearchConfig(
+                postsPerPage = TestSearchPostsPerPage,
+                preloadPubSubTopic = TestPreloadSearchPubSubTopic,
+            )
         )
         testBlock(useCase, pubSubPublisher, searchRepository, searchWithHistoryUseCase)
     }
@@ -228,3 +232,5 @@ class RealSearchUseCaseTest {
 
 private const val TestSearchQuery = "test"
 private const val TestSearchSessionId = "session_123"
+private const val TestSearchPostsPerPage = 4
+private const val TestPreloadSearchPubSubTopic = "topic_123"

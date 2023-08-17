@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.searchdata.model
+package com.gchristov.thecodinglove.searchdata.domain
 
 import com.gchristov.thecodinglove.htmlparsedata.HtmlPost
 import com.gchristov.thecodinglove.searchdata.db.DbPost

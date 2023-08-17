@@ -132,6 +132,8 @@ class RealVerifySlackRequestUseCaseTest {
                     requestVerificationEnabled = true,
                     clientId = TestClientId,
                     clientSecret = TestClientSecret,
+                    interactivityPubSubTopic = TestInteractivityPubSubTopic,
+                    slashCommandPubSubTopic = TestSlashCommandPubSubTopic,
                 ),
                 clock = TestClock,
                 log = FakeLogger
@@ -147,3 +149,5 @@ private const val TestClientSecret = "client_secret_1"
 private val TestClock = object : Clock {
     override fun now(): Instant = Instant.fromEpochMilliseconds(1675611196847)
 }
+private const val TestInteractivityPubSubTopic = "topic_123"
+private const val TestSlashCommandPubSubTopic = "topic_456"
