@@ -5,11 +5,7 @@ import com.gchristov.thecodinglove.kmpcommonkotlin.requireModule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-interface ParseHtmlTotalPostsUseCase {
-    suspend operator fun invoke(html: String): Either<Throwable, Int>
-}
-
-internal class RealParseHtmlTotalPostsUseCase(
+internal class JavascriptParseHtmlTotalPostsUseCase(
     private val dispatcher: CoroutineDispatcher,
 ) : ParseHtmlTotalPostsUseCase {
     override suspend fun invoke(html: String): Either<Throwable, Int> = withContext(dispatcher) {

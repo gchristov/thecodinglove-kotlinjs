@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealParseHtmlTotalPostsUseCaseTest {
+class JavascriptParseHtmlTotalPostsUseCaseTest {
     @Test
     fun parseTotalPosts() = runBlockingTest { parser ->
         val actualCount = parser(HtmlCreator.defaultHtml())
@@ -28,7 +28,7 @@ class RealParseHtmlTotalPostsUseCaseTest {
 
     private fun runBlockingTest(testBlock: suspend (ParseHtmlTotalPostsUseCase) -> Unit) =
         runTest {
-            val parser = RealParseHtmlTotalPostsUseCase(
+            val parser = JavascriptParseHtmlTotalPostsUseCase(
                 dispatcher = FakeCoroutineDispatcher
             )
             testBlock(parser)

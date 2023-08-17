@@ -10,7 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealParseHtmlPostsUseCaseTest {
+class JavascriptParseHtmlPostsUseCaseTest {
     @Test
     fun parsePosts() = runBlockingTest { parser ->
         val actualPosts = parser(HtmlCreator.defaultHtml())
@@ -31,7 +31,7 @@ class RealParseHtmlPostsUseCaseTest {
 
     private fun runBlockingTest(testBlock: suspend (ParseHtmlPostsUseCase) -> Unit) =
         runTest {
-            val parser = RealParseHtmlPostsUseCase(
+            val parser = JavascriptParseHtmlPostsUseCase(
                 dispatcher = FakeCoroutineDispatcher
             )
             testBlock(parser)
