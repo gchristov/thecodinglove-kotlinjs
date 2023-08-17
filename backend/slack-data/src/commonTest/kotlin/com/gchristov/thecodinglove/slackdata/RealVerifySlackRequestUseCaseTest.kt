@@ -93,7 +93,8 @@ class RealVerifySlackRequestUseCaseTest {
         return runBlockingTest { useCase ->
             val actualResult = useCase.invoke(
                 FakeSlackApiRequest(
-                    fakeTimestamp = TestClock.now().toEpochMilliseconds().toString(),
+                    fakeTimestamp = TestClock.now().toEpochMilliseconds()
+                        .toString(),
                     fakeSignature = "v0=afd7e1dbff43bfdd7860f4da361f593eff602833c931adc9ac02fa6b16d3c5e2",
                     fakeRawBody = "Test body 2"
                 )
@@ -110,7 +111,8 @@ class RealVerifySlackRequestUseCaseTest {
         return runBlockingTest { useCase ->
             val actualResult = useCase.invoke(
                 FakeSlackApiRequest(
-                    fakeTimestamp = TestClock.now().toEpochMilliseconds().toString(),
+                    fakeTimestamp = TestClock.now().toEpochMilliseconds()
+                        .toString(),
                     fakeSignature = "v0=afd7e1dbff43bfdd7860f4da361f593eff602833c931adc9ac02fa6b16d3c5e2",
                     fakeRawBody = "Test body"
                 )
