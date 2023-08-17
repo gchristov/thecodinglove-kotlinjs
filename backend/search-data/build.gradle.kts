@@ -4,14 +4,14 @@ plugins {
 
 kotlin {
     sourceSets {
-        val jsMain by getting {
+        val commonMain by getting {
             dependencies {
                 implementation(projects.kmpCommonFirebase)
                 implementation(projects.commonServiceData)
                 implementation(projects.htmlParseData)
             }
         }
-        val jsTest by getting {
+        val commonTest by getting {
             dependencies {
                 implementation(projects.commonServiceTestfixtures)
                 implementation(projects.searchTestfixtures)
