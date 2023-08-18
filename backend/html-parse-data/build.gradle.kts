@@ -4,7 +4,7 @@ plugins {
 
 kotlin {
     sourceSets {
-        val jsTest by getting {
+        val commonTest by getting {
             dependencies {
                 implementation(projects.htmlParseTestfixtures)
             }

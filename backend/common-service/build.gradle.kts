@@ -4,7 +4,7 @@ plugins {
 
 kotlin {
     sourceSets {
-        val jsMain by getting {
+        val commonMain by getting {
             dependencies {
                 api(projects.commonServiceData)
             }
