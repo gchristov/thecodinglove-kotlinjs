@@ -28,10 +28,24 @@ The project is configured to be deployed and run on Google Cloud.
     - `Cloud Run Admin`
 3. Create a second Service Account with these permissions for PubSub
     - `Pub/Sub Admin`
-4. Create `local.properties` file with the following contents
-    - WIP
-5. Create `local-credentials-pubsub.json` file with the following contents
-    - WIP
+4. Create a `local.properties` file with the following contents
+```
+GCP_PROJECT_ID=
+GCP_FIREBASE_API_KEY=
+GCP_FIREBASE_APPLICATION_ID=
+SLACK_SIGNING_SECRET=
+SLACK_REQUEST_VERIFICATION_ENABLED=
+SLACK_CLIENT_ID=
+SLACK_CLIENT_SECRET=
+SLACK_INTERACTIVITY_PUBSUB_TOPIC=
+SLACK_SLASH_COMMAND_PUBSUB_TOPIC=
+APP_LOG_LEVEL=
+APP_NETWORK_HTML_LOG_LEVEL=
+APP_NETWORK_JSON_LOG_LEVEL=
+APP_PUBLIC_URL=
+SEARCH_PRELOAD_PUBSUB_TOPIC=
+```
+5. Create a `local-credentials-pubsub.json` file with the contents of the JSON API key for the PubSub service account.
 
 # Run
 

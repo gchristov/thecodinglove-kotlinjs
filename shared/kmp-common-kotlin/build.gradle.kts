@@ -33,33 +33,18 @@ buildkonfig {
     defaultConfigs {
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "FIREBASE_API_KEY",
-            value = getLocalSecret(rootProject, "FIREBASE_API_KEY")
+            name = "GCP_PROJECT_ID",
+            value = getLocalSecret(rootProject, "GCP_PROJECT_ID")
         )
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "FIREBASE_AUTH_DOMAIN",
-            value = getLocalSecret(rootProject, "FIREBASE_AUTH_DOMAIN")
+            name = "GCP_FIREBASE_API_KEY",
+            value = getLocalSecret(rootProject, "GCP_FIREBASE_API_KEY")
         )
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "FIREBASE_PROJECT_ID",
-            value = getLocalSecret(rootProject, "FIREBASE_PROJECT_ID")
-        )
-        buildConfigField(
-            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "FIREBASE_STORAGE_BUCKET",
-            value = getLocalSecret(rootProject, "FIREBASE_STORAGE_BUCKET")
-        )
-        buildConfigField(
-            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "FIREBASE_GCM_SENDER_ID",
-            value = getLocalSecret(rootProject, "FIREBASE_GCM_SENDER_ID")
-        )
-        buildConfigField(
-            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "FIREBASE_APPLICATION_ID",
-            value = getLocalSecret(rootProject, "FIREBASE_APPLICATION_ID")
+            name = "GCP_FIREBASE_APPLICATION_ID",
+            value = getLocalSecret(rootProject, "GCP_FIREBASE_APPLICATION_ID")
         )
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,

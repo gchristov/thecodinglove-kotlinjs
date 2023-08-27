@@ -23,12 +23,9 @@ object KmpCommonFirebaseModule : DiModule() {
     }
 
     private fun provideFirebaseOptions(): FirebaseOptions = FirebaseOptions(
-        apiKey = BuildConfig.FIREBASE_API_KEY,
-        authDomain = BuildConfig.FIREBASE_AUTH_DOMAIN,
-        projectId = BuildConfig.FIREBASE_PROJECT_ID,
-        storageBucket = BuildConfig.FIREBASE_STORAGE_BUCKET,
-        gcmSenderId = BuildConfig.FIREBASE_GCM_SENDER_ID,
-        applicationId = BuildConfig.FIREBASE_APPLICATION_ID
+        applicationId = BuildConfig.GCP_FIREBASE_APPLICATION_ID,
+        apiKey = BuildConfig.GCP_FIREBASE_API_KEY,
+        projectId = BuildConfig.GCP_PROJECT_ID,
     )
 
     private fun provideFirestore(app: FirebaseApp): FirebaseFirestore = Firebase.firestore(app)
