@@ -19,20 +19,26 @@
 
 The project is configured to be deployed and run on Google Cloud.
 1. Create a Google Cloud project and enable the following APIs
-    - `Cloud Run Admin API`, used to run the final Docker container
+    - `Cloud Run API`, used to run the final Docker container
     - `Artifact Registry API`, used to store the final Docker container
-    - `Cloud Pub/Sub API`
+    - `Cloud Pub/Sub API`, used for communication between services
+    - `Cloud Firestore API`, used for data storage
 2. Create Service Account with these permissions for CI deployment
     - `Service Account User`
-    - `Artifact Registry Admin`
+    - `Artifact Registry Administrator`
     - `Cloud Run Admin`
 3. Create a second Service Account with these permissions for PubSub
     - `Pub/Sub Admin`
-4. Create a `local.properties` file with the following contents
+4. Setup Firestore
+   - Create a Firestore database in Google Cloud
+   - Navigate to your new Firestore database -> Security rules
+   - Click `Enable Firebase` to allow editing of the rules. This will add two service accounts to your project:
+     - `firebase-adminsdk-5-ramdom-chars@projectname.iam.gserviceaccount.com` - provides credentials for the Firebase Admin SDK
+     - `firebase-service-account@firebase-sa-management.iam.gserviceaccount.com` - manages and links Firebase services to Google Cloud projects
+   - Navigate to your project in Firebase -> Firebase Database -> Rules and allow reads and writes 
+5. Create a `local.properties` file with the following contents
 ```
 GCP_PROJECT_ID=
-GCP_FIREBASE_API_KEY=
-GCP_FIREBASE_APPLICATION_ID=
 SLACK_SIGNING_SECRET=
 SLACK_REQUEST_VERIFICATION_ENABLED=
 SLACK_CLIENT_ID=
@@ -45,7 +51,7 @@ APP_NETWORK_JSON_LOG_LEVEL=
 APP_PUBLIC_URL=
 SEARCH_PRELOAD_PUBSUB_TOPIC=
 ```
-5. Create a `local-credentials-pubsub.json` file with the contents of the JSON API key for the PubSub service account.
+6. Create a `local-credentials-pubsub.json` file with the contents of the JSON API key for the PubSub service account.
 
 # Run
 

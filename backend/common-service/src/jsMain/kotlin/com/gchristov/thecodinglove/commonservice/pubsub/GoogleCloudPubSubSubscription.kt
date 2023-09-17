@@ -33,7 +33,7 @@ internal class GoogleCloudPubSubSubscription(
             val trimmedDomain = appConfig.publicUrl
             val trimmedPath = httpPath.removePrefix("/")
             pubSubSubscription.create(
-                // TODO: Fix this to use a env variable for the website
+                // TODO: Set a decent retry mechanism for when there's a pubsub delivery failure
                 json("pushEndpoint" to "$trimmedDomain/$trimmedPath")
             ).await()
         }

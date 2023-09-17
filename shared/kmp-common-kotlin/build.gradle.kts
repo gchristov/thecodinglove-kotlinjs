@@ -38,16 +38,6 @@ buildkonfig {
         )
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "GCP_FIREBASE_API_KEY",
-            value = getLocalSecret(rootProject, "GCP_FIREBASE_API_KEY")
-        )
-        buildConfigField(
-            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "GCP_FIREBASE_APPLICATION_ID",
-            value = getLocalSecret(rootProject, "GCP_FIREBASE_APPLICATION_ID")
-        )
-        buildConfigField(
-            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             name = "SLACK_SIGNING_SECRET",
             value = getLocalSecret(rootProject, "SLACK_SIGNING_SECRET")
         )
