@@ -9,6 +9,7 @@
 # Setup
 
 ## Slack
+
 This project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN). You can [follow steps here](https://api.slack.com/start/quickstart) to create one. Once you have the Slack app, you can use [Slack App Manifest](https://api.slack.com/reference/manifests) to setup the required bits:
   - [Slash commands](https://api.slack.com/slash-commands)
   - [OAuth](https://api.slack.com/authentication/oauth-v2)
@@ -54,7 +55,7 @@ The project is configured to be deployed and run on Google Cloud.
       }
    }
    ```
-5. Create a `local.properties` file with the following contents
+5. Create a `local.properties` file at the root of the project with the following contents
 ```
 GCP_PROJECT_ID=YOUR_GCP_PROJECT_ID
 SLACK_SIGNING_SECRET=YOUR_SLACK_SIGNING_SECRET
@@ -69,10 +70,18 @@ APP_NETWORK_JSON_LOG_LEVEL=all|info|none
 APP_PUBLIC_URL=YOUR_PUBLIC_APP_URL
 SEARCH_PRELOAD_PUBSUB_TOPIC=TOPIC_NAME
 ```
-6. Create a `local-credentials-pubsub.json` file with the contents of the JSON API key for the PubSub service account.
+6. Create a `local-credentials-pubsub.json` file at the root of the project with the contents of the JSON API key for the PubSub service account.
+7. Expose each of the variables from `local.properties` as [GitHub encrypted secrets](https://docs.github.com/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets). 
+   - Add an additional `GCP_SA_KEY_DEPLOY` GitHub encrypted secret, containing the JSON API key for the CI service account
+   - Add an additional `GCP_SA_KEY_PUBSUB` GitHub encrypted secret, containing the JSON API key for the PubSub service account
 
 # Run
 
 There are two ways to run the app locally
 - run the `TheCodingLove` IntelliJ IDE configuration
 - run the `scripts/run_local.sh` script from a Terminal
+
+# Deploy
+
+- Opening pull requests against the repo triggers build and test checks.
+- Merging pull requests to the main branch deploys the changes to Google Cloud.
