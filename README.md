@@ -21,7 +21,7 @@ This project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN). Y
 1. [Install Docker](https://docs.docker.com/get-started/) and start it up. No additional configuration is required as the project sets up its own image and cleans up the containers after each run
 2. [Install IntelliJ](https://www.jetbrains.com/help/idea/installation-guide.html). This project has been tested with `IntelliJ IDEA 2023.2.2`
 3. Clone the repository and open the project with IntelliJ
-4. Configure [serveo.net](http://serveo.net) for local development - `ssh -R codinglove.serveo.net:80:localhost:3000 serveo.net`. This is useful when you want your app to be accessible globally via a tunnel, which is great for for developing Slack apps.
+4. Configure [serveo.net](http://serveo.net) for local development - `ssh -R YOUR_DOMAIN.serveo.net:80:localhost:3000 serveo.net`. This is useful when you want your app to be accessible globally via a tunnel, which is great for for developing Slack apps.
 
 ## Environment
 
@@ -74,6 +74,10 @@ SEARCH_PRELOAD_PUBSUB_TOPIC=TOPIC_NAME
 7. Expose each of the variables from `local.properties` as [GitHub encrypted secrets](https://docs.github.com/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets). 
    - Add an additional `GCP_SA_KEY_DEPLOY` GitHub encrypted secret, containing the JSON API key for the CI service account
    - Add an additional `GCP_SA_KEY_PUBSUB` GitHub encrypted secret, containing the JSON API key for the PubSub service account
+
+## Dependencies
+
+Dependencies are automatically pulled when the project is ran. Updating dependency versions requires `./gradlew kotlinUpgradeYarnLock` to be executed manually in order for the lock file to be updated.
 
 # Run
 
