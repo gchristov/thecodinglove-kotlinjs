@@ -8,12 +8,19 @@
 
 # Setup
 
+## Slack
+This project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN). You can [follow steps here](https://api.slack.com/start/quickstart) to create one. Once you have the Slack app, you can use [Slack App Manifest](https://api.slack.com/reference/manifests) to setup the required bits:
+  - [Slash commands](https://api.slack.com/slash-commands)
+  - [OAuth](https://api.slack.com/authentication/oauth-v2)
+  - [Events](http://api.slack.com/events-api)
+  - [Interactivity](https://api.slack.com/messaging/interactivity)
+
 ## Project
 
-1. [Install Docker](https://docs.docker.com/get-started/) and start it up. No additional configuration is required as the app sets up its own image and cleans up the containers after each run
-2. [Install IntelliJ](https://www.jetbrains.com/help/idea/installation-guide.html)
+1. [Install Docker](https://docs.docker.com/get-started/) and start it up. No additional configuration is required as the project sets up its own image and cleans up the containers after each run
+2. [Install IntelliJ](https://www.jetbrains.com/help/idea/installation-guide.html). This project has been tested with `IntelliJ IDEA 2023.2.2`
 3. Clone the repository and open the project with IntelliJ
-4. Configure [serveo.net](http://serveo.net) for local development - `ssh -R codinglove.serveo.net:80:localhost:3000 serveo.net`. This is useful when you want your app to be accessible globally via a tunnel, eg for developing Slack apps in this case.
+4. Configure [serveo.net](http://serveo.net) for local development - `ssh -R codinglove.serveo.net:80:localhost:3000 serveo.net`. This is useful when you want your app to be accessible globally via a tunnel, which is great for for developing Slack apps.
 
 ## Environment
 
@@ -39,11 +46,12 @@ The project is configured to be deployed and run on Google Cloud.
    ```
    rules_version = '2';
    service cloud.firestore {
-     match /databases/{database}/documents {
-       match /{document=**} {
-         allow read, write: if request.auth != null;
-       }
-     }
+      match /databases/{database}/documents {
+         match /{document=**} {
+            // TODO: Make this secure, as this allows reads/writes from anywhere
+            allow read, write: if true;
+         }
+      }
    }
    ```
 5. Create a `local.properties` file with the following contents
