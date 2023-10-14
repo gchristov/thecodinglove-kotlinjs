@@ -23,7 +23,7 @@ import kotlinx.serialization.json.Json
 class SlackInteractivityPubSubHandler(
     dispatcher: CoroutineDispatcher,
     private val jsonSerializer: Json,
-    log: Logger,
+    private val log: Logger,
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
     private val slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
     private val slackCancelSearchUseCase: SlackCancelSearchUseCase,
@@ -59,6 +59,19 @@ class SlackInteractivityPubSubHandler(
                         (it.payload as SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage).handle()
                 }
             }
+            .fold(
+                ifLeft = {
+                    when {
+                        // If the Slack response url has expired we can't really do much else, so we ACK it
+                        it.message?.contains("used_url") == true -> {
+                            log.w(it) { "Ignoring PubSub error for expired Slack url" }
+                            Either.Right(Unit)
+                        }
+
+                        else -> Either.Left(it)
+                    }
+                }, ifRight = { Either.Right(Unit) }
+            )
 
     private suspend fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.handle(): Either<Throwable, Unit> {
         val sendAction = sendAction()

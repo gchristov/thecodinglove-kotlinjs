@@ -23,12 +23,11 @@ object KmpCommonFirebaseModule : DiModule() {
     }
 
     private fun provideFirebaseOptions(): FirebaseOptions = FirebaseOptions(
-        apiKey = BuildConfig.FIREBASE_API_KEY,
-        authDomain = BuildConfig.FIREBASE_AUTH_DOMAIN,
-        projectId = BuildConfig.FIREBASE_PROJECT_ID,
-        storageBucket = BuildConfig.FIREBASE_STORAGE_BUCKET,
-        gcmSenderId = BuildConfig.FIREBASE_GCM_SENDER_ID,
-        applicationId = BuildConfig.FIREBASE_APPLICATION_ID
+        // For this project, we're using Google's Default Credentials using GOOGLE_APPLICATION_CREDENTIALS, so there is
+        // no need to set additional Firebase authentication credentials here. However, projectId is still needed.
+        applicationId = "",
+        apiKey = "",
+        projectId = BuildConfig.GCP_PROJECT_ID,
     )
 
     private fun provideFirestore(app: FirebaseApp): FirebaseFirestore = Firebase.firestore(app)

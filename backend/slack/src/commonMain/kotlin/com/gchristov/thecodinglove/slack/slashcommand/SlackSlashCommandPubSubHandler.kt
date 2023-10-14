@@ -22,7 +22,7 @@ import kotlinx.serialization.json.Json
 class SlackSlashCommandPubSubHandler(
     dispatcher: CoroutineDispatcher,
     private val jsonSerializer: Json,
-    log: Logger,
+    private val log: Logger,
     private val slackRepository: SlackRepository,
     private val searchUseCase: SearchUseCase,
     pubSubSubscription: PubSubSubscription,
@@ -52,6 +52,19 @@ class SlackSlashCommandPubSubHandler(
         )
             .leftIfNull { Exception("PubSub request body missing") }
             .flatMap { it.handle() }
+            .fold(
+                ifLeft = {
+                    when {
+                        // If the Slack response url has expired we can't really do much else, so we ACK it
+                        it.message?.contains("used_url") == true -> {
+                            log.w(it) { "Ignoring PubSub error for expired Slack url" }
+                            Either.Right(Unit)
+                        }
+
+                        else -> Either.Left(it)
+                    }
+                }, ifRight = { Either.Right(Unit) }
+            )
 
     private suspend fun SlackSlashCommandPubSubMessage.handle() = slackRepository.replyWithMessage(
         responseUrl = responseUrl,
