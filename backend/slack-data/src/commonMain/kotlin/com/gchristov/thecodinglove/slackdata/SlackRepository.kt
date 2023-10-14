@@ -122,7 +122,7 @@ internal class RealSlackRepository(
             message = message
         )
         // Sending requests to Slack response URLs currently has an issue where the content type
-        // does not honor the Accept header and we get text/plain, instead of application/json
+        // does not honor the Accept header, so we get text/plain instead of application/json
         if (slackResponse.contentType()?.match(ContentType.Application.Json) == true) {
             val jsonResponse: ApiSlackReplyWithMessageResponse = slackResponse.body()
             if (jsonResponse.ok) {
