@@ -13,6 +13,7 @@ class Deps {
 
     object Google {
         const val firebaseFirestore = "dev.gitlive:firebase-firestore:1.6.2"
+        val firebaseAdmin = NpmDependency("firebase-admin", "11.11.0")
         val pubSub = NpmDependency("@google-cloud/pubsub", "3.7.1")
     }
 

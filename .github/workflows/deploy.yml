@@ -15,7 +15,7 @@ env:
   GCP_REPOSITORY_IMAGE: cloudrun-test-image
   GCP_SA_KEY_DEPLOY: ${{ secrets.GCP_SA_KEY_DEPLOY }}
   # Required for build
-  GCP_SA_KEY_PUBSUB: ${{ secrets.GCP_SA_KEY_PUBSUB }}
+  GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
   SLACK_REQUEST_VERIFICATION_ENABLED: ${{ secrets.SLACK_REQUEST_VERIFICATION_ENABLED }}
@@ -57,7 +57,7 @@ jobs:
           path: |
             build/bin
             local.properties
-            local-credentials-pubsub.json
+            local-credentials-gcp.json
       - name: Set up deploy environment
         run: |
           GCP_BUILD_TAG="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_REPOSITORY }}/${{ env.GCP_REPOSITORY_IMAGE }}"

@@ -13,7 +13,7 @@ internal class GoogleCloudPubSubPublisher(
 ) : PubSubPublisher {
 
     init {
-        process.env.GOOGLE_APPLICATION_CREDENTIALS = "local-credentials-pubsub.json"
+        process.env.GOOGLE_APPLICATION_CREDENTIALS = "local-credentials-gcp.json"
     }
 
     override suspend fun <T> publishJson(

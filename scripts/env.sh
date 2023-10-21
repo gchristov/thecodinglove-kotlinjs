@@ -1,6 +1,6 @@
 # Exports required CI environment secrets to local environment files so that the project can use them
 set -e
-echo "$GCP_SA_KEY_PUBSUB" >> ./local-credentials-pubsub.json
+echo "$GCP_SA_KEY_APP" >> ./local-credentials-gcp.json
 echo GCP_PROJECT_ID="$GCP_PROJECT_ID" >> ./local.properties
 echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./local.properties
 echo SLACK_REQUEST_VERIFICATION_ENABLED="$SLACK_REQUEST_VERIFICATION_ENABLED" >> ./local.properties

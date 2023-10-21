@@ -19,6 +19,7 @@ kotlin {
                 // not found" errors. As a workaround, all NPM dependencies will be listed here,
                 // making them available to all submodules.
                 implementation(npm(Deps.Google.pubSub.name, Deps.Google.pubSub.version))
+                implementation(npm(Deps.Google.firebaseAdmin.name, Deps.Google.firebaseAdmin.version))
                 implementation(npm(Deps.Node.htmlParser.name, Deps.Node.htmlParser.version))
                 implementation(npm(Deps.Node.express.name, Deps.Node.express.version))
                 implementation(npm(Deps.Node.jsJoda.name, Deps.Node.jsJoda.version))
@@ -35,7 +36,7 @@ tasks.named("assemble") {
             into(file("$rootDir/build/bin"))
         }
         copy {
-            from(file("$rootDir/local-credentials-pubsub.json"))
+            from(file("$rootDir/local-credentials-gcp.json"))
             into(file("$rootDir/build/bin"))
         }
     }

@@ -17,9 +17,9 @@ import com.gchristov.thecodinglove.search.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.SearchHttpHandler
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
-import com.gchristov.thecodinglove.slack.SlackModule
 import com.gchristov.thecodinglove.slack.SlackAuthHttpHandler
 import com.gchristov.thecodinglove.slack.SlackEventHttpHandler
+import com.gchristov.thecodinglove.slack.SlackModule
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler
@@ -35,6 +35,10 @@ suspend fun main() {
             error.printStackTrace()
         }, ifRight = {
             // TODO: Add start-up metrics
+            println("Trying out Firebase Admin SDK")
+            val test = FirebaseAdminTest()
+            test.init()
+            test.testFirestore()
         })
 }
 
