@@ -4,6 +4,9 @@ import kotlin.js.Date
 import kotlin.js.Promise
 import kotlin.js.json
 
+/*
+ * Inspiration taken from https://github.com/chrisnkrueger/kotlin-firebase-admin
+ */
 @JsModule("firebase-admin")
 @JsNonModule
 external object admin {
