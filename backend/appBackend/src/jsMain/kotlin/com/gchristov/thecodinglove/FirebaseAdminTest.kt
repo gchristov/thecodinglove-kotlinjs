@@ -8,6 +8,7 @@ import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
 import com.gchristov.thecodinglove.kmpcommonkotlin.process
 import kotlinx.serialization.json.Json
+import kotlin.js.json
 
 class FirebaseAdminTest {
     private var app: admin.App? = null
@@ -18,13 +19,14 @@ class FirebaseAdminTest {
     }
 
     fun testFirestore() {
-        val store = admin
+        val doc = admin
             .firestore
             .Firestore()
-        store.collection("messages")
+            .collection("messages")
             .doc("test")
-            .get()
+        doc.get()
             .then(onFulfilled = {
+                println("EXISTS: ${it.exists}")
                 println("TYPED ARGUMENT: something=${it.getValue<Int>("something")}")
                 println("RAW DOCUMENT: something=${it.data()}")
                 val jsonSerializer = DiGraph.inject<Json>()
@@ -34,11 +36,10 @@ class FirebaseAdminTest {
                     },
                     ifRight = {
                         println("PARSED DOCUMENT: $it")
+
+                        doc.update(json("something" to it!!.something + 1))
                     }
                 )
-//                store.collection("messages")
-//                    .doc("test")
-//                    .set(TestFirestoreDoc(something = doc.something + 1))
             }, onRejected = {
                 it.printStackTrace()
             })
