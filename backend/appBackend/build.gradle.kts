@@ -10,6 +10,7 @@ kotlin {
             dependencies {
                 implementation(projects.search)
                 implementation(projects.slack)
+                implementation(projects.commonFirebaseData)
             }
         }
         val jsMain by getting {

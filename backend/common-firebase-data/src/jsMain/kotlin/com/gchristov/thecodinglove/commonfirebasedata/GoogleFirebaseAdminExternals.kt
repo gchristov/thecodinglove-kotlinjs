@@ -1,13 +1,12 @@
-package com.gchristov.thecodinglove.firebase
+package com.gchristov.thecodinglove.commonfirebasedata
 
-import arrow.core.Either
-import kotlinx.serialization.DeserializationStrategy
 import kotlin.js.Json
 import kotlin.js.Promise
 
+@Suppress("unused")
 @JsModule("firebase-admin")
 @JsNonModule
-external object FirebaseAdmin {
+internal external object GoogleFirebaseAdminExternals {
     fun initializeApp(): App
 
     open class App {
@@ -175,16 +174,4 @@ external object FirebaseAdmin {
             }
         }
     }
-}
-
-fun <T> FirebaseAdmin.firestore.DocumentSnapshot.decodeBodyFromJson(
-    jsonSerializer: kotlinx.serialization.json.Json,
-    strategy: DeserializationStrategy<T>
-): Either<Throwable, T?> = try {
-    Either.Right(data()?.let { jsonSerializer.decodeFromString(strategy, JSON.stringify(it)) })
-} catch (error: Throwable) {
-    Either.Left(Throwable(
-        message = "Error decoding DocumentSnapshot data${error.message?.let { ": $it" } ?: ""}",
-        cause = error,
-    ))
 }

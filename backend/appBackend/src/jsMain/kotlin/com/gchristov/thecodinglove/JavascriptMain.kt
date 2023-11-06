@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.sequence
+import com.gchristov.thecodinglove.commonfirebasedata.CommonFirebaseDataModule
 import com.gchristov.thecodinglove.commonservice.CommonServiceModule
 import com.gchristov.thecodinglove.commonservice.http.StaticFileHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpService
@@ -35,10 +36,7 @@ suspend fun main() {
             error.printStackTrace()
         }, ifRight = {
             // TODO: Add start-up metrics
-            println("Trying out Firebase Admin SDK")
-            val test = FirebaseAdminTest()
-            test.init()
-            test.testFirestore()
+            FirebaseAdminTest().testFirestore()
         })
 }
 
@@ -51,6 +49,7 @@ private fun setupDi(): Either<Throwable, Unit> {
             KmpCommonKotlinModule.module,
             KmpCommonFirebaseModule.module,
             KmpCommonNetworkModule.module,
+            CommonFirebaseDataModule.module,
             CommonServiceModule.module,
             HtmlParseDataModule.module,
             SearchModule.module,
