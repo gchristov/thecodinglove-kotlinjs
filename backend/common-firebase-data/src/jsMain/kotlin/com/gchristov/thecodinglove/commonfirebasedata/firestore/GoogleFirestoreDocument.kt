@@ -27,7 +27,7 @@ internal class GoogleFirestoreDocumentReference(
         strategy: SerializationStrategy<T>,
         data: T
     ): Either<Throwable, Unit> = try {
-        js.set(jsonSerializer.encodeToDynamic(strategy, data) as Any).await()
+        js.set(jsonSerializer.encodeToDynamic(strategy, data)).await()
         Either.Right(Unit)
     } catch (error: Throwable) {
         Either.Left(Throwable(
@@ -52,5 +52,5 @@ internal class GoogleFirestoreDocumentSnapshot(
 ) : FirestoreDocumentSnapshot {
     override val exists: Boolean = js.exists
 
-    override fun data(): Any? = js.data()
+    override fun data(): dynamic = js.data()
 }

@@ -2,8 +2,10 @@ package com.gchristov.thecodinglove.commonfirebasedata.firestore
 
 import arrow.core.Either
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromDynamic
 
 interface FirestoreDocumentReference {
     suspend fun get(): Either<Throwable, FirestoreDocumentSnapshot>
@@ -20,16 +22,21 @@ interface FirestoreDocumentReference {
 interface FirestoreDocumentSnapshot {
     val exists: Boolean
 
-    fun data(): Any?
+    fun data(): dynamic
 
+    @OptIn(ExperimentalSerializationApi::class)
     fun <T> decodeDataFromJson(
         jsonSerializer: Json,
         strategy: DeserializationStrategy<T>
     ): Either<Throwable, T?> = try {
-        Either.Right(data()?.let { jsonSerializer.decodeFromString(strategy, JSON.stringify(it)) })
+        if (data() != null) {
+            Either.Right(jsonSerializer.decodeFromDynamic(strategy, data()))
+        } else {
+            Either.Right(null)
+        }
     } catch (error: Throwable) {
         Either.Left(Throwable(
-            message = "Error decoding FirestoreDocumentSnapshot data${error.message?.let { ": $it" } ?: ""}",
+            message = "Error decoding Firestore document snapshot data${error.message?.let { ": $it" } ?: ""}",
             cause = error,
         ))
     }

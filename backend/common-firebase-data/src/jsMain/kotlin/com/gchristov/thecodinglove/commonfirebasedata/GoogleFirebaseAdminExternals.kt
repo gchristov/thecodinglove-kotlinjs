@@ -3,37 +3,22 @@ package com.gchristov.thecodinglove.commonfirebasedata
 import kotlin.js.Json
 import kotlin.js.Promise
 
-@Suppress("unused")
 @JsModule("firebase-admin")
 @JsNonModule
 internal external object GoogleFirebaseAdminExternals {
     fun initializeApp(): App
 
     open class App {
-        val name: String
-//        fun auth(): Auth
         fun firestore(): firestore.Firestore
     }
 
     object firestore {
-        fun setLogLevel(level: String)
-
-        open class PersistenceSettings {
-            var experimentalTabSynchronization: Boolean
-        }
-
         open class Firestore {
             fun <T> runTransaction(func: (transaction: Transaction) -> Promise<T>): Promise<T>
             fun batch(): WriteBatch
             fun collection(collectionPath: String): CollectionReference
             fun collectionGroup(collectionId: String): Query
             fun doc(documentPath: String): DocumentReference
-            fun settings(settings: Json)
-            fun enablePersistence(): Promise<Unit>
-            fun clearPersistence(): Promise<Unit>
-            fun useEmulator(host: String, port: Int)
-            fun disableNetwork(): Promise<Unit>
-            fun enableNetwork(): Promise<Unit>
         }
 
         open class Timestamp {
@@ -70,7 +55,7 @@ internal external object GoogleFirebaseAdminExternals {
             val path: String
             val parent: DocumentReference?
             fun doc(path: String = definedExternally): DocumentReference
-            fun add(data: Any): Promise<DocumentReference>
+            fun add(data: dynamic): Promise<DocumentReference>
         }
 
         open class QuerySnapshot {
@@ -92,7 +77,7 @@ internal external object GoogleFirebaseAdminExternals {
             val ref: DocumentReference
             val exists: Boolean
             val metadata: SnapshotMetadata
-            fun data(options: Any? = definedExternally): Any?
+            fun data(options: Any? = definedExternally): dynamic
             fun get(fieldPath: String, options: Any? = definedExternally): Any?
             fun get(fieldPath: FieldPath, options: Any? = definedExternally): Any?
         }
@@ -109,8 +94,8 @@ internal external object GoogleFirebaseAdminExternals {
 
             fun collection(path: String): CollectionReference
             fun get(options: Any? = definedExternally): Promise<DocumentSnapshot>
-            fun set(data: Any, options: Any? = definedExternally): Promise<Unit>
-            fun update(data: Any): Promise<Unit>
+            fun set(data: dynamic, options: Any? = definedExternally): Promise<Unit>
+            fun update(data: dynamic): Promise<Unit>
             fun update(field: String, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
             fun update(field: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
             fun delete(): Promise<Unit>
