@@ -7,7 +7,7 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.kmpcommonkotlin.AppConfig
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
-import kotlinx.serialization.json.Json
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
@@ -40,4 +40,4 @@ expect fun providePubSubSubscription(
     appConfig: AppConfig,
 ): PubSubSubscription
 
-expect fun providePubSubDecoder(jsonSerializer: Json): PubSubDecoder
+expect fun providePubSubDecoder(jsonSerializer: JsonSerializer.Default): PubSubDecoder

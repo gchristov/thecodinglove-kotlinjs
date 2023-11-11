@@ -1,12 +1,12 @@
 package com.gchristov.thecodinglove.slackdata
 
-import com.gchristov.thecodinglove.kmpcommonnetwork.JsonClient
+import com.gchristov.thecodinglove.kmpcommonnetwork.NetworkClient
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 
-internal class SlackApi(private val client: JsonClient) {
+internal class SlackApi(private val client: NetworkClient.Json) {
     suspend fun authUser(
         code: String,
         clientId: String,

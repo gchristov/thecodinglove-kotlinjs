@@ -1,11 +1,11 @@
 package com.gchristov.thecodinglove.searchdata
 
-import com.gchristov.thecodinglove.kmpcommonnetwork.HtmlClient
+import com.gchristov.thecodinglove.kmpcommonnetwork.NetworkClient
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 
-internal class SearchApi(private val client: HtmlClient) {
+internal class SearchApi(private val client: NetworkClient.Html) {
     suspend fun search(
         page: Int,
         query: String

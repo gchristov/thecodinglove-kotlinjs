@@ -6,7 +6,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.kmpCommonFirebase)
+                implementation(projects.commonFirebaseData)
                 implementation(projects.commonServiceData)
                 implementation(projects.htmlParseData)
             }

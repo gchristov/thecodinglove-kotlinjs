@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.slacktestfixtures
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.ParameterMap
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.json.Json
 
 @Suppress("UNCHECKED_CAST")
 class FakeSlackApiRequest(
@@ -35,7 +35,7 @@ class FakeSlackApiRequest(
     override val bodyString: String? = fakeRawBody
 
     override fun <T> decodeBodyFromJson(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer,
         strategy: DeserializationStrategy<T>
-    ): Either<Throwable, T?> = Either.Right(bodyString?.let { jsonSerializer.decodeFromString(strategy, it) })
+    ): Either<Throwable, T?> = Either.Right(bodyString?.let { jsonSerializer.json.decodeFromString(strategy, it) })
 }

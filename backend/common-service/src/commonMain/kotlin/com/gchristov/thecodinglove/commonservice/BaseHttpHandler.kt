@@ -6,17 +6,17 @@ import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
 import com.gchristov.thecodinglove.commonservicedata.http.sendJson
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotlin.coroutines.CoroutineContext
 
 abstract class BaseHttpHandler(
     private val dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: Json,
+    private val jsonSerializer: JsonSerializer,
     private val log: Logger,
 ) : HttpHandler, CoroutineScope {
 

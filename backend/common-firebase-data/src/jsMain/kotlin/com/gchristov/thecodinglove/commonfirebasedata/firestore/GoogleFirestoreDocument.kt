@@ -2,11 +2,12 @@ package com.gchristov.thecodinglove.commonfirebasedata.firestore
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonfirebasedata.GoogleFirebaseAdminExternals
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import kotlinx.coroutines.await
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToDynamic
+import kotlin.js.json
 
 internal class GoogleFirestoreDocumentReference(
     private val js: GoogleFirebaseAdminExternals.firestore.DocumentReference
@@ -16,22 +17,23 @@ internal class GoogleFirestoreDocumentReference(
         Either.Right(GoogleFirestoreDocumentSnapshot(result))
     } catch (error: Throwable) {
         Either.Left(Throwable(
-            message = "Error getting Firestore document ${error.message?.let { ": $it" } ?: ""}",
+            message = "Error getting Firestore document${error.message?.let { ": $it" } ?: ""}",
             cause = error,
         ))
     }
 
     @OptIn(ExperimentalSerializationApi::class)
     override suspend fun <T> set(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer,
         strategy: SerializationStrategy<T>,
-        data: T
+        data: T,
+        merge: Boolean,
     ): Either<Throwable, Unit> = try {
-        js.set(jsonSerializer.encodeToDynamic(strategy, data)).await()
+        js.set(jsonSerializer.json.encodeToDynamic(strategy, data), json("merge" to merge)).await()
         Either.Right(Unit)
     } catch (error: Throwable) {
         Either.Left(Throwable(
-            message = "Error setting Firestore document ${error.message?.let { ": $it" } ?: ""}",
+            message = "Error setting Firestore document${error.message?.let { ": $it" } ?: ""}",
             cause = error,
         ))
     }
@@ -41,7 +43,7 @@ internal class GoogleFirestoreDocumentReference(
         Either.Right(Unit)
     } catch (error: Throwable) {
         Either.Left(Throwable(
-            message = "Error deleting Firestore document ${error.message?.let { ": $it" } ?: ""}",
+            message = "Error deleting Firestore document${error.message?.let { ": $it" } ?: ""}",
             cause = error,
         ))
     }

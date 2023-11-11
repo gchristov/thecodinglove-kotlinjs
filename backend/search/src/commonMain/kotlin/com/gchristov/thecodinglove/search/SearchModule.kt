@@ -4,11 +4,11 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import kotlinx.coroutines.Dispatchers
-import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
@@ -39,7 +39,7 @@ object SearchModule : DiModule() {
     }
 
     private fun provideSearchHttpHandler(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer.Default,
         log: Logger,
         searchUseCase: SearchUseCase,
     ): SearchHttpHandler = SearchHttpHandler(
@@ -50,7 +50,7 @@ object SearchModule : DiModule() {
     )
 
     private fun providePreloadSearchPubSubHttpHandler(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer.Default,
         log: Logger,
         preloadSearchResultUseCase: PreloadSearchResultUseCase,
         pubSubSubscription: PubSubSubscription,

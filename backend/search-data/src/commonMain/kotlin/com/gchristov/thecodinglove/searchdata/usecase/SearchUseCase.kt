@@ -4,11 +4,11 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.benasher44.uuid.uuid4
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.domain.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 
 interface SearchUseCase {
     suspend operator fun invoke(type: Type): Either<SearchError, Result>
@@ -31,7 +31,7 @@ class RealSearchUseCase(
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
     private val pubSubPublisher: PubSubPublisher,
-    private val jsonSerializer: Json,
+    private val jsonSerializer: JsonSerializer,
     private val searchConfig: SearchConfig,
 ) : SearchUseCase {
     override suspend operator fun invoke(
@@ -58,8 +58,7 @@ class RealSearchUseCase(
                     preloadedPost = preloadedPost,
                     searchRepository = searchRepository
                 )
-                    // TODO: Consider better error type
-                    .mapLeft { SearchError.SessionNotFound }
+                    .mapLeft { SearchError.SessionNotFound(it.message) }
                     .map {
                         SearchUseCase.Result(
                             searchSessionId = searchSession.id,
@@ -80,8 +79,7 @@ class RealSearchUseCase(
                             is SearchError.Exhausted -> {
                                 searchSession
                                     .clearExhaustedHistory(searchRepository)
-                                    // TODO: Consider better error type
-                                    .mapLeft { SearchError.SessionNotFound }
+                                    .mapLeft { SearchError.SessionNotFound(it.message) }
                                     .flatMap { invoke(type = type) }
                             }
 
@@ -94,8 +92,7 @@ class RealSearchUseCase(
                                 searchResult = searchResult,
                                 searchRepository = searchRepository
                             )
-                            // TODO: Consider better error type
-                            .mapLeft { SearchError.SessionNotFound }
+                            .mapLeft { SearchError.SessionNotFound(it.message) }
                             .map {
                                 SearchUseCase.Result(
                                     searchSessionId = searchSession.id,
@@ -119,7 +116,7 @@ class RealSearchUseCase(
             jsonSerializer = jsonSerializer,
             strategy = PreloadSearchPubSubMessage.serializer(),
         )
-        .mapLeft { SearchError.SessionNotFound }
+        .mapLeft { SearchError.SessionNotFound(it.message) }
 }
 
 private suspend fun SearchUseCase.Type.getSearchSession(
@@ -139,7 +136,7 @@ private suspend fun SearchUseCase.Type.getSearchSession(
 
     is SearchUseCase.Type.WithSessionId -> searchRepository
         .getSearchSession(this.sessionId)
-        .mapLeft { SearchError.SessionNotFound }
+        .mapLeft { SearchError.SessionNotFound(it.message) }
 }
 
 private suspend fun SearchSession.insertCurrentPost(

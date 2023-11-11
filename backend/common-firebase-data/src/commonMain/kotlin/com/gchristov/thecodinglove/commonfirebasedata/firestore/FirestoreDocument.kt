@@ -1,19 +1,20 @@
 package com.gchristov.thecodinglove.commonfirebasedata.firestore
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromDynamic
 
 interface FirestoreDocumentReference {
     suspend fun get(): Either<Throwable, FirestoreDocumentSnapshot>
 
     suspend fun <T> set(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer,
         strategy: SerializationStrategy<T>,
         data: T,
+        merge: Boolean = false,
     ): Either<Throwable, Unit>
 
     suspend fun delete(): Either<Throwable, Unit>
@@ -26,11 +27,11 @@ interface FirestoreDocumentSnapshot {
 
     @OptIn(ExperimentalSerializationApi::class)
     fun <T> decodeDataFromJson(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer,
         strategy: DeserializationStrategy<T>
     ): Either<Throwable, T?> = try {
         if (data() != null) {
-            Either.Right(jsonSerializer.decodeFromDynamic(strategy, data()))
+            Either.Right(jsonSerializer.json.decodeFromDynamic(strategy, data()))
         } else {
             Either.Right(null)
         }

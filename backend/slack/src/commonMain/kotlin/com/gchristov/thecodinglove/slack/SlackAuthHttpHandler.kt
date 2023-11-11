@@ -7,6 +7,7 @@ import com.gchristov.thecodinglove.commonservice.BaseHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthState
 import com.gchristov.thecodinglove.slackdata.domain.toAuthState
 import com.gchristov.thecodinglove.slackdata.usecase.SlackAuthUseCase
@@ -15,11 +16,10 @@ import io.ktor.http.*
 import io.ktor.util.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 class SlackAuthHttpHandler(
     dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: Json,
+    private val jsonSerializer: JsonSerializer,
     private val log: Logger,
     private val slackAuthUseCase: SlackAuthUseCase,
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
@@ -69,7 +69,7 @@ class SlackAuthHttpHandler(
     private suspend fun handleAuthState(state: String) = try {
         val base64Decoded = state.decodeBase64String()
         log.d("Decoded Base64 auth state: decoded=$base64Decoded")
-        val authState = jsonSerializer
+        val authState = jsonSerializer.json
             .decodeFromString<ApiSlackAuthState>(base64Decoded)
             .toAuthState()
         log.d("Parsed Base64 auth state: parsed=$authState")

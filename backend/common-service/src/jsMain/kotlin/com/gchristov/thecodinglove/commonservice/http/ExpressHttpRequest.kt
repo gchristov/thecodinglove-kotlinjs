@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.commonservice.http
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.ParameterMap
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.json.Json
 
 internal class ExpressHttpRequest(private val req: dynamic) : HttpRequest {
     override val baseURL: String = req.baseUrl as String
@@ -26,12 +26,12 @@ internal class ExpressHttpRequest(private val req: dynamic) : HttpRequest {
     override val bodyString: String? = req.bodyString as? String
 
     override fun <T> decodeBodyFromJson(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer,
         strategy: DeserializationStrategy<T>
     ): Either<Throwable, T?> = try {
         // Express exposes "body" as a key-value map based on the middleware installed. To decode it from JSON we simply
         // convert it to String in Javascript, which should behave the same for any kind of content type.
-        Either.Right(body?.let { jsonSerializer.decodeFromString(strategy, JSON.stringify(it)) })
+        Either.Right(body?.let { jsonSerializer.json.decodeFromString(strategy, JSON.stringify(it)) })
     } catch (error: Throwable) {
         Either.Left(Throwable(
             message = "Error decoding HTTP request body${error.message?.let { ": $it" } ?: ""}",

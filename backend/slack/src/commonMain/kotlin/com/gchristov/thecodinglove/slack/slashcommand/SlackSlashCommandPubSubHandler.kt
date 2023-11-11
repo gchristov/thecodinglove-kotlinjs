@@ -5,11 +5,12 @@ import arrow.core.flatMap
 import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
@@ -17,11 +18,10 @@ import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackSlashCommandPubSubMessage
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.serialization.json.Json
 
 class SlackSlashCommandPubSubHandler(
     dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: Json,
+    private val jsonSerializer: JsonSerializer,
     private val log: Logger,
     private val slackRepository: SlackRepository,
     private val searchUseCase: SearchUseCase,

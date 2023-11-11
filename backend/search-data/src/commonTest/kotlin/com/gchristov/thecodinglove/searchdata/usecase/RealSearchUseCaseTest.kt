@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubPublisher
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.searchdata.domain.PreloadSearchPubSubMessage
 import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
@@ -11,7 +12,6 @@ import com.gchristov.thecodinglove.searchtestfixtures.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -219,7 +219,7 @@ class RealSearchUseCaseTest {
             dispatcher = FakeCoroutineDispatcher,
             searchRepository = searchRepository,
             searchWithHistoryUseCase = searchWithHistoryUseCase,
-            jsonSerializer = Json,
+            jsonSerializer = JsonSerializer.Default,
             pubSubPublisher = pubSubPublisher,
             searchConfig = SearchConfig(
                 postsPerPage = TestSearchPostsPerPage,

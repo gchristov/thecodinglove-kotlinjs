@@ -1,17 +1,17 @@
 package com.gchristov.thecodinglove.slackdata
 
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
 import com.gchristov.thecodinglove.kmpcommonkotlin.BuildConfig
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
-import com.gchristov.thecodinglove.kmpcommonnetwork.JsonClient
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.kmpcommonnetwork.NetworkClient
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.*
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
-import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
@@ -27,7 +27,8 @@ object SlackDataModule : DiModule() {
             bindSingleton {
                 provideSlackRepository(
                     api = instance(),
-                    firebaseFirestore = instance(),
+                    firebaseAdmin = instance(),
+                    jsonSerializer = instance(),
                 )
             }
             bindProvider {
@@ -75,7 +76,7 @@ object SlackDataModule : DiModule() {
         }
     }
 
-    private fun provideSlackApi(client: JsonClient) = SlackApi(client)
+    private fun provideSlackApi(client: NetworkClient.Json) = SlackApi(client)
 
     private fun provideSlackConfig(): SlackConfig = SlackConfig(
         signingSecret = BuildConfig.SLACK_SIGNING_SECRET,
@@ -89,10 +90,12 @@ object SlackDataModule : DiModule() {
 
     private fun provideSlackRepository(
         api: SlackApi,
-        firebaseFirestore: FirebaseFirestore,
+        firebaseAdmin: FirebaseAdmin,
+        jsonSerializer: JsonSerializer.ExplicitNulls,
     ): SlackRepository = RealSlackRepository(
         apiService = api,
-        firebaseFirestore = firebaseFirestore
+        firebaseAdmin = firebaseAdmin,
+        jsonSerializer = jsonSerializer,
     )
 
     private fun provideSlackVerifyRequestUseCase(
@@ -132,7 +135,7 @@ object SlackDataModule : DiModule() {
         searchRepository: SearchRepository,
         slackRepository: SlackRepository,
         slackConfig: SlackConfig,
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer.Default,
     ): SlackSendSearchUseCase = RealSlackSendSearchUseCase(
         dispatcher = Dispatchers.Default,
         log = log,

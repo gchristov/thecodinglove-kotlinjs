@@ -2,13 +2,13 @@ package com.gchristov.thecodinglove.slackdata.api
 
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
 
 @Serializable
 data class ApiSlackInteractivity(
@@ -55,19 +55,19 @@ data class ApiSlackInteractivity(
 // Payload is encoded as application/x-www-form-urlencoded
 // https://api.slack.com/legacy/message-buttons
 private object PayloadSerializer : KSerializer<ApiSlackInteractivity.ApiSlackInteractivityPayload> {
-    private val jsonSerializer = DiGraph.inject<Json>()
+    private val jsonSerializer = DiGraph.inject<JsonSerializer.ExplicitNulls>()
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
         serialName = "ApiSlackInteractivity.ApiSlackInteractivityPayload",
         kind = PrimitiveKind.STRING
     )
 
     override fun deserialize(decoder: Decoder): ApiSlackInteractivity.ApiSlackInteractivityPayload =
-        jsonSerializer.decodeFromString(decoder.decodeString())
+        jsonSerializer.json.decodeFromString(decoder.decodeString())
 
     override fun serialize(
         encoder: Encoder,
         value: ApiSlackInteractivity.ApiSlackInteractivityPayload
     ) {
-        encoder.encodeString(jsonSerializer.encodeToString(value))
+        encoder.encodeString(jsonSerializer.json.encodeToString(value))
     }
 }

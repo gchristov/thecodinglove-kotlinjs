@@ -8,7 +8,6 @@ import com.gchristov.thecodinglove.commonservice.CommonServiceModule
 import com.gchristov.thecodinglove.commonservice.http.StaticFileHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpService
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
-import com.gchristov.thecodinglove.kmpcommonfirebase.KmpCommonFirebaseModule
 import com.gchristov.thecodinglove.kmpcommonkotlin.KmpCommonKotlinModule
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
@@ -36,7 +35,6 @@ suspend fun main() {
             error.printStackTrace()
         }, ifRight = {
             // TODO: Add start-up metrics
-            FirebaseAdminTest().testFirestore()
         })
 }
 
@@ -47,7 +45,6 @@ private fun setupDi(): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             KmpCommonKotlinModule.module,
-            KmpCommonFirebaseModule.module,
             KmpCommonNetworkModule.module,
             CommonFirebaseDataModule.module,
             CommonServiceModule.module,

@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.searchdata.db
 
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -9,7 +10,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
 
 @Serializable
 data class DbSearchSession(
@@ -33,20 +33,20 @@ data class DbSearchSession(
 // There's currently an issue with Firebase serialization of sealed classes.
 // https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/343
 private object SessionStateSerializer : KSerializer<DbSearchSession.DbState> {
-    private val jsonSerializer = DiGraph.inject<Json>()
+    private val jsonSerializer = DiGraph.inject<JsonSerializer.ExplicitNulls>()
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
         serialName = "DbSearchSession.DbState",
         kind = PrimitiveKind.STRING
     )
 
     override fun deserialize(decoder: Decoder): DbSearchSession.DbState =
-        jsonSerializer.decodeFromString(decoder.decodeString())
+        jsonSerializer.json.decodeFromString(decoder.decodeString())
 
     override fun serialize(
         encoder: Encoder,
         value: DbSearchSession.DbState
     ) {
-        encoder.encodeString(jsonSerializer.encodeToString(value))
+        encoder.encodeString(jsonSerializer.json.encodeToString(value))
     }
 }
 

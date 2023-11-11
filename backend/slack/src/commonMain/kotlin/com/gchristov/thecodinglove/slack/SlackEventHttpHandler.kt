@@ -6,6 +6,7 @@ import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.BaseHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.*
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackEvent
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackEvent
@@ -14,11 +15,10 @@ import com.gchristov.thecodinglove.slackdata.usecase.SlackRevokeTokensUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.SlackVerifyRequestUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.serialization.json.Json
 
 class SlackEventHttpHandler(
     dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: Json,
+    private val jsonSerializer: JsonSerializer,
     log: Logger,
     private val slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
     private val slackConfig: SlackConfig,
