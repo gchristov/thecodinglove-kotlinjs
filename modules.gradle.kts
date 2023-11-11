@@ -1,7 +1,6 @@
 includeBuild("gradle-plugins")
 
 val projects = listOf(
-    "shared/kmp-common-firebase",
     "shared/kmp-common-kotlin",
     "shared/kmp-common-network",
     "shared/kmp-common-test",
