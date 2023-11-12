@@ -1,4 +1,4 @@
-name: Deployment
+name: Deployment (GCP)
 
 on:
   push:
