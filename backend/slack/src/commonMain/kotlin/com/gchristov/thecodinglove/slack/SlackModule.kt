@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
@@ -14,7 +15,6 @@ import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
@@ -86,7 +86,7 @@ object SlackModule : DiModule() {
     }
 
     private fun provideSlackSlashCommandHttpHandler(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
         slackConfig: SlackConfig,
@@ -101,7 +101,7 @@ object SlackModule : DiModule() {
     )
 
     private fun provideSlackSlashCommandPubSubHttpHandler(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackRepository: SlackRepository,
         searchUseCase: SearchUseCase,
@@ -120,7 +120,7 @@ object SlackModule : DiModule() {
     )
 
     private fun provideSlackInteractivityHttpHandler(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
         slackConfig: SlackConfig,
@@ -135,7 +135,7 @@ object SlackModule : DiModule() {
     )
 
     private fun provideSlackInteractivityPubSubHandler(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackSendSearchUseCase: SlackSendSearchUseCase,
         slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
@@ -156,7 +156,7 @@ object SlackModule : DiModule() {
     )
 
     private fun provideSlackAuthHttpHandler(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackAuthUseCase: SlackAuthUseCase,
         slackSendSearchUseCase: SlackSendSearchUseCase,
@@ -169,7 +169,7 @@ object SlackModule : DiModule() {
     )
 
     private fun provideSlackEventHttpHandler(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
         slackConfig: SlackConfig,

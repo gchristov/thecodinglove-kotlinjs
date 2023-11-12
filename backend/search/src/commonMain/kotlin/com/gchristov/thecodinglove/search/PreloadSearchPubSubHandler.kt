@@ -5,21 +5,21 @@ import arrow.core.flatMap
 import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.searchdata.domain.PreloadSearchPubSubMessage
 import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.serialization.json.Json
 
 class PreloadSearchPubSubHandler(
     dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: Json,
+    private val jsonSerializer: JsonSerializer,
     log: Logger,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
     pubSubSubscription: PubSubSubscription,

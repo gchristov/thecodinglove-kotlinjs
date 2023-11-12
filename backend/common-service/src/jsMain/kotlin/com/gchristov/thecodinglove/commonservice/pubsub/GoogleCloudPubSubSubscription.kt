@@ -14,7 +14,7 @@ internal class GoogleCloudPubSubSubscription(
     private val appConfig: AppConfig,
 ) : PubSubSubscription {
     init {
-        process.env.GOOGLE_APPLICATION_CREDENTIALS = "local-credentials-pubsub.json"
+        process.env.GOOGLE_APPLICATION_CREDENTIALS = "local-credentials-gcp.json"
     }
 
     override suspend fun initialise(

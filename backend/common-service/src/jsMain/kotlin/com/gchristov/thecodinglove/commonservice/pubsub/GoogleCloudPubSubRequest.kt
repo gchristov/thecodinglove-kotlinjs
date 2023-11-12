@@ -2,20 +2,20 @@ package com.gchristov.thecodinglove.commonservice.pubsub
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import io.ktor.util.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 internal class GoogleCloudPubSubRequest(override val bodyString: String?) : PubSubRequest {
 
     override fun <T> decodeBodyFromJson(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer,
         strategy: DeserializationStrategy<T>
     ): Either<Throwable, T?> = try {
-        Either.Right(bodyString?.let { jsonSerializer.decodeFromString(strategy, it) })
+        Either.Right(bodyString?.let { jsonSerializer.json.decodeFromString(strategy, it) })
     } catch (error: Throwable) {
         Either.Left(Throwable(
             message = "Error decoding PubSub request body${error.message?.let { ": $it" } ?: ""}",

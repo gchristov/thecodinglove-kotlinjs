@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubDecoder
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSubscription
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
 import com.gchristov.thecodinglove.searchdata.domain.PreloadSearchPubSubMessage
@@ -15,7 +16,6 @@ import io.ktor.http.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -91,7 +91,7 @@ class PreloadSearchPubSubHttpHandlerTest {
         )
         val handler = PreloadSearchPubSubHandler(
             dispatcher = FakeCoroutineDispatcher,
-            jsonSerializer = Json,
+            jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
             preloadSearchResultUseCase = preloadSearchResultUseCase,
             pubSubSubscription = FakePubSubSubscription(),

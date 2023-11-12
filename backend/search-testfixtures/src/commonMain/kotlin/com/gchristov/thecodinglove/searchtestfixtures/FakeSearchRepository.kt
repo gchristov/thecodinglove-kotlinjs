@@ -37,7 +37,7 @@ class FakeSearchRepository(
     override suspend fun getSearchSession(id: String): Either<Throwable, SearchSession> {
         searchSessionGetCalled = true
         return searchSession?.let { Either.Right(searchSessionResponse.execute(it)) }
-            ?: Either.Left(SearchError.SessionNotFound)
+            ?: Either.Left(SearchError.SessionNotFound())
     }
 
     override suspend fun saveSearchSession(searchSession: SearchSession): Either<Throwable, Unit> {

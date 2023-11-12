@@ -2,8 +2,8 @@ package com.gchristov.thecodinglove.commonservicetestfixtures
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.json.Json
 import kotlin.test.assertEquals
 
 class FakePubSubPublisher : PubSubPublisher {
@@ -14,7 +14,7 @@ class FakePubSubPublisher : PubSubPublisher {
     override suspend fun <T> publishJson(
         topic: String,
         body: T,
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer,
         strategy: SerializationStrategy<T>
     ): Either<Throwable, String> {
         lastTopic = topic

@@ -1,16 +1,16 @@
 package com.gchristov.thecodinglove.searchdata
 
+import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.kmpcommonkotlin.BuildConfig
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
-import com.gchristov.thecodinglove.kmpcommonnetwork.HtmlClient
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.kmpcommonnetwork.NetworkClient
 import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
 import com.gchristov.thecodinglove.searchdata.usecase.*
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
@@ -27,7 +27,8 @@ object SearchDataModule : DiModule() {
                     api = instance(),
                     parseHtmlTotalPostsUseCase = instance(),
                     parseHtmlPostsUseCase = instance(),
-                    firebaseFirestore = instance()
+                    firebaseAdmin = instance(),
+                    jsonSerializer = instance(),
                 )
             }
             bindSingleton { provideSearchConfig() }
@@ -55,18 +56,20 @@ object SearchDataModule : DiModule() {
         }
     }
 
-    private fun provideSearchApi(client: HtmlClient) = SearchApi(client)
+    private fun provideSearchApi(client: NetworkClient.Html) = SearchApi(client)
 
     private fun provideSearchRepository(
         api: SearchApi,
         parseHtmlTotalPostsUseCase: ParseHtmlTotalPostsUseCase,
         parseHtmlPostsUseCase: ParseHtmlPostsUseCase,
-        firebaseFirestore: FirebaseFirestore
+        firebaseAdmin: FirebaseAdmin,
+        jsonSerializer: JsonSerializer.ExplicitNulls,
     ): SearchRepository = RealSearchRepository(
         apiService = api,
         parseHtmlTotalPostsUseCase = parseHtmlTotalPostsUseCase,
         parseHtmlPostsUseCase = parseHtmlPostsUseCase,
-        firebaseFirestore = firebaseFirestore
+        firebaseAdmin = firebaseAdmin,
+        jsonSerializer = jsonSerializer,
     )
 
     private fun provideSearchConfig(): SearchConfig = SearchConfig(
@@ -87,7 +90,7 @@ object SearchDataModule : DiModule() {
         searchRepository: SearchRepository,
         searchWithHistoryUseCase: SearchWithHistoryUseCase,
         pubSubPublisher: PubSubPublisher,
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer.Default,
         searchConfig: SearchConfig,
     ): SearchUseCase = RealSearchUseCase(
         dispatcher = Dispatchers.Default,

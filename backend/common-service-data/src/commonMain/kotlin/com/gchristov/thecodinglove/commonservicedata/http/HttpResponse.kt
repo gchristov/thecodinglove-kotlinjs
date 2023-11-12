@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.commonservicedata.http
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import io.ktor.http.*
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 interface HttpResponse {
     fun send(string: String)
@@ -23,11 +23,11 @@ interface HttpResponse {
 inline fun <reified T> HttpResponse.sendJson(
     status: Int = 200,
     data: T,
-    jsonSerializer: Json,
+    jsonSerializer: JsonSerializer,
 ): Either<Throwable, Unit> = try {
     send(
         status = status,
-        content = jsonSerializer.encodeToString(data),
+        content = jsonSerializer.json.encodeToString(data),
         contentType = ContentType.Application.Json
     )
     Either.Right(Unit)

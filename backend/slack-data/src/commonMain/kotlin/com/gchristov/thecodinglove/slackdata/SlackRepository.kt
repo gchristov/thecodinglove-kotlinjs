@@ -1,6 +1,9 @@
 package com.gchristov.thecodinglove.slackdata
 
 import arrow.core.Either
+import arrow.core.flatMap
+import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthResponse
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackPostMessageResponse
@@ -9,7 +12,6 @@ import com.gchristov.thecodinglove.slackdata.db.DbSlackAuthToken
 import com.gchristov.thecodinglove.slackdata.db.toAuthToken
 import com.gchristov.thecodinglove.slackdata.domain.SlackAuthToken
 import com.gchristov.thecodinglove.slackdata.domain.toAuthToken
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -40,7 +42,8 @@ interface SlackRepository {
 
 internal class RealSlackRepository(
     private val apiService: SlackApi,
-    private val firebaseFirestore: FirebaseFirestore,
+    private val firebaseAdmin: FirebaseAdmin,
+    private val jsonSerializer: JsonSerializer,
 ) : SlackRepository {
     override suspend fun authUser(
         code: String,
@@ -64,54 +67,42 @@ internal class RealSlackRepository(
         ))
     }
 
-    override suspend fun getAuthToken(tokenId: String): Either<Throwable, SlackAuthToken> = try {
-        val document = firebaseFirestore
-            .collection(AuthTokenCollection)
-            .document(tokenId)
-            .get()
-        if (document.exists) {
-            val dbAuthToken: DbSlackAuthToken = document.data()
-            Either.Right(dbAuthToken.toAuthToken())
-        } else {
-            Either.Left(Exception("Slack auth token not found"))
+    override suspend fun getAuthToken(tokenId: String): Either<Throwable, SlackAuthToken> = firebaseAdmin
+        .firestore()
+        .collection(AuthTokenCollection)
+        .document(tokenId)
+        .get()
+        .flatMap { document ->
+            if (document.exists) {
+                document.decodeDataFromJson(
+                    jsonSerializer = jsonSerializer,
+                    strategy = DbSlackAuthToken.serializer(),
+                ).flatMap { dbAuthToken ->
+                    dbAuthToken?.let {
+                        Either.Right(it.toAuthToken())
+                    } ?: Either.Left(Exception("Slack auth token not found"))
+                }
+            } else {
+                Either.Left(Exception("Slack auth token not found"))
+            }
         }
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during finding Slack auth token${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
-    }
 
-    override suspend fun saveAuthToken(token: SlackAuthToken): Either<Throwable, Unit> = try {
-        val document = firebaseFirestore
-            .collection(AuthTokenCollection)
-            .document(token.id)
-        Either.Right(
-            document.set(
-                data = token.toAuthToken(),
-                encodeDefaults = true,
-                merge = true
-            )
+    override suspend fun saveAuthToken(token: SlackAuthToken): Either<Throwable, Unit> = firebaseAdmin
+        .firestore()
+        .collection(AuthTokenCollection)
+        .document(token.id)
+        .set(
+            jsonSerializer = jsonSerializer,
+            strategy = DbSlackAuthToken.serializer(),
+            data = token.toAuthToken(),
+            merge = true,
         )
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during saving Slack auth token${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
-    }
 
-    override suspend fun deleteAuthToken(tokenId: String): Either<Throwable, Unit> = try {
-        firebaseFirestore
-            .collection(AuthTokenCollection)
-            .document(tokenId)
-            .delete()
-        Either.Right(Unit)
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during deleting Slack auth token${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
-    }
+    override suspend fun deleteAuthToken(tokenId: String): Either<Throwable, Unit> = firebaseAdmin
+        .firestore()
+        .collection(AuthTokenCollection)
+        .document(tokenId)
+        .delete()
 
     override suspend fun replyWithMessage(
         responseUrl: String,

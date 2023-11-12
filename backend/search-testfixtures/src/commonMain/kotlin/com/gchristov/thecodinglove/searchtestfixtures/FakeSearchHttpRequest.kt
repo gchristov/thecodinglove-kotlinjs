@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.searchtestfixtures
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.ParameterMap
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.json.Json
 
 class FakeSearchHttpRequest(
     private val fakeSearchSessionId: String? = null,
@@ -36,7 +36,7 @@ class FakeSearchHttpRequest(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> decodeBodyFromJson(
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer,
         strategy: DeserializationStrategy<T>
     ): Either<Throwable, T?> = Either.Right(body as T)
 }

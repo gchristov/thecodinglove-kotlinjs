@@ -16,6 +16,8 @@ object KmpCommonKotlinModule : DiModule() {
         builder.apply {
             bindSingleton { provideAppConfig() }
             bindSingleton { provideLogger(appConfig = instance()) }
+            bindSingleton { provideDefaultJsonSerializer() }
+            bindSingleton { provideExplicitNullsJsonSerializer() }
         }
     }
 
@@ -38,4 +40,8 @@ object KmpCommonKotlinModule : DiModule() {
             logWriterList = listOf(CommonWriter())
         )
     )
+
+    private fun provideDefaultJsonSerializer() = JsonSerializer.Default
+
+    private fun provideExplicitNullsJsonSerializer() = JsonSerializer.ExplicitNulls
 }

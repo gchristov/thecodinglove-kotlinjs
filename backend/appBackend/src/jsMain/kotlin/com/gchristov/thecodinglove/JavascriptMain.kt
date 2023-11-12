@@ -3,11 +3,11 @@ package com.gchristov.thecodinglove
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.sequence
+import com.gchristov.thecodinglove.commonfirebasedata.CommonFirebaseDataModule
 import com.gchristov.thecodinglove.commonservice.CommonServiceModule
 import com.gchristov.thecodinglove.commonservice.http.StaticFileHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpService
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
-import com.gchristov.thecodinglove.kmpcommonfirebase.KmpCommonFirebaseModule
 import com.gchristov.thecodinglove.kmpcommonkotlin.KmpCommonKotlinModule
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
@@ -17,9 +17,9 @@ import com.gchristov.thecodinglove.search.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.SearchHttpHandler
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
-import com.gchristov.thecodinglove.slack.SlackModule
 import com.gchristov.thecodinglove.slack.SlackAuthHttpHandler
 import com.gchristov.thecodinglove.slack.SlackEventHttpHandler
+import com.gchristov.thecodinglove.slack.SlackModule
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler
@@ -45,8 +45,8 @@ private fun setupDi(): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             KmpCommonKotlinModule.module,
-            KmpCommonFirebaseModule.module,
             KmpCommonNetworkModule.module,
+            CommonFirebaseDataModule.module,
             CommonServiceModule.module,
             HtmlParseDataModule.module,
             SearchModule.module,

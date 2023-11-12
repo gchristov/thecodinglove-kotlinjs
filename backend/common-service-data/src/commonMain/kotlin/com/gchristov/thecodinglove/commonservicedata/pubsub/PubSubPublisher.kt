@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.commonservicedata.pubsub
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.json.Json
 
 interface PubSubPublisher {
     /**
@@ -11,7 +11,7 @@ interface PubSubPublisher {
     suspend fun <T> publishJson(
         topic: String,
         body: T,
-        jsonSerializer: Json,
+        jsonSerializer: JsonSerializer,
         strategy: SerializationStrategy<T>,
     ): Either<Throwable, String>
 }

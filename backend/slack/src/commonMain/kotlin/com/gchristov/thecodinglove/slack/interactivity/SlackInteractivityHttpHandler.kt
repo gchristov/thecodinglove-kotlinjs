@@ -10,6 +10,7 @@ import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
 import com.gchristov.thecodinglove.commonservicedata.http.sendEmpty
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackInteractivity
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
@@ -17,11 +18,10 @@ import com.gchristov.thecodinglove.slackdata.domain.toPubSubMessage
 import com.gchristov.thecodinglove.slackdata.usecase.SlackVerifyRequestUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.serialization.json.Json
 
 class SlackInteractivityHttpHandler(
     dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: Json,
+    private val jsonSerializer: JsonSerializer,
     log: Logger,
     private val slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
     private val slackConfig: SlackConfig,

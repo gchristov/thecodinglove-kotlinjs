@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slackdata.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthState
@@ -12,7 +13,6 @@ import io.ktor.util.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 interface SlackSendSearchUseCase {
     suspend operator fun invoke(
@@ -30,7 +30,7 @@ class RealSlackSendSearchUseCase(
     private val searchRepository: SearchRepository,
     private val slackRepository: SlackRepository,
     private val slackConfig: SlackConfig,
-    private val jsonSerializer: Json,
+    private val jsonSerializer: JsonSerializer,
 ) : SlackSendSearchUseCase {
     override suspend operator fun invoke(
         userId: String,
@@ -72,7 +72,7 @@ class RealSlackSendSearchUseCase(
         clientId: String,
         channelId: String,
     ): Either<Throwable, Unit> = try {
-        val state = jsonSerializer.encodeToString(
+        val state = jsonSerializer.json.encodeToString(
             ApiSlackAuthState(
                 searchSessionId = searchSessionId,
                 channelId = channelId,

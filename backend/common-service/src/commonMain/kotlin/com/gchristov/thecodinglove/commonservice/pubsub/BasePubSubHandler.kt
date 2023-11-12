@@ -10,13 +10,13 @@ import com.gchristov.thecodinglove.commonservicedata.http.sendEmpty
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.serialization.json.Json
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 abstract class BasePubSubHandler(
     dispatcher: CoroutineDispatcher,
-    jsonSerializer: Json,
+    jsonSerializer: JsonSerializer,
     log: Logger,
     private val pubSubSubscription: PubSubSubscription,
     private val pubSubDecoder: PubSubDecoder,

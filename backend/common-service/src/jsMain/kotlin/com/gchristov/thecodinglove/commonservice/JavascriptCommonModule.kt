@@ -2,13 +2,16 @@ package com.gchristov.thecodinglove.commonservice
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.http.ExpressHttpService
-import com.gchristov.thecodinglove.commonservice.pubsub.*
+import com.gchristov.thecodinglove.commonservice.pubsub.GoogleCloudPubSubDecoder
+import com.gchristov.thecodinglove.commonservice.pubsub.GoogleCloudPubSubExternals
+import com.gchristov.thecodinglove.commonservice.pubsub.GoogleCloudPubSubPublisher
+import com.gchristov.thecodinglove.commonservice.pubsub.GoogleCloudPubSubSubscription
 import com.gchristov.thecodinglove.commonservicedata.http.HttpService
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.kmpcommonkotlin.AppConfig
-import kotlinx.serialization.json.Json
+import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 
 actual fun provideHttpService(log: Logger): HttpService = ExpressHttpService(log)
 
@@ -23,6 +26,8 @@ actual fun providePubSubSubscription(
     appConfig = appConfig,
 )
 
-actual fun providePubSubDecoder(jsonSerializer: Json): PubSubDecoder = GoogleCloudPubSubDecoder(jsonSerializer)
+actual fun providePubSubDecoder(
+    jsonSerializer: JsonSerializer.Default
+): PubSubDecoder = GoogleCloudPubSubDecoder(jsonSerializer)
 
 private val PubSub = GoogleCloudPubSubExternals.PubSub()
