@@ -1,4 +1,4 @@
-[![Deploy Build](https://github.com/gchristov/thecodinglove-kmp/actions/workflows/deploy.yml/badge.svg)](https://github.com/gchristov/thecodinglove-kmp/actions/workflows/deploy.yml)
+[![Deployment (GCP)](https://github.com/gchristov/thecodinglove-kmp/actions/workflows/deploy_gcp.yml/badge.svg)](https://github.com/gchristov/thecodinglove-kmp/actions/workflows/deploy_gcp.yml)
 
 # Resources
 
