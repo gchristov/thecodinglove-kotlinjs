@@ -33,11 +33,6 @@ buildkonfig {
     defaultConfigs {
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "GCP_PROJECT_ID",
-            value = getLocalSecret(rootProject, "GCP_PROJECT_ID")
-        )
-        buildConfigField(
-            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             name = "SLACK_SIGNING_SECRET",
             value = getLocalSecret(rootProject, "SLACK_SIGNING_SECRET")
         )

@@ -58,7 +58,6 @@ The project is configured to be deployed and run on Google Cloud. It also uses F
    - `Pub/Sub Admin`, for managing the PubSub subscriptions
 5. Create a `local.properties` file at the root of the project with the following contents
 ```
-GCP_PROJECT_ID=YOUR_GCP_PROJECT_ID
 SLACK_SIGNING_SECRET=YOUR_SLACK_SIGNING_SECRET
 SLACK_REQUEST_VERIFICATION_ENABLED=true|false
 SLACK_CLIENT_ID=YOUR_SLACK_CLIENT_ID
@@ -72,9 +71,14 @@ APP_PUBLIC_URL=YOUR_PUBLIC_APP_URL
 SEARCH_PRELOAD_PUBSUB_TOPIC=TOPIC_NAME
 ```
 6. Create a `local-credentials-gcp.json` file at the root of the project with the contents of a new JSON API key for the `firebase-adminsdk` service account.
-7. Expose each of the variables from `local.properties` as [GitHub encrypted secrets](https://docs.github.com/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets). 
-   - Add an additional `GCP_SA_KEY_DEPLOY` GitHub encrypted secret, containing the JSON API key for the CI deployment service account
-   - Add an additional `GCP_SA_KEY_APP` GitHub encrypted secret, containing the JSON API key for the `firebase-adminsdk` service account
+
+## CI
+
+The project is configured to build with [GitHub Actions](https://github.com/features/actions). Checkout the `.github` folder for the workflows. Follow these steps to configure the CI environment.
+
+1. Expose each of the variables defined in `local.properties` should be exposed as [GitHub encrypted secrets](https://docs.github.com/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets) using the same keys. 
+2. Add an additional `GCP_SA_KEY_DEPLOY` GitHub encrypted secret, containing the raw JSON API key for the CI deployment service account
+3. Add an additional `GCP_SA_KEY_APP` GitHub encrypted secret, containing the raw JSON API key for the `firebase-adminsdk` service account
 
 ## Dependencies
 
