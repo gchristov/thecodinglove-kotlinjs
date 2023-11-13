@@ -1,10 +1,9 @@
 package com.gchristov.thecodinglove.searchdata.db
 
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.searchdata.domain.SearchSession
-import kotlinx.serialization.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -22,31 +21,32 @@ data class DbSearchSession(
     @SerialName("preloaded_post") val preloadedPost: DbPost?,
     @SerialName("state") @Serializable(with = SessionStateSerializer::class) val state: DbState
 ) {
-    @Serializable
-    sealed class DbState {
-        @Serializable
-        @SerialName("searching")
-        object DbSearching : DbState()
+    enum class DbState(val apiValue: String) {
+        DbSearching("searching"),
+        DbSent("sent"),
     }
 }
 
-// There's currently an issue with Firebase serialization of sealed classes.
-// https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/343
 private object SessionStateSerializer : KSerializer<DbSearchSession.DbState> {
-    private val jsonSerializer = DiGraph.inject<JsonSerializer.ExplicitNulls>()
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
         serialName = "DbSearchSession.DbState",
         kind = PrimitiveKind.STRING
     )
 
-    override fun deserialize(decoder: Decoder): DbSearchSession.DbState =
-        jsonSerializer.json.decodeFromString(decoder.decodeString())
+    override fun deserialize(decoder: Decoder): DbSearchSession.DbState {
+        val value = decoder.decodeString()
+        return when (value) {
+            DbSearchSession.DbState.DbSearching.apiValue -> DbSearchSession.DbState.DbSearching
+            DbSearchSession.DbState.DbSent.apiValue -> DbSearchSession.DbState.DbSent
+            else -> throw IllegalStateException("Unknown session state: $value")
+        }
+    }
 
     override fun serialize(
         encoder: Encoder,
         value: DbSearchSession.DbState
     ) {
-        encoder.encodeString(jsonSerializer.json.encodeToString(value))
+        encoder.encodeString(value.apiValue)
     }
 }
 
@@ -66,6 +66,7 @@ internal fun SearchSession.toSearchSession() = DbSearchSession(
     state = state.toSearchSessionState()
 )
 
-private fun SearchSession.State.toSearchSessionState() = when (this) {
-    is SearchSession.State.Searching -> DbSearchSession.DbState.DbSearching
+private fun SearchSession.State.toSearchSessionState(): DbSearchSession.DbState = when (this) {
+    SearchSession.State.Searching -> DbSearchSession.DbState.DbSearching
+    SearchSession.State.Sent -> DbSearchSession.DbState.DbSent
 }
