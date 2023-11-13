@@ -8,11 +8,11 @@ env:
   # Required for CI workflow
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
-  GCP_SERVICE: cloudrun-test
-  GCP_REGION: us-west1
-  GCP_REPOSITORY: cloudrun-test-repo
+  GCP_SERVICE: service-app
+  GCP_REGION: europe-west1
+  GCP_REPOSITORY: thecodinglove
   GCP_REPOSITORY_FORMAT: docker
-  GCP_REPOSITORY_IMAGE: cloudrun-test-image
+  GCP_REPOSITORY_IMAGE: thecodinglove-image
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GCP_SA_KEY_DEPLOY: ${{ secrets.GCP_SA_KEY_DEPLOY }}
   # Required for build
