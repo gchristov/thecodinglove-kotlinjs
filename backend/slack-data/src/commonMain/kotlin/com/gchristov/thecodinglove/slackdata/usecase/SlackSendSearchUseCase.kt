@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.searchdata.SearchRepository
+import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthState
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
@@ -123,9 +124,8 @@ class RealSlackSendSearchUseCase(
                             channelId = channelId,
                         )
                     ).flatMap {
-                        // TODO: Should we track session state here?
-                        log.d("Deleting search session: searchSessionId=$searchSessionId")
-                        searchRepository.deleteSearchSession(searchSessionId)
+                        log.d("Marking search session as sent: searchSessionId=$searchSessionId")
+                        searchRepository.saveSearchSession(searchSession.copy(state = SearchSession.State.Sent))
                     }
                 }
             }
