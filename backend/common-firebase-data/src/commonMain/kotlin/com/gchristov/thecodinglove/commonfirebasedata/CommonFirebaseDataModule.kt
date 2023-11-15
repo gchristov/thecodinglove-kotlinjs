@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.commonfirebasedata
 
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
+import com.gchristov.thecodinglove.commonkotlin.di.DiModule
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 

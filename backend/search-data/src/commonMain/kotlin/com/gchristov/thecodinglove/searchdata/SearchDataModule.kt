@@ -4,10 +4,10 @@ import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
-import com.gchristov.thecodinglove.kmpcommonkotlin.BuildConfig
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.kmpcommonnetwork.NetworkClient
+import com.gchristov.thecodinglove.commonkotlin.di.DiModule
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonnetwork.NetworkClient
+import com.gchristov.thecodinglove.commonkotlin.BuildConfig
 import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
 import com.gchristov.thecodinglove.searchdata.usecase.*
 import kotlinx.coroutines.Dispatchers

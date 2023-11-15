@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.commonservice.http
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.ParameterMap
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import kotlinx.serialization.DeserializationStrategy
 
 internal class ExpressHttpRequest(private val req: dynamic) : HttpRequest {

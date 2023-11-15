@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.slackdata
 import arrow.core.Either
 import arrow.core.flatMap
 import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthResponse
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackPostMessageResponse
@@ -29,8 +29,8 @@ interface SlackRepository {
 
     suspend fun deleteAuthToken(tokenId: String): Either<Throwable, Unit>
 
-    suspend fun replyWithMessage(
-        responseUrl: String,
+    suspend fun postMessageToUrl(
+        url: String,
         message: ApiSlackMessage
     ): Either<Throwable, Unit>
 
@@ -104,12 +104,12 @@ internal class RealSlackRepository(
         .document(tokenId)
         .delete()
 
-    override suspend fun replyWithMessage(
-        responseUrl: String,
+    override suspend fun postMessageToUrl(
+        url: String,
         message: ApiSlackMessage
     ) = try {
-        val slackResponse = apiService.replyWithMessage(
-            responseUrl = responseUrl,
+        val slackResponse = apiService.postMessageToUrl(
+            url = url,
             message = message
         )
         // Sending requests to Slack response URLs currently has an issue where the content type

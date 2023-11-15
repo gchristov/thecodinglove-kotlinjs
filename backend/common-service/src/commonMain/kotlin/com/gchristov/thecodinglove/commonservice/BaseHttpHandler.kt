@@ -6,7 +6,7 @@ import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
 import com.gchristov.thecodinglove.commonservicedata.http.sendJson
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -46,41 +46,41 @@ abstract class BaseHttpHandler(
         response: HttpResponse,
     ) {
         launch(dispatcher) {
-            request.bodyString?.let { log.d("Received request: bodyString=$it") } ?: log.d("Received request")
+            request.bodyString?.let { log.d("Received HTTP request: bodyString=$it") } ?: log.d("Received request")
             try {
                 handleHttpRequestAsync(
                     request = request,
                     response = response,
                 ).fold(
                     ifLeft = { handlerError ->
-                        log.e(handlerError) { "Error handling request: trace=${handlerError.stackTraceToString()}" }
+                        log.e(handlerError) { "Error handling HTTP request" }
                         handleError(
                             error = handlerError,
                             response = response,
                         ).fold(
                             ifLeft = { errorHandlerError ->
-                                log.e(errorHandlerError) { "Error sending error response: trace=${errorHandlerError.stackTraceToString()}" }
+                                log.e(errorHandlerError) { "Error sending HTTP error response" }
                             },
                             ifRight = {
                                 // TODO: Add some request metrics in here
-                                log.d("Request error sent successfully")
+                                log.d("HTTP request error sent successfully")
                             }
                         )
                     },
                     ifRight = {
                         // TODO: Add some request metrics in here
-                        log.d("Request handled successfully")
+                        log.d("HTTP request handled successfully")
                     }
                 )
             } catch (uncaughtHandlerError: Throwable) {
-                log.e(uncaughtHandlerError) { "Uncaught handler error: trace=${uncaughtHandlerError.stackTraceToString()}" }
+                log.e(uncaughtHandlerError) { "Uncaught HTTP handler error" }
                 try {
                     handleError(
                         error = uncaughtHandlerError,
                         response = response,
                     ).fold(
                         ifLeft = { errorHandlerError ->
-                            log.e(errorHandlerError) { "Error sending uncaught handler error: trace=${errorHandlerError.stackTraceToString()}" }
+                            log.e(errorHandlerError) { "Error sending uncaught HTTP handler error" }
                         },
                         ifRight = {
                             // TODO: Add some request metrics in here
@@ -88,7 +88,7 @@ abstract class BaseHttpHandler(
                         }
                     )
                 } catch (lastResort: Throwable) {
-                    log.e(lastResort) { "Uncaught last resort error: trace=${lastResort.stackTraceToString()}" }
+                    log.e(lastResort) { "Uncaught HTTP last resort error" }
                 }
             }
         }

@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.commonfirebasedata.firestore
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy

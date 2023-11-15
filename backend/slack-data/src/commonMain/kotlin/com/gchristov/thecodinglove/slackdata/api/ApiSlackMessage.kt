@@ -21,7 +21,6 @@ data class ApiSlackMessage(
     @SerialName("text") val text: String?,
     @SerialName("user_id") val userId: String?,
     @SerialName("channel") val channelId: String?,
-    @SerialName("response_url") val responseUrl: String?,
     @SerialName("response_type") val responseType: String,
     @SerialName("team") val teamId: String?,
     @SerialName("replace_original") val replaceOriginal: Boolean,
@@ -58,7 +57,7 @@ enum class ApiSlackActionName(val apiValue: String, val text: String) {
     CANCEL(apiValue = "cancel", text = "Cancel"),
 }
 
-private enum class ApiSlackMessageResponseType(val apiValue: String) {
+enum class ApiSlackMessageResponseType(val apiValue: String) {
     EPHEMERAL("ephemeral"),
     IN_CHANNEL("in_channel"),
 }
@@ -67,29 +66,25 @@ object ApiSlackMessageFactory {
     private const val ActionTypeButton = "button"
     private const val ActionStylePrimary = "primary"
 
-    fun processingMessage() = ApiSlackMessage(
-        text = "🔎 Hang tight, we're finding your GIF...",
+    fun message(
+        text: String? = null,
+        channelId: String? = null,
+        responseType: ApiSlackMessageResponseType = ApiSlackMessageResponseType.EPHEMERAL,
+        replaceOriginal: Boolean = true,
+        deleteOriginal: Boolean = false,
+        attachments: List<ApiSlackMessage.ApiAttachment>? = null,
+    ) = ApiSlackMessage(
+        text = text,
         userId = null,
-        channelId = null,
-        responseType = ApiSlackMessageResponseType.EPHEMERAL.apiValue,
-        responseUrl = null,
+        channelId = channelId,
+        responseType = responseType.apiValue,
         teamId = null,
-        replaceOriginal = true,
-        deleteOriginal = false,
-        attachments = null,
+        replaceOriginal = replaceOriginal,
+        deleteOriginal = deleteOriginal,
+        attachments = attachments,
     )
 
-    fun cancelMessage() = ApiSlackMessage(
-        text = null,
-        userId = null,
-        channelId = null,
-        responseType = ApiSlackMessageResponseType.EPHEMERAL.apiValue,
-        responseUrl = null,
-        teamId = null,
-        replaceOriginal = true,
-        deleteOriginal = true,
-        attachments = null,
-    )
+    fun cancelMessage() = message(deleteOriginal = true)
 
     fun searchResultMessage(
         searchQuery: String,
@@ -98,20 +93,14 @@ object ApiSlackMessageFactory {
         attachmentTitle: String,
         attachmentUrl: String,
         attachmentImageUrl: String,
-    ) = ApiSlackMessage(
+    ) = message(
         text = "$searchQuery - ($searchResults result${if (searchResults == 1) "" else "s"} found)",
-        userId = null,
-        channelId = null,
-        responseType = ApiSlackMessageResponseType.EPHEMERAL.apiValue,
-        responseUrl = null,
-        teamId = null,
-        replaceOriginal = true,
-        deleteOriginal = false,
         attachments = listOf(
             attachment(
                 title = attachmentTitle,
                 url = attachmentUrl,
                 imageUrl = attachmentImageUrl,
+                footer = PostedUsingFooter,
                 actions = listOf(
                     ApiSlackMessage.ApiAttachment.ApiAction(
                         name = ApiSlackActionName.SEND.apiValue,
@@ -147,19 +136,11 @@ object ApiSlackMessageFactory {
         teamId: String,
         clientId: String,
         state: String,
-    ) = ApiSlackMessage(
-        text = null,
-        userId = null,
-        channelId = null,
-        responseType = ApiSlackMessageResponseType.EPHEMERAL.apiValue,
-        responseUrl = null,
-        teamId = null,
-        replaceOriginal = true,
-        deleteOriginal = false,
+    ) = message(
         attachments = listOf(
             attachment(
-                text = "The Coding Love GIFs does not have permission to send messages on your behalf yet. Press Authorize and Send below to allow this.",
-                footer = "We'll never post without your permission.",
+                text = AuthText,
+                footer = AuthFooter,
                 actions = listOf(
                     ApiSlackMessage.ApiAttachment.ApiAction(
                         name = ApiSlackActionName.AUTH_SEND.apiValue,
@@ -188,32 +169,30 @@ object ApiSlackMessageFactory {
         attachmentUrl: String,
         attachmentImageUrl: String,
         channelId: String,
-    ) = ApiSlackMessage(
+    ) = message(
         text = searchQuery,
-        userId = null,
         channelId = channelId,
-        responseType = ApiSlackMessageResponseType.IN_CHANNEL.apiValue,
-        responseUrl = null,
-        teamId = null,
+        responseType = ApiSlackMessageResponseType.IN_CHANNEL,
         replaceOriginal = false,
-        deleteOriginal = false,
         attachments = listOf(
             attachment(
                 title = attachmentTitle,
                 url = attachmentUrl,
                 imageUrl = attachmentImageUrl,
                 actions = emptyList(),
+                footer = PostedUsingFooter,
             )
         ),
     )
 
-    private fun attachment(
+    fun attachment(
         title: String? = null,
         text: String? = null,
         url: String? = null,
-        footer: String? = "Posted using /codinglove",
+        footer: String? = null,
         imageUrl: String? = null,
-        actions: List<ApiSlackMessage.ApiAttachment.ApiAction>,
+        actions: List<ApiSlackMessage.ApiAttachment.ApiAction> = emptyList(),
+        color: String = "#1e1e1e",
     ) = ApiSlackMessage.ApiAttachment(
         title = title,
         titleLink = url,
@@ -221,7 +200,12 @@ object ApiSlackMessageFactory {
         imageUrl = imageUrl,
         footer = footer,
         callbackId = uuid4().toString(),
-        color = "#1e1e1e",
+        color = color,
         actions = actions,
     )
 }
+
+private const val AuthText =
+    "The Coding Love GIFs does not have permission to send messages on your behalf yet. Press Authorize and Send below to allow this."
+private const val AuthFooter = "We'll never post without your permission."
+private const val PostedUsingFooter = "Posted using /codinglove"

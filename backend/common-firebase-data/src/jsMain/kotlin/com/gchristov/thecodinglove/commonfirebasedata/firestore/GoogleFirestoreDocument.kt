@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.commonfirebasedata.firestore
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonfirebasedata.GoogleFirebaseAdminExternals
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import kotlinx.coroutines.await
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy

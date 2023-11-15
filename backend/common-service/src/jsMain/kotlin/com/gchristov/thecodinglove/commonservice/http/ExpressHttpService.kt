@@ -6,8 +6,8 @@ import arrow.core.sequence
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpService
-import com.gchristov.thecodinglove.kmpcommonkotlin.__dirname
-import com.gchristov.thecodinglove.kmpcommonkotlin.requireModule
+import com.gchristov.thecodinglove.commonkotlin.__dirname
+import com.gchristov.thecodinglove.commonkotlin.requireModule
 import io.ktor.http.*
 
 internal class ExpressHttpService(

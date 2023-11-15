@@ -5,7 +5,7 @@ import arrow.core.flatMap
 import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.searchdata.db.DbSearchSession
 import com.gchristov.thecodinglove.searchdata.db.toSearchSession
 import com.gchristov.thecodinglove.searchdata.domain.*

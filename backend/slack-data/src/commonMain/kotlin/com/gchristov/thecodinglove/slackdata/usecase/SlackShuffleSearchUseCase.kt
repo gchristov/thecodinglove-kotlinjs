@@ -30,8 +30,8 @@ class RealSlackShuffleSearchUseCase(
         searchUseCase.invoke(SearchUseCase.Type.WithSessionId(searchSessionId))
             .flatMap { searchResult ->
                 log.d("Sending Slack response: responseUrl=$responseUrl")
-                slackRepository.replyWithMessage(
-                    responseUrl = responseUrl,
+                slackRepository.postMessageToUrl(
+                    url = responseUrl,
                     message = ApiSlackMessageFactory.searchResultMessage(
                         searchQuery = searchResult.query,
                         searchResults = searchResult.totalPosts,

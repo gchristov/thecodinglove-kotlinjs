@@ -10,7 +10,7 @@ import com.gchristov.thecodinglove.commonservicedata.http.sendEmpty
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlin.io.encoding.ExperimentalEncodingApi
 

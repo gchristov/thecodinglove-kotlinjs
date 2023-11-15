@@ -1,17 +1,17 @@
 includeBuild("gradle-plugins")
 
 val projects = listOf(
-    "shared/kmp-common-kotlin",
-    "shared/kmp-common-network",
-    "shared/kmp-common-test",
     "backend/appBackend",
     "backend/common-firebase-data",
+    "backend/common-kotlin",
+    "backend/common-network",
     "backend/common-service",
     "backend/common-service-data",
     "backend/common-service-testfixtures",
-    "backend/firebasefunctions",
+    "backend/common-test",
     "backend/html-parse-data",
     "backend/html-parse-testfixtures",
+    "backend/monitoring-data",
     "backend/search",
     "backend/search-data",
     "backend/search-testfixtures",

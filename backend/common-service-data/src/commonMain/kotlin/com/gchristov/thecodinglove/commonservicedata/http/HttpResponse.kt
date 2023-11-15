@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.commonservicedata.http
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import io.ktor.http.*
 import kotlinx.serialization.encodeToString
 

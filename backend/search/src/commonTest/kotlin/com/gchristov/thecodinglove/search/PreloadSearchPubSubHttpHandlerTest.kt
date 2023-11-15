@@ -4,9 +4,9 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubDecoder
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSubscription
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.commontest.FakeLogger
 import com.gchristov.thecodinglove.searchdata.domain.PreloadSearchPubSubMessage
 import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
 import com.gchristov.thecodinglove.searchdata.domain.SearchError

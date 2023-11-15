@@ -10,8 +10,8 @@ import com.gchristov.thecodinglove.commonservicedata.http.HttpService
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
-import com.gchristov.thecodinglove.kmpcommonkotlin.AppConfig
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.AppConfig
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 
 actual fun provideHttpService(log: Logger): HttpService = ExpressHttpService(log)
 

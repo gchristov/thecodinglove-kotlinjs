@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.commonservice.pubsub
 import arrow.core.Either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
-import com.gchristov.thecodinglove.kmpcommonkotlin.AppConfig
-import com.gchristov.thecodinglove.kmpcommonkotlin.process
+import com.gchristov.thecodinglove.commonkotlin.AppConfig
+import com.gchristov.thecodinglove.commonkotlin.process
 import kotlinx.coroutines.await
 import kotlin.js.json
 

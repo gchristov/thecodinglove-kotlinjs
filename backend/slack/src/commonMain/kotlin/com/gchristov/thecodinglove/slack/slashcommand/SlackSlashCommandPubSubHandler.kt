@@ -10,7 +10,8 @@ import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
@@ -52,28 +53,15 @@ class SlackSlashCommandPubSubHandler(
         )
             .leftIfNull { Exception("PubSub request body missing") }
             .flatMap { it.handle() }
-            .fold(
-                ifLeft = {
-                    when {
-                        // If the Slack response url has expired we can't really do much else, so we ACK it
-                        it.message?.contains("used_url") == true -> {
-                            log.w(it) { "Ignoring PubSub error for expired Slack url" }
-                            Either.Right(Unit)
-                        }
 
-                        else -> Either.Left(it)
-                    }
-                }, ifRight = { Either.Right(Unit) }
-            )
-
-    private suspend fun SlackSlashCommandPubSubMessage.handle() = slackRepository.replyWithMessage(
-        responseUrl = responseUrl,
-        message = ApiSlackMessageFactory.processingMessage()
+    private suspend fun SlackSlashCommandPubSubMessage.handle() = slackRepository.postMessageToUrl(
+        url = responseUrl,
+        message = ApiSlackMessageFactory.message("🔎 Hang tight, we're finding your GIF...")
     )
         .flatMap { searchUseCase(SearchUseCase.Type.NewSession(query = text)) }
         .flatMap { searchResult ->
-            slackRepository.replyWithMessage(
-                responseUrl = responseUrl,
+            slackRepository.postMessageToUrl(
+                url = responseUrl,
                 message = ApiSlackMessageFactory.searchResultMessage(
                     searchQuery = searchResult.query,
                     searchResults = searchResult.totalPosts,
@@ -84,4 +72,20 @@ class SlackSlashCommandPubSubHandler(
                 )
             )
         }
+        .fold(
+            ifLeft = {
+                // Attempt to handle Slack PubSub errors as success, so that they aren't retried automatically. If
+                // sending the reply back fails, the entire PubSub chain will be retried.
+                log.e(it) { "Error handling request" }
+                val userErrorMessage = when {
+                    it is SearchError.Empty -> "No results found for '$text'. Please try a different query."
+                    else -> "⚠️ Something has gone wrong. We are investigating. Please try again."
+                }
+                slackRepository.postMessageToUrl(
+                    url = responseUrl,
+                    message = ApiSlackMessageFactory.message(text = userErrorMessage)
+                )
+            },
+            ifRight = { Either.Right(Unit) }
+        )
 }

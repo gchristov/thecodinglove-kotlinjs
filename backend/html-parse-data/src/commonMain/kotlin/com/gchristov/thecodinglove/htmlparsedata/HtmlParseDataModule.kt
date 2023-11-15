@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.htmlparsedata
 
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
+import com.gchristov.thecodinglove.commonkotlin.di.DiModule
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 

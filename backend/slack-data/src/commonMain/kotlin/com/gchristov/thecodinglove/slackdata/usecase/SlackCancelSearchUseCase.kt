@@ -27,8 +27,8 @@ class RealSlackCancelSearchUseCase(
         searchSessionId: String,
     ): Either<Throwable, Unit> = withContext(dispatcher) {
         log.d("Cancelling Slack message: responseUrl=$responseUrl")
-        slackRepository.replyWithMessage(
-            responseUrl = responseUrl,
+        slackRepository.postMessageToUrl(
+            url = responseUrl,
             message = ApiSlackMessageFactory.cancelMessage()
         ).flatMap {
             log.d("Deleting search session: searchSessionId=$searchSessionId")

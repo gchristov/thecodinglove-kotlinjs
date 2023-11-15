@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.searchtestfixtures
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.kmpcommontest.FakeResponse
-import com.gchristov.thecodinglove.kmpcommontest.execute
+import com.gchristov.thecodinglove.commontest.FakeResponse
+import com.gchristov.thecodinglove.commontest.execute
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.domain.Post
 import com.gchristov.thecodinglove.searchdata.domain.SearchError

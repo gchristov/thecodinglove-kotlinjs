@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.htmlparsedata.usecase
 import arrow.core.Either
 import com.gchristov.thecodinglove.htmlparsedata.HtmlPost
 import com.gchristov.thecodinglove.htmlparsetestfixtures.HtmlCreator
-import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test

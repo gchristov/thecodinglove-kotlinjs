@@ -3,16 +3,19 @@ package com.gchristov.thecodinglove
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.sequence
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonfirebasedata.CommonFirebaseDataModule
+import com.gchristov.thecodinglove.commonkotlin.CommonKotlinModule
+import com.gchristov.thecodinglove.commonkotlin.di.DiGraph
+import com.gchristov.thecodinglove.commonkotlin.di.inject
+import com.gchristov.thecodinglove.commonkotlin.di.registerModules
+import com.gchristov.thecodinglove.commonnetwork.CommonNetworkModule
 import com.gchristov.thecodinglove.commonservice.CommonServiceModule
 import com.gchristov.thecodinglove.commonservice.http.StaticFileHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpService
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
-import com.gchristov.thecodinglove.kmpcommonkotlin.KmpCommonKotlinModule
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.registerModules
-import com.gchristov.thecodinglove.kmpcommonnetwork.KmpCommonNetworkModule
+import com.gchristov.thecodinglove.monitoringdata.MonitoringDataModule
+import com.gchristov.thecodinglove.monitoringdata.MonitoringLogWriter
 import com.gchristov.thecodinglove.search.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.SearchHttpHandler
 import com.gchristov.thecodinglove.search.SearchModule
@@ -28,6 +31,7 @@ import com.gchristov.thecodinglove.slackdata.SlackDataModule
 
 suspend fun main() {
     setupDi()
+        .flatMap { setupMonitoring() }
         .flatMap { setupServices() }
         .flatMap { startServices(it) }
         .fold(ifLeft = { error ->
@@ -39,22 +43,33 @@ suspend fun main() {
 }
 
 /**
- * Setup dependency injection with all participating modules
+ * Setup dependency injection with all participating modules.
  */
 private fun setupDi(): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
-            KmpCommonKotlinModule.module,
-            KmpCommonNetworkModule.module,
+            CommonKotlinModule.module,
+            CommonNetworkModule.module,
             CommonFirebaseDataModule.module,
             CommonServiceModule.module,
             HtmlParseDataModule.module,
+            MonitoringDataModule.module,
             SearchModule.module,
             SearchDataModule.module,
             SlackModule.module,
             SlackDataModule.module,
         )
     )
+    return Either.Right(Unit)
+}
+
+/**
+ * Setup custom log writer to monitor specific logs.
+ */
+private fun setupMonitoring(): Either<Throwable, Unit> {
+    DiGraph.inject<MonitoringLogWriter>().apply {
+        Logger.addLogWriter(this)
+    }
     return Either.Right(Unit)
 }
 

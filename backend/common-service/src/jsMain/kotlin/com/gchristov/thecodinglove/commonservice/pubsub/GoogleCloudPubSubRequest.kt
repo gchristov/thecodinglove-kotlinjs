@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.commonservice.pubsub
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import io.ktor.util.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName

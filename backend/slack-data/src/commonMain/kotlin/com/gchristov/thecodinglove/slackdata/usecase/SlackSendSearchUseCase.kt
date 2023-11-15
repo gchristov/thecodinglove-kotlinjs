@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.slackdata.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import com.gchristov.thecodinglove.slackdata.SlackRepository
@@ -83,8 +83,8 @@ class RealSlackSendSearchUseCase(
             )
         ).encodeBase64()
         log.d("Asking user to authenticate: userId=$userId, state=$state")
-        slackRepository.replyWithMessage(
-            responseUrl = responseUrl,
+        slackRepository.postMessageToUrl(
+            url = responseUrl,
             message = ApiSlackMessageFactory.authMessage(
                 searchSessionId = searchSessionId,
                 teamId = teamId,
@@ -109,8 +109,8 @@ class RealSlackSendSearchUseCase(
         return searchRepository.getSearchSession(searchSessionId)
             .flatMap { searchSession ->
                 log.d("Cancelling previous Slack message: responseUrl=$responseUrl")
-                slackRepository.replyWithMessage(
-                    responseUrl = responseUrl,
+                slackRepository.postMessageToUrl(
+                    url = responseUrl,
                     message = ApiSlackMessageFactory.cancelMessage()
                 ).flatMap {
                     log.d("Posting search result: searchSessionId=$searchSessionId")

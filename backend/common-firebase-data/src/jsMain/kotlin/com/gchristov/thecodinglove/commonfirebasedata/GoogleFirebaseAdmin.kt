@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.commonfirebasedata
 
 import com.gchristov.thecodinglove.commonfirebasedata.firestore.Firestore
 import com.gchristov.thecodinglove.commonfirebasedata.firestore.GoogleFirestore
-import com.gchristov.thecodinglove.kmpcommonkotlin.process
+import com.gchristov.thecodinglove.commonkotlin.process
 
 internal class GoogleFirebaseAdmin : FirebaseAdmin {
     private val app: GoogleFirebaseAdminExternals.App
