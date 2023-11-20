@@ -4,13 +4,13 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
@@ -76,7 +76,7 @@ class SlackSlashCommandPubSubHandler(
             ifLeft = {
                 // Attempt to handle Slack PubSub errors as success, so that they aren't retried automatically. If
                 // sending the reply back fails, the entire PubSub chain will be retried.
-                log.e(it) { "Error handling request" }
+                log.e(it) { "Error handling Slash command PubSub request" }
                 val userErrorMessage = when {
                     it is SearchError.Empty -> "No results found for '$text'. Please try a different query."
                     else -> "⚠️ Something has gone wrong. We are investigating. Please try again."
