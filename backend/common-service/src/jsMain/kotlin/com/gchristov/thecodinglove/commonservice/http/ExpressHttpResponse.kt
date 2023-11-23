@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.commonservice.http
 
 import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
-import com.gchristov.thecodinglove.kmpcommonkotlin.__dirname
-import com.gchristov.thecodinglove.kmpcommonkotlin.requireModule
+import com.gchristov.thecodinglove.commonkotlin.__dirname
+import com.gchristov.thecodinglove.commonkotlin.requireModule
 
 internal class ExpressHttpResponse(private val res: dynamic) : HttpResponse {
     override fun send(string: String) {

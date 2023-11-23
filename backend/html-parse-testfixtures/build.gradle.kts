@@ -1,3 +1,3 @@
 plugins {
-    id("kmp-module-plugin")
+    id("module-plugin")
 }

@@ -5,9 +5,9 @@ import com.gchristov.thecodinglove.commonservicedata.http.HttpService
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
-import com.gchristov.thecodinglove.kmpcommonkotlin.AppConfig
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.AppConfig
+import com.gchristov.thecodinglove.commonkotlin.di.DiModule
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton

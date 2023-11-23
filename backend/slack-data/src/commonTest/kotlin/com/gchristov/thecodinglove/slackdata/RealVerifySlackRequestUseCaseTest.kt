@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.slackdata
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.kmpcommontest.FakeLogger
+import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.commontest.FakeLogger
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.RealSlackVerifyRequestUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.SlackVerifyRequestUseCase
@@ -33,7 +33,7 @@ class RealVerifySlackRequestUseCaseTest {
         return runBlockingTest { useCase ->
             val actualResult = useCase.invoke(FakeSlackApiRequest(fakeTimestamp = "timestamp"))
             assertEquals(
-                expected = Either.Left(SlackVerifyRequestUseCase.Error.Other("Error during Slack request verification: Invalid number format: 'timestamp'")),
+                expected = Either.Left(SlackVerifyRequestUseCase.Error.Other("Error during request verification: Invalid number format: 'timestamp'")),
                 actual = actualResult
             )
         }
@@ -136,6 +136,7 @@ class RealVerifySlackRequestUseCaseTest {
                     clientSecret = TestClientSecret,
                     interactivityPubSubTopic = TestInteractivityPubSubTopic,
                     slashCommandPubSubTopic = TestSlashCommandPubSubTopic,
+                    monitoringUrl = TestMonitoringUrl,
                 ),
                 clock = TestClock,
                 log = FakeLogger
@@ -153,3 +154,4 @@ private val TestClock = object : Clock {
 }
 private const val TestInteractivityPubSubTopic = "topic_123"
 private const val TestSlashCommandPubSubTopic = "topic_456"
+private const val TestMonitoringUrl = "https://monitoring"

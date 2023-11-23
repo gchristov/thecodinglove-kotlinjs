@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.slackdata.api
 
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiGraph
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.inject
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.di.DiGraph
+import com.gchristov.thecodinglove.commonkotlin.di.inject
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor

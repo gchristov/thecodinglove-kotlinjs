@@ -3,17 +3,17 @@ plugins {
 }
 
 gradlePlugin {
-    plugins.register("kmp-platform-plugin") {
-        id = "kmp-platform-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.kmp.KmpPlatformPlugin"
+    plugins.register("platform-plugin") {
+        id = "platform-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.kmp.PlatformPlugin"
     }
-    plugins.register("kmp-module-plugin") {
-        id = "kmp-module-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.kmp.KmpModulePlugin"
+    plugins.register("module-plugin") {
+        id = "module-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.kmp.ModulePlugin"
     }
-    plugins.register("kmp-data-plugin") {
-        id = "kmp-data-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.kmp.KmpDataPlugin"
+    plugins.register("data-plugin") {
+        id = "data-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.kmp.DataPlugin"
     }
     plugins.register("build-config-plugin") {
         id = "build-config-plugin"

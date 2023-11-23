@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.commonservice.pubsub
 
-import com.gchristov.thecodinglove.kmpcommonkotlin.Buffer
+import com.gchristov.thecodinglove.commonkotlin.Buffer
 import kotlin.js.Promise
 
 @JsModule("@google-cloud/pubsub")

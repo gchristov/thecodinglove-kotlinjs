@@ -4,13 +4,15 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.error
 import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
@@ -35,6 +37,8 @@ class SlackSlashCommandPubSubHandler(
     pubSubSubscription = pubSubSubscription,
     pubSubDecoder = pubSubDecoder,
 ) {
+    private val tag = this::class.simpleName
+
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
         path = "/api/pubsub/slack/slash",
@@ -50,30 +54,17 @@ class SlackSlashCommandPubSubHandler(
             jsonSerializer = jsonSerializer,
             strategy = SlackSlashCommandPubSubMessage.serializer(),
         )
-            .leftIfNull { Exception("PubSub request body missing") }
+            .leftIfNull { Exception("Request body is invalid") }
             .flatMap { it.handle() }
-            .fold(
-                ifLeft = {
-                    when {
-                        // If the Slack response url has expired we can't really do much else, so we ACK it
-                        it.message?.contains("used_url") == true -> {
-                            log.w(it) { "Ignoring PubSub error for expired Slack url" }
-                            Either.Right(Unit)
-                        }
 
-                        else -> Either.Left(it)
-                    }
-                }, ifRight = { Either.Right(Unit) }
-            )
-
-    private suspend fun SlackSlashCommandPubSubMessage.handle() = slackRepository.replyWithMessage(
-        responseUrl = responseUrl,
-        message = ApiSlackMessageFactory.processingMessage()
+    private suspend fun SlackSlashCommandPubSubMessage.handle() = slackRepository.postMessageToUrl(
+        url = responseUrl,
+        message = ApiSlackMessageFactory.message("🔎 Hang tight, we're finding your GIF...")
     )
         .flatMap { searchUseCase(SearchUseCase.Type.NewSession(query = text)) }
         .flatMap { searchResult ->
-            slackRepository.replyWithMessage(
-                responseUrl = responseUrl,
+            slackRepository.postMessageToUrl(
+                url = responseUrl,
                 message = ApiSlackMessageFactory.searchResultMessage(
                     searchQuery = searchResult.query,
                     searchResults = searchResult.totalPosts,
@@ -84,4 +75,20 @@ class SlackSlashCommandPubSubHandler(
                 )
             )
         }
+        .fold(
+            ifLeft = {
+                // Handle errors as success without PubSub retries, but try to notify the user of the error. If sending
+                // the reply back fails, the entire PubSub chain will be retried automatically.
+                log.error(tag, it) { "Error handling request" }
+                val userErrorMessage = when {
+                    it is SearchError.Empty -> "No results found for '$text'. Please try a different search query."
+                    else -> "⚠️ Something has gone wrong. Please try again while we investigate."
+                }
+                slackRepository.postMessageToUrl(
+                    url = responseUrl,
+                    message = ApiSlackMessageFactory.message(text = userErrorMessage)
+                )
+            },
+            ifRight = { Either.Right(Unit) }
+        )
 }

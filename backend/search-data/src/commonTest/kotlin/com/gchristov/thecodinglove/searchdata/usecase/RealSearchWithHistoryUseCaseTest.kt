@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.kmpcommontest.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.searchdata.domain.Post
 import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
 import com.gchristov.thecodinglove.searchdata.domain.SearchError

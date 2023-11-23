@@ -8,4 +8,5 @@ data class SlackConfig(
     val clientSecret: String,
     val interactivityPubSubTopic: String,
     val slashCommandPubSubTopic: String,
+    val monitoringUrl: String,
 )

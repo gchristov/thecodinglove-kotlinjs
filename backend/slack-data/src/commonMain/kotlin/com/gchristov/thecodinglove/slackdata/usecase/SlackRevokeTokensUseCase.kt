@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slackdata.usecase
 import arrow.core.Either
 import arrow.core.sequence
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonkotlin.debug
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.domain.SlackEvent
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,15 +18,17 @@ class RealSlackRevokeTokensUseCase(
     private val log: Logger,
     private val slackRepository: SlackRepository,
 ) : SlackRevokeTokensUseCase {
+    private val tag = this::class.simpleName
+
     override suspend fun invoke(event: SlackEvent.Callback.Event.TokensRevoked): Either<Throwable, Unit> =
         withContext(dispatcher) {
             val tokensIdsToRevoke = (event.tokens.oAuth?.toMutableList() ?: mutableListOf()).apply {
                 addAll(event.tokens.bot ?: emptyList())
             }
-            log.d("Processing Slack revoked tokens: tokensIdsToRevoke=$tokensIdsToRevoke")
+            log.debug(tag, "Processing revoked tokens: tokensIdsToRevoke=$tokensIdsToRevoke")
             tokensIdsToRevoke
                 .map {
-                    log.d("Deleting Slack token: id=$it")
+                    log.debug(tag, "Deleting token: id=$it")
                     slackRepository.deleteAuthToken(it)
                 }
                 .sequence()

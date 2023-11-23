@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.searchdata
 
-import com.gchristov.thecodinglove.kmpcommonnetwork.NetworkClient
+import com.gchristov.thecodinglove.commonnetwork.NetworkClient
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

@@ -3,7 +3,8 @@ package com.gchristov.thecodinglove.slackdata.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.debug
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import com.gchristov.thecodinglove.slackdata.SlackRepository
@@ -33,6 +34,8 @@ class RealSlackSendSearchUseCase(
     private val slackConfig: SlackConfig,
     private val jsonSerializer: JsonSerializer,
 ) : SlackSendSearchUseCase {
+    private val tag = this::class.simpleName
+
     override suspend operator fun invoke(
         userId: String,
         teamId: String,
@@ -40,11 +43,11 @@ class RealSlackSendSearchUseCase(
         responseUrl: String,
         searchSessionId: String
     ): Either<Throwable, Unit> = withContext(dispatcher) {
-        log.d("Checking auth token before sending message: userId=$userId")
+        log.debug(tag, "Checking auth token before sending message: userId=$userId")
         slackRepository.getAuthToken(tokenId = userId)
             .fold(
                 ifLeft = { error ->
-                    log.d(error) { "Error fetching user token${error.message?.let { ": $it" } ?: ""}" }
+                    log.debug(tag, error) { "Error fetching user token${error.message?.let { ": $it" } ?: ""}" }
                     authenticate(
                         userId = userId,
                         responseUrl = responseUrl,
@@ -82,9 +85,9 @@ class RealSlackSendSearchUseCase(
                 responseUrl = responseUrl
             )
         ).encodeBase64()
-        log.d("Asking user to authenticate: userId=$userId, state=$state")
-        slackRepository.replyWithMessage(
-            responseUrl = responseUrl,
+        log.debug(tag, "Asking user to authenticate: userId=$userId, state=$state")
+        slackRepository.postMessageToUrl(
+            url = responseUrl,
             message = ApiSlackMessageFactory.authMessage(
                 searchSessionId = searchSessionId,
                 teamId = teamId,
@@ -105,15 +108,15 @@ class RealSlackSendSearchUseCase(
         responseUrl: String,
         searchSessionId: String
     ): Either<Throwable, Unit> {
-        log.d("Obtaining search session: searchSessionId=$searchSessionId")
+        log.debug(tag, "Obtaining search session: searchSessionId=$searchSessionId")
         return searchRepository.getSearchSession(searchSessionId)
             .flatMap { searchSession ->
-                log.d("Cancelling previous Slack message: responseUrl=$responseUrl")
-                slackRepository.replyWithMessage(
-                    responseUrl = responseUrl,
+                log.debug(tag, "Cancelling previous search: responseUrl=$responseUrl")
+                slackRepository.postMessageToUrl(
+                    url = responseUrl,
                     message = ApiSlackMessageFactory.cancelMessage()
                 ).flatMap {
-                    log.d("Posting search result: searchSessionId=$searchSessionId")
+                    log.debug(tag, "Posting search result: searchSessionId=$searchSessionId")
                     slackRepository.postMessage(
                         authToken = authToken,
                         message = ApiSlackMessageFactory.searchPostMessage(
@@ -124,7 +127,7 @@ class RealSlackSendSearchUseCase(
                             channelId = channelId,
                         )
                     ).flatMap {
-                        log.d("Marking search session as sent: searchSessionId=$searchSessionId")
+                        log.debug(tag, "Marking search session as sent: searchSessionId=$searchSessionId")
                         searchRepository.saveSearchSession(searchSession.copy(state = SearchSession.State.Sent))
                     }
                 }

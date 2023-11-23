@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slackdata.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonkotlin.debug
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import diglol.crypto.Hmac
@@ -32,6 +33,8 @@ class RealSlackVerifyRequestUseCase(
     private val clock: Clock,
     private val log: Logger,
 ) : SlackVerifyRequestUseCase {
+    private val tag = this::class.simpleName
+
     override suspend fun invoke(request: HttpRequest): Either<SlackVerifyRequestUseCase.Error, Unit> =
         withContext(dispatcher) {
             try {
@@ -40,7 +43,10 @@ class RealSlackVerifyRequestUseCase(
                     ?: return@withContext Either.Left(SlackVerifyRequestUseCase.Error.MissingTimestamp)
                 val signature: String = request.headers["x-slack-signature"]
                     ?: return@withContext Either.Left(SlackVerifyRequestUseCase.Error.MissingSignature)
-                log.d("Verifying Slack request: timestamp=$timestamp, signature=$signature, body=${request.bodyString}")
+                log.debug(
+                    tag = tag,
+                    message = "Verifying request: timestamp=$timestamp, signature=$signature, body=${request.bodyString}",
+                )
 
                 verifyTimestamp(
                     timestamp = timestamp,
@@ -56,7 +62,7 @@ class RealSlackVerifyRequestUseCase(
                 }
             } catch (error: Throwable) {
                 Either.Left(SlackVerifyRequestUseCase.Error.Other(
-                    message = "Error during Slack request verification${error.message?.let { ": $it" } ?: ""}",
+                    message = "Error during request verification${error.message?.let { ": $it" } ?: ""}",
                 ))
             }
         }

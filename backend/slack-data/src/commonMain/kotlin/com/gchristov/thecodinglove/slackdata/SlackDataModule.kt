@@ -2,10 +2,10 @@ package com.gchristov.thecodinglove.slackdata
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
-import com.gchristov.thecodinglove.kmpcommonkotlin.BuildConfig
-import com.gchristov.thecodinglove.kmpcommonkotlin.di.DiModule
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.kmpcommonnetwork.NetworkClient
+import com.gchristov.thecodinglove.commonkotlin.BuildConfig
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.di.DiModule
+import com.gchristov.thecodinglove.commonnetwork.NetworkClient
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
@@ -86,6 +86,7 @@ object SlackDataModule : DiModule() {
         clientSecret = BuildConfig.SLACK_CLIENT_SECRET,
         interactivityPubSubTopic = BuildConfig.SLACK_INTERACTIVITY_PUBSUB_TOPIC,
         slashCommandPubSubTopic = BuildConfig.SLACK_SLASH_COMMAND_PUBSUB_TOPIC,
+        monitoringUrl = BuildConfig.SLACK_MONITORING_URL,
     )
 
     private fun provideSlackRepository(

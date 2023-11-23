@@ -3,11 +3,12 @@ package com.gchristov.thecodinglove.slack
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.debug
 import com.gchristov.thecodinglove.commonservice.BaseHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
-import com.gchristov.thecodinglove.kmpcommonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthState
 import com.gchristov.thecodinglove.slackdata.domain.toAuthState
 import com.gchristov.thecodinglove.slackdata.usecase.SlackAuthUseCase
@@ -28,6 +29,8 @@ class SlackAuthHttpHandler(
     jsonSerializer = jsonSerializer,
     log = log
 ) {
+    private val tag = this::class.simpleName
+
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Get,
         path = "/api/slack/auth",
@@ -68,11 +71,11 @@ class SlackAuthHttpHandler(
 
     private suspend fun handleAuthState(state: String) = try {
         val base64Decoded = state.decodeBase64String()
-        log.d("Decoded Base64 auth state: decoded=$base64Decoded")
+        log.debug(tag, "Decoded Base64 auth state: decoded=$base64Decoded")
         val authState = jsonSerializer.json
             .decodeFromString<ApiSlackAuthState>(base64Decoded)
             .toAuthState()
-        log.d("Parsed Base64 auth state: parsed=$authState")
+        log.debug(tag, "Parsed Base64 auth state: parsed=$authState")
         slackSendSearchUseCase.invoke(
             userId = authState.userId,
             teamId = authState.teamId,

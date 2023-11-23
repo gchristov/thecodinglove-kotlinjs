@@ -4,15 +4,17 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.sequence
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonkotlin.__dirname
+import com.gchristov.thecodinglove.commonkotlin.debug
+import com.gchristov.thecodinglove.commonkotlin.requireModule
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpService
-import com.gchristov.thecodinglove.kmpcommonkotlin.__dirname
-import com.gchristov.thecodinglove.kmpcommonkotlin.requireModule
 import io.ktor.http.*
 
 internal class ExpressHttpService(
     private val log: Logger,
 ) : HttpService {
+    private val tag = this::class.simpleName
     private val express: dynamic = requireModule("express")
     private val app: dynamic = express()
     private var port: Int? = null
@@ -22,7 +24,7 @@ internal class ExpressHttpService(
         staticWebsiteRoot: String?,
         port: Int
     ): Either<Throwable, Unit> = try {
-        log.d("Initialising ${this::class.simpleName}")
+        log.debug(tag, "Initialising")
         this.port = port
 
         staticWebsiteRoot?.let {
@@ -35,29 +37,29 @@ internal class ExpressHttpService(
                 handler
                     .initialise()
                     .map {
-                        log.d("Attaching ${handler::class.simpleName}")
+                        log.debug(handler::class.simpleName, "Attaching")
                         handler.attach(app)
                     }
             }
             .sequence()
             .flatMap {
-                log.d("${this::class.simpleName} initialised")
+                log.debug(tag, "Initialised")
                 Either.Right(Unit)
             }
     } catch (error: Throwable) {
         Either.Left(Throwable(
-            message = "Error initialising ${this::class.simpleName}${error.message?.let { ": $it" } ?: ""}",
+            message = "Error initialising $tag${error.message?.let { ": $it" } ?: ""}",
             cause = error,
         ))
     }
 
     override suspend fun start(): Either<Throwable, Unit> = try {
         app.listen(requireNotNull(port))
-        log.d("${this::class.simpleName} started on port $port")
+        log.debug(tag, "Started on port $port")
         Either.Right(Unit)
     } catch (error: Throwable) {
         Either.Left(Throwable(
-            message = "Error starting ${this::class.simpleName}${error.message?.let { ": $it" } ?: ""}",
+            message = "Error starting $tag${error.message?.let { ": $it" } ?: ""}",
             cause = error,
         ))
     }
