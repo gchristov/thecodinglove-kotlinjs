@@ -48,7 +48,7 @@ class MonitoringLogWriter(
                     message = slackMessage,
                 ).fold(
                     ifLeft = {
-                        // This logged has already attempted to post to Slack but has failed, so just log the error.
+                        // The logger has already attempted to post to Slack but has failed, so just log the error locally.
                         it.printStackTrace()
                     },
                     ifRight = {
