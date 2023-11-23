@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.error
 import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
@@ -36,6 +37,8 @@ class SlackSlashCommandPubSubHandler(
     pubSubSubscription = pubSubSubscription,
     pubSubDecoder = pubSubDecoder,
 ) {
+    private val tag = this::class.simpleName
+
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
         path = "/api/pubsub/slack/slash",
@@ -51,7 +54,7 @@ class SlackSlashCommandPubSubHandler(
             jsonSerializer = jsonSerializer,
             strategy = SlackSlashCommandPubSubMessage.serializer(),
         )
-            .leftIfNull { Exception("PubSub request body missing") }
+            .leftIfNull { Exception("Request body is invalid") }
             .flatMap { it.handle() }
 
     private suspend fun SlackSlashCommandPubSubMessage.handle() = slackRepository.postMessageToUrl(
@@ -74,12 +77,12 @@ class SlackSlashCommandPubSubHandler(
         }
         .fold(
             ifLeft = {
-                // Attempt to handle Slack PubSub errors as success, so that they aren't retried automatically. If
-                // sending the reply back fails, the entire PubSub chain will be retried.
-                log.e(it) { "Error handling Slash command PubSub request" }
+                // Handle errors as success without PubSub retries, but try to notify the user of the error. If sending
+                // the reply back fails, the entire PubSub chain will be retried automatically.
+                log.error(tag, it) { "Error handling request" }
                 val userErrorMessage = when {
-                    it is SearchError.Empty -> "No results found for '$text'. Please try a different query."
-                    else -> "⚠️ Something has gone wrong. We are investigating. Please try again."
+                    it is SearchError.Empty -> "No results found for '$text'. Please try a different search query."
+                    else -> "⚠️ Something has gone wrong. Please try again while we investigate."
                 }
                 slackRepository.postMessageToUrl(
                     url = responseUrl,

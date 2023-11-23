@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slackdata.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonkotlin.debug
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,10 +24,12 @@ class RealSlackAuthUseCase(
     private val log: Logger,
     private val slackRepository: SlackRepository,
 ) : SlackAuthUseCase {
+    private val tag = this::class.simpleName
+
     override suspend fun invoke(code: String?): Either<SlackAuthUseCase.Error, Unit> = withContext(dispatcher) {
-        log.d("Processing Slack user auth request: code=$code")
+        log.debug(tag, "Processing user auth request: code=$code")
         if (code.isNullOrEmpty()) {
-            log.d("Auth cancelled")
+            log.debug(tag, "Auth cancelled")
             Either.Left(SlackAuthUseCase.Error.Cancelled)
         } else {
             slackRepository.authUser(
@@ -36,7 +39,7 @@ class RealSlackAuthUseCase(
             )
                 .mapLeft { SlackAuthUseCase.Error.Other(it.message) }
                 .flatMap { authResponse ->
-                    log.d("Persisting Slack token")
+                    log.debug(tag, "Persisting auth token")
                     slackRepository
                         .saveAuthToken(authResponse)
                         .mapLeft { SlackAuthUseCase.Error.Other(it.message) }

@@ -2,9 +2,10 @@ package com.gchristov.thecodinglove.commonservice.pubsub
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.commonkotlin.AppConfig
+import com.gchristov.thecodinglove.commonkotlin.debug
 import com.gchristov.thecodinglove.commonkotlin.process
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import kotlinx.coroutines.await
 import kotlin.js.json
 
@@ -13,6 +14,8 @@ internal class GoogleCloudPubSubSubscription(
     private val pubSub: GoogleCloudPubSubExternals.PubSub,
     private val appConfig: AppConfig,
 ) : PubSubSubscription {
+    private val tag = this::class.simpleName
+
     init {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = "local-credentials-gcp.json"
     }
@@ -23,13 +26,13 @@ internal class GoogleCloudPubSubSubscription(
     ): Either<Throwable, Unit> = try {
         val pubSubTopic = pubSub.topic(topic)
         if (!pubSubTopic.exists().await().first()) {
-            log.d("Creating PubSub topic $topic")
+            log.debug(tag, "Creating topic $topic")
             pubSubTopic.create().await()
         }
         val subscription = "${topic}_subscription"
         val pubSubSubscription = pubSubTopic.subscription(subscription)
         if (!pubSubSubscription.exists().await().first()) {
-            log.d("Creating PubSub subscription $subscription")
+            log.debug(tag, "Creating subscription $subscription")
             val trimmedDomain = appConfig.publicUrl
             val trimmedPath = httpPath.removePrefix("/")
             pubSubSubscription.create(

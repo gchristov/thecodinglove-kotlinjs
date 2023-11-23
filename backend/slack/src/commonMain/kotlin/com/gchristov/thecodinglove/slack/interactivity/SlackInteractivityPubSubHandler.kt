@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import arrow.core.leftIfNull
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.error
 import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
@@ -37,6 +38,8 @@ class SlackInteractivityPubSubHandler(
     pubSubSubscription = pubSubSubscription,
     pubSubDecoder = pubSubDecoder,
 ) {
+    private val tag = this::class.simpleName
+
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
         path = "/api/pubsub/slack/interactivity",
@@ -52,7 +55,7 @@ class SlackInteractivityPubSubHandler(
             jsonSerializer = jsonSerializer,
             strategy = SlackInteractivityPubSubMessage.serializer(),
         )
-            .leftIfNull { Exception("PubSub request body missing") }
+            .leftIfNull { Exception("Request body is invalid") }
             .flatMap {
                 when (it.payload) {
                     is SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage ->
@@ -61,15 +64,10 @@ class SlackInteractivityPubSubHandler(
             }
             .fold(
                 ifLeft = {
-                    when {
-                        // If the Slack response url has expired we can't really do much else, so we ACK it
-                        it.message?.contains("used_url") == true -> {
-                            log.w(it) { "Ignoring PubSub error for expired Slack interactivity url" }
-                            Either.Right(Unit)
-                        }
-
-                        else -> Either.Left(it)
-                    }
+                    // Swallow but report the error, so that we can investigate. At this point, the user will be seeing
+                    // a post with interactivity options, so from their POV nothing will happen, so they can re-shuffle.
+                    log.error(tag, it) { "Error handling request" }
+                    Either.Right(Unit)
                 }, ifRight = { Either.Right(Unit) }
             )
 

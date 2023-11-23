@@ -80,10 +80,10 @@ internal class RealSlackRepository(
                 ).flatMap { dbAuthToken ->
                     dbAuthToken?.let {
                         Either.Right(it.toAuthToken())
-                    } ?: Either.Left(Exception("Slack auth token not found"))
+                    } ?: Either.Left(Exception("Auth token not found"))
                 }
             } else {
-                Either.Left(Exception("Slack auth token not found"))
+                Either.Left(Exception("Auth token not found"))
             }
         }
 

@@ -33,7 +33,7 @@ class RealVerifySlackRequestUseCaseTest {
         return runBlockingTest { useCase ->
             val actualResult = useCase.invoke(FakeSlackApiRequest(fakeTimestamp = "timestamp"))
             assertEquals(
-                expected = Either.Left(SlackVerifyRequestUseCase.Error.Other("Error during Slack request verification: Invalid number format: 'timestamp'")),
+                expected = Either.Left(SlackVerifyRequestUseCase.Error.Other("Error during request verification: Invalid number format: 'timestamp'")),
                 actual = actualResult
             )
         }

@@ -35,6 +35,7 @@ object CommonKotlinModule : DiModule() {
             else -> Severity.Info
         }
         Logger.setMinSeverity(severity)
+        Logger.setTag("Log")
         return Logger
     }
 

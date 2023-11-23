@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slackdata.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.commonkotlin.debug
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
@@ -22,14 +23,16 @@ class RealSlackShuffleSearchUseCase(
     private val searchUseCase: SearchUseCase,
     private val slackRepository: SlackRepository,
 ) : SlackShuffleSearchUseCase {
+    private val tag = this::class.simpleName
+
     override suspend operator fun invoke(
         responseUrl: String,
         searchSessionId: String,
     ): Either<Throwable, Unit> = withContext(dispatcher) {
-        log.d("Shuffling search result: searchSessionId=$searchSessionId")
+        log.debug(tag, "Shuffling search result: searchSessionId=$searchSessionId")
         searchUseCase.invoke(SearchUseCase.Type.WithSessionId(searchSessionId))
             .flatMap { searchResult ->
-                log.d("Sending Slack response: responseUrl=$responseUrl")
+                log.debug(tag, "Sending search response: responseUrl=$responseUrl")
                 slackRepository.postMessageToUrl(
                     url = responseUrl,
                     message = ApiSlackMessageFactory.searchResultMessage(
