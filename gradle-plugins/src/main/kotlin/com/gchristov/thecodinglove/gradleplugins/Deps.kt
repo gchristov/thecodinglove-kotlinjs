@@ -26,17 +26,13 @@ class Deps {
     }
 
     object Kotlin {
-        private const val coroutinesCoreVersion = "1.6.0"
-        private const val coroutinesTestVersion = "1.6.4"
+        private const val coroutinesVersion = "1.7.3"
 
-        // "-native-mt" is required here, otherwise iOS fails with runtime exception
-        const val coroutinesCore =
-            "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesCoreVersion-native-mt"
-        const val coroutinesTest =
-            "org.jetbrains.kotlinx:kotlinx-coroutines-test:${coroutinesTestVersion}"
+        const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+        const val coroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${coroutinesVersion}"
         const val test = "org.jetbrains.kotlin:kotlin-test"
-        const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
-        const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+        const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.1"
+        const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1"
     }
 
     object Ktor {
@@ -45,17 +41,17 @@ class Deps {
         const val contentNegotiation = "io.ktor:ktor-client-content-negotiation:$ktorVersion"
         const val serialization = "io.ktor:ktor-serialization-kotlinx-json:$ktorVersion"
         const val logging = "io.ktor:ktor-client-logging:$ktorVersion"
-        const val logback = "ch.qos.logback:logback-classic:1.2.10"
+        const val logback = "ch.qos.logback:logback-classic:1.4.11"
     }
 
     object Node {
-        val htmlParser = NpmDependency("node-html-parser", "6.1.4")
+        val htmlParser = NpmDependency("node-html-parser", "6.1.11")
         val express = NpmDependency("express", "4.18.2")
-        val jsJoda = NpmDependency("@js-joda/core", "5.4.2")
+        val jsJoda = NpmDependency("@js-joda/core", "5.6.1")
     }
 
     object Uuid {
-        const val uuid = "com.benasher44:uuid:0.6.0"
+        const val uuid = "com.benasher44:uuid:0.8.2"
     }
 }
 
