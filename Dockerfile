@@ -8,4 +8,4 @@ COPY /build/bin/. ./bin/
 # Step 2: Run binaries
 FROM npm AS run
 WORKDIR ./bin/
-CMD [ "node", "thecodinglove-kmp-appBackend.js" ]
+CMD exec node --enable-source-maps thecodinglove-kmp-appBackend.js
