@@ -8,9 +8,11 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(projects.commonFirebaseData)
                 implementation(projects.search)
                 implementation(projects.slack)
                 implementation(projects.monitoringData)
+                implementation(projects.htmlParseData)
             }
         }
         val jsMain by getting {

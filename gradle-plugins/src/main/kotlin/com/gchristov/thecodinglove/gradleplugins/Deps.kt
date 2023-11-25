@@ -3,26 +3,26 @@ package com.gchristov.thecodinglove.gradleplugins
 @Suppress("unused")
 class Deps {
     object Arrow {
-        const val core = "io.arrow-kt:arrow-core:1.1.3"
+        const val core = "io.arrow-kt:arrow-core:1.2.1"
     }
 
     object Crypto {
-        const val mac = "com.diglol.crypto:mac:0.1.3"
-        const val encoding = "com.diglol.encoding:encoding:0.1.0"
+        const val mac = "com.diglol.crypto:mac:0.1.5"
+        const val encoding = "com.diglol.encoding:encoding:0.3.0"
     }
 
     object Google {
-        val firebaseAdmin = NpmDependency("firebase-admin", "11.11.0")
-        val pubSub = NpmDependency("@google-cloud/pubsub", "3.7.1")
+        val firebaseAdmin = NpmDependency("firebase-admin", "11.11.1")
+        val pubSub = NpmDependency("@google-cloud/pubsub", "4.0.7")
     }
 
     object Kermit {
-        private const val kermitVersion = "1.2.2"
+        private const val kermitVersion = "2.0.2"
         const val logger = "co.touchlab:kermit:$kermitVersion"
     }
 
     object Kodein {
-        const val di = "org.kodein.di:kodein-di:7.15.0"
+        const val di = "org.kodein.di:kodein-di:7.21.0"
     }
 
     object Kotlin {
@@ -40,7 +40,7 @@ class Deps {
     }
 
     object Ktor {
-        private const val ktorVersion = "2.1.2"
+        private const val ktorVersion = "2.3.6"
         const val client = "io.ktor:ktor-client-core:$ktorVersion"
         const val contentNegotiation = "io.ktor:ktor-client-content-negotiation:$ktorVersion"
         const val serialization = "io.ktor:ktor-serialization-kotlinx-json:$ktorVersion"

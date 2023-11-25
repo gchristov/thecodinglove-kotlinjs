@@ -40,8 +40,8 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.21")
-    implementation("org.jetbrains.kotlin:kotlin-serialization:1.8.21")
-    implementation("dev.petuska:npm-publish-gradle-plugin:3.3.1")
-    implementation("com.codingfeline.buildkonfig:buildkonfig-gradle-plugin:0.7.0")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.21")
+    implementation("org.jetbrains.kotlin:kotlin-serialization:1.9.21")
+    implementation("dev.petuska:npm-publish-gradle-plugin:3.4.1")
+    implementation("com.codingfeline.buildkonfig:buildkonfig-gradle-plugin:0.15.0")
 }

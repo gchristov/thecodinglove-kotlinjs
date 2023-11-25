@@ -12,11 +12,11 @@ class ModulePlugin : Plugin<Project> {
         target.plugins.apply("org.jetbrains.kotlin.plugin.serialization")
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
             sourceSets.maybeCreate("commonMain").dependencies {
-                implementation(project(":common-kotlin"))
-                implementation(project(":common-test"))
+                api(project(":common-kotlin"))
+                api(project(":common-test"))
             }
             sourceSets.maybeCreate("commonTest").dependencies {
-                implementation(Deps.Kotlin.coroutinesTest)
+                api(Deps.Kotlin.coroutinesTest)
             }
         }
     }

@@ -10,10 +10,10 @@ class BackendServicePlugin : Plugin<Project> {
         target.plugins.apply("data-plugin")
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
             sourceSets.maybeCreate("jsMain").dependencies {
-                implementation(project(":common-service"))
+                api(project(":common-service"))
             }
             sourceSets.maybeCreate("jsTest").dependencies {
-                implementation(project(":common-service-testfixtures"))
+                api(project(":common-service-testfixtures"))
             }
         }
     }
