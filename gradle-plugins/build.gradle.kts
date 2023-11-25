@@ -25,13 +25,11 @@ gradlePlugin {
     }
     plugins.register("backend-executable-plugin") {
         id = "backend-executable-plugin"
-        implementationClass =
-            "com.gchristov.thecodinglove.gradleplugins.backend.BackendExecutablePlugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.backend.BackendExecutablePlugin"
     }
     plugins.register("backend-service-plugin") {
         id = "backend-service-plugin"
-        implementationClass =
-            "com.gchristov.thecodinglove.gradleplugins.backend.BackendServicePlugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.backend.BackendServicePlugin"
     }
 }
 

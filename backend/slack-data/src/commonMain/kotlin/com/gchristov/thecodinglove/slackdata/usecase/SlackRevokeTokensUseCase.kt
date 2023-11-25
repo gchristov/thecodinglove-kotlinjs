@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slackdata.usecase
 
 import arrow.core.Either
+import arrow.core.raise.either
 import arrow.core.sequence
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonkotlin.debug
@@ -31,7 +32,7 @@ class RealSlackRevokeTokensUseCase(
                     log.debug(tag, "Deleting token: id=$it")
                     slackRepository.deleteAuthToken(it)
                 }
-                .sequence()
+                .let { l -> either { l.bindAll() } }
                 .map {}
         }
 }

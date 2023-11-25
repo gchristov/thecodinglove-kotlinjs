@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.commonservice.http
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.raise.either
 import arrow.core.sequence
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonkotlin.__dirname
@@ -41,7 +42,7 @@ internal class ExpressHttpService(
                         handler.attach(app)
                     }
             }
-            .sequence()
+            .let { l -> either { l.bindAll() } }
             .flatMap {
                 log.debug(tag, "Initialised")
                 Either.Right(Unit)
