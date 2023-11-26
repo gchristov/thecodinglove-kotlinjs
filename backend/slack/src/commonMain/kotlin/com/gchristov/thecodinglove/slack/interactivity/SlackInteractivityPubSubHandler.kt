@@ -1,8 +1,6 @@
 package com.gchristov.thecodinglove.slack.interactivity
 
-import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.leftIfNull
+import arrow.core.*
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.commonkotlin.error
@@ -55,7 +53,7 @@ class SlackInteractivityPubSubHandler(
             jsonSerializer = jsonSerializer,
             strategy = SlackInteractivityPubSubMessage.serializer(),
         )
-            .leftIfNull { Exception("Request body is invalid") }
+            .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
             .flatMap {
                 when (it.payload) {
                     is SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage ->

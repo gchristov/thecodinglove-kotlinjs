@@ -1,8 +1,6 @@
 package com.gchristov.thecodinglove.slack.slashcommand
 
-import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.leftIfNull
+import arrow.core.*
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.BaseHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
@@ -51,7 +49,7 @@ class SlackSlashCommandHttpHandler(
                 strategy = ApiSlackSlashCommand.serializer(),
             )
         }
-        .leftIfNull(default = { Exception("Request body is invalid") })
+        .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
         .flatMap { publishSlashCommandMessage(it) }
         .flatMap { response.sendEmpty() }
 

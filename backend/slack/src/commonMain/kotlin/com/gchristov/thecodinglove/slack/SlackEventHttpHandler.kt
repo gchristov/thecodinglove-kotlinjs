@@ -1,8 +1,6 @@
 package com.gchristov.thecodinglove.slack
 
-import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.leftIfNull
+import arrow.core.*
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.BaseHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.*
@@ -48,7 +46,7 @@ class SlackEventHttpHandler(
                 strategy = ApiSlackEvent.serializer(),
             )
         }
-        .leftIfNull { Exception("Request body is invalid") }
+        .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
         .flatMap {
             when (val event = it.toEvent()) {
                 is SlackEvent.UrlVerification -> event.handle(response)

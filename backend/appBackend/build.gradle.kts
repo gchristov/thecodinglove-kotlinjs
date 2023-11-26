@@ -8,9 +8,11 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(projects.commonFirebaseData)
                 implementation(projects.search)
                 implementation(projects.slack)
                 implementation(projects.monitoringData)
+                implementation(projects.htmlParseData)
             }
         }
         val jsMain by getting {
@@ -33,7 +35,7 @@ kotlin {
 tasks.named("assemble") {
     doLast {
         copy {
-            from(file("$buildDir/productionLibrary"))
+            from(file("${layout.buildDirectory}/productionLibrary"))
             into(file("$rootDir/build/bin"))
         }
         copy {

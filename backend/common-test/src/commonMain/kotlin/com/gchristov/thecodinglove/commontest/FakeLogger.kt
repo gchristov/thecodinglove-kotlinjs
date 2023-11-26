@@ -18,7 +18,6 @@ private class TestCommonWriter : LogWriter() {
         tag: String,
         throwable: Throwable?
     ) {
-        println(commonLogger.formatMessage(severity, message, tag, throwable))
-        throwable?.let { println(it.message) }
+        commonLogger.log(severity, message, tag, throwable)
     }
 }

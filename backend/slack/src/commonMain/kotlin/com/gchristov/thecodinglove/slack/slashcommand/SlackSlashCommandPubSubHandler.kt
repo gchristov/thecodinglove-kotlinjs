@@ -1,8 +1,6 @@
 package com.gchristov.thecodinglove.slack.slashcommand
 
-import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.leftIfNull
+import arrow.core.*
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.commonkotlin.error
@@ -54,7 +52,7 @@ class SlackSlashCommandPubSubHandler(
             jsonSerializer = jsonSerializer,
             strategy = SlackSlashCommandPubSubMessage.serializer(),
         )
-            .leftIfNull { Exception("Request body is invalid") }
+            .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
             .flatMap { it.handle() }
 
     private suspend fun SlackSlashCommandPubSubMessage.handle() = slackRepository.postMessageToUrl(

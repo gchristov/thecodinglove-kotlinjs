@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.raise.either
 import arrow.core.sequence
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonfirebasedata.CommonFirebaseDataModule
@@ -78,7 +79,7 @@ private fun setupMonitoring(): Either<Throwable, Unit> {
  */
 private suspend fun setupServices(): Either<Throwable, List<HttpService>> {
     val appService = setupAppService()
-    return listOf(appService).sequence()
+    return listOf(appService).let { l -> either { l.bindAll() } }
 }
 
 /**
@@ -108,5 +109,5 @@ private suspend fun setupAppService(): Either<Throwable, HttpService> {
 
 private suspend fun startServices(services: List<HttpService>): Either<Throwable, Unit> = services
     .map { it.start() }
-    .sequence()
+    .let { l -> either { l.bindAll() } }
     .flatMap { Either.Right(Unit) }

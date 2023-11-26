@@ -1,8 +1,6 @@
 package com.gchristov.thecodinglove.search
 
-import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.leftIfNull
+import arrow.core.*
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
@@ -47,6 +45,6 @@ class PreloadSearchPubSubHandler(
             jsonSerializer = jsonSerializer,
             strategy = PreloadSearchPubSubMessage.serializer(),
         )
-            .leftIfNull { Exception("Request body is invalid") }
+            .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
             .flatMap { preloadSearchResultUseCase(searchSessionId = it.searchSessionId) }
 }

@@ -10,7 +10,7 @@ class DataPlugin : Plugin<Project> {
         target.plugins.apply("module-plugin")
         target.extensions.configure(KotlinMultiplatformExtension::class.java) {
             sourceSets.maybeCreate("commonMain").dependencies {
-                implementation(project(":common-network"))
+                api(project(":common-network"))
             }
         }
     }
