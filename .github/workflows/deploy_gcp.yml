@@ -53,6 +53,7 @@ jobs:
           ./gradlew --no-daemon assemble
       - name: Artifacts
         uses: actions/upload-artifact@v3
+        if: always() # Ensure all artifacts are collected, even after errors
         with:
           name: Build
           path: |
