@@ -6,7 +6,7 @@ plugins {
 tasks.named("assemble") {
     doLast {
         copy {
-            from(file("${layout.buildDirectory}/distributions"))
+            from(layout.buildDirectory.dir("distributions").get().asFile)
             into(file("$rootDir/build/bin/web"))
         }
     }
