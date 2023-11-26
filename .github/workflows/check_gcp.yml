@@ -43,7 +43,8 @@ jobs:
         run: |
           set -o pipefail && 
           bash ./scripts/env.sh && 
-          ./gradlew --no-daemon assemble
+          ./gradlew --no-daemon assemble &&
+          docker build -t check .
       - name: Artifacts
         uses: actions/upload-artifact@v3
         with:
