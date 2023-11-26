@@ -1,8 +1,6 @@
 package com.gchristov.thecodinglove.commonservice.pubsub
 
-import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.leftIfNull
+import arrow.core.*
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
@@ -15,6 +13,6 @@ internal class GoogleCloudPubSubDecoder(private val jsonSerializer: JsonSerializ
         jsonSerializer = jsonSerializer,
         strategy = GoogleCloudPubSubRequestBody.serializer(),
     )
-        .leftIfNull { Exception("Request body is invalid") }
+        .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
         .flatMap { it.toPubSubRequest() }
 }

@@ -1,8 +1,6 @@
 package com.gchristov.thecodinglove.slack.interactivity
 
-import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.leftIfNull
+import arrow.core.*
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonservice.BaseHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
@@ -51,7 +49,7 @@ class SlackInteractivityHttpHandler(
                 strategy = ApiSlackInteractivity.serializer(),
             )
         }
-        .leftIfNull(default = { Exception("Request body is invalid") })
+        .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
         .flatMap { publishInteractivityMessage(it) }
         .flatMap { response.sendEmpty() }
 
