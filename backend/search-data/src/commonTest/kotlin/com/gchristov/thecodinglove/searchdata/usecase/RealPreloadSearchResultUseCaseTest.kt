@@ -5,13 +5,11 @@ import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import com.gchristov.thecodinglove.searchtestfixtures.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RealPreloadSearchResultUseCaseTest {
     @Test
     fun preloadWithMissingSessionReturnsSessionNotFound(): TestResult {

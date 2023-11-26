@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicetestfixtures.FakeHttpResponse
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonservicetestfixtures.FakeHttpResponse
 import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.commontest.FakeLogger
 import com.gchristov.thecodinglove.searchdata.domain.SearchError
@@ -11,13 +11,11 @@ import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchHttpRequest
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.SearchResultCreator
 import io.ktor.http.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class SearchHttpHandlerTest {
     @Test
     fun config(): TestResult = runBlockingTest(

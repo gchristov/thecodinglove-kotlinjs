@@ -7,7 +7,6 @@ import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
 import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchRepository
 import com.gchristov.thecodinglove.searchtestfixtures.PostCreator
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -15,7 +14,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RealSearchWithHistoryUseCaseTest {
     @Test
     fun searchWithNoResultsReturnsEmpty(): TestResult {
