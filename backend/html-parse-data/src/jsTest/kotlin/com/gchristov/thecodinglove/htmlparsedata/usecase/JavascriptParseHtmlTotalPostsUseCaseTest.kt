@@ -1,15 +1,13 @@
 package com.gchristov.thecodinglove.htmlparsedata.usecase
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.htmlparsetestfixtures.HtmlCreator
 import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.gchristov.thecodinglove.htmlparsetestfixtures.HtmlCreator
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class JavascriptParseHtmlTotalPostsUseCaseTest {
     @Test
     fun parseTotalPosts() = runBlockingTest { parser ->

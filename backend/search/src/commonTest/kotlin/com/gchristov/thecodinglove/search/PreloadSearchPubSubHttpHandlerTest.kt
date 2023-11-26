@@ -1,10 +1,10 @@
 package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubDecoder
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubSubscription
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.commontest.FakeLogger
 import com.gchristov.thecodinglove.searchdata.domain.PreloadSearchPubSubMessage
@@ -13,14 +13,12 @@ import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.searchtestfixtures.FakePreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.PreloadSearchPubSubCreator
 import io.ktor.http.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class PreloadSearchPubSubHttpHandlerTest {
     @Test
     fun httpConfig(): TestResult = runBlockingTest(

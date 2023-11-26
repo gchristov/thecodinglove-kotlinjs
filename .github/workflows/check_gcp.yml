@@ -39,13 +39,18 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Set up Gradle cache
         uses: gradle/gradle-build-action@v2 # By default, cache is only saved on the 'master' branch
-      - name: Build
+      - name: Build project
         run: |
           set -o pipefail && 
           bash ./scripts/env.sh && 
           ./gradlew --no-daemon assemble
+      - name: Build container image
+        run: |
+          set -o pipefail &&
+          docker build -t check .
       - name: Artifacts
         uses: actions/upload-artifact@v3
+        if: always() # Ensure all artifacts are collected, even after errors
         with:
           name: Build
           path: |

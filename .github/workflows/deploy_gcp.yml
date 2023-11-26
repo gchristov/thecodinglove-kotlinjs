@@ -46,23 +46,6 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Set up Gradle cache
         uses: gradle/gradle-build-action@v2 # By default, cache is only saved on the 'master' branch
-      - name: Build
-        run: |
-          set -o pipefail && 
-          bash ./scripts/env.sh && 
-          ./gradlew --no-daemon assemble
-      - name: Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: Build
-          path: |
-            build/bin
-            local.properties
-            local-credentials-gcp.json
-      - name: Set up deploy environment
-        run: |
-          GCP_BUILD_TAG="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_REPOSITORY }}/${{ env.GCP_REPOSITORY_IMAGE }}"
-          echo "GCP_BUILD_TAG=$GCP_BUILD_TAG" >> $GITHUB_ENV
       - name: Set up deploy authentication
         uses: google-github-actions/auth@v1.1.1
         with:
@@ -79,7 +62,19 @@ jobs:
           else
             echo "Artifact registry repository already exists"
           fi
-      - name: Build and push container image
+      - name: Set up deploy environment
+        run: |
+          GCP_BUILD_TAG="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_REPOSITORY }}/${{ env.GCP_REPOSITORY_IMAGE }}"
+          echo "GCP_BUILD_TAG=$GCP_BUILD_TAG" >> $GITHUB_ENV
+      - name: Build project
+        run: |
+          set -o pipefail && 
+          bash ./scripts/env.sh && 
+          ./gradlew --no-daemon assemble
+      - name: Build container image
+        run: |-
+          docker build -t $GCP_BUILD_TAG .
+      - name: Push container image
         run: |-
           gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
           docker build -t $GCP_BUILD_TAG .
@@ -98,9 +93,15 @@ jobs:
             --region ${{ env.GCP_REGION }} \
             --member=allUsers \
             --role=roles/run.invoker
-      - name: Deploy output
-        run: |-
-          echo "Service available at: ${{ steps.deployment.outputs.url }}"
+      - name: Artifacts
+        uses: actions/upload-artifact@v3
+        if: always() # Ensure all artifacts are collected, even after errors
+        with:
+          name: Build
+          path: |
+            build/bin
+            local.properties
+            local-credentials-gcp.json
 
   jsTest:
     runs-on: ubuntu-20.04

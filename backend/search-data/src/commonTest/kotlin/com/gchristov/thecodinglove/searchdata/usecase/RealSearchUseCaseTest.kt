@@ -1,21 +1,19 @@
 package com.gchristov.thecodinglove.searchdata.usecase
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubPublisher
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubPublisher
 import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.searchdata.domain.PreloadSearchPubSubMessage
 import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
 import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import com.gchristov.thecodinglove.searchtestfixtures.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RealSearchUseCaseTest {
     @Test
     fun searchWithNewSessionCreatesNewSession(): TestResult {

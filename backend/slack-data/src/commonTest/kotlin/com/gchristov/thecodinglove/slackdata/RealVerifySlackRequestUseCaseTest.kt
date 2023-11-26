@@ -7,7 +7,6 @@ import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.RealSlackVerifyRequestUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.SlackVerifyRequestUseCase
 import com.gchristov.thecodinglove.slacktestfixtures.FakeSlackApiRequest
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
@@ -15,7 +14,6 @@ import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RealVerifySlackRequestUseCaseTest {
     @Test
     fun verifyWithMissingTimestampReturnsError(): TestResult {
