@@ -35,7 +35,7 @@ kotlin {
 tasks.named("assemble") {
     doLast {
         copy {
-            from(file("$buildDir/productionLibrary"))
+            from(file("${layout.buildDirectory}/productionLibrary"))
             into(file("$rootDir/build/bin"))
         }
         copy {
