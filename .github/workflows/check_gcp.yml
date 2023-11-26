@@ -44,7 +44,7 @@ jobs:
           set -o pipefail && 
           bash ./scripts/env.sh && 
           ./gradlew --no-daemon assemble
-      - name: Build container
+      - name: Build container image
         run: |
           set -o pipefail &&
           docker build -t check .
