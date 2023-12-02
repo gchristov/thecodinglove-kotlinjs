@@ -12,9 +12,11 @@ import kotlinx.coroutines.withContext
 interface SlackAuthUseCase {
     suspend operator fun invoke(code: String?): Either<Error, Unit>
 
-    sealed class Error(message: String? = null) : Throwable(message) {
+    sealed class Error(override val message: String? = null) : Throwable(message) {
         object Cancelled : Error()
-        data class Other(override val message: String?) : Error(message)
+        data class Other(
+            val additionalInfo: String? = null
+        ) : Error("Auth error${additionalInfo?.let { ": $it" } ?: ""}")
     }
 }
 

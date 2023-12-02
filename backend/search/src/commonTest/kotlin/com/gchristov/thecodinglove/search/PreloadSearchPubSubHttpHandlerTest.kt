@@ -23,7 +23,7 @@ class PreloadSearchPubSubHttpHandlerTest {
     @Test
     fun httpConfig(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = null,
-        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty),
+        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty()),
     ) { handler, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
@@ -34,7 +34,7 @@ class PreloadSearchPubSubHttpHandlerTest {
     @Test
     fun pubSubConfig(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = null,
-        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty),
+        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty()),
     ) { handler, _, _ ->
         val config = handler.pubSubConfig()
         assertEquals(TestPreloadSearchPubSubTopic, config.topic)
@@ -54,13 +54,13 @@ class PreloadSearchPubSubHttpHandlerTest {
     @Test
     fun handleMessageError(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = PreloadSearchPubSubCreator.defaultMessage(),
-        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty)
+        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty())
     ) { handler, preloadUseCase, request ->
         val result = handler.handlePubSubRequest(request)
         preloadUseCase.assertInvokedOnce()
         preloadUseCase.assertSearchSessionId("session_123")
         assertEquals(
-            expected = Either.Left(SearchError.Empty),
+            expected = Either.Left(SearchError.Empty()),
             actual = result,
         )
     }
@@ -68,7 +68,7 @@ class PreloadSearchPubSubHttpHandlerTest {
     @Test
     fun handleMessageParseError(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = null,
-        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty)
+        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty())
     ) { handler, preloadUseCase, request ->
         val result = handler.handlePubSubRequest(request)
         preloadUseCase.assertNotInvoked()

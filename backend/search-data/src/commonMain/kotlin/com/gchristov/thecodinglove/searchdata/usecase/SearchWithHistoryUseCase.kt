@@ -15,7 +15,7 @@ interface SearchWithHistoryUseCase {
         query: String,
         totalPosts: Int? = null,
         searchHistory: Map<Int, List<Int>>,
-    ) : Either<SearchError, Result>
+    ): Either<SearchError, Result>
 
     data class Result(
         val query: String,
@@ -39,10 +39,10 @@ class RealSearchWithHistoryUseCase(
     ): Either<SearchError, SearchWithHistoryUseCase.Result> = withContext(dispatcher) {
         // Find total number of posts
         (totalPosts?.let { Either.Right(it) } ?: searchRepository.getTotalPosts(query))
-            .mapLeft { SearchError.Empty }
+            .mapLeft { SearchError.Empty(additionalInfo = it.message) }
             .flatMap { totalResults ->
                 if (totalResults <= 0) {
-                    return@withContext Either.Left(SearchError.Empty)
+                    return@withContext Either.Left(SearchError.Empty(additionalInfo = "query=$query"))
                 }
                 // Generate random page number
                 Random.nextRandomPage(
@@ -57,10 +57,10 @@ class RealSearchWithHistoryUseCase(
                             page = postPage,
                             query = query
                         )
-                            .mapLeft { SearchError.Empty }
+                            .mapLeft { SearchError.Empty(additionalInfo = it.message) }
                             .flatMap { searchResults ->
                                 if (searchResults.isEmpty()) {
-                                    return@withContext Either.Left(SearchError.Empty)
+                                    return@withContext Either.Left(SearchError.Empty(additionalInfo = "query=$query"))
                                 }
                                 // Pick a post randomly from the page
                                 Random.nextRandomPostIndex(
@@ -85,6 +85,6 @@ class RealSearchWithHistoryUseCase(
 }
 
 private fun RangeError.toSearchError() = when (this) {
-    is RangeError.Empty -> SearchError.Empty
+    is RangeError.Empty -> SearchError.Empty(additionalInfo = "could not randomize")
     is RangeError.Exhausted -> SearchError.Exhausted
 }

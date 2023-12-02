@@ -58,7 +58,7 @@ class RealSearchUseCase(
                     preloadedPost = preloadedPost,
                     searchRepository = searchRepository
                 )
-                    .mapLeft { SearchError.SessionNotFound(it.message) }
+                    .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
                     .map {
                         SearchUseCase.Result(
                             searchSessionId = searchSession.id,
@@ -79,7 +79,7 @@ class RealSearchUseCase(
                             is SearchError.Exhausted -> {
                                 searchSession
                                     .clearExhaustedHistory(searchRepository)
-                                    .mapLeft { SearchError.SessionNotFound(it.message) }
+                                    .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
                                     .flatMap { invoke(type = type) }
                             }
 
@@ -92,7 +92,7 @@ class RealSearchUseCase(
                                 searchResult = searchResult,
                                 searchRepository = searchRepository
                             )
-                            .mapLeft { SearchError.SessionNotFound(it.message) }
+                            .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
                             .map {
                                 SearchUseCase.Result(
                                     searchSessionId = searchSession.id,
@@ -116,7 +116,7 @@ class RealSearchUseCase(
             jsonSerializer = jsonSerializer,
             strategy = PreloadSearchPubSubMessage.serializer(),
         )
-        .mapLeft { SearchError.SessionNotFound(it.message) }
+        .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
 }
 
 private suspend fun SearchUseCase.Type.getSearchSession(
@@ -136,7 +136,7 @@ private suspend fun SearchUseCase.Type.getSearchSession(
 
     is SearchUseCase.Type.WithSessionId -> searchRepository
         .getSearchSession(this.sessionId)
-        .mapLeft { SearchError.SessionNotFound(it.message) }
+        .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
 }
 
 private suspend fun SearchSession.insertCurrentPost(
