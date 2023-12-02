@@ -46,7 +46,7 @@ class RealPreloadSearchResultUseCaseTest {
 
     @Test
     fun preloadWithEmptyResultReturnsEmpty(): TestResult {
-        val searchWithHistoryResult = Either.Left(SearchError.Empty())
+        val searchWithHistoryResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
         val searchSession = SearchSessionCreator.searchSession(
             id = TestSearchSessionId,
             query = TestSearchQuery
@@ -60,7 +60,7 @@ class RealPreloadSearchResultUseCaseTest {
             searchRepository.assertSessionFetched()
             searchWithHistoryUseCase.assertInvokedOnce()
             assertEquals(
-                expected = Either.Left(SearchError.Empty()),
+                expected = Either.Left(SearchError.Empty(additionalInfo = "test")),
                 actual = actualResult,
             )
         }

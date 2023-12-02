@@ -54,13 +54,13 @@ class PreloadSearchPubSubHttpHandlerTest {
     @Test
     fun handleMessageError(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = PreloadSearchPubSubCreator.defaultMessage(),
-        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty())
+        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
     ) { handler, preloadUseCase, request ->
         val result = handler.handlePubSubRequest(request)
         preloadUseCase.assertInvokedOnce()
         preloadUseCase.assertSearchSessionId("session_123")
         assertEquals(
-            expected = Either.Left(SearchError.Empty()),
+            expected = Either.Left(SearchError.Empty(additionalInfo = "test")),
             actual = result,
         )
     }

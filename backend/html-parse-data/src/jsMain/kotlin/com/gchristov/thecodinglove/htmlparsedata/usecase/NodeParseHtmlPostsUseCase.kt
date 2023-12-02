@@ -6,7 +6,7 @@ import com.gchristov.thecodinglove.commonkotlin.requireModule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-internal class JavascriptParseHtmlPostsUseCase(
+internal class NodeParseHtmlPostsUseCase(
     private val dispatcher: CoroutineDispatcher,
 ) : ParseHtmlPostsUseCase {
     override suspend operator fun invoke(html: String): Either<Throwable, List<HtmlPost>> =

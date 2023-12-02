@@ -8,7 +8,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class JavascriptParseHtmlTotalPostsUseCaseTest {
+class NodeParseHtmlTotalPostsUseCaseTest {
     @Test
     fun parseTotalPosts() = runBlockingTest { parser ->
         val actualCount = parser(HtmlCreator.defaultHtml())
@@ -26,7 +26,7 @@ class JavascriptParseHtmlTotalPostsUseCaseTest {
 
     private fun runBlockingTest(testBlock: suspend (ParseHtmlTotalPostsUseCase) -> Unit) =
         runTest {
-            val parser = JavascriptParseHtmlTotalPostsUseCase(
+            val parser = NodeParseHtmlTotalPostsUseCase(
                 dispatcher = FakeCoroutineDispatcher
             )
             testBlock(parser)

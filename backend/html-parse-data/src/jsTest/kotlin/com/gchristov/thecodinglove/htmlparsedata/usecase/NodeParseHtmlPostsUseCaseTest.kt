@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class JavascriptParseHtmlPostsUseCaseTest {
+class NodeParseHtmlPostsUseCaseTest {
     @Test
     fun parsePosts() = runBlockingTest { parser ->
         val actualPosts = parser(HtmlCreator.defaultHtml())
@@ -29,7 +29,7 @@ class JavascriptParseHtmlPostsUseCaseTest {
 
     private fun runBlockingTest(testBlock: suspend (ParseHtmlPostsUseCase) -> Unit) =
         runTest {
-            val parser = JavascriptParseHtmlPostsUseCase(
+            val parser = NodeParseHtmlPostsUseCase(
                 dispatcher = FakeCoroutineDispatcher
             )
             testBlock(parser)
