@@ -29,7 +29,7 @@ class RealSearchWithHistoryUseCaseTest {
                 searchHistory = mutableMapOf(),
             )
             assertEquals(
-                expected = Either.Left(SearchError.Empty()),
+                expected = Either.Left(SearchError.Empty(additionalInfo = "query=$TestSearchQuery")),
                 actual = actualResult
             )
         }
@@ -49,7 +49,7 @@ class RealSearchWithHistoryUseCaseTest {
                 searchHistory = mutableMapOf(),
             )
             assertEquals(
-                expected = Either.Left(SearchError.Empty()),
+                expected = Either.Left(SearchError.Empty(additionalInfo = "query=$TestSearchQuery")),
                 actual = actualResult,
             )
         }

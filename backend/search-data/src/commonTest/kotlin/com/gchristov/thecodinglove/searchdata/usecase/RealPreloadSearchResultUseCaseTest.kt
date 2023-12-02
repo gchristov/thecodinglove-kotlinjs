@@ -18,7 +18,7 @@ class RealPreloadSearchResultUseCaseTest {
             searchRepository.assertSessionFetched()
             searchWithHistoryUseCase.assertNotInvoked()
             assertEquals(
-                expected = Either.Left(SearchError.SessionNotFound()),
+                expected = Either.Left(SearchError.SessionNotFound(additionalInfo = "Session not found")),
                 actual = actualResult
             )
         }
