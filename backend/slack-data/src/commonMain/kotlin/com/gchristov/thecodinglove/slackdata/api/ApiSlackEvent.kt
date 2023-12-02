@@ -14,6 +14,7 @@ sealed class ApiSlackEvent {
     @Serializable
     @SerialName("event_callback")
     data class ApiCallback(
+        @SerialName("team_id") val teamId: String,
         @SerialName("event") val event: ApiEvent,
     ) : ApiSlackEvent() {
         @Serializable
@@ -29,6 +30,10 @@ sealed class ApiSlackEvent {
                     @SerialName("bot") val bot: List<String>?,
                 )
             }
+
+            @Serializable
+            @SerialName("app_uninstalled")
+            data object ApiAppUninstalled : ApiEvent()
         }
     }
 }

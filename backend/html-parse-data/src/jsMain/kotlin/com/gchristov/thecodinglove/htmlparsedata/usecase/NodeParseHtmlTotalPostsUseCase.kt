@@ -5,7 +5,7 @@ import com.gchristov.thecodinglove.commonkotlin.requireModule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-internal class JavascriptParseHtmlTotalPostsUseCase(
+internal class NodeParseHtmlTotalPostsUseCase(
     private val dispatcher: CoroutineDispatcher,
 ) : ParseHtmlTotalPostsUseCase {
     override suspend fun invoke(html: String): Either<Throwable, Int> = withContext(dispatcher) {

@@ -2,9 +2,11 @@ package com.gchristov.thecodinglove.slack
 
 import arrow.core.*
 import co.touchlab.kermit.Logger
+import co.touchlab.kermit.Logger.Companion.tag
 import com.gchristov.thecodinglove.commonservice.BaseHttpHandler
 import com.gchristov.thecodinglove.commonservicedata.http.*
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonkotlin.debug
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackEvent
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackEvent
@@ -17,14 +19,14 @@ import kotlinx.coroutines.CoroutineDispatcher
 class SlackEventHttpHandler(
     dispatcher: CoroutineDispatcher,
     private val jsonSerializer: JsonSerializer,
-    log: Logger,
+    private val log: Logger,
     private val slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
     private val slackConfig: SlackConfig,
     private val slackRevokeTokensUseCase: SlackRevokeTokensUseCase,
 ) : BaseHttpHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
-    log = log
+    log = log,
 ) {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
@@ -59,6 +61,11 @@ class SlackEventHttpHandler(
     private suspend fun SlackEvent.Callback.handle(response: HttpResponse) =
         when (val typedEvent = event) {
             is SlackEvent.Callback.Event.TokensRevoked -> slackRevokeTokensUseCase(typedEvent).flatMap {
+                response.sendEmpty()
+            }
+
+            is SlackEvent.Callback.Event.AppUninstalled -> {
+                log.debug(tag, "App uninstalled: teamId=$teamId")
                 response.sendEmpty()
             }
         }

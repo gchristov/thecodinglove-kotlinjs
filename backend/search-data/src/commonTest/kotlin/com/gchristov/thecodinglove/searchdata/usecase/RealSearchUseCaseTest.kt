@@ -105,7 +105,7 @@ class RealSearchUseCaseTest {
     @Test
     fun searchWithEmptyResultReturnsEmptyAndDoesNotPreload(): TestResult {
         val searchType = SearchUseCase.Type.NewSession(query = TestSearchQuery)
-        val searchWithHistoryResult = Either.Left(SearchError.Empty)
+        val searchWithHistoryResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
 
         return runBlockingTest(
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
@@ -126,7 +126,7 @@ class RealSearchUseCaseTest {
         val searchType = SearchUseCase.Type.WithSessionId(TestSearchSessionId)
         val searchWithHistoryResults = listOf(
             Either.Left(SearchError.Exhausted),
-            Either.Left(SearchError.Empty)
+            Either.Left(SearchError.Empty(additionalInfo = "test"))
         )
         val searchSession = SearchSessionCreator.searchSession(
             id = TestSearchSessionId,

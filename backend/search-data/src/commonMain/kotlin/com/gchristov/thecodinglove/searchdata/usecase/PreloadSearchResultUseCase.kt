@@ -22,7 +22,7 @@ class RealPreloadSearchResultUseCase(
     ): Either<SearchError, Unit> = withContext(dispatcher) {
         searchRepository
             .getSearchSession(searchSessionId)
-            .mapLeft { SearchError.SessionNotFound(it.message) }
+            .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
             .flatMap { searchSession ->
                 searchWithHistoryUseCase(
                     query = searchSession.query,
@@ -36,7 +36,7 @@ class RealPreloadSearchResultUseCase(
                                 // updating the history
                                 searchSession
                                     .clearPreloadedPost(searchRepository)
-                                    .mapLeft { SearchError.SessionNotFound(it.message) }
+                                    .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
                                     .flatMap { Either.Left(searchError) }
                             }
 
@@ -49,7 +49,7 @@ class RealPreloadSearchResultUseCase(
                                 searchResult = searchResult,
                                 searchRepository = searchRepository
                             )
-                            .mapLeft { SearchError.SessionNotFound(it.message) }
+                            .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
                     }
                 )
             }

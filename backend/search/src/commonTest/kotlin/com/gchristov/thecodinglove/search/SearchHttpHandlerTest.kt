@@ -21,7 +21,7 @@ class SearchHttpHandlerTest {
     fun config(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
-        searchInvocationResult = Either.Left(SearchError.Empty)
+        searchInvocationResult = Either.Left(SearchError.Empty())
     ) { handler, _, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Get, config.method)
@@ -94,7 +94,7 @@ class SearchHttpHandlerTest {
     fun handleError(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
-        searchInvocationResult = Either.Left(SearchError.Empty)
+        searchInvocationResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
     ) { handler, searchUseCase, request, response ->
         handler.handleHttpRequest(
             request = request,
@@ -104,7 +104,7 @@ class SearchHttpHandlerTest {
         response.assertEquals(
             header = "Content-Type",
             headerValue = ContentType.Application.Json.toString(),
-            data = "{\"errorMessage\":\"No results found\"}",
+            data = "{\"errorMessage\":\"No results found: test\"}",
             status = 400,
             filePath = null,
         )

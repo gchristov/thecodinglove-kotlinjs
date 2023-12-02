@@ -18,12 +18,14 @@ import kotlinx.datetime.plus
 interface SlackVerifyRequestUseCase {
     suspend operator fun invoke(request: HttpRequest): Either<Error, Unit>
 
-    sealed class Error(message: String? = null) : Throwable(message) {
+    sealed class Error(override val message: String? = null) : Throwable(message) {
         object MissingTimestamp : Error()
         object MissingSignature : Error()
         object TooOld : Error()
         object SignatureMismatch : Error()
-        data class Other(override val message: String?) : Error(message)
+        data class Other(
+            val additionalInfo: String?
+        ) : Error("Request verification error${additionalInfo?.let { ": $it" } ?: ""}")
     }
 }
 
@@ -61,9 +63,7 @@ class RealSlackVerifyRequestUseCase(
                     )
                 }
             } catch (error: Throwable) {
-                Either.Left(SlackVerifyRequestUseCase.Error.Other(
-                    message = "Error during request verification${error.message?.let { ": $it" } ?: ""}",
-                ))
+                Either.Left(SlackVerifyRequestUseCase.Error.Other(additionalInfo = error.message))
             }
         }
 
