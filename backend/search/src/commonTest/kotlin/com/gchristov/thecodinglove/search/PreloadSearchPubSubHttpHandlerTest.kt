@@ -52,27 +52,24 @@ class PreloadSearchPubSubHttpHandlerTest {
     }
 
     @Test
-    fun handleMessageError(): TestResult = runBlockingTest(
+    fun handleRequestParseError(): TestResult = runBlockingTest(
+        preloadSearchPubSubMessage = null,
+        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty())
+    ) { handler, preloadUseCase, request ->
+        val result = handler.handlePubSubRequest(request)
+        preloadUseCase.assertNotInvoked()
+        assertTrue { result.isRight() }
+    }
+
+    @Test
+    fun handleRequestSearchError(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = PreloadSearchPubSubCreator.defaultMessage(),
         preloadSearchResultInvocationResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
     ) { handler, preloadUseCase, request ->
         val result = handler.handlePubSubRequest(request)
         preloadUseCase.assertInvokedOnce()
         preloadUseCase.assertSearchSessionId("session_123")
-        assertEquals(
-            expected = Either.Left(SearchError.Empty(additionalInfo = "test")),
-            actual = result,
-        )
-    }
-
-    @Test
-    fun handleMessageParseError(): TestResult = runBlockingTest(
-        preloadSearchPubSubMessage = null,
-        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty())
-    ) { handler, preloadUseCase, request ->
-        val result = handler.handlePubSubRequest(request)
-        preloadUseCase.assertNotInvoked()
-        assertTrue { result.isLeft() }
+        assertTrue { result.isRight() }
     }
 
     private fun runBlockingTest(
