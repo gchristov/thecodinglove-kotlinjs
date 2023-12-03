@@ -91,7 +91,7 @@ class SearchHttpHandlerTest {
     }
 
     @Test
-    fun handleError(): TestResult = runBlockingTest(
+    fun handleRequestError(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
