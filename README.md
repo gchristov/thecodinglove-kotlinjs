@@ -11,8 +11,6 @@
 
 # Setup
 
-## Slack
-
 This project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN), with the following features enabled:
 - [Slash commands](https://api.slack.com/slash-commands)
 - [OAuth](https://api.slack.com/authentication/oauth-v2)
