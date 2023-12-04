@@ -19,7 +19,7 @@ This project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN). Y
 ## Project
 
 1. [Install Docker](https://docs.docker.com/get-started/) and start it up. No additional configuration is required as the project sets up its own image and cleans up the containers after each run
-2. [Install IntelliJ](https://www.jetbrains.com/help/idea/installation-guide.html). This project has been tested with `IntelliJ IDEA 2023.2.2`
+2. [Install IntelliJ](https://www.jetbrains.com/help/idea/installation-guide.html). This project has been tested with `IntelliJ IDEA 2023.2.5`
 3. Clone the repository and open the project with IntelliJ
 4. Configure [serveo.net](http://serveo.net) for local development - `ssh -R YOUR_DOMAIN.serveo.net:80:localhost:3000 serveo.net`. This is useful when you want your app to be accessible globally via a tunnel, which is great for for developing Slack apps.
 
@@ -72,6 +72,10 @@ APP_PUBLIC_URL=YOUR_PUBLIC_APP_URL
 SEARCH_PRELOAD_PUBSUB_TOPIC=TOPIC_NAME
 ```
 6. Create a `local-credentials-gcp.json` file at the root of the project with the contents of a new JSON API key for the `firebase-adminsdk` service account.
+
+## Monitoring
+
+The project is configured to send all `Throwable`s to a Slack channel specified via the `SLACK_MONITORING_URL` environment variable. This is mainly used for stability monitoring.
 
 ## CI
 
