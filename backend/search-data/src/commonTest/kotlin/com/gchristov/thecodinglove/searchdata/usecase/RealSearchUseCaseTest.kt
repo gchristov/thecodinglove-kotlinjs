@@ -125,7 +125,7 @@ class RealSearchUseCaseTest {
     fun searchWithExhaustedResultClearsSearchSessionHistoryAndRetries(): TestResult {
         val searchType = SearchUseCase.Type.WithSessionId(TestSearchSessionId)
         val searchWithHistoryResults = listOf(
-            Either.Left(SearchError.Exhausted),
+            Either.Left(SearchError.Exhausted(additionalInfo = "test")),
             Either.Left(SearchError.Empty(additionalInfo = "test"))
         )
         val searchSession = SearchSessionCreator.searchSession(

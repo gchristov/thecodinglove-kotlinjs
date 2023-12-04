@@ -160,7 +160,7 @@ class RealSearchWithHistoryUseCaseTest {
                 query = TestSearchQuery,
                 searchHistory = searchHistory,
             )
-            assertTrue { actualResult == Either.Left(SearchError.Exhausted) }
+            assertTrue { actualResult == Either.Left(SearchError.Exhausted(additionalInfo = "query=$TestSearchQuery")) }
         }
     }
 

@@ -76,7 +76,7 @@ class RealPreloadSearchResultUseCaseTest {
         )
 
         return runBlockingTest(
-            singleSearchWithHistoryInvocationResult = Either.Left(SearchError.Exhausted),
+            singleSearchWithHistoryInvocationResult = Either.Left(SearchError.Exhausted(additionalInfo = "test")),
             searchSession = searchSession,
         ) { useCase, searchRepository, searchWithHistoryUseCase ->
             val actualResult = useCase.invoke(searchSessionId = TestSearchSessionId)
@@ -93,7 +93,7 @@ class RealPreloadSearchResultUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(SearchError.Exhausted),
+                expected = Either.Left(SearchError.Exhausted(additionalInfo = "test")),
                 actual = actualResult,
             )
         }

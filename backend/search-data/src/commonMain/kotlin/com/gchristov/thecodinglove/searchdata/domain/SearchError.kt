@@ -1,12 +1,16 @@
 package com.gchristov.thecodinglove.searchdata.domain
 
 sealed class SearchError(override val message: String? = null) : Throwable(message) {
+    abstract val additionalInfo: String?
     data class Empty(
-        val additionalInfo: String? = null
+        override val additionalInfo: String? = null
     ) : SearchError("No results found${additionalInfo?.let { ": $it" } ?: ""}")
 
-    object Exhausted : SearchError("Results exhausted")
+    data class Exhausted(
+        override val additionalInfo: String? = null
+    ) : SearchError("Results exhausted${additionalInfo?.let { ": $it" } ?: ""}")
+
     data class SessionNotFound(
-        val additionalInfo: String? = null
+        override val additionalInfo: String? = null
     ) : SearchError("Session not found${additionalInfo?.let { ": $it" } ?: ""}")
 }

@@ -50,7 +50,7 @@ class RealSearchWithHistoryUseCase(
                     resultsPerPage = searchConfig.postsPerPage,
                     exclusions = searchHistory.getExcludedPages()
                 )
-                    .mapLeft { it.toSearchError() }
+                    .mapLeft { it.toSearchError(query) }
                     .flatMap { postPage ->
                         // Get all posts on the random page
                         searchRepository.search(
@@ -67,7 +67,7 @@ class RealSearchWithHistoryUseCase(
                                     posts = searchResults,
                                     exclusions = searchHistory.getExcludedPostIndexes(postPage)
                                 )
-                                    .mapLeft { it.toSearchError() }
+                                    .mapLeft { it.toSearchError(query) }
                                     .map { postIndexOnPage ->
                                         SearchWithHistoryUseCase.Result(
                                             query = query,
@@ -84,7 +84,7 @@ class RealSearchWithHistoryUseCase(
     }
 }
 
-private fun RangeError.toSearchError() = when (this) {
+private fun RangeError.toSearchError(query: String) = when (this) {
     is RangeError.Empty -> SearchError.Empty(additionalInfo = "could not randomize")
-    is RangeError.Exhausted -> SearchError.Exhausted
+    is RangeError.Exhausted -> SearchError.Exhausted(additionalInfo = "query=$query")
 }
