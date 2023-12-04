@@ -1,33 +1,36 @@
 [![Deployment (GCP)](https://github.com/gchristov/thecodinglove-kmp/actions/workflows/deploy_gcp.yml/badge.svg)](https://github.com/gchristov/thecodinglove-kmp/actions/workflows/deploy_gcp.yml)
 
-# Resources
+# Stack
 
-  - [KotlinJS NodeJS example](https://github.com/wadejensen/kotlin-nodejs-example)
-  - [KotlinJS ExpressJS example](https://github.com/chrisnkrueger/kotlin-express)
-  - [KotlinJS external mappings example](https://dev.to/mpetuska/js-in-kotlinjs-c4g)
+- [KotlinJS](https://kotlinlang.org/docs/js-overview.html) - NodeJS transpiling
+- [PubSub](https://cloud.google.com/pubsub) - event-driven messaging
+- [Firestore](https://firebase.google.com/docs/firestore) - NoSQL database
+- [Docker](https://www.docker.com/) - containerised deployment
+- [Cloud Run](https://cloud.google.com/run) - serverless deployment of containers
+- [GitHub Actions](https://github.com/features/actions) - CI automation
 
 # Setup
 
 ## Slack
 
-This project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN). You can [follow steps here](https://api.slack.com/start/quickstart) to create one. Once you have the Slack app, you can use [Slack App Manifest](https://api.slack.com/reference/manifests) to setup the required bits:
-  - [Slash commands](https://api.slack.com/slash-commands)
-  - [OAuth](https://api.slack.com/authentication/oauth-v2)
-  - [Events](http://api.slack.com/events-api)
-  - [Interactivity](https://api.slack.com/messaging/interactivity)
+This project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN), with the following features enabled:
+- [Slash commands](https://api.slack.com/slash-commands)
+- [OAuth](https://api.slack.com/authentication/oauth-v2)
+- [Events](http://api.slack.com/events-api)
+- [Interactivity](https://api.slack.com/messaging/interactivity)
 
 ## Project
 
-1. [Install Docker](https://docs.docker.com/get-started/) and start it up. No additional configuration is required as the project sets up its own image and cleans up the containers after each run
+1. [Install Docker Desktop](https://docs.docker.com/get-started/) and start it up. No additional configuration is required as the project sets up its own image and cleans up the containers after each run
 2. [Install IntelliJ](https://www.jetbrains.com/help/idea/installation-guide.html). This project has been tested with `IntelliJ IDEA 2023.2.5`
 3. Clone the repository and open the project with IntelliJ
-4. Configure [serveo.net](http://serveo.net) for local development - `ssh -R YOUR_DOMAIN.serveo.net:80:localhost:3000 serveo.net`. This is useful when you want your app to be accessible globally via a tunnel, which is great for for developing Slack apps.
+4. _(Optional)_ Configure [serveo.net](http://serveo.net) for local development - `ssh -R YOUR_DOMAIN.serveo.net:80:localhost:3000 serveo.net`. This is useful when you want your app to be accessible globally via a tunnel, which is great for for developing Slack apps.
 
 ## Environment
 
-The project is configured to be deployed and run on Google Cloud. It also uses Firestore as a database.
+The project is configured to be deployed and run on Google Cloud, using Firestore as a database.
 
-1. Create a Google Cloud project and enable the following APIs
+1. Create a new Google Cloud project and enable the following APIs
     - `Cloud Run API`, used to run the final Docker container
     - `Artifact Registry API`, used to store the final Docker container
     - `Cloud Pub/Sub API`, used for communication between services
@@ -75,13 +78,13 @@ SEARCH_PRELOAD_PUBSUB_TOPIC=TOPIC_NAME
 
 ## Monitoring
 
-The project is configured to send all `Throwable`s to a Slack channel specified via the `SLACK_MONITORING_URL` environment variable. This is mainly used for stability monitoring.
+The project is configured to report all `Throwable`s to a Slack channel specified via the `SLACK_MONITORING_URL` environment variable. This is mainly used for stability monitoring.
 
 ## CI
 
 The project is configured to build with [GitHub Actions](https://github.com/features/actions). Checkout the `.github` folder for the workflows. Follow these steps to configure the CI environment.
 
-1. Expose each of the variables defined in `local.properties` should be exposed as [GitHub encrypted secrets](https://docs.github.com/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets) using the same keys. 
+1. Each of the variables defined in `local.properties` should be exposed as [GitHub encrypted secrets](https://docs.github.com/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets) using the same keys. 
 2. Add an additional `GCP_SA_KEY_DEPLOY` GitHub encrypted secret, containing the raw JSON API key for the CI deployment service account
 3. Add an additional `GCP_SA_KEY_APP` GitHub encrypted secret, containing the raw JSON API key for the `firebase-adminsdk` service account
 
