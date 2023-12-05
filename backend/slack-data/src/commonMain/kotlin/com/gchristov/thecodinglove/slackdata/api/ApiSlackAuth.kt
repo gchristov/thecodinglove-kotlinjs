@@ -9,12 +9,15 @@ data class ApiSlackAuthResponse(
     @SerialName("error") val error: String?,
     @SerialName("authed_user") val authedUser: ApiAuthedUser?,
     @SerialName("team") val team: ApiTeam?,
+    @SerialName("scope") val scope: String?,
+    @SerialName("access_token") val accessToken: String?,
+    @SerialName("bot_user_id") val botUserId: String?,
 ) {
     @Serializable
     data class ApiAuthedUser(
         @SerialName("id") val id: String,
-        @SerialName("scope") val scope: String,
-        @SerialName("access_token") val accessToken: String,
+        @SerialName("scope") val scope: String?,
+        @SerialName("access_token") val accessToken: String?,
     )
 
     @Serializable
