@@ -20,13 +20,26 @@ data class SlackAuthState(
     val responseUrl: String,
 )
 
-internal fun ApiSlackAuthResponse.toAuthToken() = SlackAuthToken(
-    id = requireNotNull(authedUser).id,
-    scope = authedUser.scope,
-    token = authedUser.accessToken,
-    teamId = requireNotNull(team).id,
-    teamName = team.name,
-)
+// TODO: Consider better differentiation between the token types
+internal fun ApiSlackAuthResponse.toAuthToken() = if (authedUser?.accessToken != null) {
+    // User token
+    SlackAuthToken(
+        id = requireNotNull(authedUser.id),
+        scope = requireNotNull(authedUser.scope),
+        token = authedUser.accessToken,
+        teamId = requireNotNull(team).id,
+        teamName = team.name,
+    )
+} else {
+    // Bot token
+    SlackAuthToken(
+        id = requireNotNull(botUserId),
+        scope = requireNotNull(scope),
+        token = requireNotNull(accessToken),
+        teamId = requireNotNull(team).id,
+        teamName = team.name,
+    )
+}
 
 internal fun DbSlackAuthToken.toAuthToken() = SlackAuthToken(
     id = id,
