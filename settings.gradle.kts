@@ -4,7 +4,7 @@ plugins {
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-rootProject.name = "thecodinglove-kmp"
+rootProject.name = "thecodinglove-kotlinjs"
 
 apply {
     from("modules.gradle.kts")
