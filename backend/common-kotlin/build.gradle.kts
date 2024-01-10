@@ -99,7 +99,7 @@ fun getLocalSecret(
     rootProject: Project,
     key: String
 ): String {
-    val propFile = rootProject.file("./local.properties")
+    val propFile = rootProject.file("./env.properties")
     val properties = Properties()
     properties.load(FileInputStream(propFile))
     return properties.getProperty(key)

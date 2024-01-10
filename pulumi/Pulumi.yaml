@@ -1,0 +1,123 @@
+name: pulumi-thecoding-love-test
+runtime: yaml
+description: Testing thecodinglove import once
+      
+variables:
+  region: europe-west1
+  containerImage: pulumi-test
+
+resources:
+  firebase-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: firebase.googleapis.com
+  firebase:
+    type: gcp:firebase:Project
+    options:
+      dependsOn:
+        - ${firebase-api}
+  cloud-resource-manager-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: cloudresourcemanager.googleapis.com
+  firestore-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: firestore.googleapis.com
+    options:
+      dependsOn:
+        - ${cloud-resource-manager-api}
+  firestore:
+    type: gcp:firestore:Database
+    properties:
+      appEngineIntegrationMode: DISABLED
+      concurrencyMode: PESSIMISTIC
+      deleteProtectionState: DELETE_PROTECTION_DISABLED
+      locationId: eur3
+      name: (default)
+      type: FIRESTORE_NATIVE
+    options:
+      dependsOn:
+        - ${firestore-api}
+  firestore-rules:
+    type: gcp:firebaserules:Ruleset
+    properties:
+      source:
+        files:
+          - content: |-
+              rules_version = '2';
+              service cloud.firestore {
+                match /databases/{database}/documents {
+                  match /{document=**} {
+                    // Disable public access as we're using Firebase Admin SDK
+                    allow read, write: if false;
+                  }
+                }
+              }
+            name: firestore.rules
+    options:
+      dependsOn:
+        - ${firestore}
+  firestore-rules-publish:
+    type: gcp:firebaserules:Release
+    properties:
+      name: cloud.firestore
+      rulesetName: projects/${firestore-rules.project}/rulesets/${firestore-rules.name}
+  artifact-registry:
+    type: gcp:artifactregistry:Repository
+    properties:
+      format: DOCKER
+      location: ${region}
+      repositoryId: thecodinglove
+  docker-image:
+    type: docker:Image
+    properties:
+      build:
+        platform: linux/amd64
+        context: ../docker
+        dockerfile: ../docker/Dockerfile
+      imageName: ${region}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/${containerImage}
+      registry:
+        server: ${region}-docker.pkg.dev
+        username: _json_key
+        password:
+          fn::secret:
+            fn::readFile: credentials-gcp-infra.json
+  app-service-2:
+    type: gcp:cloudrunv2:Service
+    properties:
+      location: ${region}
+      name: pulumi-test-2
+      template:
+        containers:
+          - image: ${region}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/${containerImage}
+            ports:
+              - containerPort: 8080
+        scaling: 
+          minInstanceCount: 0
+          maxInstanceCount: 100
+    options:
+      dependsOn:
+        - ${docker-image}
+  app-service-policy:
+    type: gcp:cloudrunv2/serviceIamPolicy:ServiceIamPolicy
+    properties:
+      name: ${app-service-2.name}
+      location: ${app-service-2.location}
+      policyData: |
+        {
+          "bindings": [
+            {
+              "role": "roles/run.invoker",
+              "members": [
+                "allUsers"
+              ]
+            }
+          ]
+        }
+
+outputs:
+  appServiceUrl: ${app-service-2.uri}

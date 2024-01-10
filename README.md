@@ -81,7 +81,7 @@ Just clone the repository and open the project with IntelliJ. That's it!
 <details>
   <summary>Local environment</summary>
 
-1. Create a `local.properties` file at the root of the project with the following contents
+1. Create a `env.properties` file at the root of the project with the following contents
 ```
 SLACK_SIGNING_SECRET=YOUR_SLACK_SIGNING_SECRET
 SLACK_REQUEST_VERIFICATION_ENABLED=true|false
@@ -96,7 +96,7 @@ APP_NETWORK_JSON_LOG_LEVEL=all|info|none
 APP_PUBLIC_URL=YOUR_PUBLIC_APP_URL
 SEARCH_PRELOAD_PUBSUB_TOPIC=TOPIC_NAME
 ```
-2. Create a `local-credentials-gcp.json` file at the root of the project with the contents of a new JSON API key for the `firebase-adminsdk` service account you created previously.
+2. Create a `credentials-gcp-app.json` file at the root of the project with the contents of a new JSON API key for the `firebase-adminsdk` service account you created previously.
 </details>
 
 <details>
@@ -114,6 +114,7 @@ The project is configured to report all `Throwable`s to a Slack channel specifie
 ## Run locally
 
 After completing the above setup, you should be able to run the project locally. There are two ways to run the app:
+// TODO: Fix this
 - run the `TheCodingLove` IntelliJ IDE configuration
 - run the `scripts/run_local.sh` script from a Terminal
 
@@ -133,7 +134,7 @@ The project is configured to build with [GitHub Actions](https://github.com/feat
    - `Service Account User`
    - `Artifact Registry Administrator`
    - `Cloud Run Admin`
-3. Each of the variables defined in `local.properties` should be exposed as [GitHub encrypted secrets](https://docs.github.com/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets) using the same keys.
+3. Each of the variables defined in `env.properties` should be exposed as [GitHub encrypted secrets](https://docs.github.com/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets) using the same keys.
 3. Add an additional `GCP_SA_KEY_DEPLOY` GitHub encrypted secret, containing the raw JSON API key for the CI deployment service account
 4. Add an additional `GCP_SA_KEY_APP` GitHub encrypted secret, containing the raw JSON API key for the `firebase-adminsdk` service account
 

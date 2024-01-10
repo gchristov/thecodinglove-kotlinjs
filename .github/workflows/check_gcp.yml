@@ -42,21 +42,20 @@ jobs:
       - name: Build project
         run: |
           set -o pipefail && 
-          bash ./scripts/env.sh && 
+          bash ./env.sh && 
           ./gradlew --no-daemon assemble
       - name: Build container image
         run: |
           set -o pipefail &&
-          docker build -t check .
+          docker build -t check ./docker
       - name: Artifacts
         uses: actions/upload-artifact@v3
         if: always() # Ensure all artifacts are collected, even after errors
         with:
           name: Build
           path: |
-            build/bin
-            local.properties
-            local-credentials-gcp.json
+            docker/bin
+            env.properties
 
   jsTest:
     runs-on: ubuntu-20.04
@@ -76,7 +75,7 @@ jobs:
       - name: Test
         run: |
           set -o pipefail && 
-          bash ./scripts/env.sh && 
+          bash ./env.sh && 
           ./gradlew --no-daemon --continue jsNodeTest
       - name: Generate test report
         uses: mikepenz/action-junit-report@v3

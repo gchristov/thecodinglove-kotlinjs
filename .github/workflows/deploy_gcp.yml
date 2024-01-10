@@ -69,15 +69,15 @@ jobs:
       - name: Build project
         run: |
           set -o pipefail && 
-          bash ./scripts/env.sh && 
+          bash ./env.sh && 
           ./gradlew --no-daemon assemble
       - name: Build container image
         run: |-
-          docker build -t $GCP_BUILD_TAG .
+          docker build -t $GCP_BUILD_TAG ./docker
       - name: Push container image
         run: |-
           gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
-          docker build -t $GCP_BUILD_TAG .
+          docker build -t $GCP_BUILD_TAG ./docker
           docker push $GCP_BUILD_TAG
       - name: Deploy
         id: deployment
@@ -99,9 +99,8 @@ jobs:
         with:
           name: Build
           path: |
-            build/bin
-            local.properties
-            local-credentials-gcp.json
+            docker/bin
+            env.properties
 
   jsTest:
     runs-on: ubuntu-20.04
@@ -121,7 +120,7 @@ jobs:
       - name: Test
         run: |
           set -o pipefail && 
-          bash ./scripts/env.sh && 
+          bash ./env.sh && 
           ./gradlew --no-daemon --continue jsNodeTest
       - name: Generate test report
         uses: mikepenz/action-junit-report@v3
