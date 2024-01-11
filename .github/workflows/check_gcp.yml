@@ -5,12 +5,12 @@ on:
     branches: [ master ]
 
 env:
-  # Required for CI workflow
+  # Required for CI
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
-  # Required for build
+  # Required for app
   GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
   SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
   SLACK_REQUEST_VERIFICATION_ENABLED: ${{ secrets.SLACK_REQUEST_VERIFICATION_ENABLED }}
