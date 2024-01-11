@@ -57,7 +57,7 @@ jobs:
           path: |
             docker/bin
             env.properties
-            pulumi/.
+            pulumi/
 
   jsTest:
     runs-on: ubuntu-20.04
