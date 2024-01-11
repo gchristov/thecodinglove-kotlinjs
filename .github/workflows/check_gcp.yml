@@ -8,6 +8,7 @@ env:
   # Required for CI workflow
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
+  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
   # Required for build
   GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
@@ -55,6 +56,8 @@ jobs:
           command: preview
           stack-name: dev
           work-dir: pulumi
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ env.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
         uses: actions/upload-artifact@v3
         if: always() # Ensure all artifacts are collected, even after errors
