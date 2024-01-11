@@ -49,6 +49,12 @@ jobs:
         run: |
           set -o pipefail &&
           docker build -t check ./docker
+      - name: Preview infrastructure
+        uses: pulumi/actions@v3
+        with:
+          command: preview
+          stack-name: dev
+          work-dir: pulumi
       - name: Artifacts
         uses: actions/upload-artifact@v3
         if: always() # Ensure all artifacts are collected, even after errors
