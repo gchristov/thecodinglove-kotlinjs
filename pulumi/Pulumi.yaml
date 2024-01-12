@@ -184,7 +184,3 @@ resources:
         routeName: service-app
     options:
       protect: true
-
-outputs:
-  dockerImageName: ${docker-image.imageName}
-  appServiceUrl: ${app-service.uri}
