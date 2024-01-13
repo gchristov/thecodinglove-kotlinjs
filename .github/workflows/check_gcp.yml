@@ -46,6 +46,10 @@ jobs:
           set -o pipefail && 
           bash ./env.sh && 
           ./gradlew --no-daemon assemble
+      - name: Build container image
+        run: |
+          set -o pipefail &&
+          docker build -t check ./docker
       - name: Preview infrastructure
         uses: pulumi/actions@v4
         with:
