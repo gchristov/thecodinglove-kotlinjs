@@ -107,9 +107,9 @@ resources:
         platform: linux/amd64
         context: ../docker
         dockerfile: ../docker/Dockerfile
-      imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/pulumi-test:latest
+      imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/thecodinglove-image:latest
       registry:
-        server: ${region}-docker.pkg.dev
+        server: ${artifact-registry.location}-docker.pkg.dev
         username: _json_key
         password:
           fn::secret:
