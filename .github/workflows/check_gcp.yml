@@ -51,7 +51,7 @@ jobs:
           set -o pipefail &&
           docker build -t check ./docker
       - name: Preview infrastructure
-        uses: pulumi/actions@v3
+        uses: pulumi/actions@v4
         with:
           command: preview
           stack-name: prod
