@@ -8,13 +8,8 @@ env:
   # Required for CI
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
-  GCP_SERVICE: service-app
-  GCP_REGION: europe-west1
-  GCP_REPOSITORY: thecodinglove
-  GCP_REPOSITORY_FORMAT: docker
-  GCP_REPOSITORY_IMAGE: thecodinglove-image
-  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  GCP_SA_KEY_DEPLOY: ${{ secrets.GCP_SA_KEY_DEPLOY }}
+  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+  GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
   # Required for app
   GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
   SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
@@ -46,53 +41,19 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Set up Gradle cache
         uses: gradle/gradle-build-action@v2 # By default, cache is only saved on the 'master' branch
-      - name: Set up deploy authentication
-        uses: google-github-actions/auth@v1.1.1
-        with:
-          credentials_json: ${{ env.GCP_SA_KEY_DEPLOY }}
-      - name: Set up deploy cli
-        uses: google-github-actions/setup-gcloud@v1.1.1
-        with:
-          project_id: ${{ env.GCP_PROJECT_ID }}
-      - name: Set up container storage
-        run: |-
-          if [ "$(gcloud artifacts repositories describe ${{ env.GCP_REPOSITORY }} --location=${{ env.GCP_REGION }} >&/dev/null ; echo $?)" -ne 0 ]; then
-            echo "Creating new artifact registry repository"
-            gcloud artifacts repositories create ${{ env.GCP_REPOSITORY }} --location=${{ env.GCP_REGION }} --repository-format=${{ env.GCP_REPOSITORY_FORMAT }}  
-          else
-            echo "Artifact registry repository already exists"
-          fi
-      - name: Set up deploy environment
-        run: |
-          GCP_BUILD_TAG="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_REPOSITORY }}/${{ env.GCP_REPOSITORY_IMAGE }}"
-          echo "GCP_BUILD_TAG=$GCP_BUILD_TAG" >> $GITHUB_ENV
       - name: Build project
         run: |
           set -o pipefail && 
           bash ./env.sh && 
           ./gradlew --no-daemon assemble
-      - name: Build container image
-        run: |-
-          docker build -t $GCP_BUILD_TAG ./docker
-      - name: Push container image
-        run: |-
-          gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
-          docker build -t $GCP_BUILD_TAG ./docker
-          docker push $GCP_BUILD_TAG
-      - name: Deploy
-        id: deployment
-        uses: google-github-actions/deploy-cloudrun@v1.0.2
+      - name: Deploy infrastructure
+        uses: pulumi/actions@v4
         with:
-          service: ${{ env.GCP_SERVICE }}
-          image: ${{ env.GCP_BUILD_TAG }}
-          region: ${{ env.GCP_REGION }}
-      - name: Allow public access
-        run: |
-          gcloud run services add-iam-policy-binding ${{ env.GCP_SERVICE }} \
-            --platform managed \
-            --region ${{ env.GCP_REGION }} \
-            --member=allUsers \
-            --role=roles/run.invoker
+          command: up
+          stack-name: prod
+          work-dir: pulumi
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ env.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
         uses: actions/upload-artifact@v3
         if: always() # Ensure all artifacts are collected, even after errors
@@ -101,6 +62,7 @@ jobs:
           path: |
             docker/bin
             env.properties
+            pulumi/
 
   jsTest:
     runs-on: ubuntu-20.04
