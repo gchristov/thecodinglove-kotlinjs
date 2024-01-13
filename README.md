@@ -31,19 +31,21 @@ The project can be run locally and on the cloud - in this case Google Cloud via 
    - `Firebase Admin`
    - `Service Account User`
    - `Service Usage Admin`
-3. Export a JSON API key for your Service Account.
+3. Export a JSON API key for your Service Account and call it `credentials-gcp-infra.json`.
 4. [Signup and Install Pulumi](https://www.pulumi.com/docs/clouds/gcp/get-started/begin/#install-pulumi).
 5. Create a Pulumi access token and login locally using `pulumi login`.
 6. Create a new empty folder under the root of the project, called `infra` and `cd` into it.
-7. Create an empty Pulumi project with no resources using the `pulumi new` command and follow the instructions. You can use `prod` as your stack name.
-8. Copy the contents of the existing `pulumi` folder into the `infra` directory along with the Service Account JSON API key.
+7. Create an empty Pulumi project with no resources using the `pulumi new` command and follow the instructions:
+   - you can use this prompt for the Pulumi AI `Empty project with no resources`
+   - you can use `prod` as your stack name
+8. Replace the created `Pulumi.yaml` file with the one from the existing `pulumi` folder, preserving the original `name` and paste the Service Account JSON API key file there too.
 9. Setup Pulumi with your Google Cloud project ID and credentials:
-   - `pulumi config set gcp:credentials GCP_SA_CREDENTIALS.json`
+   - `pulumi config set gcp:credentials credentials-gcp-infra.json`
    - `pulumi config set gcp:project GCP_PROJECT_ID`
 10. Run `pulumi up` to automatically create the required project infrastructure.
 11. Find your new `firebase-adminsdk` Service Account and give it the following additional roles:
    - `Pub/Sub Admin`, for managing the PubSub subscriptions
-12. Export a JSON API key for your `firebase-adminsdk` Service Account - the app will need it later.
+12. Export a JSON API key for your `firebase-adminsdk` Service Account and call it `credentials-gcp-app.json` - the app will need it later.
 </details>
 
 <details>
@@ -83,7 +85,7 @@ APP_NETWORK_JSON_LOG_LEVEL=all|info|none
 APP_PUBLIC_URL=YOUR_PUBLIC_APP_URL
 SEARCH_PRELOAD_PUBSUB_TOPIC=TOPIC_NAME
 ```
-6. Create a `credentials-gcp-app.json` file at the root of the project with the contents of your `firebase-adminsdk` Service Account JSON API key.
+6. Copy the `credentials-gcp-app.json` Service Account JSON API key to the root of the project.
 </details>
 
 ## Run locally

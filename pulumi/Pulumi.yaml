@@ -89,6 +89,15 @@ resources:
       rulesetName: projects/${firestore-rules.project}/rulesets/${firestore-rules.name}
     options:
       protect: true
+  # Enables the Artifact Registry API. Needed for Docker.
+  # pulumi import gcp:projects/service:Service artifact-registry-api PROJECT_ID/artifactregistry.googleapis.com
+  artifact-registry-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: artifactregistry.googleapis.com
+    options:
+      protect: true
   # Manages the Docker image repository.
   # pulumi import gcp:artifactregistry/repository:Repository artifact-registry PROJECT_ID/REGION/REPOSITORY_NAME
   artifact-registry:
@@ -99,6 +108,8 @@ resources:
       repositoryId: thecodinglove
     options:
       protect: true
+      dependsOn:
+        - ${artifact-registry-api}
   # Manages the main app Docker image.
   docker-image:
     type: docker:Image
@@ -114,6 +125,15 @@ resources:
         password:
           fn::secret:
             fn::readFile: credentials-gcp-infra.json
+    options:
+      protect: true
+  # Enables the Cloud Run Admin API. Needed for Cloud Run.
+  # pulumi import gcp:projects/service:Service cloud-run-admin-api PROJECT_ID/run.googleapis.com
+  cloud-run-admin-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: run.googleapis.com
     options:
       protect: true
   # Manages the main app Cloud Run service.
@@ -151,6 +171,8 @@ resources:
           type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
     options:
       protect: true
+      dependsOn:
+        - ${cloud-run-admin-api}
   # Manages the main app Cloud Run service policy.
   # pulumi import gcp:cloudrunv2/serviceIamPolicy:ServiceIamPolicy app-service-policy projects/PROJECT_ID/locations/REGION/services/SERVICE_NAME
   app-service-policy:
