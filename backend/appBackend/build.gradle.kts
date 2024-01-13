@@ -31,16 +31,17 @@ kotlin {
     }
 }
 
-// Copy the output binaries to their final destination
+// Copy the output binaries to their final destination.
+// Currently, that is the /docker/bin directory.
 tasks.named("assemble") {
     doLast {
         copy {
             from(layout.buildDirectory.dir("packages/js").get().asFile)
-            into(file("$rootDir/build/bin"))
+            into(file("$rootDir/docker/bin"))
         }
         copy {
-            from(file("$rootDir/local-credentials-gcp.json"))
-            into(file("$rootDir/build/bin"))
+            from(file("$rootDir/credentials-gcp-app.json"))
+            into(file("$rootDir/docker/bin"))
         }
     }
 }

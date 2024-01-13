@@ -17,7 +17,7 @@ internal class GoogleCloudPubSubSubscription(
     private val tag = this::class.simpleName
 
     init {
-        process.env.GOOGLE_APPLICATION_CREDENTIALS = "local-credentials-gcp.json"
+        process.env.GOOGLE_APPLICATION_CREDENTIALS = "credentials-gcp-app.json"
     }
 
     override suspend fun initialise(

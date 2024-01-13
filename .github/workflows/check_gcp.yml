@@ -5,10 +5,12 @@ on:
     branches: [ master ]
 
 env:
-  # Required for CI workflow
+  # Required for CI
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
-  # Required for build
+  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+  GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
+  # Required for app
   GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
   SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
   SLACK_REQUEST_VERIFICATION_ENABLED: ${{ secrets.SLACK_REQUEST_VERIFICATION_ENABLED }}
@@ -42,21 +44,29 @@ jobs:
       - name: Build project
         run: |
           set -o pipefail && 
-          bash ./scripts/env.sh && 
+          bash ./env.sh && 
           ./gradlew --no-daemon assemble
       - name: Build container image
         run: |
           set -o pipefail &&
-          docker build -t check .
+          docker build -t check ./docker
+      - name: Preview infrastructure
+        uses: pulumi/actions@v4
+        with:
+          command: preview
+          stack-name: prod
+          work-dir: pulumi
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ env.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
         uses: actions/upload-artifact@v3
         if: always() # Ensure all artifacts are collected, even after errors
         with:
           name: Build
           path: |
-            build/bin
-            local.properties
-            local-credentials-gcp.json
+            docker/bin
+            env.properties
+            pulumi/
 
   jsTest:
     runs-on: ubuntu-20.04
@@ -76,7 +86,7 @@ jobs:
       - name: Test
         run: |
           set -o pipefail && 
-          bash ./scripts/env.sh && 
+          bash ./env.sh && 
           ./gradlew --no-daemon --continue jsNodeTest
       - name: Generate test report
         uses: mikepenz/action-junit-report@v3

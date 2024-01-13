@@ -8,7 +8,7 @@ internal class GoogleFirebaseAdmin : FirebaseAdmin {
     private val app: GoogleFirebaseAdminExternals.App
 
     init {
-        process.env.GOOGLE_APPLICATION_CREDENTIALS = "local-credentials-gcp.json"
+        process.env.GOOGLE_APPLICATION_CREDENTIALS = "credentials-gcp-app.json"
         app = GoogleFirebaseAdminExternals.initializeApp()
     }
 
