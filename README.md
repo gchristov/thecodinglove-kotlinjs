@@ -45,7 +45,7 @@ The project can be run locally and on the cloud - in this case Google Cloud via 
    - `pulumi config set gcp:project GCP_PROJECT_ID`
 10. Run `pulumi up` to automatically create the required project infrastructure.
 11. Find your new `firebase-adminsdk` Service Account and give it the following additional roles:
-   - `Pub/Sub Admin`, for managing the PubSub subscriptions
+   - `Pub/Sub Publisher`, for publishing messages to PubSub topics
 12. Export a JSON API key for your `firebase-adminsdk` Service Account and call it `credentials-gcp-app.json` - the app will need it later.
 </details>
 
