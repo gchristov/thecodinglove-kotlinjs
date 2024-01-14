@@ -206,3 +206,60 @@ resources:
         routeName: service-app
     options:
       protect: true
+  # Enables the PubSub API.
+  # pulumi import gcp:projects/service:Service pubsub-api PROJECT_ID/pubsub.googleapis.com
+  pubsub-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: pubsub.googleapis.com
+    options:
+      protect: true
+  # Manages the preload search PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-preload-search TOPIC
+  pubsub-topic-preload-search:
+    type: gcp:pubsub:Topic
+    properties:
+      name: preload_search
+    options:
+      protect: true
+  # Manages the dev preload search PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-preload-search-dev TOPIC
+  pubsub-topic-preload-search-dev:
+    type: gcp:pubsub:Topic
+    properties:
+      name: preload_search_dev
+    options:
+      protect: true
+  # Manages the Slack interactivity PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-interactivity TOPIC
+  pubsub-topic-slack-interactivity:
+    type: gcp:pubsub:Topic
+    properties:
+      name: slack_interactivity
+    options:
+      protect: true
+  # Manages the dev Slack interactivity PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-interactivity-dev TOPIC
+  pubsub-topic-slack-interactivity-dev:
+    type: gcp:pubsub:Topic
+    properties:
+      name: slack_interactivity_dev
+    options:
+      protect: true
+  # Manages the Slack slash command PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-slash-command TOPIC
+  pubsub-topic-slack-slash-command:
+    type: gcp:pubsub:Topic
+    properties:
+      name: slack_slash_command
+    options:
+      protect: true
+  # Manages the dev Slack slash command PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-slash-command-dev TOPIC
+  pubsub-topic-slack-slash-command-dev:
+    type: gcp:pubsub:Topic
+    properties:
+      name: slack_slash_command_dev
+    options:
+      protect: true
