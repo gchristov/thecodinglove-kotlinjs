@@ -83,7 +83,6 @@ SLACK_MONITORING_URL=YOUR_SLACK_MONITORING_URL
 APP_LOG_LEVEL=debug|verbose|error|info
 APP_NETWORK_HTML_LOG_LEVEL=all|info|none
 APP_NETWORK_JSON_LOG_LEVEL=all|info|none
-APP_PUBLIC_URL=YOUR_PUBLIC_APP_URL
 SEARCH_PRELOAD_PUBSUB_TOPIC=TOPIC_NAME
 ```
 6. Copy the `credentials-gcp-app.json` Service Account JSON API key to the root of the project.
