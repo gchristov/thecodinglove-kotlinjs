@@ -234,8 +234,7 @@ resources:
       messageRetentionDuration: 600s
       name: preload_search_subscription
       pushConfig:
-        # TODO: Un-hardcode the URL
-        pushEndpoint: https://service-app-xk523rsata-ew.a.run.app/api/pubsub/search
+        pushEndpoint: ${app-service.uri}/api/pubsub/search
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s
@@ -288,8 +287,7 @@ resources:
       messageRetentionDuration: 600s
       name: slack_interactivity_subscription
       pushConfig:
-        # TODO: Un-hardcode the URL
-        pushEndpoint: https://service-app-xk523rsata-ew.a.run.app/api/pubsub/slack/interactivity
+        pushEndpoint: ${app-service.uri}/api/pubsub/slack/interactivity
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s
@@ -342,8 +340,7 @@ resources:
       messageRetentionDuration: 600s
       name: slack_slash_command_subscription
       pushConfig:
-        # TODO: Un-hardcode the URL
-        pushEndpoint: https://service-app-xk523rsata-ew.a.run.app/api/pubsub/slack/slash
+        pushEndpoint: ${app-service.uri}/api/pubsub/slack/slash
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s
