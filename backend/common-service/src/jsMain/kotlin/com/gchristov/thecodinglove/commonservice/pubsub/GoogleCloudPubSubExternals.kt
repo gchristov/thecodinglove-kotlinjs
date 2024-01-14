@@ -12,18 +12,6 @@ internal external object GoogleCloudPubSubExternals {
     }
 
     class Topic {
-        fun exists(): Promise<Array<Boolean>>
-
-        fun create(): Promise<Topic>
-
-        fun subscription(name: String): Subscription
-
         fun publish(message: Buffer): Promise<String>
-    }
-
-    class Subscription {
-        fun exists(): Promise<Array<Boolean>>
-
-        fun create(options: kotlin.js.Json?): Promise<Subscription>
     }
 }

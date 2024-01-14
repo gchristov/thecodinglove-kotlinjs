@@ -164,7 +164,7 @@ resources:
         maxInstanceRequestConcurrency: 80
         scaling:
           maxInstanceCount: 100
-          minInstanceCount: 1
+          minInstanceCount: 0
         timeout: 300s
       traffics:
         - percent: 100
@@ -204,5 +204,173 @@ resources:
       name: thecodinglove.crowdstandout.com
       spec:
         routeName: service-app
+    options:
+      protect: true
+  # Enables the PubSub API.
+  # pulumi import gcp:projects/service:Service pubsub-api PROJECT_ID/pubsub.googleapis.com
+  pubsub-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: pubsub.googleapis.com
+    options:
+      protect: true
+  # Manages the preload search PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-preload-search TOPIC
+  pubsub-topic-preload-search:
+    type: gcp:pubsub:Topic
+    properties:
+      name: preload_search
+    options:
+      protect: true
+  # Manages the preload search PubSub subscription.
+  # pulumi import gcp:pubsub/subscription:Subscription pubsub-subscription-preload-search SUBSCRIPTION
+  pubsub-subscription-preload-search:
+    type: gcp:pubsub:Subscription
+    properties:
+      ackDeadlineSeconds: 10
+      expirationPolicy:
+        ttl: ""
+      messageRetentionDuration: 600s
+      name: preload_search_subscription
+      pushConfig:
+        pushEndpoint: ${app-service.uri}/api/pubsub/search
+      retryPolicy:
+        maximumBackoff: 600s
+        minimumBackoff: 10s
+      topic: ${pubsub-topic-preload-search.name}
+    options:
+      protect: true
+  # Manages the dev preload search PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-preload-search-dev TOPIC
+  pubsub-topic-preload-search-dev:
+    type: gcp:pubsub:Topic
+    properties:
+      name: preload_search_dev
+    options:
+      protect: true
+  # Manages the dev preload search PubSub subscription.
+  # pulumi import gcp:pubsub/subscription:Subscription pubsub-subscription-preload-search-dev SUBSCRIPTION
+  pubsub-subscription-preload-search-dev:
+    type: gcp:pubsub:Subscription
+    properties:
+      ackDeadlineSeconds: 10
+      expirationPolicy:
+        ttl: ""
+      messageRetentionDuration: 600s
+      name: preload_search_dev_subscription
+      pushConfig:
+        # TODO: Un-hardcode the URL
+        pushEndpoint: https://codinglove.serveo.net/api/pubsub/search
+      retryPolicy:
+        maximumBackoff: 600s
+        minimumBackoff: 10s
+      topic: ${pubsub-topic-preload-search-dev.name}
+    options:
+      protect: true
+  # Manages the Slack interactivity PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-interactivity TOPIC
+  pubsub-topic-slack-interactivity:
+    type: gcp:pubsub:Topic
+    properties:
+      name: slack_interactivity
+    options:
+      protect: true
+  # Manages the Slack interactivity PubSub subscription.
+  # pulumi import gcp:pubsub/subscription:Subscription pubsub-subscription-slack-interactivity SUBSCRIPTION
+  pubsub-subscription-slack-interactivity:
+    type: gcp:pubsub:Subscription
+    properties:
+      ackDeadlineSeconds: 10
+      expirationPolicy:
+        ttl: ""
+      messageRetentionDuration: 600s
+      name: slack_interactivity_subscription
+      pushConfig:
+        pushEndpoint: ${app-service.uri}/api/pubsub/slack/interactivity
+      retryPolicy:
+        maximumBackoff: 600s
+        minimumBackoff: 10s
+      topic: ${pubsub-topic-slack-interactivity.name}
+    options:
+      protect: true
+  # Manages the dev Slack interactivity PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-interactivity-dev TOPIC
+  pubsub-topic-slack-interactivity-dev:
+    type: gcp:pubsub:Topic
+    properties:
+      name: slack_interactivity_dev
+    options:
+      protect: true
+  # Manages the dev Slack interactivity PubSub subscription.
+  # pulumi import gcp:pubsub/subscription:Subscription pubsub-subscription-slack-interactivity-dev SUBSCRIPTION
+  pubsub-subscription-slack-interactivity-dev:
+    type: gcp:pubsub:Subscription
+    properties:
+      ackDeadlineSeconds: 10
+      expirationPolicy:
+        ttl: ""
+      messageRetentionDuration: 600s
+      name: slack_interactivity_dev_subscription
+      pushConfig:
+        # TODO: Un-hardcode the URL
+        pushEndpoint: https://codinglove.serveo.net/api/pubsub/slack/interactivity
+      retryPolicy:
+        maximumBackoff: 600s
+        minimumBackoff: 10s
+      topic: ${pubsub-topic-slack-interactivity-dev.name}
+    options:
+      protect: true
+  # Manages the Slack slash command PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-slash-command TOPIC
+  pubsub-topic-slack-slash-command:
+    type: gcp:pubsub:Topic
+    properties:
+      name: slack_slash_command
+    options:
+      protect: true
+  # Manages the Slack slash command PubSub subscription.
+  # pulumi import gcp:pubsub/subscription:Subscription pubsub-subscription-slack-slash-command SUBSCRIPTION
+  pubsub-subscription-slack-slash-command:
+    type: gcp:pubsub:Subscription
+    properties:
+      ackDeadlineSeconds: 10
+      expirationPolicy:
+        ttl: ""
+      messageRetentionDuration: 600s
+      name: slack_slash_command_subscription
+      pushConfig:
+        pushEndpoint: ${app-service.uri}/api/pubsub/slack/slash
+      retryPolicy:
+        maximumBackoff: 600s
+        minimumBackoff: 10s
+      topic: ${pubsub-topic-slack-slash-command.name}
+    options:
+      protect: true
+  # Manages the dev Slack slash command PubSub topic.
+  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-slash-command-dev TOPIC
+  pubsub-topic-slack-slash-command-dev:
+    type: gcp:pubsub:Topic
+    properties:
+      name: slack_slash_command_dev
+    options:
+      protect: true
+  # Manages the dev Slack slash command PubSub subscription.
+  # pulumi import gcp:pubsub/subscription:Subscription pubsub-subscription-slack-slash-command-dev SUBSCRIPTION
+  pubsub-subscription-slack-slash-command-dev:
+    type: gcp:pubsub:Subscription
+    properties:
+      ackDeadlineSeconds: 10
+      expirationPolicy:
+        ttl: ""
+      messageRetentionDuration: 600s
+      name: slack_slash_command_dev_subscription
+      pushConfig:
+        # TODO: Un-hardcode the URL
+        pushEndpoint: https://codinglove.serveo.net/api/pubsub/slack/slash
+      retryPolicy:
+        maximumBackoff: 600s
+        minimumBackoff: 10s
+      topic: ${pubsub-topic-slack-slash-command-dev.name}
     options:
       protect: true

@@ -1,15 +1,16 @@
 package com.gchristov.thecodinglove.slack.interactivity
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.flatMap
+import arrow.core.left
+import arrow.core.right
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.commonkotlin.error
 import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackActionName
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
@@ -26,14 +27,12 @@ class SlackInteractivityPubSubHandler(
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
     private val slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
     private val slackCancelSearchUseCase: SlackCancelSearchUseCase,
-    pubSubSubscription: PubSubSubscription,
     pubSubDecoder: PubSubDecoder,
     private val slackConfig: SlackConfig,
 ) : BasePubSubHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
     log = log,
-    pubSubSubscription = pubSubSubscription,
     pubSubDecoder = pubSubDecoder,
 ) {
     private val tag = this::class.simpleName
@@ -42,10 +41,6 @@ class SlackInteractivityPubSubHandler(
         method = HttpMethod.Post,
         path = "/api/pubsub/slack/interactivity",
         contentType = ContentType.Application.Json,
-    )
-
-    override fun pubSubConfig() = PubSubHandler.PubSubConfig(
-        topic = slackConfig.interactivityPubSubTopic,
     )
 
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =

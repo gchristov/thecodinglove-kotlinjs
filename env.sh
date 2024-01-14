@@ -12,5 +12,4 @@ echo SLACK_MONITORING_URL="$SLACK_MONITORING_URL" >> ./env.properties
 echo APP_LOG_LEVEL="$APP_LOG_LEVEL" >> ./env.properties
 echo APP_NETWORK_HTML_LOG_LEVEL="$APP_NETWORK_HTML_LOG_LEVEL" >> ./env.properties
 echo APP_NETWORK_JSON_LOG_LEVEL="$APP_NETWORK_JSON_LOG_LEVEL" >> ./env.properties
-echo APP_PUBLIC_URL="$APP_PUBLIC_URL" >> ./env.properties
 echo SEARCH_PRELOAD_PUBSUB_TOPIC="$SEARCH_PRELOAD_PUBSUB_TOPIC" >> ./env.properties
