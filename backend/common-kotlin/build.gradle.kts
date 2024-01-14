@@ -83,11 +83,6 @@ buildkonfig {
         )
         buildConfigField(
             type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "APP_PUBLIC_URL",
-            value = getLocalSecret(rootProject, "APP_PUBLIC_URL")
-        )
-        buildConfigField(
-            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             name = "SEARCH_PRELOAD_PUBSUB_TOPIC",
             value = getLocalSecret(rootProject, "SEARCH_PRELOAD_PUBSUB_TOPIC")
         )

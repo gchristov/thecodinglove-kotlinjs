@@ -1,11 +1,10 @@
 package com.gchristov.thecodinglove.slack
 
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.commonkotlin.di.DiModule
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubHandler
@@ -39,7 +38,6 @@ object SlackModule : DiModule() {
                     log = instance(),
                     slackRepository = instance(),
                     searchUseCase = instance(),
-                    pubSubSubscription = instance(),
                     pubSubDecoder = instance(),
                     slackConfig = instance(),
                 )
@@ -60,7 +58,6 @@ object SlackModule : DiModule() {
                     slackSendSearchUseCase = instance(),
                     slackShuffleSearchUseCase = instance(),
                     slackCancelSearchUseCase = instance(),
-                    pubSubSubscription = instance(),
                     pubSubDecoder = instance(),
                     slackConfig = instance(),
                 )
@@ -105,7 +102,6 @@ object SlackModule : DiModule() {
         log: Logger,
         slackRepository: SlackRepository,
         searchUseCase: SearchUseCase,
-        pubSubSubscription: PubSubSubscription,
         pubSubDecoder: PubSubDecoder,
         slackConfig: SlackConfig,
     ): SlackSlashCommandPubSubHandler = SlackSlashCommandPubSubHandler(
@@ -114,7 +110,6 @@ object SlackModule : DiModule() {
         log = log,
         slackRepository = slackRepository,
         searchUseCase = searchUseCase,
-        pubSubSubscription = pubSubSubscription,
         pubSubDecoder = pubSubDecoder,
         slackConfig = slackConfig,
     )
@@ -140,7 +135,6 @@ object SlackModule : DiModule() {
         slackSendSearchUseCase: SlackSendSearchUseCase,
         slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
         slackCancelSearchUseCase: SlackCancelSearchUseCase,
-        pubSubSubscription: PubSubSubscription,
         pubSubDecoder: PubSubDecoder,
         slackConfig: SlackConfig,
     ): SlackInteractivityPubSubHandler = SlackInteractivityPubSubHandler(
@@ -150,7 +144,6 @@ object SlackModule : DiModule() {
         slackSendSearchUseCase = slackSendSearchUseCase,
         slackShuffleSearchUseCase = slackShuffleSearchUseCase,
         slackCancelSearchUseCase = slackCancelSearchUseCase,
-        pubSubSubscription = pubSubSubscription,
         pubSubDecoder = pubSubDecoder,
         slackConfig = slackConfig,
     )

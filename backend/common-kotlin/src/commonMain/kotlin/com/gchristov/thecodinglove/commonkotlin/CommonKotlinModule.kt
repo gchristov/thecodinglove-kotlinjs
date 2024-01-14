@@ -23,7 +23,6 @@ object CommonKotlinModule : DiModule() {
         logLevel = BuildConfig.APP_LOG_LEVEL,
         networkHtmlLogLevel = BuildConfig.APP_NETWORK_HTML_LOG_LEVEL,
         networkJsonLogLevel = BuildConfig.APP_NETWORK_JSON_LOG_LEVEL,
-        publicUrl = BuildConfig.APP_PUBLIC_URL.removeSuffix("/"),
     )
 
     private fun provideLogger(appConfig: AppConfig): Logger {

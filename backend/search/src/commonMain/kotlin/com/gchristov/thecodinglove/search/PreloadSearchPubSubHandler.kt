@@ -10,11 +10,8 @@ import com.gchristov.thecodinglove.commonkotlin.error
 import com.gchristov.thecodinglove.commonservice.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubSubscription
 import com.gchristov.thecodinglove.searchdata.domain.PreloadSearchPubSubMessage
-import com.gchristov.thecodinglove.searchdata.domain.SearchConfig
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,14 +21,11 @@ class PreloadSearchPubSubHandler(
     private val jsonSerializer: JsonSerializer,
     private val log: Logger,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
-    pubSubSubscription: PubSubSubscription,
     pubSubDecoder: PubSubDecoder,
-    private val searchConfig: SearchConfig,
 ) : BasePubSubHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
     log = log,
-    pubSubSubscription = pubSubSubscription,
     pubSubDecoder = pubSubDecoder,
 ) {
     private val tag = this::class.simpleName
@@ -40,10 +34,6 @@ class PreloadSearchPubSubHandler(
         method = HttpMethod.Post,
         path = "/api/pubsub/search",
         contentType = ContentType.Application.Json,
-    )
-
-    override fun pubSubConfig() = PubSubHandler.PubSubConfig(
-        topic = searchConfig.preloadPubSubTopic,
     )
 
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =
