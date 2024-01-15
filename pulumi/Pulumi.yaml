@@ -164,7 +164,7 @@ resources:
         maxInstanceRequestConcurrency: 80
         scaling:
           maxInstanceCount: 100
-          minInstanceCount: 0
+          minInstanceCount: 1
         timeout: 300s
       traffics:
         - percent: 100
