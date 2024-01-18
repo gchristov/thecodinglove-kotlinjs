@@ -2,9 +2,6 @@ name: thecodinglove
 runtime: yaml
 description: Infrastructure as code for the app.
 
-variables:
-  region: europe-west1
-
 resources:
   # Enables the Firebase API. Needed to enable Firebase.
   # pulumi import gcp:projects/service:Service firebase-api PROJECT_ID/firebase.googleapis.com
@@ -104,7 +101,7 @@ resources:
     type: gcp:artifactregistry:Repository
     properties:
       format: DOCKER
-      location: ${region}
+      location: europe-west1
       repositoryId: thecodinglove
     options:
       protect: true
@@ -142,7 +139,7 @@ resources:
     type: gcp:cloudrunv2:Service
     properties:
       ingress: INGRESS_TRAFFIC_ALL
-      location: ${region}
+      location: ${artifact-registry.location}
       name: service-app
       template:
         containers:
@@ -372,5 +369,25 @@ resources:
         maximumBackoff: 600s
         minimumBackoff: 10s
       topic: ${pubsub-topic-slack-slash-command-dev.name}
+    options:
+      protect: true
+  # Manages the post self-destruct timer.
+  self-destruct-timer-job:
+    type: gcp:cloudscheduler:Job
+    properties:
+      name: self-destruct-timer
+      schedule: "*/30 * * * *"
+      timeZone: "Etc/UTC"
+      region: ${app-service.location}
+      httpTarget:
+        uri: "https://codinglove.free.beeceptor.com/"
+        httpMethod: "POST"
+        body: "aGVsbG8gd29ybGQ="
+      retryConfig:
+        retryCount: 5
+        maxRetryDuration: "3600s"
+        maxBackoffDuration: "60s"
+        minBackoffDuration: "5s"
+        maxDoublings: 5
     options:
       protect: true
