@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slackdata
 
 import com.gchristov.thecodinglove.commonnetwork.NetworkClient
+import com.gchristov.thecodinglove.slackdata.api.ApiSlackDeleteMessage
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -29,5 +30,20 @@ internal class SlackApi(private val client: NetworkClient.Json) {
         bearerAuth(authToken)
         contentType(ContentType.Application.Json)
         setBody(message)
+    }
+
+    suspend fun deleteMessage(
+        authToken: String,
+        channelId: String,
+        messageTs: String,
+    ): HttpResponse = client.http.post("https://slack.com/api/chat.delete") {
+        bearerAuth(authToken)
+        contentType(ContentType.Application.Json)
+        setBody(
+            ApiSlackDeleteMessage(
+                channelId = channelId,
+                messageTs = messageTs,
+            )
+        )
     }
 }

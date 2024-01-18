@@ -18,6 +18,7 @@ data class SlackAuthState(
     val teamId: String,
     val userId: String,
     val responseUrl: String,
+    val selfDestructMinutes: Int?,
 )
 
 // TODO: Consider better differentiation between the token types
@@ -55,4 +56,5 @@ fun ApiSlackAuthState.toAuthState() = SlackAuthState(
     teamId = teamId,
     userId = userId,
     responseUrl = responseUrl,
+    selfDestructMinutes = selfDestructMinutes,
 )

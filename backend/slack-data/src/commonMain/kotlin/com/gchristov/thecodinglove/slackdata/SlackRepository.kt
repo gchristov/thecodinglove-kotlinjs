@@ -2,16 +2,18 @@ package com.gchristov.thecodinglove.slackdata
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.raise.either
 import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthResponse
-import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
-import com.gchristov.thecodinglove.slackdata.api.ApiSlackPostMessageResponse
-import com.gchristov.thecodinglove.slackdata.api.ApiSlackReplyWithMessageResponse
+import com.gchristov.thecodinglove.slackdata.api.*
 import com.gchristov.thecodinglove.slackdata.db.DbSlackAuthToken
+import com.gchristov.thecodinglove.slackdata.db.DbSlackSelfDestructMessage
 import com.gchristov.thecodinglove.slackdata.db.toAuthToken
+import com.gchristov.thecodinglove.slackdata.db.toSelfDestructMessage
 import com.gchristov.thecodinglove.slackdata.domain.SlackAuthToken
+import com.gchristov.thecodinglove.slackdata.domain.SlackSelfDestructMessage
 import com.gchristov.thecodinglove.slackdata.domain.toAuthToken
+import com.gchristov.thecodinglove.slackdata.domain.toSelfDestructMessage
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -37,7 +39,19 @@ interface SlackRepository {
     suspend fun postMessage(
         authToken: String,
         message: ApiSlackMessage
+    ): Either<Throwable, String>
+
+    suspend fun deleteMessage(
+        authToken: String,
+        channelId: String,
+        messageTs: String,
     ): Either<Throwable, Unit>
+
+    suspend fun saveSelfDestructMessage(message: SlackSelfDestructMessage): Either<Throwable, Unit>
+
+    suspend fun deleteSelfDestructMessage(messageId: String): Either<Throwable, Unit>
+
+    suspend fun getSelfDestructMessages(): Either<Throwable, List<SlackSelfDestructMessage>>
 }
 
 internal class RealSlackRepository(
@@ -145,7 +159,7 @@ internal class RealSlackRepository(
             message = message
         ).body()
         if (slackResponse.ok) {
-            Either.Right(Unit)
+            Either.Right(slackResponse.messageTs)
         } else {
             throw Exception(slackResponse.error)
         }
@@ -155,6 +169,66 @@ internal class RealSlackRepository(
             cause = error,
         ))
     }
+
+    override suspend fun deleteMessage(
+        authToken: String,
+        channelId: String,
+        messageTs: String,
+    ): Either<Throwable, Unit> = try {
+        val slackResponse: ApiSlackDeleteMessageResponse = apiService.deleteMessage(
+            authToken = authToken,
+            channelId = channelId,
+            messageTs = messageTs,
+        ).body()
+        if (slackResponse.ok) {
+            Either.Right(Unit)
+        } else {
+            throw Exception(slackResponse.error)
+        }
+    } catch (error: Throwable) {
+        Either.Left(Throwable(
+            message = "Error during message delete${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
+    }
+
+    override suspend fun saveSelfDestructMessage(message: SlackSelfDestructMessage): Either<Throwable, Unit> =
+        firebaseAdmin
+            .firestore()
+            .collection(SelfDestructCollection)
+            .document(message.id)
+            .set(
+                jsonSerializer = jsonSerializer,
+                strategy = DbSlackSelfDestructMessage.serializer(),
+                data = message.toSelfDestructMessage(),
+                merge = true,
+            )
+
+    override suspend fun deleteSelfDestructMessage(messageId: String): Either<Throwable, Unit> = firebaseAdmin
+        .firestore()
+        .collection(SelfDestructCollection)
+        .document(messageId)
+        .delete()
+
+    override suspend fun getSelfDestructMessages(): Either<Throwable, List<SlackSelfDestructMessage>> = firebaseAdmin
+        .firestore()
+        .collection(SelfDestructCollection)
+        .get()
+        .flatMap {
+            it.docs
+                .map { document ->
+                    document.decodeDataFromJson(
+                        jsonSerializer = jsonSerializer,
+                        strategy = DbSlackSelfDestructMessage.serializer(),
+                    ).flatMap { dbSelfDestructMessage ->
+                        dbSelfDestructMessage?.let {
+                            Either.Right(it.toSelfDestructMessage())
+                        } ?: Either.Left(Throwable("Could not decode self-destruct message"))
+                    }
+                }
+                .let { l -> either { l.bindAll() } }
+        }
 }
 
 private const val AuthTokenCollection = "slack_auth_token"
+private const val SelfDestructCollection = "slack_self_destruct"

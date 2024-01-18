@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.searchdata.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import com.benasher44.uuid.uuid4
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.domain.*
 import kotlinx.coroutines.CoroutineDispatcher
@@ -26,7 +26,7 @@ interface SearchUseCase {
     )
 }
 
-class RealSearchUseCase(
+internal class RealSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,

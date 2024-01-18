@@ -73,6 +73,12 @@ object SlackDataModule : DiModule() {
                     slackRepository = instance(),
                 )
             }
+            bindProvider {
+                provideSelfDestructUseCase(
+                    log = instance(),
+                    slackRepository = instance(),
+                )
+            }
         }
     }
 
@@ -144,6 +150,7 @@ object SlackDataModule : DiModule() {
         slackRepository = slackRepository,
         slackConfig = slackConfig,
         jsonSerializer = jsonSerializer,
+        clock = Clock.System,
     )
 
     private fun provideSlackAuthUseCase(
@@ -164,5 +171,15 @@ object SlackDataModule : DiModule() {
         dispatcher = Dispatchers.Default,
         log = log,
         slackRepository = slackRepository,
+    )
+
+    private fun provideSelfDestructUseCase(
+        log: Logger,
+        slackRepository: SlackRepository,
+    ): SlackSelfDestructUseCase = RealSlackSelfDestructUseCase(
+        dispatcher = Dispatchers.Default,
+        log = log,
+        slackRepository = slackRepository,
+        clock = Clock.System,
     )
 }

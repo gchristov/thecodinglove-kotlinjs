@@ -12,9 +12,10 @@ data class SearchSession(
     val preloadedPost: Post?,
     val state: State
 ) {
-    enum class State {
-        Searching,
-        Sent,
+    sealed class State {
+        data object Searching : State()
+        data object Sent : State()
+        data object SelfDestruct : State()
     }
 }
 
@@ -35,6 +36,7 @@ internal fun DbSearchSession.toSearchSession() = SearchSession(
 )
 
 private fun DbSearchSession.DbState.toSearchSessionState(): SearchSession.State = when (this) {
-    DbSearchSession.DbState.DbSearching -> SearchSession.State.Searching
-    DbSearchSession.DbState.DbSent -> SearchSession.State.Sent
+    is DbSearchSession.DbState.Searching -> SearchSession.State.Searching
+    is DbSearchSession.DbState.Sent -> SearchSession.State.Sent
+    is DbSearchSession.DbState.SelfDestruct -> SearchSession.State.SelfDestruct
 }

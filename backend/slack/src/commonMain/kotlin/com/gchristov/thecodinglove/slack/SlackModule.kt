@@ -59,7 +59,6 @@ object SlackModule : DiModule() {
                     slackShuffleSearchUseCase = instance(),
                     slackCancelSearchUseCase = instance(),
                     pubSubDecoder = instance(),
-                    slackConfig = instance(),
                 )
             }
             bindSingleton {
@@ -77,6 +76,13 @@ object SlackModule : DiModule() {
                     slackVerifyRequestUseCase = instance(),
                     slackConfig = instance(),
                     slackRevokeTokensUseCase = instance(),
+                )
+            }
+            bindSingleton {
+                provideSelfDestructHttpHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    slackSelfDestructUseCase = instance(),
                 )
             }
         }
@@ -136,7 +142,6 @@ object SlackModule : DiModule() {
         slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
         slackCancelSearchUseCase: SlackCancelSearchUseCase,
         pubSubDecoder: PubSubDecoder,
-        slackConfig: SlackConfig,
     ): SlackInteractivityPubSubHandler = SlackInteractivityPubSubHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
@@ -145,7 +150,6 @@ object SlackModule : DiModule() {
         slackShuffleSearchUseCase = slackShuffleSearchUseCase,
         slackCancelSearchUseCase = slackCancelSearchUseCase,
         pubSubDecoder = pubSubDecoder,
-        slackConfig = slackConfig,
     )
 
     private fun provideSlackAuthHttpHandler(
@@ -174,5 +178,16 @@ object SlackModule : DiModule() {
         slackVerifyRequestUseCase = slackVerifyRequestUseCase,
         slackConfig = slackConfig,
         slackRevokeTokensUseCase = slackRevokeTokensUseCase,
+    )
+
+    private fun provideSelfDestructHttpHandler(
+        jsonSerializer: JsonSerializer.Default,
+        log: Logger,
+        slackSelfDestructUseCase: SlackSelfDestructUseCase,
+    ): SlackSelfDestructHttpHandler = SlackSelfDestructHttpHandler(
+        dispatcher = Dispatchers.Default,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        slackSelfDestructUseCase = slackSelfDestructUseCase,
     )
 }
