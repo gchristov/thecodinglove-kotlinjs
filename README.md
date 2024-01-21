@@ -12,6 +12,7 @@
 - [Firestore](https://firebase.google.com/docs/firestore) - NoSQL database
 - [Docker](https://www.docker.com/) - containerised deployment
 - [Cloud Run](https://cloud.google.com/run) - serverless deployment of containers
+- [Cloud Scheduler](https://cloud.google.com/scheduler) - cron jobs
 - [GitHub Actions](https://github.com/features/actions) - CI automation
 - [Pulumi](https://www.pulumi.com/) - infrastructure as code
 </details>
