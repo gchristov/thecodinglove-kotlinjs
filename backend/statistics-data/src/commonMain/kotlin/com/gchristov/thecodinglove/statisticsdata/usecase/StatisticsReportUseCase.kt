@@ -7,6 +7,7 @@ import com.gchristov.thecodinglove.commonkotlin.debug
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import com.gchristov.thecodinglove.slackdata.SlackRepository
+import com.gchristov.thecodinglove.slackdata.domain.SlackAuthToken
 import com.gchristov.thecodinglove.statisticsdata.domain.StatisticsReport
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -36,19 +37,31 @@ internal class RealStatisticsReportUseCase(
                                 log.debug(tag, "Obtaining all self-destruct search sessions")
                                 searchRepository.findSearchSessions(SearchSession.State.SelfDestruct())
                                     .flatMap { selfDestructMessages ->
-                                        Either.Right(
-                                            StatisticsReport(
-                                                messagesSent = sentMessages.size,
-                                                activeSearchSessions = activeSearchSessions.size,
-                                                messagesSelfDestruct = selfDestructMessages.size,
-                                                activeSelfDestructMessages = activeSelfDestructMessages.size,
-                                                userTokens = 0,
-                                                teams = 0,
-                                            )
-                                        )
+                                        log.debug(tag, "Obtaining all Slack auth tokens")
+                                        slackRepository.getAuthTokens()
+                                            .flatMap { authTokens ->
+                                                Either.Right(
+                                                    StatisticsReport(
+                                                        messagesSent = sentMessages.size,
+                                                        activeSearchSessions = activeSearchSessions.size,
+                                                        messagesSelfDestruct = selfDestructMessages.size,
+                                                        activeSelfDestructMessages = activeSelfDestructMessages.size,
+                                                        userTokens = authTokens.size,
+                                                        teams = authTokens.teamsCount(),
+                                                    )
+                                                )
+                                            }
                                     }
                             }
                     }
             }
     }
+}
+
+private fun List<SlackAuthToken>.teamsCount(): Int {
+    val teams = mutableSetOf<String>()
+    forEach {
+        teams.add(it.teamId)
+    }
+    return teams.size
 }

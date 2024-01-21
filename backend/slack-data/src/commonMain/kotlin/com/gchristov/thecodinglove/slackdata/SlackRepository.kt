@@ -27,6 +27,8 @@ interface SlackRepository {
 
     suspend fun getAuthToken(tokenId: String): Either<Throwable, SlackAuthToken>
 
+    suspend fun getAuthTokens(): Either<Throwable, List<SlackAuthToken>>
+
     suspend fun saveAuthToken(token: SlackAuthToken): Either<Throwable, Unit>
 
     suspend fun deleteAuthToken(tokenId: String): Either<Throwable, Unit>
@@ -99,6 +101,25 @@ internal class RealSlackRepository(
             } else {
                 Either.Left(Exception("Auth token not found"))
             }
+        }
+
+    override suspend fun getAuthTokens(): Either<Throwable, List<SlackAuthToken>> = firebaseAdmin
+        .firestore()
+        .collection(AuthTokenCollection)
+        .get()
+        .flatMap {
+            it.docs
+                .map { document ->
+                    document.decodeDataFromJson(
+                        jsonSerializer = jsonSerializer,
+                        strategy = DbSlackAuthToken.serializer(),
+                    ).flatMap { dbAuthToken ->
+                        dbAuthToken?.let {
+                            Either.Right(it.toAuthToken())
+                        } ?: Either.Left(Throwable("Could not decode auth token"))
+                    }
+                }
+                .let { l -> either { l.bindAll() } }
         }
 
     override suspend fun saveAuthToken(token: SlackAuthToken): Either<Throwable, Unit> = firebaseAdmin
