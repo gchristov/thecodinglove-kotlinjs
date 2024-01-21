@@ -34,4 +34,5 @@ data class ApiSlackAuthState(
     @SerialName("team_id") val teamId: String,
     @SerialName("user_id") val userId: String,
     @SerialName("response_url") val responseUrl: String,
+    @SerialName("self_destruct_minutes") val selfDestructMinutes: Int?,
 )

@@ -3,7 +3,6 @@ package com.gchristov.thecodinglove
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.raise.either
-import arrow.core.sequence
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonfirebasedata.CommonFirebaseDataModule
 import com.gchristov.thecodinglove.commonkotlin.CommonKotlinModule
@@ -21,6 +20,8 @@ import com.gchristov.thecodinglove.search.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.SearchHttpHandler
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
+import com.gchristov.thecodinglove.selfdestruct.SelfDestructHttpHandler
+import com.gchristov.thecodinglove.selfdestruct.SelfDestructModule
 import com.gchristov.thecodinglove.slack.SlackAuthHttpHandler
 import com.gchristov.thecodinglove.slack.SlackEventHttpHandler
 import com.gchristov.thecodinglove.slack.SlackModule
@@ -57,6 +58,7 @@ private fun setupDi(): Either<Throwable, Unit> {
             MonitoringDataModule.module,
             SearchModule.module,
             SearchDataModule.module,
+            SelfDestructModule.module,
             SlackModule.module,
             SlackDataModule.module,
         )
@@ -96,6 +98,7 @@ private suspend fun setupAppService(): Either<Throwable, HttpService> {
         DiGraph.inject<SlackInteractivityPubSubHandler>(),
         DiGraph.inject<SlackAuthHttpHandler>(),
         DiGraph.inject<SlackEventHttpHandler>(),
+        DiGraph.inject<SelfDestructHttpHandler>(),
         // Link this last so that API handlers are correctly registered
         StaticFileHttpHandler("$staticWebsiteRoot/index.html"),
     )

@@ -59,7 +59,6 @@ object SlackModule : DiModule() {
                     slackShuffleSearchUseCase = instance(),
                     slackCancelSearchUseCase = instance(),
                     pubSubDecoder = instance(),
-                    slackConfig = instance(),
                 )
             }
             bindSingleton {
@@ -136,7 +135,6 @@ object SlackModule : DiModule() {
         slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
         slackCancelSearchUseCase: SlackCancelSearchUseCase,
         pubSubDecoder: PubSubDecoder,
-        slackConfig: SlackConfig,
     ): SlackInteractivityPubSubHandler = SlackInteractivityPubSubHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
@@ -145,7 +143,6 @@ object SlackModule : DiModule() {
         slackShuffleSearchUseCase = slackShuffleSearchUseCase,
         slackCancelSearchUseCase = slackCancelSearchUseCase,
         pubSubDecoder = pubSubDecoder,
-        slackConfig = slackConfig,
     )
 
     private fun provideSlackAuthHttpHandler(

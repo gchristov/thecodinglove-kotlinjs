@@ -16,7 +16,6 @@ import com.gchristov.thecodinglove.slackdata.usecase.SlackSendSearchUseCase
 import io.ktor.http.*
 import io.ktor.util.*
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.serialization.decodeFromString
 
 class SlackAuthHttpHandler(
     dispatcher: CoroutineDispatcher,
@@ -82,6 +81,7 @@ class SlackAuthHttpHandler(
             channelId = authState.channelId,
             responseUrl = authState.responseUrl,
             searchSessionId = authState.searchSessionId,
+            selfDestructMinutes = authState.selfDestructMinutes,
         )
     } catch (error: Throwable) {
         Either.Left(Throwable(

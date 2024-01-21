@@ -32,6 +32,7 @@ The project can be run locally and on the cloud - in this case Google Cloud via 
    - `Service Account User`
    - `Service Usage Admin`
    - `Pub/Sub Admin`
+   - `Cloud Scheduler Admin`
 3. Export a JSON API key for your Service Account and call it `credentials-gcp-infra.json`.
 4. [Signup and Install Pulumi](https://www.pulumi.com/docs/clouds/gcp/get-started/begin/#install-pulumi).
 5. Create a Pulumi access token and login locally using `pulumi login`.

@@ -27,7 +27,7 @@ interface SearchWithHistoryUseCase {
     )
 }
 
-class RealSearchWithHistoryUseCase(
+internal class RealSearchWithHistoryUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchConfig: SearchConfig

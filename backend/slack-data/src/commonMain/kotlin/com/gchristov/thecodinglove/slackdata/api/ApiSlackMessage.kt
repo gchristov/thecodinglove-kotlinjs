@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 data class ApiSlackPostMessageResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("error") val error: String?,
+    @SerialName("ts") val messageTs: String,
 )
 
 @Serializable
@@ -51,8 +52,10 @@ data class ApiSlackMessage(
 }
 
 enum class ApiSlackActionName(val apiValue: String, val text: String) {
-    AUTH_SEND(apiValue = "auth_send", text = "Authorize and Send"),
+    AUTH_SEND(apiValue = "auth_send", text = "Allow"),
     SEND(apiValue = "send", text = "Send"),
+    // TODO: Consider adding more self-destruct times here if needed
+    SELF_DESTRUCT_5_MIN(apiValue = "self_destruct_5_min", text = "Send and erase in 5 minutes"),
     SHUFFLE(apiValue = "shuffle", text = "Shuffle"),
     CANCEL(apiValue = "cancel", text = "Cancel"),
 }
@@ -111,6 +114,14 @@ object ApiSlackMessageFactory {
                         style = ActionStylePrimary,
                     ),
                     ApiSlackMessage.ApiAttachment.ApiAction(
+                        name = ApiSlackActionName.SELF_DESTRUCT_5_MIN.apiValue,
+                        text = ApiSlackActionName.SELF_DESTRUCT_5_MIN.text,
+                        type = ActionTypeButton,
+                        value = searchSessionId,
+                        url = null,
+                        style = ActionStylePrimary,
+                    ),
+                    ApiSlackMessage.ApiAttachment.ApiAction(
                         name = ApiSlackActionName.SHUFFLE.apiValue,
                         text = ApiSlackActionName.SHUFFLE.text,
                         type = ActionTypeButton,
@@ -139,8 +150,10 @@ object ApiSlackMessageFactory {
     ) = message(
         attachments = listOf(
             attachment(
-                text = AuthText,
-                footer = AuthFooter,
+                text = """
+                The Coding Love GIFs does not have permission to post messages yet. Allowing access will post this GIF to this channel on your behalf.  
+                """.trimIndent(),
+                footer = "Will never post anything without your permission. <https://thecodinglove.crowdstandout.com/privacy-policy|Check out our privacy policy>",
                 actions = listOf(
                     ApiSlackMessage.ApiAttachment.ApiAction(
                         name = ApiSlackActionName.AUTH_SEND.apiValue,
@@ -169,6 +182,7 @@ object ApiSlackMessageFactory {
         attachmentUrl: String,
         attachmentImageUrl: String,
         channelId: String,
+        selfDestructMinutes: Int?,
     ) = message(
         text = searchQuery,
         channelId = channelId,
@@ -180,7 +194,7 @@ object ApiSlackMessageFactory {
                 url = attachmentUrl,
                 imageUrl = attachmentImageUrl,
                 actions = emptyList(),
-                footer = PostedUsingFooter,
+                footer = selfDestructMinutes?.let { "Self-destructing in ~$selfDestructMinutes minutes • $PostedUsingFooter" } ?: PostedUsingFooter,
             )
         ),
     )
@@ -205,7 +219,4 @@ object ApiSlackMessageFactory {
     )
 }
 
-private const val AuthText =
-    "The Coding Love GIFs does not have permission to send messages on your behalf yet. Press Authorize and Send below to allow this."
-private const val AuthFooter = "We'll never post without your permission."
 private const val PostedUsingFooter = "Posted using /codinglove"

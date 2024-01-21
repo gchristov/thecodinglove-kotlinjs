@@ -11,9 +11,13 @@ import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackAuthState
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
+import com.gchristov.thecodinglove.slackdata.domain.SlackSelfDestructMessage
 import io.ktor.util.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.plus
 import kotlinx.serialization.encodeToString
 
 interface SlackSendSearchUseCase {
@@ -23,6 +27,7 @@ interface SlackSendSearchUseCase {
         channelId: String,
         responseUrl: String,
         searchSessionId: String,
+        selfDestructMinutes: Int? = null,
     ): Either<Throwable, Unit>
 }
 
@@ -33,6 +38,7 @@ class RealSlackSendSearchUseCase(
     private val slackRepository: SlackRepository,
     private val slackConfig: SlackConfig,
     private val jsonSerializer: JsonSerializer,
+    private val clock: Clock,
 ) : SlackSendSearchUseCase {
     private val tag = this::class.simpleName
 
@@ -41,7 +47,8 @@ class RealSlackSendSearchUseCase(
         teamId: String,
         channelId: String,
         responseUrl: String,
-        searchSessionId: String
+        searchSessionId: String,
+        selfDestructMinutes: Int?,
     ): Either<Throwable, Unit> = withContext(dispatcher) {
         log.debug(tag, "Checking auth token before sending message: userId=$userId")
         slackRepository.getAuthToken(tokenId = userId)
@@ -55,14 +62,17 @@ class RealSlackSendSearchUseCase(
                         teamId = teamId,
                         clientId = slackConfig.clientId,
                         channelId = channelId,
+                        selfDestructMinutes = selfDestructMinutes,
                     )
                 },
                 ifRight = {
                     sendResult(
+                        userId = userId,
                         authToken = it.token,
                         channelId = channelId,
                         responseUrl = responseUrl,
-                        searchSessionId = searchSessionId
+                        searchSessionId = searchSessionId,
+                        selfDestructMinutes = selfDestructMinutes,
                     )
                 }
             )
@@ -75,6 +85,7 @@ class RealSlackSendSearchUseCase(
         teamId: String,
         clientId: String,
         channelId: String,
+        selfDestructMinutes: Int?,
     ): Either<Throwable, Unit> = try {
         val state = jsonSerializer.json.encodeToString(
             ApiSlackAuthState(
@@ -82,7 +93,8 @@ class RealSlackSendSearchUseCase(
                 channelId = channelId,
                 teamId = teamId,
                 userId = userId,
-                responseUrl = responseUrl
+                responseUrl = responseUrl,
+                selfDestructMinutes = selfDestructMinutes,
             )
         ).encodeBase64()
         log.debug(tag, "Asking user to authenticate: userId=$userId, state=$state")
@@ -103,10 +115,12 @@ class RealSlackSendSearchUseCase(
     }
 
     private suspend fun sendResult(
+        userId: String,
         authToken: String,
         channelId: String,
         responseUrl: String,
-        searchSessionId: String
+        searchSessionId: String,
+        selfDestructMinutes: Int?,
     ): Either<Throwable, Unit> {
         log.debug(tag, "Obtaining search session: searchSessionId=$searchSessionId")
         return searchRepository.getSearchSession(searchSessionId)
@@ -125,10 +139,35 @@ class RealSlackSendSearchUseCase(
                             attachmentUrl = searchSession.currentPost!!.url,
                             attachmentImageUrl = searchSession.currentPost!!.imageUrl,
                             channelId = channelId,
+                            selfDestructMinutes = selfDestructMinutes,
                         )
-                    ).flatMap {
-                        log.debug(tag, "Marking search session as sent: searchSessionId=$searchSessionId")
-                        searchRepository.saveSearchSession(searchSession.copy(state = SearchSession.State.Sent))
+                    ).flatMap { messageTs ->
+                        val logPlaceholder = selfDestructMinutes?.let { "self-destruct" } ?: "sent"
+                        val state = selfDestructMinutes?.let {
+                            SearchSession.State.SelfDestruct
+                        } ?: SearchSession.State.Sent
+                        log.debug(tag, "Marking search session as $logPlaceholder: searchSessionId=$searchSessionId")
+                        searchRepository
+                            .saveSearchSession(searchSession.copy(state = state))
+                            .flatMap {
+                                selfDestructMinutes?.let {
+                                    log.debug(tag, "Persisting self-destruct state: searchSessionId=$searchSessionId")
+                                    val destroyTimestamp = clock.now().plus(
+                                        value = selfDestructMinutes,
+                                        unit = DateTimeUnit.MINUTE,
+                                    ).toEpochMilliseconds()
+                                    slackRepository.saveSelfDestructMessage(
+                                        SlackSelfDestructMessage(
+                                            id = searchSessionId,
+                                            userId = userId,
+                                            searchSessionId = searchSessionId,
+                                            destroyTimestamp = destroyTimestamp,
+                                            channelId = channelId,
+                                            messageTs = messageTs,
+                                        )
+                                    )
+                                } ?: Either.Right(Unit)
+                            }
                     }
                 }
             }

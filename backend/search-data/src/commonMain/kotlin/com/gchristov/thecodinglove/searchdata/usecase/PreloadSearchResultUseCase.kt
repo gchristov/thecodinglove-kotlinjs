@@ -12,7 +12,7 @@ interface PreloadSearchResultUseCase {
     suspend operator fun invoke(searchSessionId: String) : Either<SearchError, Unit>
 }
 
-class RealPreloadSearchResultUseCase(
+internal class RealPreloadSearchResultUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,

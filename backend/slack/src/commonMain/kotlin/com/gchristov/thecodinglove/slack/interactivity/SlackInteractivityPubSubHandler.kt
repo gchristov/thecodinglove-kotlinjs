@@ -12,7 +12,6 @@ import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackActionName
-import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage
 import com.gchristov.thecodinglove.slackdata.usecase.SlackCancelSearchUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.SlackSendSearchUseCase
@@ -28,7 +27,6 @@ class SlackInteractivityPubSubHandler(
     private val slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
     private val slackCancelSearchUseCase: SlackCancelSearchUseCase,
     pubSubDecoder: PubSubDecoder,
-    private val slackConfig: SlackConfig,
 ) : BasePubSubHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
@@ -66,6 +64,7 @@ class SlackInteractivityPubSubHandler(
 
     private suspend fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.handle(): Either<Throwable, Unit> {
         val sendAction = sendAction()
+        val selfDestruct5MinAction = selfDestruct5MinAction()
         val shuffleAction = shuffleAction()
         val cancelAction = cancelAction()
         return when {
@@ -75,6 +74,15 @@ class SlackInteractivityPubSubHandler(
                 channelId = channel.id,
                 responseUrl = responseUrl,
                 searchSessionId = sendAction.value
+            )
+
+            selfDestruct5MinAction != null -> slackSendSearchUseCase.invoke(
+                userId = user.id,
+                teamId = team.id,
+                channelId = channel.id,
+                responseUrl = responseUrl,
+                searchSessionId = selfDestruct5MinAction.value,
+                selfDestructMinutes = 5,
             )
 
             shuffleAction != null -> slackShuffleSearchUseCase.invoke(
@@ -94,6 +102,9 @@ class SlackInteractivityPubSubHandler(
 
 private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.sendAction() =
     actions.find { it.name == ApiSlackActionName.SEND.apiValue }
+
+private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.selfDestruct5MinAction() =
+    actions.find { it.name == ApiSlackActionName.SELF_DESTRUCT_5_MIN.apiValue }
 
 private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.shuffleAction() =
     actions.find { it.name == ApiSlackActionName.SHUFFLE.apiValue }

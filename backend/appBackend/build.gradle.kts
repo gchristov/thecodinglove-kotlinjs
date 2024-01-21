@@ -10,6 +10,7 @@ kotlin {
             dependencies {
                 implementation(projects.commonFirebaseData)
                 implementation(projects.search)
+                implementation(projects.selfDestruct)
                 implementation(projects.slack)
                 implementation(projects.monitoringData)
                 implementation(projects.htmlParseData)
