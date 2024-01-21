@@ -30,6 +30,8 @@ import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubH
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
+import com.gchristov.thecodinglove.statistics.StatisticsHttpHandler
+import com.gchristov.thecodinglove.statistics.StatisticsModule
 
 suspend fun main() {
     setupDi()
@@ -61,6 +63,7 @@ private fun setupDi(): Either<Throwable, Unit> {
             SelfDestructModule.module,
             SlackModule.module,
             SlackDataModule.module,
+            StatisticsModule.module,
         )
     )
     return Either.Right(Unit)
@@ -99,6 +102,7 @@ private suspend fun setupAppService(): Either<Throwable, HttpService> {
         DiGraph.inject<SlackAuthHttpHandler>(),
         DiGraph.inject<SlackEventHttpHandler>(),
         DiGraph.inject<SelfDestructHttpHandler>(),
+        DiGraph.inject<StatisticsHttpHandler>(),
         // Link this last so that API handlers are correctly registered
         StaticFileHttpHandler("$staticWebsiteRoot/index.html"),
     )

@@ -12,6 +12,7 @@ kotlin {
                 implementation(projects.search)
                 implementation(projects.selfDestruct)
                 implementation(projects.slack)
+                implementation(projects.statistics)
                 implementation(projects.monitoringData)
                 implementation(projects.htmlParseData)
             }
