@@ -16,6 +16,6 @@ object SearchSessionCreator {
         searchHistory = searchHistory,
         currentPost = null,
         preloadedPost = preloadedPost,
-        state = SearchSession.State.Searching
+        state = SearchSession.State.Searching()
     )
 }

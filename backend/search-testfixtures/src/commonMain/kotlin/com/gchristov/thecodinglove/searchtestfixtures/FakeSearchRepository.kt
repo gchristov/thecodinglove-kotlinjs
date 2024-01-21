@@ -49,6 +49,10 @@ class FakeSearchRepository(
         TODO("Not yet implemented")
     }
 
+    override suspend fun findSearchSessions(state: SearchSession.State): Either<Throwable, List<SearchSession>> {
+        TODO("Not yet implemented")
+    }
+
     fun assertSessionFetched() {
         assertTrue(searchSessionGetCalled)
     }

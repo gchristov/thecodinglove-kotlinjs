@@ -13,9 +13,11 @@ data class SearchSession(
     val state: State
 ) {
     sealed class State {
-        data object Searching : State()
-        data object Sent : State()
-        data object SelfDestruct : State()
+        abstract val type: String
+
+        data class Searching(override val type: String = "searching") : State()
+        data class Sent(override val type: String = "sent") : State()
+        data class SelfDestruct(override val type: String = "self-destruct") : State()
     }
 }
 
@@ -36,7 +38,7 @@ internal fun DbSearchSession.toSearchSession() = SearchSession(
 )
 
 private fun DbSearchSession.DbState.toSearchSessionState(): SearchSession.State = when (this) {
-    is DbSearchSession.DbState.Searching -> SearchSession.State.Searching
-    is DbSearchSession.DbState.Sent -> SearchSession.State.Sent
-    is DbSearchSession.DbState.SelfDestruct -> SearchSession.State.SelfDestruct
+    is DbSearchSession.DbState.Searching -> SearchSession.State.Searching()
+    is DbSearchSession.DbState.Sent -> SearchSession.State.Sent()
+    is DbSearchSession.DbState.SelfDestruct -> SearchSession.State.SelfDestruct()
 }

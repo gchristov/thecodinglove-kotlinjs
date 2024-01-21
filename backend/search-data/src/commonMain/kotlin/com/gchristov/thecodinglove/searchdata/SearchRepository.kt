@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.searchdata
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.raise.either
 import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
@@ -24,6 +25,8 @@ interface SearchRepository {
     suspend fun saveSearchSession(searchSession: SearchSession): Either<Throwable, Unit>
 
     suspend fun deleteSearchSession(id: String): Either<Throwable, Unit>
+
+    suspend fun findSearchSessions(state: SearchSession.State): Either<Throwable, List<SearchSession>>
 }
 
 internal class RealSearchRepository(
@@ -99,6 +102,28 @@ internal class RealSearchRepository(
         .collection(SearchSessionCollection)
         .document(id)
         .delete()
+
+    override suspend fun findSearchSessions(
+        state: SearchSession.State
+    ): Either<Throwable, List<SearchSession>> = firebaseAdmin
+        .firestore()
+        .collection(SearchSessionCollection)
+        .where("state.type", "==", state.type)
+        .get()
+        .flatMap {
+            it.docs
+                .map { document ->
+                    document.decodeDataFromJson(
+                        jsonSerializer = jsonSerializer,
+                        strategy = DbSearchSession.serializer(),
+                    ).flatMap { dbSearchSession ->
+                        dbSearchSession?.let {
+                            Either.Right(it.toSearchSession())
+                        } ?: Either.Left(Throwable("Could not decode search session"))
+                    }
+                }
+                .let { l -> either { l.bindAll() } }
+        }
 }
 
 private const val SearchSessionCollection = "search_session"

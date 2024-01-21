@@ -144,8 +144,8 @@ internal class RealSlackSendSearchUseCase(
                     ).flatMap { messageTs ->
                         val logPlaceholder = selfDestructMinutes?.let { "self-destruct" } ?: "sent"
                         val state = selfDestructMinutes?.let {
-                            SearchSession.State.SelfDestruct
-                        } ?: SearchSession.State.Sent
+                            SearchSession.State.SelfDestruct()
+                        } ?: SearchSession.State.Sent()
                         log.debug(tag, "Marking search session as $logPlaceholder: searchSessionId=$searchSessionId")
                         searchRepository
                             .saveSearchSession(searchSession.copy(state = state))
