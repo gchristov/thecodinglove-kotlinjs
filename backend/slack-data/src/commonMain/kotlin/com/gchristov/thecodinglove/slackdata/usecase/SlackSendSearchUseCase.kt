@@ -31,7 +31,7 @@ interface SlackSendSearchUseCase {
     ): Either<Throwable, Unit>
 }
 
-class RealSlackSendSearchUseCase(
+internal class RealSlackSendSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
     private val searchRepository: SearchRepository,

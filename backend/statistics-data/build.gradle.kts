@@ -1,12 +1,13 @@
 plugins {
-    id("backend-service-plugin")
+    id("data-plugin")
 }
 
 kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(projects.statisticsData)
+                implementation(projects.slackData)
+                implementation(projects.searchData)
             }
         }
     }

@@ -17,7 +17,7 @@ interface SlackCancelSearchUseCase {
     ): Either<Throwable, Unit>
 }
 
-class RealSlackCancelSearchUseCase(
+internal class RealSlackCancelSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
     private val searchRepository: SearchRepository,

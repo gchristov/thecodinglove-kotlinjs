@@ -32,6 +32,7 @@ import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubHan
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
 import com.gchristov.thecodinglove.statistics.StatisticsHttpHandler
 import com.gchristov.thecodinglove.statistics.StatisticsModule
+import com.gchristov.thecodinglove.statisticsdata.StatisticsDataModule
 
 suspend fun main() {
     setupDi()
@@ -64,6 +65,7 @@ private fun setupDi(): Either<Throwable, Unit> {
             SlackModule.module,
             SlackDataModule.module,
             StatisticsModule.module,
+            StatisticsDataModule.module,
         )
     )
     return Either.Right(Unit)
