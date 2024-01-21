@@ -78,13 +78,6 @@ object SlackModule : DiModule() {
                     slackRevokeTokensUseCase = instance(),
                 )
             }
-            bindSingleton {
-                provideSelfDestructHttpHandler(
-                    jsonSerializer = instance(),
-                    log = instance(),
-                    slackSelfDestructUseCase = instance(),
-                )
-            }
         }
     }
 
@@ -178,16 +171,5 @@ object SlackModule : DiModule() {
         slackVerifyRequestUseCase = slackVerifyRequestUseCase,
         slackConfig = slackConfig,
         slackRevokeTokensUseCase = slackRevokeTokensUseCase,
-    )
-
-    private fun provideSelfDestructHttpHandler(
-        jsonSerializer: JsonSerializer.Default,
-        log: Logger,
-        slackSelfDestructUseCase: SlackSelfDestructUseCase,
-    ): SlackSelfDestructHttpHandler = SlackSelfDestructHttpHandler(
-        dispatcher = Dispatchers.Default,
-        jsonSerializer = jsonSerializer,
-        log = log,
-        slackSelfDestructUseCase = slackSelfDestructUseCase,
     )
 }

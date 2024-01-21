@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slack
+package com.gchristov.thecodinglove.selfdestruct
 
 import arrow.core.Either
 import arrow.core.flatMap
@@ -13,7 +13,7 @@ import com.gchristov.thecodinglove.slackdata.usecase.SlackSelfDestructUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
-class SlackSelfDestructHttpHandler(
+class SelfDestructHttpHandler(
     dispatcher: CoroutineDispatcher,
     jsonSerializer: JsonSerializer,
     log: Logger,
@@ -25,7 +25,7 @@ class SlackSelfDestructHttpHandler(
 ) {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Get,
-        path = "/api/slack/self-destruct",
+        path = "/api/self-destruct",
         contentType = ContentType.Application.Json,
     )
 

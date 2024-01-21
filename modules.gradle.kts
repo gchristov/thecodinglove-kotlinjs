@@ -15,6 +15,7 @@ val projects = listOf(
     "backend/search",
     "backend/search-data",
     "backend/search-testfixtures",
+    "backend/self-destruct",
     "backend/slack",
     "backend/slack-data",
     "backend/slack-testfixtures",
