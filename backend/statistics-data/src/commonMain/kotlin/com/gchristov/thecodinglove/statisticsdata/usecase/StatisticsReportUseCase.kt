@@ -39,7 +39,7 @@ internal class RealStatisticsReportUseCase(
                                         Either.Right(
                                             StatisticsReport(
                                                 messagesSent = sentMessages.size,
-                                                messagesSearching = activeSearchSessions.size,
+                                                activeSearchSessions = activeSearchSessions.size,
                                                 messagesSelfDestruct = selfDestructMessages.size,
                                                 activeSelfDestructMessages = activeSelfDestructMessages.size,
                                                 userTokens = 0,

@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ApiStatisticsReport(
     @SerialName("messages_sent") val messagesSent: Int,
-    @SerialName("messages_searching") val messagesSearching: Int,
+    @SerialName("active_search_sessions") val activeSearchSessions: Int,
     @SerialName("messages_self_destruct") val messagesSelfDestruct: Int,
     @SerialName("active_self_destruct_messages") val activeSelfDestructMessages: Int,
     @SerialName("user_tokens") val userTokens: Int,
@@ -16,7 +16,7 @@ data class ApiStatisticsReport(
 
 fun StatisticsReport.toStatisticsReport() = ApiStatisticsReport(
     messagesSent = messagesSent,
-    messagesSearching = messagesSearching,
+    activeSearchSessions = activeSearchSessions,
     messagesSelfDestruct = messagesSelfDestruct,
     activeSelfDestructMessages = activeSelfDestructMessages,
     userTokens = userTokens,
