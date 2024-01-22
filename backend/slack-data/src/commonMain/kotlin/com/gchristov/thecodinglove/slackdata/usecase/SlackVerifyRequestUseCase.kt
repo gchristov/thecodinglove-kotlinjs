@@ -29,7 +29,7 @@ interface SlackVerifyRequestUseCase {
     }
 }
 
-class RealSlackVerifyRequestUseCase(
+internal class RealSlackVerifyRequestUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val slackConfig: SlackConfig,
     private val clock: Clock,

@@ -89,7 +89,7 @@ class RealPreloadSearchResultUseCaseTest {
                     searchHistory = searchSession.searchHistory,
                     currentPost = searchSession.currentPost,
                     preloadedPost = null,
-                    state = SearchSession.State.Searching
+                    state = SearchSession.State.Searching()
                 )
             )
             assertEquals(
@@ -122,7 +122,7 @@ class RealPreloadSearchResultUseCaseTest {
                     searchHistory = mapOf(1 to listOf(0, -1)),
                     currentPost = searchSession.currentPost,
                     preloadedPost = searchWithHistoryResult.post,
-                    state = SearchSession.State.Searching
+                    state = SearchSession.State.Searching()
                 )
             )
             assertEquals(

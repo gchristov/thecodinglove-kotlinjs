@@ -14,7 +14,7 @@ interface SlackRevokeTokensUseCase {
     suspend operator fun invoke(event: SlackEvent.Callback.Event.TokensRevoked): Either<Throwable, Unit>
 }
 
-class RealSlackRevokeTokensUseCase(
+internal class RealSlackRevokeTokensUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
     private val slackRepository: SlackRepository,

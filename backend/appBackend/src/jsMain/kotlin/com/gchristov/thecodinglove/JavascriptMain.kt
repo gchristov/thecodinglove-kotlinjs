@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonfirebasedata.CommonFirebaseDataModule
+import com.gchristov.thecodinglove.commonfirebasedata.firestore.FirestoreMigration
 import com.gchristov.thecodinglove.commonkotlin.CommonKotlinModule
 import com.gchristov.thecodinglove.commonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.commonkotlin.di.inject
@@ -30,12 +31,16 @@ import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubH
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
+import com.gchristov.thecodinglove.statistics.StatisticsHttpHandler
+import com.gchristov.thecodinglove.statistics.StatisticsModule
+import com.gchristov.thecodinglove.statisticsdata.StatisticsDataModule
 
 suspend fun main() {
     setupDi()
         .flatMap { setupMonitoring() }
         .flatMap { setupServices() }
         .flatMap { startServices(it) }
+        .flatMap { runDatabaseMigrations() }
         .fold(ifLeft = { error ->
             println("Error starting app${error.message?.let { ": $it" } ?: ""}")
             error.printStackTrace()
@@ -61,6 +66,8 @@ private fun setupDi(): Either<Throwable, Unit> {
             SelfDestructModule.module,
             SlackModule.module,
             SlackDataModule.module,
+            StatisticsModule.module,
+            StatisticsDataModule.module,
         )
     )
     return Either.Right(Unit)
@@ -99,6 +106,7 @@ private suspend fun setupAppService(): Either<Throwable, HttpService> {
         DiGraph.inject<SlackAuthHttpHandler>(),
         DiGraph.inject<SlackEventHttpHandler>(),
         DiGraph.inject<SelfDestructHttpHandler>(),
+        DiGraph.inject<StatisticsHttpHandler>(),
         // Link this last so that API handlers are correctly registered
         StaticFileHttpHandler("$staticWebsiteRoot/index.html"),
     )
@@ -114,3 +122,10 @@ private suspend fun startServices(services: List<HttpService>): Either<Throwable
     .map { it.start() }
     .let { l -> either { l.bindAll() } }
     .flatMap { Either.Right(Unit) }
+
+private suspend fun runDatabaseMigrations(): Either<Throwable, Unit> {
+    val migrations = DiGraph.inject<List<FirestoreMigration>>()
+    return migrations
+        .map { it.invoke() }
+        .let { l -> either { l.bindAll() } }
+}

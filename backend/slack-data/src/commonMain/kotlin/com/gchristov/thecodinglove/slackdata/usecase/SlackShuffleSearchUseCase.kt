@@ -17,7 +17,7 @@ interface SlackShuffleSearchUseCase {
     ): Either<Throwable, Unit>
 }
 
-class RealSlackShuffleSearchUseCase(
+internal class RealSlackShuffleSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
     private val searchUseCase: SearchUseCase,

@@ -1,5 +1,5 @@
 plugins {
-    id("backend-service-plugin")
+    id("data-plugin")
 }
 
 kotlin {
@@ -7,6 +7,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.slackData)
+                implementation(projects.searchData)
             }
         }
     }

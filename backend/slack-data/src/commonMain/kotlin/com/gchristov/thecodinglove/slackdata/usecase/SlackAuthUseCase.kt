@@ -20,7 +20,7 @@ interface SlackAuthUseCase {
     }
 }
 
-class RealSlackAuthUseCase(
+internal class RealSlackAuthUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val slackConfig: SlackConfig,
     private val log: Logger,

@@ -6,7 +6,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.slackData)
+                api(projects.statisticsData)
             }
         }
     }

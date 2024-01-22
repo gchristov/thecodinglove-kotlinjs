@@ -130,7 +130,7 @@ private suspend fun SearchUseCase.Type.getSearchSession(
             searchHistory = emptyMap(),
             currentPost = null,
             preloadedPost = null,
-            state = SearchSession.State.Searching
+            state = SearchSession.State.Searching()
         )
     )
 
