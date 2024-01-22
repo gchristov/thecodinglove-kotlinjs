@@ -4,7 +4,7 @@ data class StatisticsReport(
     val messagesSent: Int,
     val activeSearchSessions: Int,
     val messagesSelfDestruct: Int,
-    val activeSelfDestructMessages: Int,
-    val userTokens: Int,
-    val teams: Int,
+    val slackActiveSelfDestructMessages: Int,
+    val slackUserTokens: Int,
+    val slackTeams: Int,
 )
