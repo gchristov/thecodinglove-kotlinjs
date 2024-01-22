@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonfirebasedata.CommonFirebaseDataModule
+import com.gchristov.thecodinglove.commonfirebasedata.firestore.FirestoreMigration
 import com.gchristov.thecodinglove.commonkotlin.CommonKotlinModule
 import com.gchristov.thecodinglove.commonkotlin.di.DiGraph
 import com.gchristov.thecodinglove.commonkotlin.di.inject
@@ -39,6 +40,7 @@ suspend fun main() {
         .flatMap { setupMonitoring() }
         .flatMap { setupServices() }
         .flatMap { startServices(it) }
+        .flatMap { runDatabaseMigrations() }
         .fold(ifLeft = { error ->
             println("Error starting app${error.message?.let { ": $it" } ?: ""}")
             error.printStackTrace()
@@ -120,3 +122,10 @@ private suspend fun startServices(services: List<HttpService>): Either<Throwable
     .map { it.start() }
     .let { l -> either { l.bindAll() } }
     .flatMap { Either.Right(Unit) }
+
+private suspend fun runDatabaseMigrations(): Either<Throwable, Unit> {
+    val migrations = DiGraph.inject<List<FirestoreMigration>>()
+    return migrations
+        .map { it.invoke() }
+        .let { l -> either { l.bindAll() } }
+}
