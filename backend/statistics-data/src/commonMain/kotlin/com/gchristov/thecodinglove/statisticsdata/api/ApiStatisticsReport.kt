@@ -9,16 +9,16 @@ data class ApiStatisticsReport(
     @SerialName("messages_sent") val messagesSent: Int,
     @SerialName("active_search_sessions") val activeSearchSessions: Int,
     @SerialName("messages_self_destruct") val messagesSelfDestruct: Int,
-    @SerialName("active_self_destruct_messages") val activeSelfDestructMessages: Int,
-    @SerialName("user_tokens") val userTokens: Int,
-    @SerialName("teams") val teams: Int,
+    @SerialName("slack_active_self_destruct_messages") val slackActiveSelfDestructMessages: Int,
+    @SerialName("slack_user_tokens") val slackUserTokens: Int,
+    @SerialName("slack_teams") val slackTeams: Int,
 )
 
 fun StatisticsReport.toStatisticsReport() = ApiStatisticsReport(
     messagesSent = messagesSent,
     activeSearchSessions = activeSearchSessions,
     messagesSelfDestruct = messagesSelfDestruct,
-    activeSelfDestructMessages = activeSelfDestructMessages,
-    userTokens = userTokens,
-    teams = teams,
+    slackActiveSelfDestructMessages = slackActiveSelfDestructMessages,
+    slackUserTokens = slackUserTokens,
+    slackTeams = slackTeams,
 )
