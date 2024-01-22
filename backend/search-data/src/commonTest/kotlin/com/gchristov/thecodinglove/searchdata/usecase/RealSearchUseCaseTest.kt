@@ -148,7 +148,7 @@ class RealSearchUseCaseTest {
                     searchHistory = emptyMap(),
                     currentPost = null,
                     preloadedPost = null,
-                    state = SearchSession.State.Searching
+                    state = SearchSession.State.Searching()
                 )
             )
         }
@@ -189,7 +189,7 @@ class RealSearchUseCaseTest {
                     searchHistory = mapOf(1 to listOf(0, -1)),
                     currentPost = searchWithHistoryResult.post,
                     preloadedPost = null,
-                    state = SearchSession.State.Searching
+                    state = SearchSession.State.Searching()
                 )
             )
             pubSub.assertEquals(
