@@ -59,7 +59,7 @@ jobs:
         with:
           name: Build
           path: |
-            docker/bin
+            build/services
             env.properties
             pulumi/
 

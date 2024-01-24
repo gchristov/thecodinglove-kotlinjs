@@ -60,7 +60,6 @@ node_modules/
 firebase-debug.log*
 firebase-debug.*.log*
 
-docker/bin
 env.properties
-credentials-gcp-app.json
+app-service/credentials-gcp-app.json
 credentials-gcp-infra.json

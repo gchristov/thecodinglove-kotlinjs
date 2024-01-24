@@ -1,0 +1,12 @@
+services:
+  landing-page-service:
+    build: ../build/services/landing-page-service/.
+    ports:
+      - "8080:80"
+    environment:
+      - APP_SERVICE_HOST=http://app-service:8081
+      - APP_SERVICE_ROOT=api
+  app-service:
+    build: ../build/services/app-service/.
+    ports:
+      - "8081:8081"

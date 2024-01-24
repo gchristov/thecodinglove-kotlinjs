@@ -3,33 +3,33 @@ plugins {
 }
 
 gradlePlugin {
-    plugins.register("platform-plugin") {
-        id = "platform-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.kmp.PlatformPlugin"
+    plugins.register("base-plugin") {
+        id = "base-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.BasePlugin"
     }
     plugins.register("module-plugin") {
         id = "module-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.kmp.ModulePlugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.ModulePlugin"
     }
     plugins.register("data-plugin") {
         id = "data-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.kmp.DataPlugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.DataPlugin"
     }
     plugins.register("build-config-plugin") {
         id = "build-config-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.BuildConfigPlugin"
     }
-    plugins.register("web-executable-plugin") {
-        id = "web-executable-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.web.WebExecutablePlugin"
+    plugins.register("frontend-binary-plugin") {
+        id = "frontend-binary-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.FrontendBinaryPlugin"
     }
-    plugins.register("backend-executable-plugin") {
-        id = "backend-executable-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.backend.BackendExecutablePlugin"
+    plugins.register("backend-binary-plugin") {
+        id = "backend-binary-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.BackendBinaryPlugin"
     }
-    plugins.register("backend-service-plugin") {
-        id = "backend-service-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.backend.BackendServicePlugin"
+    plugins.register("backend-nested-service-plugin") {
+        id = "backend-nested-service-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.BackendNestedServicePlugin"
     }
 }
 

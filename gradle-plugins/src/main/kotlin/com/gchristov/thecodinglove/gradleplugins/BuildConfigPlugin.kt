@@ -6,6 +6,8 @@ import org.gradle.api.Project
 @Suppress("unused")
 class BuildConfigPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.plugins.apply("com.codingfeline.buildkonfig")
+        target.run {
+            plugins.apply("com.codingfeline.buildkonfig")
+        }
     }
 }

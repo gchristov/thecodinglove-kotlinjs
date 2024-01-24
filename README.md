@@ -59,6 +59,7 @@ The project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN), so
 1. Create a new Slack app.
 2. You will need an SSH tunnel to your localhost for Slack's APIs. You can use [serveo.net](http://serveo.net) for free and configure it with this command `ssh -R YOUR_DOMAIN.serveo.net:80:localhost:3000 serveo.net`.
 3. Point the following Slack features to the relevant project APIs that know how to respond to them using the url you used for [serveo.net](http://serveo.net):
+   # TODO: Fix this
    - [Slash commands](https://api.slack.com/slash-commands) -> `YOUR_DOMAIN.serveo.net/api/slack/slash`
    - [OAuth](https://api.slack.com/authentication/oauth-v2) -> `YOUR_DOMAIN.serveo.net/api/slack/auth`
    - [Events](http://api.slack.com/events-api) -> `YOUR_DOMAIN.serveo.net/api/slack/event`
@@ -87,7 +88,7 @@ APP_NETWORK_HTML_LOG_LEVEL=all|info|none
 APP_NETWORK_JSON_LOG_LEVEL=all|info|none
 SEARCH_PRELOAD_PUBSUB_TOPIC=TOPIC_NAME
 ```
-6. Copy the `credentials-gcp-app.json` Service Account JSON API key to the root of the project.
+6. Copy the `credentials-gcp-app.json` Service Account JSON API key to the `app-service` folder.
 </details>
 
 ## Run locally

@@ -45,10 +45,10 @@ jobs:
           set -o pipefail && 
           bash ./env.sh && 
           ./gradlew --no-daemon assemble
-      - name: Build container image
+      - name: Build container images
         run: |
           set -o pipefail &&
-          docker build -t check ./docker
+          docker compose -f docker/compose.yaml build
       - name: Preview infrastructure
         uses: pulumi/actions@v4
         with:
@@ -63,7 +63,7 @@ jobs:
         with:
           name: Build
           path: |
-            docker/bin
+            build/services
             env.properties
             pulumi/
 
