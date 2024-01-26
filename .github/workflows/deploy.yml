@@ -1,7 +1,7 @@
-name: PR Checks (GCP)
+name: Deployment
 
 on:
-  pull_request:
+  push:
     branches: [ master ]
 
 env:
@@ -25,10 +25,10 @@ env:
   SEARCH_PRELOAD_PUBSUB_TOPIC: ${{ secrets.SEARCH_PRELOAD_PUBSUB_TOPIC }}
 
 jobs:
-  jsBuild:
+  jsDeploy:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}_jsBuild
+      group: ${{ github.ref }}_jsDeploy
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -45,14 +45,10 @@ jobs:
           set -o pipefail && 
           bash ./env.sh && 
           ./gradlew --no-daemon assemble
-      - name: Build container images
-        run: |
-          set -o pipefail &&
-          docker compose -f docker/compose.yaml build
-      - name: Preview infrastructure
-        uses: pulumi/actions@v4
+      - name: Deploy infrastructure
+        uses: pulumi/actions@v5
         with:
-          command: preview
+          command: up
           stack-name: prod
           work-dir: pulumi
         env:
