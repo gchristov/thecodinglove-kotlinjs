@@ -25,7 +25,7 @@ class SearchHttpHandlerTest {
     ) { handler, _, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Get, config.method)
-        assertEquals("/search", config.path)
+        assertEquals("/api/search", config.path)
         assertEquals(ContentType.Application.Json, config.contentType)
     }
 

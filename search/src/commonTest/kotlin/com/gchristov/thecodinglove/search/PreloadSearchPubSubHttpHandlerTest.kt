@@ -25,7 +25,7 @@ class PreloadSearchPubSubHttpHandlerTest {
     ) { handler, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
-        assertEquals("/pubsub/search", config.path)
+        assertEquals("/api/pubsub/search", config.path)
         assertEquals(ContentType.Application.Json, config.contentType)
     }
 
