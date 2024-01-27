@@ -1,6 +1,5 @@
 package com.gchristov.thecodinglove.commonnetwork
 
-import com.gchristov.thecodinglove.commonkotlin.AppConfig
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import io.ktor.client.*
 import io.ktor.client.plugins.*
@@ -11,17 +10,16 @@ import io.ktor.serialization.kotlinx.json.*
 sealed class NetworkClient {
     abstract val http: HttpClient
 
-    data class Html(val appConfig: AppConfig) : NetworkClient() {
-        override val http: HttpClient = buildHttpClient(appConfig.networkHtmlLogLevel).config {
+    object Html : NetworkClient() {
+        override val http: HttpClient = buildHttpClient(LogLevel.INFO).config {
             BrowserUserAgent()
         }
     }
 
     data class Json(
-        val appConfig: AppConfig,
         val jsonSerializer: JsonSerializer,
     ) : NetworkClient() {
-        override val http: HttpClient = buildHttpClient(appConfig.networkJsonLogLevel).config {
+        override val http: HttpClient = buildHttpClient(LogLevel.ALL).config {
             install(ContentNegotiation) {
                 json(jsonSerializer.json)
             }
@@ -29,13 +27,9 @@ sealed class NetworkClient {
     }
 }
 
-private fun buildHttpClient(logLevel: String) = HttpClient {
+private fun buildHttpClient(logLevel: LogLevel) = HttpClient {
     install(Logging) {
         logger = Logger.SIMPLE
-        level = when (logLevel) {
-            "all" -> LogLevel.ALL
-            "info" -> LogLevel.INFO
-            else -> LogLevel.NONE
-        }
+        level = logLevel
     }
 }

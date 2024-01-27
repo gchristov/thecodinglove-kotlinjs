@@ -1,5 +1,10 @@
+import com.gchristov.thecodinglove.gradleplugins.common.envVar
+
+val packageId = "com.gchristov.thecodinglove.searchdata"
+
 plugins {
     id("data-plugin")
+    id("build-config-plugin")
 }
 
 kotlin {
@@ -17,5 +22,17 @@ kotlin {
                 implementation(projects.searchTestfixtures)
             }
         }
+    }
+}
+
+buildkonfig {
+    packageName = packageId
+    exposeObjectWithName = "BuildConfig"
+    defaultConfigs {
+        buildConfigField(
+            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            name = "SEARCH_PRELOAD_PUBSUB_TOPIC",
+            value = project.envVar("SEARCH_PRELOAD_PUBSUB_TOPIC")
+        )
     }
 }
