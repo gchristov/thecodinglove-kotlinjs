@@ -34,6 +34,7 @@ The project can be run locally and on the cloud - in this case Google Cloud via 
    - `Service Usage Admin`
    - `Pub/Sub Admin`
    - `Cloud Scheduler Admin`
+   - (Optional) If you're adding a custom domain mapping, [verify domain ownership and add your service account as owner](https://search.google.com/search-console).
 3. Export a JSON API key for your Service Account and call it `credentials-gcp-infra.json`.
 4. [Signup and Install Pulumi](https://www.pulumi.com/docs/clouds/gcp/get-started/begin/#install-pulumi).
 5. Create a Pulumi access token and login locally using `pulumi login`.
@@ -59,7 +60,6 @@ The project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN), so
 1. Create a new Slack app.
 2. You will need an SSH tunnel to your localhost for Slack's APIs. You can use [serveo.net](http://serveo.net) for free and configure it with this command `ssh -R YOUR_DOMAIN.serveo.net:80:localhost:3000 serveo.net`.
 3. Point the following Slack features to the relevant project APIs that know how to respond to them using the url you used for [serveo.net](http://serveo.net):
-   # TODO: Fix this
    - [Slash commands](https://api.slack.com/slash-commands) -> `YOUR_DOMAIN.serveo.net/api/slack/slash`
    - [OAuth](https://api.slack.com/authentication/oauth-v2) -> `YOUR_DOMAIN.serveo.net/api/slack/auth`
    - [Events](http://api.slack.com/events-api) -> `YOUR_DOMAIN.serveo.net/api/slack/event`
