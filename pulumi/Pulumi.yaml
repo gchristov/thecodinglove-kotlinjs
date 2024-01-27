@@ -3,24 +3,12 @@ runtime: yaml
 description: Infrastructure as code for the app.
 
 resources:
-  # Enables the Firebase API. Needed to enable Firebase.
-  # pulumi import gcp:projects/service:Service firebase-api PROJECT_ID/firebase.googleapis.com
-  firebase-api:
-    type: gcp:projects:Service
-    properties:
-      disableDependentServices: true
-      service: firebase.googleapis.com
-    options:
-      protect: true
-  # Enables Firebase. Needed for Firestore.
-  # pulumi import gcp:firebase/project:Project firebase PROJECT_ID
-  firebase:
-    type: gcp:firebase:Project
-    options:
-      protect: true
-      dependsOn:
-        - ${firebase-api}
-  # Enables Cloud Resource Manager. Needed for the rest of the resources
+
+  ########################################
+  # APIs
+  ########################################
+
+  # Enables Cloud Resource Manager API. Needed for some the resources.
   # pulumi import gcp:projects/service:Service cloud-resource-manager-api PROJECT_ID/cloudresourcemanager.googleapis.com
   cloud-resource-manager-api:
     type: gcp:projects:Service
@@ -29,8 +17,23 @@ resources:
       service: cloudresourcemanager.googleapis.com
     options:
       protect: true
-  # Enables the Firestore API. Needed for Firestore.
-  # pulumi import gcp:projects/service:Service firestore-api PROJECT_ID/firestore.googleapis.com
+  # Enables the Artifact Registry API. Needed for Docker.
+  artifact-registry-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: artifactregistry.googleapis.com
+    options:
+      protect: true
+  # Enables Firebase API. Needed for Firestore.
+  firebase-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: firebase.googleapis.com
+    options:
+      protect: true
+  # Enables the Firestore API.
   firestore-api:
     type: gcp:projects:Service
     properties:
@@ -40,8 +43,54 @@ resources:
       protect: true
       dependsOn:
         - ${cloud-resource-manager-api}
-  # Manages the Firestore database which the app uses as storage.
-  # pulumi import gcp:firestore/database:Database firestore "projects/PROJECT_ID/databases/(default)"
+  # Enables the Cloud Run Admin API.
+  cloud-run-admin-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: run.googleapis.com
+    options:
+      protect: true
+  # Enables the PubSub API.
+  pubsub-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: pubsub.googleapis.com
+    options:
+      protect: true
+
+  ########################################
+  # Artifact Registry
+  ########################################
+
+  # Manages a Docker image repository.
+  # Example: pulumi import gcp:artifactregistry/repository:Repository artifact-registry PROJECT_ID/REGION/REPOSITORY_NAME
+  artifact-registry:
+    type: gcp:artifactregistry:Repository
+    properties:
+      format: DOCKER
+      location: europe-west1
+      repositoryId: thecodinglove
+    options:
+      protect: true
+      dependsOn:
+        - ${artifact-registry-api}
+
+  ########################################
+  # Firebase
+  ########################################
+
+  # Enables Firebase.
+  # Example: pulumi import gcp:firebase/project:Project firebase PROJECT_ID
+  firebase:
+    type: gcp:firebase:Project
+    options:
+      protect: true
+      dependsOn:
+        - ${firebase-api}
+  # Manages a Firestore database.
+  # Example: pulumi import gcp:firestore/database:Database firestore "projects/PROJECT_ID/databases/(default)"
   firestore:
     type: gcp:firestore:Database
     properties:
@@ -55,8 +104,9 @@ resources:
       protect: true
       dependsOn:
         - ${firestore-api}
-  # Manages the Firestore security rules.
-  # pulumi import gcp:firebaserules/ruleset:Ruleset firestore-rules projects/PROJECT_ID/rulesets/RULESET_ID
+  # Manages Firestore security rules.
+  # Example: pulumi import gcp:firebaserules/ruleset:Ruleset firestore-rules projects/PROJECT_ID/rulesets/RULESET_ID. You
+  # can obtain the ruleset id by inspecting the network calls in GCP.
   firestore-rules:
     type: gcp:firebaserules:Ruleset
     properties:
@@ -77,8 +127,8 @@ resources:
       protect: true
       dependsOn:
         - ${firestore}
-  # Publishes the changes to the Firestore security rules.
-  # pulumi import gcp:firebaserules/release:Release firestore-rules-publish projects/PROJECT_ID/releases/cloud.firestore
+  # Manages Firestore security rules updates.
+  # Example: pulumi import gcp:firebaserules/release:Release firestore-rules-publish projects/PROJECT_ID/releases/cloud.firestore
   firestore-rules-publish:
     type: gcp:firebaserules:Release
     properties:
@@ -86,36 +136,20 @@ resources:
       rulesetName: projects/${firestore-rules.project}/rulesets/${firestore-rules.name}
     options:
       protect: true
-  # Enables the Artifact Registry API. Needed for Docker.
-  # pulumi import gcp:projects/service:Service artifact-registry-api PROJECT_ID/artifactregistry.googleapis.com
-  artifact-registry-api:
-    type: gcp:projects:Service
-    properties:
-      disableDependentServices: true
-      service: artifactregistry.googleapis.com
-    options:
-      protect: true
-  # Manages the Docker image repository.
-  # pulumi import gcp:artifactregistry/repository:Repository artifact-registry PROJECT_ID/REGION/REPOSITORY_NAME
-  artifact-registry:
-    type: gcp:artifactregistry:Repository
-    properties:
-      format: DOCKER
-      location: europe-west1
-      repositoryId: thecodinglove
-    options:
-      protect: true
-      dependsOn:
-        - ${artifact-registry-api}
-  # Manages the main app Docker image.
-  docker-image:
+
+  ########################################
+  # app-service
+  ########################################
+
+  # Manages the binary.
+  app-service-binary:
     type: docker:Image
     properties:
       build:
         platform: linux/amd64
-        context: ../docker
-        dockerfile: ../docker/Dockerfile
-      imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/thecodinglove-image:latest
+        context: ../build/services/app-service
+        dockerfile: ../build/services/app-service/Dockerfile
+      imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/app-service:latest
       registry:
         server: ${artifact-registry.location}-docker.pkg.dev
         username: _json_key
@@ -124,28 +158,19 @@ resources:
             fn::readFile: credentials-gcp-infra.json
     options:
       protect: true
-  # Enables the Cloud Run Admin API. Needed for Cloud Run.
-  # pulumi import gcp:projects/service:Service cloud-run-admin-api PROJECT_ID/run.googleapis.com
-  cloud-run-admin-api:
-    type: gcp:projects:Service
-    properties:
-      disableDependentServices: true
-      service: run.googleapis.com
-    options:
-      protect: true
-  # Manages the main app Cloud Run service.
+  # Manages the Cloud Run service.
   # pulumi import gcp:cloudrunv2/service:Service app-service REGION/SERVICE_NAME
   app-service:
     type: gcp:cloudrunv2:Service
     properties:
       ingress: INGRESS_TRAFFIC_ALL
       location: ${artifact-registry.location}
-      name: service-app
+      name: app-service
       template:
         containers:
-          - image: ${docker-image.repoDigest}
+          - image: ${app-service-binary.repoDigest}
             ports:
-              - containerPort: 8080
+              - containerPort: 8081
                 name: http1
             resources:
               cpuIdle: true
@@ -156,7 +181,7 @@ resources:
               failureThreshold: 1
               periodSeconds: 240
               tcpSocket:
-                port: 8080
+                port: 8081
               timeoutSeconds: 240
         maxInstanceRequestConcurrency: 80
         scaling:
@@ -167,10 +192,10 @@ resources:
         - percent: 100
           type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
     options:
-      protect: true
+      protect: false
       dependsOn:
         - ${cloud-run-admin-api}
-  # Manages the main app Cloud Run service policy.
+  # Manages the Cloud Run service policy.
   # pulumi import gcp:cloudrunv2/serviceIamPolicy:ServiceIamPolicy app-service-policy projects/PROJECT_ID/locations/REGION/services/SERVICE_NAME
   app-service-policy:
     type: gcp:cloudrunv2:ServiceIamPolicy
@@ -190,28 +215,103 @@ resources:
         }
     options:
       protect: true
-  # Manages the main app Cloud Run service domain mapping.
-  # pulumi import gcp:cloudrun/domainMapping:DomainMapping app-service-domain-mapping REGION/DOMAIN
-  app-service-domain-mapping:
+
+  ########################################
+  # landing-page-service
+  ########################################
+
+  # Manages the binary.
+  landing-page-service-binary:
+    type: docker:Image
+    properties:
+      build:
+        args:
+          APP_SERVICE_HOST: https://app-service-xk523rsata-ew.a.run.app
+          APP_SERVICE_ROOT: api
+        platform: linux/amd64
+        context: ../build/services/landing-page-service
+        dockerfile: ../build/services/landing-page-service/Dockerfile
+      imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/landing-page-service:latest
+      registry:
+        server: ${artifact-registry.location}-docker.pkg.dev
+        username: _json_key
+        password:
+          fn::secret:
+            fn::readFile: credentials-gcp-infra.json
+    options:
+      protect: true
+  # Manages the Cloud Run service.
+  landing-page-service:
+    type: gcp:cloudrunv2:Service
+    properties:
+      ingress: INGRESS_TRAFFIC_ALL
+      location: ${artifact-registry.location}
+      name: landing-page-service
+      template:
+        containers:
+          - image: ${landing-page-service-binary.repoDigest}
+            ports:
+              - containerPort: 80
+                name: http1
+            resources:
+              cpuIdle: true
+              limits:
+                cpu: 1000m
+                memory: 512Mi
+            startupProbe:
+              failureThreshold: 1
+              periodSeconds: 240
+              tcpSocket:
+                port: 80
+              timeoutSeconds: 240
+        maxInstanceRequestConcurrency: 80
+        scaling:
+          maxInstanceCount: 100
+          minInstanceCount: 1
+        timeout: 300s
+      traffics:
+        - percent: 100
+          type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
+    options:
+      protect: false
+      dependsOn:
+        - ${cloud-run-admin-api}
+  # Manages the Cloud Run service policy.
+  landing-page-service-policy:
+    type: gcp:cloudrunv2:ServiceIamPolicy
+    properties:
+      name: ${landing-page-service.name}
+      location: ${landing-page-service.location}
+      policyData: |
+        {
+          "bindings": [
+            {
+              "role": "roles/run.invoker",
+              "members": [
+                "allUsers"
+              ]
+            }
+          ]
+        }
+    options:
+      protect: true
+  # Manages the Cloud Run service domain mapping.
+  landing-page-service-domain-mapping:
     type: gcp:cloudrun:DomainMapping
     properties:
-      location: ${app-service.location}
+      location: ${landing-page-service.location}
       metadata:
-        namespace: ${app-service.project}
+        namespace: ${landing-page-service.project}
       name: thecodinglove.crowdstandout.com
       spec:
-        routeName: service-app
+        routeName: landing-page-service
     options:
       protect: true
-  # Enables the PubSub API.
-  # pulumi import gcp:projects/service:Service pubsub-api PROJECT_ID/pubsub.googleapis.com
-  pubsub-api:
-    type: gcp:projects:Service
-    properties:
-      disableDependentServices: true
-      service: pubsub.googleapis.com
-    options:
-      protect: true
+
+  ########################################
+  # Pub/Sub
+  ########################################
+
   # Manages the preload search PubSub topic.
   # pulumi import gcp:pubsub/topic:Topic pubsub-topic-preload-search TOPIC
   pubsub-topic-preload-search:
@@ -239,7 +339,6 @@ resources:
     options:
       protect: true
   # Manages the dev preload search PubSub topic.
-  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-preload-search-dev TOPIC
   pubsub-topic-preload-search-dev:
     type: gcp:pubsub:Topic
     properties:
@@ -247,7 +346,6 @@ resources:
     options:
       protect: true
   # Manages the dev preload search PubSub subscription.
-  # pulumi import gcp:pubsub/subscription:Subscription pubsub-subscription-preload-search-dev SUBSCRIPTION
   pubsub-subscription-preload-search-dev:
     type: gcp:pubsub:Subscription
     properties:
@@ -266,7 +364,6 @@ resources:
     options:
       protect: true
   # Manages the Slack interactivity PubSub topic.
-  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-interactivity TOPIC
   pubsub-topic-slack-interactivity:
     type: gcp:pubsub:Topic
     properties:
@@ -274,7 +371,6 @@ resources:
     options:
       protect: true
   # Manages the Slack interactivity PubSub subscription.
-  # pulumi import gcp:pubsub/subscription:Subscription pubsub-subscription-slack-interactivity SUBSCRIPTION
   pubsub-subscription-slack-interactivity:
     type: gcp:pubsub:Subscription
     properties:
@@ -292,7 +388,6 @@ resources:
     options:
       protect: true
   # Manages the dev Slack interactivity PubSub topic.
-  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-interactivity-dev TOPIC
   pubsub-topic-slack-interactivity-dev:
     type: gcp:pubsub:Topic
     properties:
@@ -300,7 +395,6 @@ resources:
     options:
       protect: true
   # Manages the dev Slack interactivity PubSub subscription.
-  # pulumi import gcp:pubsub/subscription:Subscription pubsub-subscription-slack-interactivity-dev SUBSCRIPTION
   pubsub-subscription-slack-interactivity-dev:
     type: gcp:pubsub:Subscription
     properties:
@@ -319,7 +413,6 @@ resources:
     options:
       protect: true
   # Manages the Slack slash command PubSub topic.
-  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-slash-command TOPIC
   pubsub-topic-slack-slash-command:
     type: gcp:pubsub:Topic
     properties:
@@ -327,7 +420,6 @@ resources:
     options:
       protect: true
   # Manages the Slack slash command PubSub subscription.
-  # pulumi import gcp:pubsub/subscription:Subscription pubsub-subscription-slack-slash-command SUBSCRIPTION
   pubsub-subscription-slack-slash-command:
     type: gcp:pubsub:Subscription
     properties:
@@ -345,7 +437,6 @@ resources:
     options:
       protect: true
   # Manages the dev Slack slash command PubSub topic.
-  # pulumi import gcp:pubsub/topic:Topic pubsub-topic-slack-slash-command-dev TOPIC
   pubsub-topic-slack-slash-command-dev:
     type: gcp:pubsub:Topic
     properties:
@@ -353,7 +444,6 @@ resources:
     options:
       protect: true
   # Manages the dev Slack slash command PubSub subscription.
-  # pulumi import gcp:pubsub/subscription:Subscription pubsub-subscription-slack-slash-command-dev SUBSCRIPTION
   pubsub-subscription-slack-slash-command-dev:
     type: gcp:pubsub:Subscription
     properties:
@@ -371,6 +461,11 @@ resources:
       topic: ${pubsub-topic-slack-slash-command-dev.name}
     options:
       protect: true
+
+  ########################################
+  # Cloud Scheduler
+  ########################################
+
   # Manages the post self-destruct timer.
   self-destruct-timer-job:
     type: gcp:cloudscheduler:Job

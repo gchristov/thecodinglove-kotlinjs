@@ -1,33 +1,22 @@
 includeBuild("gradle-plugins")
-
-val projects = listOf(
-    "backend/appBackend",
-    "backend/common-firebase-data",
-    "backend/common-kotlin",
-    "backend/common-network",
-    "backend/common-service",
-    "backend/common-service-data",
-    "backend/common-service-testfixtures",
-    "backend/common-test",
-    "backend/html-parse-data",
-    "backend/html-parse-testfixtures",
-    "backend/monitoring-data",
-    "backend/search",
-    "backend/search-data",
-    "backend/search-testfixtures",
-    "backend/self-destruct",
-    "backend/slack",
-    "backend/slack-data",
-    "backend/slack-testfixtures",
-    "backend/statistics",
-    "backend/statistics-data",
-    "client/appWeb/appWeb",
-)
-
-projects.forEach { project ->
-    val name = project.projectName()
-    include(":$name")
-    project(":$name").projectDir = java.io.File(project)
-}
-
-fun String.projectName(): String = this.split("/").last()
+include("app-service")
+include("common-firebase-data")
+include("common-kotlin")
+include("common-network")
+include("common-service")
+include("common-service-data")
+include("common-service-testfixtures")
+include("common-test")
+include("html-parse-data")
+include("html-parse-testfixtures")
+include("landing-page-service")
+include("monitoring-data")
+include("search")
+include("search-data")
+include("search-testfixtures")
+include("self-destruct")
+include("slack")
+include("slack-data")
+include("slack-testfixtures")
+include("statistics")
+include("statistics-data")
