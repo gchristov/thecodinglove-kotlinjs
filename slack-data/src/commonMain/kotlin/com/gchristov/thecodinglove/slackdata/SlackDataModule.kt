@@ -2,7 +2,6 @@ package com.gchristov.thecodinglove.slackdata
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
-import com.gchristov.thecodinglove.commonkotlin.BuildConfig
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.commonkotlin.di.DiModule
 import com.gchristov.thecodinglove.commonnetwork.NetworkClient
