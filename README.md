@@ -1,4 +1,4 @@
-[![Deployment (GCP)](https://github.com/gchristov/thecodinglove-kotlinjs/actions/workflows/deploy_gcp.yml/badge.svg)](https://github.com/gchristov/thecodinglove-kotlinjs/actions/workflows/deploy_gcp.yml)
+[![Deployment (GCP)](https://github.com/gchristov/thecodinglove-kotlinjs/actions/workflows/deploy.yml/badge.svg)](https://github.com/gchristov/thecodinglove-kotlinjs/actions/workflows/deploy.yml)
 
 # About
 
