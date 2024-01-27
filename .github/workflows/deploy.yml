@@ -38,8 +38,8 @@ jobs:
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
-      - name: Set up Gradle cache
-        uses: gradle/gradle-build-action@v2 # By default, cache is only saved on the 'master' branch
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Build project
         run: |
           set -o pipefail && 
@@ -76,8 +76,8 @@ jobs:
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
-      - name: Set up Gradle cache
-        uses: gradle/gradle-build-action@v2
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Test
         run: |
           set -o pipefail && 
