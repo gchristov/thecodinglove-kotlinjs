@@ -2,7 +2,6 @@ package com.gchristov.thecodinglove.monitoringdata
 
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
-import com.gchristov.thecodinglove.commonkotlin.AppConfig
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessageFactory
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig

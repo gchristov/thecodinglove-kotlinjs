@@ -1,6 +1,5 @@
 package com.gchristov.thecodinglove.commonnetwork
 
-import com.gchristov.thecodinglove.commonkotlin.AppConfig
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
 import com.gchristov.thecodinglove.commonkotlin.di.DiModule
 import org.kodein.di.DI
@@ -12,23 +11,20 @@ object CommonNetworkModule : DiModule() {
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
-            bindSingleton { provideHtmlNetworkClient(appConfig = instance()) }
+            bindSingleton { provideHtmlNetworkClient() }
             bindSingleton {
                 provideJsonNetworkClient(
                     jsonSerializer = instance(),
-                    appConfig = instance(),
                 )
             }
         }
     }
 
-    private fun provideHtmlNetworkClient(appConfig: AppConfig) = NetworkClient.Html(appConfig)
+    private fun provideHtmlNetworkClient() = NetworkClient.Html
 
     private fun provideJsonNetworkClient(
         jsonSerializer: JsonSerializer.Default,
-        appConfig: AppConfig,
     ) = NetworkClient.Json(
-        appConfig = appConfig,
         jsonSerializer = jsonSerializer,
     )
 }
