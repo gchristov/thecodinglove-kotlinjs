@@ -61,7 +61,7 @@ jobs:
           name: Build
           path: |
             build/services
-            env.properties
+            **/env.properties
             pulumi/
 
   jsTest:
