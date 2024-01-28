@@ -1,7 +1,7 @@
 # Exports required CI environment secrets to local environment files so that the project can use them
 set -e
 # Credentials
-echo "$GCP_SA_KEY_APP" >> ./app-service/credentials-gcp-app.json
+echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
 echo "$GCP_SA_KEY_INFRA" >> ./pulumi/credentials-gcp-infra.json
 # slack-data
 echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack-data/env.properties

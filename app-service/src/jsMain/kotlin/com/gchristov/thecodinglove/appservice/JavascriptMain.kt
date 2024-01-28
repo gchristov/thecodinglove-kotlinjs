@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove
+package com.gchristov.thecodinglove.appservice
 
 import arrow.core.Either
 import arrow.core.flatMap
@@ -32,9 +32,6 @@ import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubH
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler
 import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
-import com.gchristov.thecodinglove.statistics.StatisticsHttpHandler
-import com.gchristov.thecodinglove.statistics.StatisticsModule
-import com.gchristov.thecodinglove.statisticsdata.StatisticsDataModule
 
 suspend fun main() {
     // Remove the first two default Node arguments
@@ -47,7 +44,7 @@ suspend fun main() {
         .flatMap { startService(it) }
         .flatMap { runDatabaseMigrations() }
         .fold(ifLeft = { error ->
-            println("Error starting app${error.message?.let { ": $it" } ?: ""}")
+            println("Error starting app-service${error.message?.let { ": $it" } ?: ""}")
             error.printStackTrace()
         }, ifRight = {
             // TODO: Add start-up metrics
@@ -68,8 +65,6 @@ private fun setupDi(): Either<Throwable, Unit> {
             SelfDestructModule.module,
             SlackModule.module,
             SlackDataModule.module,
-            StatisticsModule.module,
-            StatisticsDataModule.module,
         )
     )
     return Either.Right(Unit)
@@ -93,7 +88,6 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
         DiGraph.inject<SlackAuthHttpHandler>(),
         DiGraph.inject<SlackEventHttpHandler>(),
         DiGraph.inject<SelfDestructHttpHandler>(),
-        DiGraph.inject<StatisticsHttpHandler>(),
     )
     val service = DiGraph.inject<HttpService>()
     return service.initialise(

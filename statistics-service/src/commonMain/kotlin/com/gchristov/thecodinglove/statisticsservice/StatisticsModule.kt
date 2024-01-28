@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.statistics
+package com.gchristov.thecodinglove.statisticsservice
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer

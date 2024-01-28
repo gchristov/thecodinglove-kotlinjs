@@ -86,7 +86,7 @@ SLACK_SLASH_COMMAND_PUBSUB_TOPIC=TOPIC_NAME
 SLACK_MONITORING_URL=YOUR_SLACK_MONITORING_URL
 SEARCH_PRELOAD_PUBSUB_TOPIC=TOPIC_NAME
 ```
-6. Copy the `credentials-gcp-app.json` Service Account JSON API key to the `app-service` folder.
+6. Copy the `credentials-gcp-app.json` Service Account JSON API key to the root project folder.
 </details>
 
 ## Run locally
