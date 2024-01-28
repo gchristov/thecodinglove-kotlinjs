@@ -148,7 +148,6 @@ resources:
       build:
         platform: linux/amd64
         context: ../build/services/app-service
-        dockerfile: ../build/services/app-service/Dockerfile
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/app-service:latest
       registry:
         server: ${artifact-registry.location}-docker.pkg.dev
@@ -217,6 +216,82 @@ resources:
       protect: true
 
   ########################################
+  # statistics-service
+  ########################################
+
+  # Manages the binary.
+  statistics-service-binary:
+    type: docker:Image
+    properties:
+      build:
+        platform: linux/amd64
+        context: ../build/services/statistics-service
+      imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/statistics-service:latest
+      registry:
+        server: ${artifact-registry.location}-docker.pkg.dev
+        username: _json_key
+        password:
+          fn::secret:
+            fn::readFile: credentials-gcp-infra.json
+    options:
+      protect: true
+  # Manages the Cloud Run service.
+  statistics-service:
+    type: gcp:cloudrunv2:Service
+    properties:
+      ingress: INGRESS_TRAFFIC_ALL
+      location: ${artifact-registry.location}
+      name: statistics-service
+      template:
+        containers:
+          - image: ${statistics-service-binary.repoDigest}
+            ports:
+              - containerPort: 8082
+                name: http1
+            resources:
+              cpuIdle: true
+              limits:
+                cpu: 1000m
+                memory: 512Mi
+            startupProbe:
+              failureThreshold: 1
+              periodSeconds: 240
+              tcpSocket:
+                port: 8082
+              timeoutSeconds: 240
+        maxInstanceRequestConcurrency: 80
+        scaling:
+          maxInstanceCount: 100
+          minInstanceCount: 0
+        timeout: 300s
+      traffics:
+        - percent: 100
+          type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
+    options:
+      protect: false
+      dependsOn:
+        - ${cloud-run-admin-api}
+  # Manages the Cloud Run service policy.
+  statistics-service-policy:
+    type: gcp:cloudrunv2:ServiceIamPolicy
+    properties:
+      name: ${statistics-service.name}
+      location: ${statistics-service.location}
+      policyData: |
+        {
+          "bindings": [
+            {
+              "role": "roles/run.invoker",
+              "members": [
+                "allUsers"
+              ]
+            }
+          ]
+        }
+    options:
+      protect: true
+
+  ########################################
   # landing-page-service
   ########################################
 
@@ -226,11 +301,12 @@ resources:
     properties:
       build:
         args:
-          APP_SERVICE_HOST: https://app-service-xk523rsata-ew.a.run.app
+          APP_SERVICE_HOST: ${app-service.uri}
           APP_SERVICE_PATH: api
+          STATISTICS_SERVICE_HOST: ${statistics-service.uri}
+          STATISTICS_SERVICE_PATH: api/stats
         platform: linux/amd64
         context: ../build/services/landing-page-service
-        dockerfile: ../build/services/landing-page-service/Dockerfile
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/landing-page-service:latest
       registry:
         server: ${artifact-registry.location}-docker.pkg.dev

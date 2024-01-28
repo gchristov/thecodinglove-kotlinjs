@@ -2,9 +2,13 @@ FROM nginx:1.25.3
 
 ARG APP_SERVICE_HOST
 ARG APP_SERVICE_PATH
+ARG STATISTICS_SERVICE_HOST
+ARG STATISTICS_SERVICE_PATH
 # Need to forward the nginx env variables manually for production. Locally we use Docker Compose which does this automatically.
 ENV APP_SERVICE_HOST=${APP_SERVICE_HOST}
 ENV APP_SERVICE_PATH=${APP_SERVICE_PATH}
+ENV STATISTICS_SERVICE_HOST=${STATISTICS_SERVICE_HOST}
+ENV STATISTICS_SERVICE_PATH=${STATISTICS_SERVICE_PATH}
 
 COPY ./default.conf.template /etc/nginx/templates/default.conf.template
 COPY ./bin/ /usr/share/nginx/html
