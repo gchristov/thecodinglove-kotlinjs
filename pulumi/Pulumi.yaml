@@ -191,7 +191,7 @@ resources:
         - percent: 100
           type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
     options:
-      protect: false
+      protect: true
       dependsOn:
         - ${cloud-run-admin-api}
   # Manages the Cloud Run service policy.
@@ -268,7 +268,7 @@ resources:
         - percent: 100
           type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
     options:
-      protect: false
+      protect: true
       dependsOn:
         - ${cloud-run-admin-api}
   # Manages the Cloud Run service policy.
@@ -344,7 +344,7 @@ resources:
         - percent: 100
           type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
     options:
-      protect: false
+      protect: true
       dependsOn:
         - ${cloud-run-admin-api}
   # Manages the Cloud Run service policy.
@@ -427,7 +427,7 @@ resources:
         - percent: 100
           type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
     options:
-      protect: false
+      protect: true
       dependsOn:
         - ${cloud-run-admin-api}
   # Manages the Cloud Run service policy.
