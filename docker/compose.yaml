@@ -14,3 +14,5 @@ services:
     environment:
       - APP_SERVICE_HOST=http://app-service:8081
       - APP_SERVICE_ROOT=api
+      - STATISTICS_SERVICE_HOST=http://statistics-service:8082
+      - STATISTICS_SERVICE_ROOT=api/stats
