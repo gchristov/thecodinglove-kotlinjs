@@ -11,6 +11,12 @@ services:
       - "8082:8082"
     environment:
       - PORT=8082
+  self-destruct-service:
+    build: ../build/services/self-destruct-service/.
+    ports:
+      - "8083:8083"
+    environment:
+      - PORT=8083
   landing-page-service:
     build: ../build/services/landing-page-service/.
     ports:
@@ -20,3 +26,5 @@ services:
       - APP_SERVICE_PATH=api
       - STATISTICS_SERVICE_HOST=http://statistics-service:8082
       - STATISTICS_SERVICE_PATH=api/stats
+      - SELF_DESTRUCT_SERVICE_HOST=http://self-destruct-service:8083
+      - SELF_DESTRUCT_SERVICE_PATH=api/self-destruct
