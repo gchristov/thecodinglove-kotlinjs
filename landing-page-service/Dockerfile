@@ -1,9 +1,8 @@
 FROM nginx:1.25.3
 
-# Needed because locally we build containers with Docker Compose but in production we build images individually and the
-# ENV properties can only be set when building containers, so we do that extra step here.
 ARG APP_SERVICE_HOST
 ARG APP_SERVICE_ROOT
+# Need to forward the nginx env variables manually for production. Locally we use Docker Compose which does this automatically.
 ENV APP_SERVICE_HOST=${APP_SERVICE_HOST}
 ENV APP_SERVICE_ROOT=${APP_SERVICE_ROOT}
 

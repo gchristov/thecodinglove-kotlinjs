@@ -1,4 +1,7 @@
 FROM node:16-slim AS npm
+
+ARG PORT
+
 WORKDIR /app
 
 # Step 1: Install Node.js dependencies
@@ -11,4 +14,4 @@ COPY /bin/. .
 # Step 3: Run binaries
 FROM npm AS run
 WORKDIR /app
-CMD exec node --enable-source-maps thecodinglove-kotlinjs-app-service.js -port 8081
+CMD exec node --enable-source-maps thecodinglove-kotlinjs-app-service.js -port ${PORT}
