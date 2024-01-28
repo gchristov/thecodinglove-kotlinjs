@@ -292,6 +292,82 @@ resources:
       protect: true
 
   ########################################
+  # self-destruct-service
+  ########################################
+
+  # Manages the binary.
+  self-destruct-service-binary:
+    type: docker:Image
+    properties:
+      build:
+        platform: linux/amd64
+        context: ../build/services/self-destruct-service
+      imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/self-destruct-service:latest
+      registry:
+        server: ${artifact-registry.location}-docker.pkg.dev
+        username: _json_key
+        password:
+          fn::secret:
+            fn::readFile: credentials-gcp-infra.json
+    options:
+      protect: true
+  # Manages the Cloud Run service.
+  self-destruct-service:
+    type: gcp:cloudrunv2:Service
+    properties:
+      ingress: INGRESS_TRAFFIC_ALL
+      location: ${artifact-registry.location}
+      name: self-destruct-service
+      template:
+        containers:
+          - image: ${self-destruct-service-binary.repoDigest}
+            ports:
+              - containerPort: 8083
+                name: http1
+            resources:
+              cpuIdle: true
+              limits:
+                cpu: 1000m
+                memory: 512Mi
+            startupProbe:
+              failureThreshold: 1
+              periodSeconds: 240
+              tcpSocket:
+                port: 8083
+              timeoutSeconds: 240
+        maxInstanceRequestConcurrency: 80
+        scaling:
+          maxInstanceCount: 100
+          minInstanceCount: 0
+        timeout: 300s
+      traffics:
+        - percent: 100
+          type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
+    options:
+      protect: false
+      dependsOn:
+        - ${cloud-run-admin-api}
+  # Manages the Cloud Run service policy.
+  self-destruct-service-policy:
+    type: gcp:cloudrunv2:ServiceIamPolicy
+    properties:
+      name: ${self-destruct-service.name}
+      location: ${self-destruct-service.location}
+      policyData: |
+        {
+          "bindings": [
+            {
+              "role": "roles/run.invoker",
+              "members": [
+                "allUsers"
+              ]
+            }
+          ]
+        }
+    options:
+      protect: true
+
+  ########################################
   # landing-page-service
   ########################################
 
@@ -305,6 +381,8 @@ resources:
           APP_SERVICE_PATH: api
           STATISTICS_SERVICE_HOST: ${statistics-service.uri}
           STATISTICS_SERVICE_PATH: api/stats
+          SELF_DESTRUCT_SERVICE_HOST: ${self-destruct-service.uri}
+          SELF_DESTRUCT_SERVICE_PATH: api/self-destruct
         platform: linux/amd64
         context: ../build/services/landing-page-service
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/landing-page-service:latest
@@ -549,9 +627,9 @@ resources:
       name: self-destruct-timer
       schedule: "*/5 * * * *"
       timeZone: Etc/UTC
-      region: ${app-service.location}
+      region: ${self-destruct-service.location}
       httpTarget:
-        uri: ${app-service.uri}/api/self-destruct
+        uri: ${self-destruct-service.uri}/api/self-destruct
         httpMethod: GET
       retryConfig:
         retryCount: 5
