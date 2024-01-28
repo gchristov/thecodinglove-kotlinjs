@@ -11,6 +11,11 @@ server {
     proxy_pass ${STATISTICS_SERVICE_HOST}/${STATISTICS_SERVICE_PATH};
     proxy_ssl_server_name on;
   }
+  location /${SELF_DESTRUCT_SERVICE_PATH} {
+      proxy_pass ${SELF_DESTRUCT_SERVICE_HOST}/${SELF_DESTRUCT_SERVICE_PATH};
+      proxy_ssl_server_name on;
+    }
+  # Keep this last as the monolith service handles a few api/ paths.
   location /${APP_SERVICE_PATH} {
     proxy_pass ${APP_SERVICE_HOST}/${APP_SERVICE_PATH};
     proxy_ssl_server_name on;

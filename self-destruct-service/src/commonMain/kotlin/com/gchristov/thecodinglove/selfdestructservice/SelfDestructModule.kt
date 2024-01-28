@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.selfdestruct
+package com.gchristov.thecodinglove.selfdestructservice
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.commonkotlin.JsonSerializer

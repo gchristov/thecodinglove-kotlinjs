@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.selfdestruct
+package com.gchristov.thecodinglove.selfdestructservice
 
 import arrow.core.Either
 import arrow.core.flatMap
