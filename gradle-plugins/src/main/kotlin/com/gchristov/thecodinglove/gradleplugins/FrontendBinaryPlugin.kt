@@ -5,21 +5,13 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
-@Suppress("unused")
 class FrontendBinaryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
-            plugins.apply("org.jetbrains.kotlin.multiplatform")
+            plugins.apply("base-browser-plugin")
             extensions.configure(KotlinMultiplatformExtension::class.java) {
                 js(IR) {
                     binaries.executable()
-                    browser {
-                        commonWebpackConfig {
-                            cssSupport {
-                                enabled.set(true)
-                            }
-                        }
-                    }
                 }
             }
             // Copy the output binaries to their final destination

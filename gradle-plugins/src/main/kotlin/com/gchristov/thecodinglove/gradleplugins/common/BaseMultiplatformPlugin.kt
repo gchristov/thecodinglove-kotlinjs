@@ -8,14 +8,40 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.FileInputStream
 import java.util.*
 
-@Suppress("unused")
-class BasePlugin : Plugin<Project> {
+abstract class BaseMultiplatformPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
+        }
+    }
+}
+
+class BaseNodePlugin : BaseMultiplatformPlugin() {
+    override fun apply(target: Project) {
+        super.apply(target)
+        target.run {
             extensions.configure(KotlinMultiplatformExtension::class.java) {
                 js(IR) {
                     nodejs()
+                }
+            }
+        }
+    }
+}
+
+class BaseBrowserPlugin : BaseMultiplatformPlugin() {
+    override fun apply(target: Project) {
+        super.apply(target)
+        target.run {
+            extensions.configure(KotlinMultiplatformExtension::class.java) {
+                js(IR) {
+                    browser {
+                        commonWebpackConfig {
+                            cssSupport {
+                                enabled.set(true)
+                            }
+                        }
+                    }
                 }
             }
         }

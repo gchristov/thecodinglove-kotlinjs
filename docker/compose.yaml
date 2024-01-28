@@ -1,4 +1,12 @@
 services:
+  app-service:
+    build: ../build/services/app-service/.
+    ports:
+      - "8081:8081"
+  statistics-service:
+    build: ../build/services/statistics-service/.
+    ports:
+      - "8082:8082"
   landing-page-service:
     build: ../build/services/landing-page-service/.
     ports:
@@ -6,7 +14,3 @@ services:
     environment:
       - APP_SERVICE_HOST=http://app-service:8081
       - APP_SERVICE_ROOT=api
-  app-service:
-    build: ../build/services/app-service/.
-    ports:
-      - "8081:8081"

@@ -61,5 +61,5 @@ firebase-debug.log*
 firebase-debug.*.log*
 
 env.properties
-app-service/credentials-gcp-app.json
+credentials-gcp-app.json
 credentials-gcp-infra.json

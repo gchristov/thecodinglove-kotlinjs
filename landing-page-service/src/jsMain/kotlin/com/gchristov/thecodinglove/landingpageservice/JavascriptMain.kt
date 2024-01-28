@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove
+package com.gchristov.thecodinglove.landingpageservice
 
 /*
  * The website still needs a source file in order to compile correctly. We use a placeholder since

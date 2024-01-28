@@ -3,9 +3,13 @@ plugins {
 }
 
 gradlePlugin {
-    plugins.register("base-plugin") {
-        id = "base-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.BasePlugin"
+    plugins.register("base-node-plugin") {
+        id = "base-node-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.BaseNodePlugin"
+    }
+    plugins.register("base-browser-plugin") {
+        id = "base-browser-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.BaseBrowserPlugin"
     }
     plugins.register("module-plugin") {
         id = "module-plugin"

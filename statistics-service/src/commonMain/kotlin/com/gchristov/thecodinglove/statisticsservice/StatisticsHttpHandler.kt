@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.statistics
+package com.gchristov.thecodinglove.statisticsservice
 
 import arrow.core.Either
 import arrow.core.flatMap
