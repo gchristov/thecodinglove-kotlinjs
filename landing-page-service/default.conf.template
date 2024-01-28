@@ -7,12 +7,12 @@ server {
   }
 
   # Reverse proxy setup. All individual microservices should be registered here in a similar way.
-  location /${STATISTICS_SERVICE_ROOT} {
-    proxy_pass ${STATISTICS_SERVICE_HOST}/${STATISTICS_SERVICE_ROOT};
+  location /${STATISTICS_SERVICE_PATH} {
+    proxy_pass ${STATISTICS_SERVICE_HOST}/${STATISTICS_SERVICE_PATH};
     proxy_ssl_server_name on;
   }
-  location /${APP_SERVICE_ROOT} {
-    proxy_pass ${APP_SERVICE_HOST}/${APP_SERVICE_ROOT};
+  location /${APP_SERVICE_PATH} {
+    proxy_pass ${APP_SERVICE_HOST}/${APP_SERVICE_PATH};
     proxy_ssl_server_name on;
   }
 }

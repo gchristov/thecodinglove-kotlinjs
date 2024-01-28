@@ -227,7 +227,7 @@ resources:
       build:
         args:
           APP_SERVICE_HOST: https://app-service-xk523rsata-ew.a.run.app
-          APP_SERVICE_ROOT: api
+          APP_SERVICE_PATH: api
         platform: linux/amd64
         context: ../build/services/landing-page-service
         dockerfile: ../build/services/landing-page-service/Dockerfile
