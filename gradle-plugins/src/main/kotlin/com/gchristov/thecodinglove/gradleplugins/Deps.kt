@@ -1,6 +1,5 @@
 package com.gchristov.thecodinglove.gradleplugins
 
-@Suppress("unused")
 class Deps {
     object Arrow {
         const val core = "io.arrow-kt:arrow-core:1.2.1"
@@ -47,7 +46,6 @@ class Deps {
     object Node {
         val htmlParser = NpmDependency("node-html-parser", "6.1.11")
         val express = NpmDependency("express", "4.18.2")
-        val jsJoda = NpmDependency("@js-joda/core", "5.6.1")
     }
 
     object Uuid {
