@@ -7,7 +7,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(projects.slackData)
-                implementation(projects.search)
+                implementation(projects.searchData)
             }
         }
     }

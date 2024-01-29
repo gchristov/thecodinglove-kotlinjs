@@ -48,11 +48,23 @@ class BackendNestedServicePlugin : Plugin<Project> {
         target.run {
             plugins.apply("module-plugin")
             extensions.configure(KotlinMultiplatformExtension::class.java) {
+                sourceSets.maybeCreate("commonMain").dependencies {
+                    implementation(project(":common-service"))
+                    implementation(project(":monitoring-data"))
+                    implementation(project(":slack-data"))
+                    implementation(project(":common-firebase-data"))
+                }
                 sourceSets.maybeCreate("jsMain").dependencies {
-                    api(project(":common-service"))
+                    // Ideally these would be linked from corresponding submodules but that is currently
+                    // not supported out of the box or through the npm-publish plugin and causes "module
+                    // not found" errors. As a workaround, all NPM dependencies will be listed here,
+                    // making them available to all submodules.
+                    implementation(npm(Deps.Google.pubSub.name, Deps.Google.pubSub.version))
+                    implementation(npm(Deps.Node.express.name, Deps.Node.express.version))
+                    implementation(npm(Deps.Google.firebaseAdmin.name, Deps.Google.firebaseAdmin.version))
                 }
                 sourceSets.maybeCreate("jsTest").dependencies {
-                    api(project(":common-service-testfixtures"))
+                    implementation(project(":common-service-testfixtures"))
                 }
             }
         }
