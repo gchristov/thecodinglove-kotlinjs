@@ -1,10 +1,6 @@
 server {  
   listen 80;
   server_name landing-page-service;
-  location / {
-    root /usr/share/nginx/html;
-    try_files $uri /index.html;
-  }
 
   # Reverse proxy setup. All individual microservices should be registered here in a similar way.
   location /${STATISTICS_SERVICE_PATH} {
@@ -19,5 +15,10 @@ server {
   location /${APP_SERVICE_PATH} {
     proxy_pass ${APP_SERVICE_HOST}/${APP_SERVICE_PATH};
     proxy_ssl_server_name on;
+  }
+
+  # Static website setup. Keep at the bottom to allow API service paths above.
+  location / {
+      root /usr/share/nginx/html;
   }
 }
