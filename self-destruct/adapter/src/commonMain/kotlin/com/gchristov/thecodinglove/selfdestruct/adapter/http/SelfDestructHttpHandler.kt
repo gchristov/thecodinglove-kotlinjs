@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.selfdestructservice
+package com.gchristov.thecodinglove.selfdestruct.adapter.http
 
 import arrow.core.Either
 import arrow.core.flatMap

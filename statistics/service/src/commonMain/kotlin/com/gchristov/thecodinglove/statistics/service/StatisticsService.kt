@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.selfdestructservice
+package com.gchristov.thecodinglove.statistics.service
 
 import arrow.core.Either
 import arrow.core.flatMap
@@ -14,7 +14,12 @@ import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
 import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
+import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
+import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
+import com.gchristov.thecodinglove.statistics.adapter.StatisticsAdapterModule
+import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
+import com.gchristov.thecodinglove.statistics.core.StatisticsDomainModule
 
 suspend fun main() {
     // Remove the first two default Node arguments
@@ -26,7 +31,7 @@ suspend fun main() {
         .flatMap { setupService(port) }
         .flatMap { startService(it) }
         .fold(ifLeft = { error ->
-            println("Error starting self-destruct-service${error.message?.let { ": $it" } ?: ""}")
+            println("Error starting statistics-service${error.message?.let { ": $it" } ?: ""}")
             error.printStackTrace()
         }, ifRight = {
             // TODO: Add start-up metrics
@@ -38,10 +43,13 @@ private fun setupDi(): Either<Throwable, Unit> {
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
-            CommonFirebaseModule.module,
             CommonMonitoringModule.module,
+            CommonFirebaseModule.module,
+            HtmlParseDataModule.module,
+            SearchDataModule.module,
             SlackDataModule.module,
-            SelfDestructModule.module,
+            StatisticsDomainModule.module,
+            StatisticsAdapterModule.module,
         )
     )
     return Either.Right(Unit)
@@ -56,7 +64,7 @@ private fun setupMonitoring(): Either<Throwable, Unit> {
 
 private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
     val handlers = listOf(
-        DiGraph.inject<SelfDestructHttpHandler>(),
+        DiGraph.inject<StatisticsHttpHandler>(),
     )
     val service = DiGraph.inject<HttpService>()
     return service.initialise(
