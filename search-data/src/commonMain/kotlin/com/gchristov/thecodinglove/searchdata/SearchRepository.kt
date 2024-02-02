@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.searchdata
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.raise.either
-import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.searchdata.db.DbSearchSession

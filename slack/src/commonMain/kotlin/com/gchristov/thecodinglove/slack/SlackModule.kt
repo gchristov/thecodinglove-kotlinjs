@@ -1,10 +1,10 @@
 package com.gchristov.thecodinglove.slack
 
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.commonkotlin.di.DiModule
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.kotlin.di.DiModule
+import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
+import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
 import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubHandler

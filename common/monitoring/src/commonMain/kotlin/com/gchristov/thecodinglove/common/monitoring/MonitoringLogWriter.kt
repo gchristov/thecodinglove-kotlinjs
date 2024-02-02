@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.monitoring
+package com.gchristov.thecodinglove.common.monitoring
 
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity

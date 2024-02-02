@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.htmlparsedata.usecase
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.common.kotlin.requireModule
 import com.gchristov.thecodinglove.htmlparsedata.HtmlPost
-import com.gchristov.thecodinglove.commonkotlin.requireModule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 

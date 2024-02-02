@@ -5,13 +5,9 @@ import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.commonservice.BaseHttpHandler
-import com.gchristov.thecodinglove.commonservicedata.http.HttpHandler
-import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
-import com.gchristov.thecodinglove.commonservicedata.http.HttpResponse
-import com.gchristov.thecodinglove.commonservicedata.http.sendEmpty
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.network.http.*
+import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackInteractivity
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackInteractivityPubSubMessage

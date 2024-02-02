@@ -11,14 +11,16 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.commonFirebaseData)
-                implementation(projects.commonServiceData)
+                implementation(projects.common.firebase)
+                implementation(projects.common.network)
+                implementation(projects.common.pubsub)
                 implementation(projects.htmlParseData)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation(projects.commonServiceTestfixtures)
+                implementation(projects.common.networkTestfixtures)
+                implementation(projects.common.pubsubTestfixtures)
                 implementation(projects.searchTestfixtures)
             }
         }

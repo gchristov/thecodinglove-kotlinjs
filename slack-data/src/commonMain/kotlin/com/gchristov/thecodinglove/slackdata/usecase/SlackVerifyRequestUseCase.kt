@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.slackdata.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonkotlin.debug
-import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
+import com.gchristov.thecodinglove.common.kotlin.debug
+import com.gchristov.thecodinglove.common.network.http.HttpRequest
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import diglol.crypto.Hmac
 import diglol.encoding.encodeHexToString

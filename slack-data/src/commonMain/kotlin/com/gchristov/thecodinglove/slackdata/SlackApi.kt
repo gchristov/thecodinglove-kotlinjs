@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.slackdata
 
-import com.gchristov.thecodinglove.commonnetwork.NetworkClient
+import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackDeleteMessage
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackMessage
 import io.ktor.client.request.*

@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.selfdestructservice
 
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.commonkotlin.di.DiModule
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.slackdata.usecase.SlackSelfDestructUseCase
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI

@@ -3,17 +3,18 @@ package com.gchristov.thecodinglove.statistics.config
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
 import com.gchristov.thecodinglove.common.kotlin.di.inject
 import com.gchristov.thecodinglove.common.kotlin.di.registerModules
 import com.gchristov.thecodinglove.common.kotlin.parseMainArgs
 import com.gchristov.thecodinglove.common.kotlin.process
+import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
+import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
-import com.gchristov.thecodinglove.monitoring.CommonMonitoringModule
-import com.gchristov.thecodinglove.monitoring.MonitoringLogWriter
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
 import com.gchristov.thecodinglove.statistics.adapter.StatisticsAdapterModule
@@ -43,6 +44,7 @@ private fun setupDi(): Either<Throwable, Unit> {
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonMonitoringModule.module,
+            CommonFirebaseModule.module,
             HtmlParseDataModule.module,
             SearchDataModule.module,
             SlackDataModule.module,

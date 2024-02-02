@@ -15,10 +15,6 @@ gradlePlugin {
         id = "module-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.ModulePlugin"
     }
-    plugins.register("module-plugin-2") {
-        id = "module-plugin-2"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.ModulePlugin2"
-    }
     plugins.register("data-plugin") {
         id = "data-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.DataPlugin"
