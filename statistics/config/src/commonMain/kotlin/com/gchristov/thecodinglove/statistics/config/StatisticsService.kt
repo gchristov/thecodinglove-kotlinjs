@@ -12,8 +12,8 @@ import com.gchristov.thecodinglove.common.kotlin.process
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
-import com.gchristov.thecodinglove.monitoringdata.MonitoringDataModule
-import com.gchristov.thecodinglove.monitoringdata.MonitoringLogWriter
+import com.gchristov.thecodinglove.monitoring.CommonMonitoringModule
+import com.gchristov.thecodinglove.monitoring.MonitoringLogWriter
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
 import com.gchristov.thecodinglove.statistics.adapter.StatisticsAdapterModule
@@ -42,8 +42,8 @@ private fun setupDi(): Either<Throwable, Unit> {
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
+            CommonMonitoringModule.module,
             HtmlParseDataModule.module,
-            MonitoringDataModule.module,
             SearchDataModule.module,
             SlackDataModule.module,
             StatisticsDomainModule.module,

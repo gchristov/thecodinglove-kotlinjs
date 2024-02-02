@@ -70,3 +70,33 @@ class BackendNestedServicePlugin : Plugin<Project> {
         }
     }
 }
+
+class BackendBinaryPlugin2 : Plugin<Project> {
+    override fun apply(target: Project) {
+        target.run {
+            plugins.apply("module-plugin-2")
+            extensions.configure(KotlinMultiplatformExtension::class.java) {
+                sourceSets.maybeCreate("commonMain").dependencies {
+                    implementation(project(":common:network"))
+                    implementation(project(":common:pubsub"))
+                    implementation(project(":common:monitoring"))
+                    // TODO: Remove once Slack is migrated to microservice
+                    implementation(project(":common:firebase"))
+                }
+                sourceSets.maybeCreate("jsMain").dependencies {
+                    // Ideally these would be linked from corresponding submodules but that is currently
+                    // not supported out of the box or through the npm-publish plugin and causes "module
+                    // not found" errors. As a workaround, all NPM dependencies will be listed here,
+                    // making them available to all submodules.
+                    implementation(npm(Deps.Google.pubSub.name, Deps.Google.pubSub.version))
+                    implementation(npm(Deps.Node.express.name, Deps.Node.express.version))
+                    implementation(npm(Deps.Google.firebaseAdmin.name, Deps.Google.firebaseAdmin.version))
+                }
+                sourceSets.maybeCreate("jsTest").dependencies {
+                    implementation(project(":common:network-testfixtures"))
+                    implementation(project(":common:pubsub-testfixtures"))
+                }
+            }
+        }
+    }
+}
