@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.statistics.adapter.http
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.common.adapter.http.*
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.network.http.*
 import com.gchristov.thecodinglove.statistics.core.usecase.StatisticsReportUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher

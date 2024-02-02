@@ -3,8 +3,6 @@ package com.gchristov.thecodinglove.statistics.config
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.common.adapter.CommonAdapterModule
-import com.gchristov.thecodinglove.common.adapter.http.HttpService
 import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
@@ -13,6 +11,7 @@ import com.gchristov.thecodinglove.common.kotlin.di.registerModules
 import com.gchristov.thecodinglove.common.kotlin.parseMainArgs
 import com.gchristov.thecodinglove.common.kotlin.process
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
+import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
 import com.gchristov.thecodinglove.monitoringdata.MonitoringDataModule
 import com.gchristov.thecodinglove.monitoringdata.MonitoringLogWriter
@@ -45,7 +44,7 @@ private fun setupDi(): Either<Throwable, Unit> {
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonFirebaseModule.module,
-            CommonAdapterModule.module,
+            CommonNetworkModule.module,
             HtmlParseDataModule.module,
             MonitoringDataModule.module,
             SearchDataModule.module,

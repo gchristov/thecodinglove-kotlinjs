@@ -6,7 +6,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.common.adapter)
+                implementation(projects.common.network)
                 implementation(projects.common.firebase)
                 implementation(projects.htmlParseData)
                 implementation(projects.monitoringData)
