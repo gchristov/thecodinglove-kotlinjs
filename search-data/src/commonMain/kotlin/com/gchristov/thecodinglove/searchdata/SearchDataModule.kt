@@ -1,10 +1,10 @@
 package com.gchristov.thecodinglove.searchdata
 
-import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.commonkotlin.di.DiModule
-import com.gchristov.thecodinglove.commonnetwork.NetworkClient
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubPublisher
+import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.kotlin.di.DiModule
+import com.gchristov.thecodinglove.common.network.NetworkClient
+import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.searchdata.domain.SearchConfig

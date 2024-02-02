@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.slackdata
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.commontest.FakeLogger
+import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.usecase.RealSlackVerifyRequestUseCase
 import com.gchristov.thecodinglove.slackdata.usecase.SlackVerifyRequestUseCase
@@ -137,7 +137,7 @@ class RealVerifySlackRequestUseCaseTest {
                     monitoringUrl = TestMonitoringUrl,
                 ),
                 clock = TestClock,
-                log = FakeLogger
+                log = FakeLogger,
             )
             testBlock(useCase)
         }

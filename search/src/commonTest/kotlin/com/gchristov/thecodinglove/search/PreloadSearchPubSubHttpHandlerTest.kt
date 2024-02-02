@@ -1,11 +1,11 @@
 package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubDecoder
-import com.gchristov.thecodinglove.commonservicetestfixtures.FakePubSubRequest
-import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.commontest.FakeLogger
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubDecoder
+import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
+import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.searchdata.domain.PreloadSearchPubSubMessage
 import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.searchtestfixtures.FakePreloadSearchResultUseCase

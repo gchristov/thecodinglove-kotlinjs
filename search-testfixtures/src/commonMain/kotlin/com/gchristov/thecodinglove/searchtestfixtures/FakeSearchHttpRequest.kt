@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.searchtestfixtures
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonservicedata.ParameterMap
-import com.gchristov.thecodinglove.commonservicedata.http.HttpRequest
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.kotlin.ParameterMap
+import com.gchristov.thecodinglove.common.network.http.HttpRequest
 import kotlinx.serialization.DeserializationStrategy
 
 class FakeSearchHttpRequest(

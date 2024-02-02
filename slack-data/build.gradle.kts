@@ -11,8 +11,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.commonFirebaseData)
-                implementation(projects.commonServiceData)
+                implementation(projects.common.firebase)
+                implementation(projects.common.network)
                 implementation(projects.searchData)
             }
         }

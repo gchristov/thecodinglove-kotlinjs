@@ -1,10 +1,10 @@
 package com.gchristov.thecodinglove.slackdata
 
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonfirebasedata.FirebaseAdmin
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.commonkotlin.di.DiModule
-import com.gchristov.thecodinglove.commonnetwork.NetworkClient
+import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.kotlin.di.DiModule
+import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig

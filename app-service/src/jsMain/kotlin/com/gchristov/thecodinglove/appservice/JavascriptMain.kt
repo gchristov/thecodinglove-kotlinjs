@@ -4,20 +4,20 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonfirebasedata.CommonFirebaseDataModule
-import com.gchristov.thecodinglove.commonfirebasedata.firestore.FirestoreMigration
-import com.gchristov.thecodinglove.commonkotlin.CommonKotlinModule
-import com.gchristov.thecodinglove.commonkotlin.di.DiGraph
-import com.gchristov.thecodinglove.commonkotlin.di.inject
-import com.gchristov.thecodinglove.commonkotlin.di.registerModules
-import com.gchristov.thecodinglove.commonkotlin.parseMainArgs
-import com.gchristov.thecodinglove.commonkotlin.process
-import com.gchristov.thecodinglove.commonnetwork.CommonNetworkModule
-import com.gchristov.thecodinglove.commonservice.CommonServiceModule
-import com.gchristov.thecodinglove.commonservicedata.http.HttpService
+import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
+import com.gchristov.thecodinglove.common.firebase.firestore.FirestoreMigration
+import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
+import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
+import com.gchristov.thecodinglove.common.kotlin.di.inject
+import com.gchristov.thecodinglove.common.kotlin.di.registerModules
+import com.gchristov.thecodinglove.common.kotlin.parseMainArgs
+import com.gchristov.thecodinglove.common.kotlin.process
+import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
+import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
+import com.gchristov.thecodinglove.common.network.CommonNetworkModule
+import com.gchristov.thecodinglove.common.network.http.HttpService
+import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
-import com.gchristov.thecodinglove.monitoringdata.MonitoringDataModule
-import com.gchristov.thecodinglove.monitoringdata.MonitoringLogWriter
 import com.gchristov.thecodinglove.search.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.SearchHttpHandler
 import com.gchristov.thecodinglove.search.SearchModule
@@ -54,10 +54,10 @@ private fun setupDi(): Either<Throwable, Unit> {
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
-            CommonFirebaseDataModule.module,
-            CommonServiceModule.module,
+            CommonPubSubModule.module,
+            CommonFirebaseModule.module,
+            CommonMonitoringModule.module,
             HtmlParseDataModule.module,
-            MonitoringDataModule.module,
             SearchModule.module,
             SearchDataModule.module,
             SlackModule.module,

@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonkotlin.debug
+import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

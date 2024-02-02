@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.slackdata.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.commonkotlin.debug
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import com.gchristov.thecodinglove.slackdata.SlackRepository

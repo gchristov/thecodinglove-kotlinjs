@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.util.prefixIfNot
 import java.io.FileInputStream
 import java.util.*
 
@@ -49,6 +50,16 @@ class BaseBrowserPlugin : BaseMultiplatformPlugin() {
 }
 
 fun Project.binaryDestination(): Provider<Directory> = rootProject.layout.buildDirectory.dir("services/${project.name}")
+
+fun Project.binaryDestination2(): Provider<Directory> {
+    var currentProject = project.parent
+    var name = project.name
+    while (currentProject != null && currentProject != rootProject) {
+        name = name.prefixIfNot("${currentProject.name}-")
+        currentProject = currentProject.parent
+    }
+    return rootProject.layout.buildDirectory.dir("services/$name")
+}
 
 fun Project.envVar(key: String): String {
     val propFile = file("./env.properties")

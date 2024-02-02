@@ -6,10 +6,9 @@ import arrow.core.left
 import arrow.core.right
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Logger.Companion.tag
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.commonkotlin.debug
-import com.gchristov.thecodinglove.commonservice.BaseHttpHandler
-import com.gchristov.thecodinglove.commonservicedata.http.*
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.kotlin.debug
+import com.gchristov.thecodinglove.common.network.http.*
 import com.gchristov.thecodinglove.slackdata.api.ApiSlackEvent
 import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
 import com.gchristov.thecodinglove.slackdata.domain.SlackEvent

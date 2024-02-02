@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.search
 
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.commonkotlin.di.DiModule
-import com.gchristov.thecodinglove.commonservicedata.pubsub.PubSubDecoder
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.kotlin.di.DiModule
+import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.searchdata.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import kotlinx.coroutines.Dispatchers

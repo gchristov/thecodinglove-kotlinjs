@@ -31,6 +31,10 @@ gradlePlugin {
         id = "backend-binary-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.BackendBinaryPlugin"
     }
+    plugins.register("backend-binary-plugin-2") {
+        id = "backend-binary-plugin-2"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.BackendBinaryPlugin2"
+    }
     plugins.register("backend-nested-service-plugin") {
         id = "backend-nested-service-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.BackendNestedServicePlugin"

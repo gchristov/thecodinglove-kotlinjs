@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.htmlparsedata.usecase
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.htmlparsetestfixtures.HtmlCreator
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test

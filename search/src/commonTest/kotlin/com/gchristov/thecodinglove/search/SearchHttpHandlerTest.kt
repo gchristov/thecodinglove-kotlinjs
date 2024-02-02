@@ -1,10 +1,10 @@
 package com.gchristov.thecodinglove.search
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.commonkotlin.JsonSerializer
-import com.gchristov.thecodinglove.commonservicetestfixtures.FakeHttpResponse
-import com.gchristov.thecodinglove.commontest.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.commontest.FakeLogger
+import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.networktestfixtures.FakeHttpResponse
+import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.searchtestfixtures.FakeSearchHttpRequest
