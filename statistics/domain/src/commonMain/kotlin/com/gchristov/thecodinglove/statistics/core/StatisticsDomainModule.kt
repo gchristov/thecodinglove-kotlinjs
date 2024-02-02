@@ -10,8 +10,8 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.instance
 
-object StatisticsCoreModule : DiModule() {
-    override fun name() = "statistics-core"
+object StatisticsDomainModule : DiModule() {
+    override fun name() = "statistics-domain"
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {

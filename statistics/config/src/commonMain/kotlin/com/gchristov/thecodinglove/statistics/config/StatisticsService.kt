@@ -3,7 +3,6 @@ package com.gchristov.thecodinglove.statistics.config
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
 import com.gchristov.thecodinglove.common.kotlin.di.inject
@@ -19,7 +18,7 @@ import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
 import com.gchristov.thecodinglove.statistics.adapter.StatisticsAdapterModule
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
-import com.gchristov.thecodinglove.statistics.core.StatisticsCoreModule
+import com.gchristov.thecodinglove.statistics.core.StatisticsDomainModule
 
 suspend fun main() {
     // Remove the first two default Node arguments
@@ -43,13 +42,11 @@ private fun setupDi(): Either<Throwable, Unit> {
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
-            CommonFirebaseModule.module,
-            CommonNetworkModule.module,
             HtmlParseDataModule.module,
             MonitoringDataModule.module,
             SearchDataModule.module,
             SlackDataModule.module,
-            StatisticsCoreModule.module,
+            StatisticsDomainModule.module,
             StatisticsAdapterModule.module,
         )
     )
