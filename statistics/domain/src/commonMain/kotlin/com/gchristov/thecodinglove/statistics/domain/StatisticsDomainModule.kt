@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.statistics.core
+package com.gchristov.thecodinglove.statistics.domain
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
-import com.gchristov.thecodinglove.statistics.core.ports.StatisticsReportSource
-import com.gchristov.thecodinglove.statistics.core.usecase.RealStatisticsReportUseCase
-import com.gchristov.thecodinglove.statistics.core.usecase.StatisticsReportUseCase
+import com.gchristov.thecodinglove.statistics.domain.ports.StatisticsReportSource
+import com.gchristov.thecodinglove.statistics.domain.usecase.RealStatisticsReportUseCase
+import com.gchristov.thecodinglove.statistics.domain.usecase.StatisticsReportUseCase
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
 import org.kodein.di.bindProvider

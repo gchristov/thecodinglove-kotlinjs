@@ -19,7 +19,7 @@ import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
 import com.gchristov.thecodinglove.statistics.adapter.StatisticsAdapterModule
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
-import com.gchristov.thecodinglove.statistics.core.StatisticsDomainModule
+import com.gchristov.thecodinglove.statistics.domain.StatisticsDomainModule
 
 suspend fun main() {
     // Remove the first two default Node arguments

@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.statistics.core.ports
+package com.gchristov.thecodinglove.statistics.domain.ports
 
 import arrow.core.Either
 

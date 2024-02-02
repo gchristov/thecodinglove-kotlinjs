@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.statistics.core.model
+package com.gchristov.thecodinglove.statistics.domain.model
 
 data class StatisticsReport(
     val messagesSent: Int,

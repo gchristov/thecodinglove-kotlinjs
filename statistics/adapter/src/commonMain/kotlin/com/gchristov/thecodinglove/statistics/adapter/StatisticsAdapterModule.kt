@@ -6,8 +6,8 @@ import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
-import com.gchristov.thecodinglove.statistics.core.ports.StatisticsReportSource
-import com.gchristov.thecodinglove.statistics.core.usecase.StatisticsReportUseCase
+import com.gchristov.thecodinglove.statistics.domain.ports.StatisticsReportSource
+import com.gchristov.thecodinglove.statistics.domain.usecase.StatisticsReportUseCase
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
 import org.kodein.di.bindProvider

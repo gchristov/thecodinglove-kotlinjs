@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.statistics.adapter.http
 
-import com.gchristov.thecodinglove.statistics.core.model.StatisticsReport
+import com.gchristov.thecodinglove.statistics.domain.model.StatisticsReport
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

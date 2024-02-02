@@ -1,11 +1,11 @@
-package com.gchristov.thecodinglove.statistics.core.usecase
+package com.gchristov.thecodinglove.statistics.domain.usecase
 
 import arrow.core.Either
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
-import com.gchristov.thecodinglove.statistics.core.model.StatisticsReport
-import com.gchristov.thecodinglove.statistics.core.ports.StatisticsReportSource
+import com.gchristov.thecodinglove.statistics.domain.model.StatisticsReport
+import com.gchristov.thecodinglove.statistics.domain.ports.StatisticsReportSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
