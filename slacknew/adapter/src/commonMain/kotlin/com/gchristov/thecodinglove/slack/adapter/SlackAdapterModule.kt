@@ -4,8 +4,11 @@ import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
+import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
+import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
+import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
 import org.kodein.di.DI
@@ -29,6 +32,9 @@ object SlackAdapterModule : DiModule() {
             }
             bindProvider {
                 provideSlackAuthStateSerializer(jsonSerializer = instance())
+            }
+            bindSingleton {
+                provideSearchSessionStorage(searchRepository = instance())
             }
         }
     }
@@ -58,4 +64,7 @@ object SlackAdapterModule : DiModule() {
 
     private fun provideSlackAuthStateSerializer(jsonSerializer: JsonSerializer.Default): SlackAuthStateSerializer =
         RealSlackAuthStateSerializer(jsonSerializer = jsonSerializer)
+
+    private fun provideSearchSessionStorage(searchRepository: SearchRepository): SearchSessionStorage =
+        RealSearchSessionStorage(searchRepository = searchRepository)
 }

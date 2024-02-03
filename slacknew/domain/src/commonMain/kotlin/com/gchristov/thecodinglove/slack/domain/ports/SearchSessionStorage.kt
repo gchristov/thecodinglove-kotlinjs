@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.slack.domain.ports
 import arrow.core.Either
 
 interface SearchSessionStorage {
-    suspend fun deleteSearchSession(id: String): Either<Throwable, Unit>
+    suspend fun deleteSearchSession(searchSessionId: String): Either<Throwable, Unit>
 
     suspend fun updateSearchSessionState(
         searchSessionId: String,
