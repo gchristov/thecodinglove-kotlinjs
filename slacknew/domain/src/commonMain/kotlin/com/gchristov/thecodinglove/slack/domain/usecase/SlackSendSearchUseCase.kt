@@ -8,7 +8,7 @@ import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionState
+import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStateDto
 import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -115,8 +115,8 @@ internal class RealSlackSendSearchUseCase(
                     ).flatMap { messageTs ->
                         val logPlaceholder = authState.selfDestructMinutes?.let { "self-destruct" } ?: "sent"
                         val state = authState.selfDestructMinutes?.let {
-                            SearchSessionState.SelfDestruct
-                        } ?: SearchSessionState.Sent
+                            SearchSessionStateDto.SelfDestruct
+                        } ?: SearchSessionStateDto.Sent
                         log.debug(
                             tag,
                             "Marking search session as $logPlaceholder: searchSessionId=${authState.searchSessionId}"

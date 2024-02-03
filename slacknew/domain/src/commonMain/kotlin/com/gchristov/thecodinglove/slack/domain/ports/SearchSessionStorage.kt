@@ -7,18 +7,18 @@ interface SearchSessionStorage {
 
     suspend fun updateSearchSessionState(
         searchSessionId: String,
-        state: SearchSessionState,
+        state: SearchSessionStateDto,
     ): Either<Throwable, Unit>
 
-    suspend fun getSearchSessionPost(searchSessionId: String): Either<Throwable, SearchSessionPost>
+    suspend fun getSearchSessionPost(searchSessionId: String): Either<Throwable, SearchSessionPostDto>
 }
 
-sealed class SearchSessionState {
-    data object Sent : SearchSessionState()
-    data object SelfDestruct : SearchSessionState()
+sealed class SearchSessionStateDto {
+    data object Sent : SearchSessionStateDto()
+    data object SelfDestruct : SearchSessionStateDto()
 }
 
-data class SearchSessionPost(
+data class SearchSessionPostDto(
     val searchQuery: String,
     val attachmentTitle: String,
     val attachmentUrl: String,

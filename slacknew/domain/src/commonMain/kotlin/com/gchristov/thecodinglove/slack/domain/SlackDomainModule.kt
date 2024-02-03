@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slack.domain
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
+import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionShuffle
 import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
@@ -60,6 +61,14 @@ object SlackDomainModule : DiModule() {
                     searchSessionStorage = instance(),
                     slackRepository = instance(),
                     slackConfig = instance(),
+                    slackMessageFactory = instance(),
+                )
+            }
+            bindProvider {
+                provideSlackShuffleSearchUseCase(
+                    log = instance(),
+                    searchSessionShuffle = instance(),
+                    slackRepository = instance(),
                     slackMessageFactory = instance(),
                 )
             }
@@ -136,5 +145,18 @@ object SlackDomainModule : DiModule() {
         slackConfig = slackConfig,
         slackMessageFactory = slackMessageFactory,
         clock = Clock.System,
+    )
+
+    private fun provideSlackShuffleSearchUseCase(
+        log: Logger,
+        searchSessionShuffle: SearchSessionShuffle,
+        slackRepository: SlackRepository,
+        slackMessageFactory: SlackMessageFactory,
+    ): SlackShuffleSearchUseCase = RealSlackShuffleSearchUseCase(
+        dispatcher = Dispatchers.Default,
+        log = log,
+        searchSessionShuffle = searchSessionShuffle,
+        slackRepository = slackRepository,
+        slackMessageFactory = slackMessageFactory,
     )
 }
