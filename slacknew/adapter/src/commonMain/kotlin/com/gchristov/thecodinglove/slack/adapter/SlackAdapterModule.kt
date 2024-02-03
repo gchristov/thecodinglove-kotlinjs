@@ -5,9 +5,12 @@ import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.searchdata.SearchRepository
+import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
+import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionShuffle
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
+import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionShuffle
 import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
@@ -35,6 +38,9 @@ object SlackAdapterModule : DiModule() {
             }
             bindSingleton {
                 provideSearchSessionStorage(searchRepository = instance())
+            }
+            bindProvider {
+                provideSearchSessionShuffle(searchUseCase = instance())
             }
         }
     }
@@ -67,4 +73,7 @@ object SlackAdapterModule : DiModule() {
 
     private fun provideSearchSessionStorage(searchRepository: SearchRepository): SearchSessionStorage =
         RealSearchSessionStorage(searchRepository = searchRepository)
+
+    private fun provideSearchSessionShuffle(searchUseCase: SearchUseCase): SearchSessionShuffle =
+        RealSearchSessionShuffle(searchUseCase = searchUseCase)
 }
