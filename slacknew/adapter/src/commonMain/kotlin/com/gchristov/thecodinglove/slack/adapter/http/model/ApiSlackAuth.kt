@@ -37,7 +37,20 @@ data class ApiSlackAuthState(
     @SerialName("user_id") val userId: String,
     @SerialName("response_url") val responseUrl: String,
     @SerialName("self_destruct_minutes") val selfDestructMinutes: Int?,
-)
+) {
+    companion object {
+        fun of(authState: SlackAuthState) = with(authState) {
+            ApiSlackAuthState(
+                searchSessionId = searchSessionId,
+                channelId = channelId,
+                teamId = teamId,
+                userId = userId,
+                responseUrl = responseUrl,
+                selfDestructMinutes = selfDestructMinutes,
+            )
+        }
+    }
+}
 
 // TODO: Consider better differentiation between the token types
 internal fun ApiSlackAuthResponse.toAuthToken() = if (authedUser?.accessToken != null) {

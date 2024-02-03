@@ -3,6 +3,8 @@ package com.gchristov.thecodinglove.slack.domain
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
+import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
+import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
 import com.gchristov.thecodinglove.slack.domain.usecase.*
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +18,9 @@ object SlackDomainModule : DiModule() {
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
+            bindProvider {
+                provideSlackMessageFactory(slackAuthStateSerializer = instance())
+            }
             bindProvider {
                 provideSlackAuthUseCase(
                     slackConfig = instance(),
@@ -41,8 +46,28 @@ object SlackDomainModule : DiModule() {
                     log = instance()
                 )
             }
+            bindProvider {
+                provideSlackCancelSearchUseCase(
+                    log = instance(),
+                    searchSessionStorage = instance(),
+                    slackRepository = instance(),
+                    slackMessageFactory = instance(),
+                )
+            }
+            bindProvider {
+                provideSlackSendSearchUseCase(
+                    log = instance(),
+                    searchSessionStorage = instance(),
+                    slackRepository = instance(),
+                    slackConfig = instance(),
+                    slackMessageFactory = instance(),
+                )
+            }
         }
     }
+
+    private fun provideSlackMessageFactory(slackAuthStateSerializer: SlackAuthStateSerializer): SlackMessageFactory =
+        RealSlackMessageFactory(slackAuthStateSerializer = slackAuthStateSerializer)
 
     private fun provideSlackAuthUseCase(
         slackConfig: SlackConfig,
@@ -82,5 +107,34 @@ object SlackDomainModule : DiModule() {
         slackConfig = slackConfig,
         clock = Clock.System,
         log = log,
+    )
+
+    private fun provideSlackCancelSearchUseCase(
+        log: Logger,
+        searchSessionStorage: SearchSessionStorage,
+        slackRepository: SlackRepository,
+        slackMessageFactory: SlackMessageFactory,
+    ): SlackCancelSearchUseCase = RealSlackCancelSearchUseCase(
+        dispatcher = Dispatchers.Default,
+        log = log,
+        searchSessionStorage = searchSessionStorage,
+        slackRepository = slackRepository,
+        slackMessageFactory = slackMessageFactory,
+    )
+
+    private fun provideSlackSendSearchUseCase(
+        log: Logger,
+        searchSessionStorage: SearchSessionStorage,
+        slackRepository: SlackRepository,
+        slackConfig: SlackConfig,
+        slackMessageFactory: SlackMessageFactory,
+    ): SlackSendSearchUseCase = RealSlackSendSearchUseCase(
+        dispatcher = Dispatchers.Default,
+        log = log,
+        searchSessionStorage = searchSessionStorage,
+        slackRepository = slackRepository,
+        slackConfig = slackConfig,
+        slackMessageFactory = slackMessageFactory,
+        clock = Clock.System,
     )
 }

@@ -15,11 +15,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.plus
 
 interface SlackVerifyRequestUseCase {
-    suspend operator fun invoke(
-        timestamp: Long,
-        signature: String,
-        rawBody: String?,
-    ): Either<Error, Unit>
+    suspend operator fun invoke(dto: Dto): Either<Error, Unit>
 
     sealed class Error(override val message: String? = null) : Throwable(message) {
         object TooOld : Error()
@@ -28,6 +24,12 @@ interface SlackVerifyRequestUseCase {
             val additionalInfo: String?
         ) : Error("Request verification error${additionalInfo?.let { ": $it" } ?: ""}")
     }
+
+    data class Dto(
+        val timestamp: Long,
+        val signature: String,
+        val rawBody: String?,
+    )
 }
 
 internal class RealSlackVerifyRequestUseCase(
@@ -38,27 +40,22 @@ internal class RealSlackVerifyRequestUseCase(
 ) : SlackVerifyRequestUseCase {
     private val tag = this::class.simpleName
 
-    override suspend fun invoke(
-        timestamp: Long,
-        signature: String,
-        rawBody: String?
-    ): Either<SlackVerifyRequestUseCase.Error, Unit> =
+    override suspend fun invoke(dto: SlackVerifyRequestUseCase.Dto): Either<SlackVerifyRequestUseCase.Error, Unit> =
         withContext(dispatcher) {
             try {
                 log.debug(
                     tag = tag,
-                    message = "Verifying request: timestamp=$timestamp, signature=$signature, body=$rawBody",
+                    message = "Verifying request: timestamp=${dto.timestamp}, signature=${dto.signature}, body=${dto.rawBody}",
                 )
-
                 verifyTimestamp(
-                    timestamp = timestamp,
+                    timestamp = dto.timestamp,
                     validityMinutes = slackConfig.timestampValidityMinutes,
                     clock = clock
                 ).flatMap {
                     verifyRequest(
-                        timestamp = timestamp,
-                        signature = signature,
-                        rawBody = rawBody,
+                        timestamp = dto.timestamp,
+                        signature = dto.signature,
+                        rawBody = dto.rawBody,
                         signingSecret = slackConfig.signingSecret
                     )
                 }

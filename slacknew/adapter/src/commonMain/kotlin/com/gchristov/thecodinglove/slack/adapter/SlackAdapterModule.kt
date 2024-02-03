@@ -6,8 +6,10 @@ import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
+import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
 import org.kodein.di.DI
+import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
@@ -24,6 +26,9 @@ object SlackAdapterModule : DiModule() {
                     firebaseAdmin = instance(),
                     jsonSerializer = instance(),
                 )
+            }
+            bindProvider {
+                provideSlackAuthStateSerializer(jsonSerializer = instance())
             }
         }
     }
@@ -50,4 +55,7 @@ object SlackAdapterModule : DiModule() {
         firebaseAdmin = firebaseAdmin,
         jsonSerializer = jsonSerializer,
     )
+
+    private fun provideSlackAuthStateSerializer(jsonSerializer: JsonSerializer.Default): SlackAuthStateSerializer =
+        RealSlackAuthStateSerializer(jsonSerializer = jsonSerializer)
 }

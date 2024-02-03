@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 interface SlackAuthUseCase {
-    suspend operator fun invoke(code: String?): Either<Error, Unit>
+    suspend operator fun invoke(dto: Dto): Either<Error, Unit>
 
     sealed class Error(override val message: String? = null) : Throwable(message) {
         object Cancelled : Error()
@@ -18,6 +18,8 @@ interface SlackAuthUseCase {
             val additionalInfo: String? = null
         ) : Error("Auth error${additionalInfo?.let { ": $it" } ?: ""}")
     }
+
+    data class Dto(val code: String?)
 }
 
 internal class RealSlackAuthUseCase(
@@ -28,24 +30,25 @@ internal class RealSlackAuthUseCase(
 ) : SlackAuthUseCase {
     private val tag = this::class.simpleName
 
-    override suspend fun invoke(code: String?): Either<SlackAuthUseCase.Error, Unit> = withContext(dispatcher) {
-        log.debug(tag, "Processing user auth request: code=$code")
-        if (code.isNullOrEmpty()) {
-            log.debug(tag, "Auth cancelled")
-            Either.Left(SlackAuthUseCase.Error.Cancelled)
-        } else {
-            slackRepository.authUser(
-                code = code,
-                clientId = slackConfig.clientId,
-                clientSecret = slackConfig.clientSecret
-            )
-                .mapLeft { SlackAuthUseCase.Error.Other(it.message) }
-                .flatMap { authResponse ->
-                    log.debug(tag, "Persisting auth token")
-                    slackRepository
-                        .saveAuthToken(authResponse)
-                        .mapLeft { SlackAuthUseCase.Error.Other(it.message) }
-                }
+    override suspend fun invoke(dto: SlackAuthUseCase.Dto): Either<SlackAuthUseCase.Error, Unit> =
+        withContext(dispatcher) {
+            log.debug(tag, "Processing user auth request: code=${dto.code}")
+            if (dto.code.isNullOrEmpty()) {
+                log.debug(tag, "Auth cancelled")
+                Either.Left(SlackAuthUseCase.Error.Cancelled)
+            } else {
+                slackRepository.authUser(
+                    code = dto.code,
+                    clientId = slackConfig.clientId,
+                    clientSecret = slackConfig.clientSecret
+                )
+                    .mapLeft { SlackAuthUseCase.Error.Other(it.message) }
+                    .flatMap { authResponse ->
+                        log.debug(tag, "Persisting auth token")
+                        slackRepository
+                            .saveAuthToken(authResponse)
+                            .mapLeft { SlackAuthUseCase.Error.Other(it.message) }
+                    }
+            }
         }
-    }
 }

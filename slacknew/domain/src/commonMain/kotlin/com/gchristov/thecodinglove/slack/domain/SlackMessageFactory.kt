@@ -2,10 +2,12 @@ package com.gchristov.thecodinglove.slack.domain
 
 import com.benasher44.uuid.uuid4
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
+import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessageResponseType
+import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
 
-class SlackMessageFactory {
+interface SlackMessageFactory {
     fun message(
         text: String? = null,
         channelId: String? = null,
@@ -13,6 +15,54 @@ class SlackMessageFactory {
         replaceOriginal: Boolean = true,
         deleteOriginal: Boolean = false,
         attachments: List<SlackMessage.Attachment>? = null,
+    ): SlackMessage
+
+    fun cancelMessage(): SlackMessage
+
+    fun searchResultMessage(
+        searchQuery: String,
+        searchResults: Int,
+        searchSessionId: String,
+        attachmentTitle: String,
+        attachmentUrl: String,
+        attachmentImageUrl: String,
+    ): SlackMessage
+
+    fun authMessage(
+        clientId: String,
+        authState: SlackAuthState
+    ): SlackMessage
+
+    fun searchPostMessage(
+        searchQuery: String,
+        attachmentTitle: String,
+        attachmentUrl: String,
+        attachmentImageUrl: String,
+        channelId: String,
+        selfDestructMinutes: Int?,
+    ): SlackMessage
+
+    fun attachment(
+        title: String? = null,
+        text: String? = null,
+        url: String? = null,
+        footer: String? = null,
+        imageUrl: String? = null,
+        actions: List<SlackMessage.Attachment.Action> = emptyList(),
+        color: String = "#1e1e1e",
+    ): SlackMessage.Attachment
+}
+
+internal class RealSlackMessageFactory(
+    private val slackAuthStateSerializer: SlackAuthStateSerializer
+) : SlackMessageFactory {
+    override fun message(
+        text: String?,
+        channelId: String?,
+        responseType: SlackMessageResponseType,
+        replaceOriginal: Boolean,
+        deleteOriginal: Boolean,
+        attachments: List<SlackMessage.Attachment>?,
     ) = SlackMessage(
         text = text,
         userId = null,
@@ -24,9 +74,9 @@ class SlackMessageFactory {
         attachments = attachments,
     )
 
-    fun cancelMessage() = message(deleteOriginal = true)
+    override fun cancelMessage() = message(deleteOriginal = true)
 
-    fun searchResultMessage(
+    override fun searchResultMessage(
         searchQuery: String,
         searchResults: Int,
         searchSessionId: String,
@@ -79,41 +129,42 @@ class SlackMessageFactory {
         ),
     )
 
-    fun authMessage(
-        searchSessionId: String,
-        teamId: String,
+    override fun authMessage(
         clientId: String,
-        state: String,
-    ) = message(
-        attachments = listOf(
-            attachment(
-                text = """
+        authState: SlackAuthState
+    ): SlackMessage {
+        val serializedAuthState = slackAuthStateSerializer.serialize(authState)
+        return message(
+            attachments = listOf(
+                attachment(
+                    text = """
                 The Coding Love GIFs does not have permission to post messages yet. Allowing access will post this GIF to this channel on your behalf.  
                 """.trimIndent(),
-                footer = "Will never post anything without your permission. <https://thecodinglove.crowdstandout.com/privacy-policy|Check out our privacy policy>",
-                actions = listOf(
-                    SlackMessage.Attachment.Action(
-                        name = SlackActionName.AUTH_SEND.apiValue,
-                        text = SlackActionName.AUTH_SEND.text,
-                        type = ActionTypeButton,
-                        value = null,
-                        url = "https://slack.com/oauth/v2/authorize?client_id=$clientId&user_scope=chat:write&team=$teamId&state=$state",
-                        style = ActionStylePrimary,
+                    footer = "Will never post anything without your permission. <https://thecodinglove.crowdstandout.com/privacy-policy|Check out our privacy policy>",
+                    actions = listOf(
+                        SlackMessage.Attachment.Action(
+                            name = SlackActionName.AUTH_SEND.apiValue,
+                            text = SlackActionName.AUTH_SEND.text,
+                            type = ActionTypeButton,
+                            value = null,
+                            url = "https://slack.com/oauth/v2/authorize?client_id=$clientId&user_scope=chat:write&team=${authState.teamId}&state=$serializedAuthState",
+                            style = ActionStylePrimary,
+                        ),
+                        SlackMessage.Attachment.Action(
+                            name = SlackActionName.CANCEL.apiValue,
+                            text = SlackActionName.CANCEL.text,
+                            type = ActionTypeButton,
+                            value = authState.searchSessionId,
+                            url = null,
+                            style = null,
+                        )
                     ),
-                    SlackMessage.Attachment.Action(
-                        name = SlackActionName.CANCEL.apiValue,
-                        text = SlackActionName.CANCEL.text,
-                        type = ActionTypeButton,
-                        value = searchSessionId,
-                        url = null,
-                        style = null,
-                    )
-                ),
-            )
-        ),
-    )
+                )
+            ),
+        )
+    }
 
-    fun searchPostMessage(
+    override fun searchPostMessage(
         searchQuery: String,
         attachmentTitle: String,
         attachmentUrl: String,
@@ -131,19 +182,20 @@ class SlackMessageFactory {
                 url = attachmentUrl,
                 imageUrl = attachmentImageUrl,
                 actions = emptyList(),
-                footer = selfDestructMinutes?.let { "Self-destructing in ~$selfDestructMinutes minutes • $PostedUsingFooter" } ?: PostedUsingFooter,
+                footer = selfDestructMinutes?.let { "Self-destructing in ~$selfDestructMinutes minutes • $PostedUsingFooter" }
+                    ?: PostedUsingFooter,
             )
         ),
     )
 
-    fun attachment(
-        title: String? = null,
-        text: String? = null,
-        url: String? = null,
-        footer: String? = null,
-        imageUrl: String? = null,
-        actions: List<SlackMessage.Attachment.Action> = emptyList(),
-        color: String = "#1e1e1e",
+    override fun attachment(
+        title: String?,
+        text: String?,
+        url: String?,
+        footer: String?,
+        imageUrl: String?,
+        actions: List<SlackMessage.Attachment.Action>,
+        color: String,
     ) = SlackMessage.Attachment(
         title = title,
         titleLink = url,

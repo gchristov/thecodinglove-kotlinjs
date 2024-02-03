@@ -4,13 +4,17 @@ import arrow.core.Either
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
-import com.gchristov.thecodinglove.slack.domain.model.SlackEvent
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 interface SlackRevokeTokensUseCase {
-    suspend operator fun invoke(event: SlackEvent.Callback.Event.TokensRevoked): Either<Throwable, Unit>
+    suspend operator fun invoke(dto: Dto): Either<Throwable, Unit>
+
+    data class Dto(
+        val oAuth: List<String>?,
+        val bot: List<String>?,
+    )
 }
 
 internal class RealSlackRevokeTokensUseCase(
@@ -20,10 +24,10 @@ internal class RealSlackRevokeTokensUseCase(
 ) : SlackRevokeTokensUseCase {
     private val tag = this::class.simpleName
 
-    override suspend fun invoke(event: SlackEvent.Callback.Event.TokensRevoked): Either<Throwable, Unit> =
+    override suspend fun invoke(dto: SlackRevokeTokensUseCase.Dto): Either<Throwable, Unit> =
         withContext(dispatcher) {
-            val tokensIdsToRevoke = (event.tokens.oAuth?.toMutableList() ?: mutableListOf()).apply {
-                addAll(event.tokens.bot ?: emptyList())
+            val tokensIdsToRevoke = (dto.oAuth?.toMutableList() ?: mutableListOf()).apply {
+                addAll(dto.bot ?: emptyList())
             }
             log.debug(tag, "Processing revoked tokens: tokensIdsToRevoke=$tokensIdsToRevoke")
             tokensIdsToRevoke
