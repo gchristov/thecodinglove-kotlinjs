@@ -10,7 +10,12 @@ import com.gchristov.thecodinglove.slack.adapter.db.DbSlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.adapter.db.toAuthToken
 import com.gchristov.thecodinglove.slack.adapter.db.toSelfDestructMessage
 import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
-import com.gchristov.thecodinglove.slack.adapter.http.model.*
+import com.gchristov.thecodinglove.slack.adapter.http.mapper.toAuthToken
+import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackMessage
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackAuthResponse
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackDeleteMessageResponse
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackPostMessageResponse
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackReplyWithMessageResponse
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthToken
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
@@ -108,7 +113,7 @@ internal class RealSlackRepository(
     ) = try {
         val slackResponse = apiService.postMessageToUrl(
             url = url,
-            message = ApiSlackMessage.of(message),
+            message = message.toSlackMessage(),
         )
         // Sending requests to Slack response URLs currently has an issue where the content type
         // does not honor the Accept header, so we get text/plain instead of application/json
@@ -140,7 +145,7 @@ internal class RealSlackRepository(
     ) = try {
         val slackResponse: ApiSlackPostMessageResponse = apiService.postMessage(
             authToken = authToken,
-            message = ApiSlackMessage.of(message),
+            message = message.toSlackMessage(),
         ).body()
         if (slackResponse.ok) {
             Either.Right(slackResponse.messageTs)

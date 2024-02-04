@@ -1,6 +1,5 @@
 package com.gchristov.thecodinglove.slack.adapter.http.model
 
-import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -48,40 +47,5 @@ data class ApiSlackMessage(
             @SerialName("url") val url: String?,
             @SerialName("style") val style: String?,
         )
-    }
-
-    companion object {
-        fun of(slackMessage: SlackMessage) = with(slackMessage) {
-            ApiSlackMessage(
-                text = text,
-                userId = userId,
-                channelId = channelId,
-                responseType = responseType,
-                teamId = teamId,
-                replaceOriginal = replaceOriginal,
-                deleteOriginal = deleteOriginal,
-                attachments = attachments?.map { attachment ->
-                    ApiAttachment(
-                        title = attachment.title,
-                        titleLink = attachment.titleLink,
-                        text = attachment.text,
-                        imageUrl = attachment.imageUrl,
-                        footer = attachment.footer,
-                        callbackId = attachment.callbackId,
-                        color = attachment.color,
-                        actions = attachment.actions.map { action ->
-                            ApiAttachment.ApiAction(
-                                name = action.name,
-                                text = action.text,
-                                type = action.type,
-                                value = action.value,
-                                url = action.url,
-                                style = action.style,
-                            )
-                        }
-                    )
-                }
-            )
-        }
     }
 }

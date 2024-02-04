@@ -8,6 +8,7 @@ import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
+import com.gchristov.thecodinglove.slack.adapter.http.SlackAuthHttpHandler
 import com.gchristov.thecodinglove.slack.adapter.http.SlackEventHttpHandler
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionShuffle
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionStorage
@@ -16,7 +17,9 @@ import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionShuffle
 import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
+import com.gchristov.thecodinglove.slack.domain.usecase.SlackAuthUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackRevokeTokensUseCase
+import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackVerifyRequestUseCase
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
@@ -54,6 +57,14 @@ object SlackAdapterModule : DiModule() {
                     slackVerifyRequestUseCase = instance(),
                     slackConfig = instance(),
                     slackRevokeTokensUseCase = instance(),
+                )
+            }
+            bindSingleton {
+                provideSlackAuthHttpHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    slackAuthUseCase = instance(),
+                    slackSendSearchUseCase = instance(),
                 )
             }
         }
@@ -104,5 +115,18 @@ object SlackAdapterModule : DiModule() {
         slackVerifyRequestUseCase = slackVerifyRequestUseCase,
         slackConfig = slackConfig,
         slackRevokeTokensUseCase = slackRevokeTokensUseCase,
+    )
+
+    private fun provideSlackAuthHttpHandler(
+        jsonSerializer: JsonSerializer.Default,
+        log: Logger,
+        slackAuthUseCase: SlackAuthUseCase,
+        slackSendSearchUseCase: SlackSendSearchUseCase,
+    ): SlackAuthHttpHandler = SlackAuthHttpHandler(
+        dispatcher = Dispatchers.Default,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        slackAuthUseCase = slackAuthUseCase,
+        slackSendSearchUseCase = slackSendSearchUseCase,
     )
 }
