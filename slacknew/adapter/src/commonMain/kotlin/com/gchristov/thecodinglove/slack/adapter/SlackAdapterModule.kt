@@ -10,6 +10,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.adapter.http.*
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchEngine
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionStorage
@@ -19,10 +20,7 @@ import com.gchristov.thecodinglove.slack.domain.ports.SearchEngine
 import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
-import com.gchristov.thecodinglove.slack.domain.usecase.SlackAuthUseCase
-import com.gchristov.thecodinglove.slack.domain.usecase.SlackRevokeTokensUseCase
-import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
-import com.gchristov.thecodinglove.slack.domain.usecase.SlackVerifyRequestUseCase
+import com.gchristov.thecodinglove.slack.domain.usecase.*
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
@@ -95,6 +93,16 @@ object SlackAdapterModule : DiModule() {
                     slackVerifyRequestUseCase = instance(),
                     slackConfig = instance(),
                     pubSubPublisher = instance(),
+                )
+            }
+            bindSingleton {
+                provideSlackInteractivityPubSubHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    slackSendSearchUseCase = instance(),
+                    slackShuffleSearchUseCase = instance(),
+                    slackCancelSearchUseCase = instance(),
+                    pubSubDecoder = instance(),
                 )
             }
         }
@@ -205,5 +213,22 @@ object SlackAdapterModule : DiModule() {
         slackVerifyRequestUseCase = slackVerifyRequestUseCase,
         slackConfig = slackConfig,
         pubSubPublisher = pubSubPublisher,
+    )
+
+    private fun provideSlackInteractivityPubSubHandler(
+        jsonSerializer: JsonSerializer.Default,
+        log: Logger,
+        slackSendSearchUseCase: SlackSendSearchUseCase,
+        slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
+        slackCancelSearchUseCase: SlackCancelSearchUseCase,
+        pubSubDecoder: PubSubDecoder,
+    ): SlackInteractivityPubSubHandler = SlackInteractivityPubSubHandler(
+        dispatcher = Dispatchers.Default,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        slackSendSearchUseCase = slackSendSearchUseCase,
+        slackShuffleSearchUseCase = slackShuffleSearchUseCase,
+        slackCancelSearchUseCase = slackCancelSearchUseCase,
+        pubSubDecoder = pubSubDecoder,
     )
 }
