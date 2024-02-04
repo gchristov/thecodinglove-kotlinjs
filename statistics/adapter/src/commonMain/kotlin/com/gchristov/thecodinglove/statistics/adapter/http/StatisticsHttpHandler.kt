@@ -30,7 +30,7 @@ class StatisticsHttpHandler(
         response: HttpResponse,
     ): Either<Throwable, Unit> = statisticsReportUseCase().flatMap { report ->
         response.sendJson(
-            data = ApiStatisticsReport.of(report),
+            data = report.toStatisticsReport(),
             jsonSerializer = jsonSerializer,
         )
     }

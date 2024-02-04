@@ -42,25 +42,21 @@ internal class RealSlackVerifyRequestUseCase(
 
     override suspend fun invoke(dto: SlackVerifyRequestUseCase.Dto): Either<SlackVerifyRequestUseCase.Error, Unit> =
         withContext(dispatcher) {
-            try {
-                log.debug(
-                    tag = tag,
-                    message = "Verifying request: timestamp=${dto.timestamp}, signature=${dto.signature}, body=${dto.rawBody}",
-                )
-                verifyTimestamp(
+            log.debug(
+                tag = tag,
+                message = "Verifying request: timestamp=${dto.timestamp}, signature=${dto.signature}, body=${dto.rawBody}",
+            )
+            verifyTimestamp(
+                timestamp = dto.timestamp,
+                validityMinutes = slackConfig.timestampValidityMinutes,
+                clock = clock
+            ).flatMap {
+                verifyRequest(
                     timestamp = dto.timestamp,
-                    validityMinutes = slackConfig.timestampValidityMinutes,
-                    clock = clock
-                ).flatMap {
-                    verifyRequest(
-                        timestamp = dto.timestamp,
-                        signature = dto.signature,
-                        rawBody = dto.rawBody,
-                        signingSecret = slackConfig.signingSecret
-                    )
-                }
-            } catch (error: Throwable) {
-                Either.Left(SlackVerifyRequestUseCase.Error.Other(additionalInfo = error.message))
+                    signature = dto.signature,
+                    rawBody = dto.rawBody,
+                    signingSecret = slackConfig.signingSecret,
+                )
             }
         }
 
@@ -68,16 +64,18 @@ internal class RealSlackVerifyRequestUseCase(
         timestamp: Long,
         validityMinutes: Int,
         clock: Clock
-    ): Either<SlackVerifyRequestUseCase.Error, Unit> {
+    ): Either<SlackVerifyRequestUseCase.Error, Unit> = try {
         val timestampInstant = Instant.fromEpochSeconds(timestamp).plus(
             value = validityMinutes,
             unit = DateTimeUnit.MINUTE
         )
-        return if (timestampInstant < clock.now()) {
+        if (timestampInstant < clock.now()) {
             Either.Left(SlackVerifyRequestUseCase.Error.TooOld)
         } else {
             Either.Right(Unit)
         }
+    } catch (error: Throwable) {
+        Either.Left(SlackVerifyRequestUseCase.Error.Other(additionalInfo = error.message))
     }
 
     private suspend fun verifyRequest(
@@ -85,7 +83,7 @@ internal class RealSlackVerifyRequestUseCase(
         signature: String,
         rawBody: String?,
         signingSecret: String
-    ): Either<SlackVerifyRequestUseCase.Error, Unit> {
+    ): Either<SlackVerifyRequestUseCase.Error, Unit> = try {
         val baseString = "$Version:$timestamp:$rawBody"
         val data = baseString.encodeToByteArray()
         val key = signingSecret.encodeToByteArray()
@@ -95,7 +93,7 @@ internal class RealSlackVerifyRequestUseCase(
         )
         val digest = cypher.compute(data)
         val computedSignature = "$Version=${digest.encodeHexToString()}"
-        return if (computedSignature.compareTo(
+        if (computedSignature.compareTo(
                 other = signature,
                 ignoreCase = true
             ) == 0
@@ -104,7 +102,9 @@ internal class RealSlackVerifyRequestUseCase(
         } else {
             Either.Left(SlackVerifyRequestUseCase.Error.SignatureMismatch)
         }
+    } catch (error: Throwable) {
+        Either.Left(SlackVerifyRequestUseCase.Error.Other(additionalInfo = error.message))
     }
 }
 
-private val Version = "v0"
+private const val Version = "v0"
