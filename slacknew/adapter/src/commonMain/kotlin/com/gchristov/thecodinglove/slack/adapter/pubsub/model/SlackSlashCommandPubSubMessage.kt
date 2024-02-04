@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slack.adapter.pubsub
+package com.gchristov.thecodinglove.slack.adapter.pubsub.model
 
 import kotlinx.serialization.Serializable
 

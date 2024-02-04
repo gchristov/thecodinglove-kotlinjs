@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.slack.domain
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionShuffle
+import com.gchristov.thecodinglove.slack.domain.ports.SearchEngine
 import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
@@ -149,7 +149,7 @@ object SlackDomainModule : DiModule() {
 
     private fun provideSlackShuffleSearchUseCase(
         log: Logger,
-        searchSessionShuffle: SearchSessionShuffle,
+        searchSessionShuffle: SearchEngine,
         slackRepository: SlackRepository,
         slackMessageFactory: SlackMessageFactory,
     ): SlackShuffleSearchUseCase = RealSlackShuffleSearchUseCase(

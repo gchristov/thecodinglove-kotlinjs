@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.http.mapper
 
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackSlashCommand
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubMessage
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSlashCommandPubSubMessage
 
 internal fun ApiSlackSlashCommand.toPubSubMessage() = SlackSlashCommandPubSubMessage(
     teamId = teamId,

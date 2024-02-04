@@ -5,7 +5,7 @@ import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionShuffle
+import com.gchristov.thecodinglove.slack.domain.ports.SearchEngine
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -22,7 +22,7 @@ interface SlackShuffleSearchUseCase {
 internal class RealSlackShuffleSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
-    private val searchSessionShuffle: SearchSessionShuffle,
+    private val searchSessionShuffle: SearchEngine,
     private val slackRepository: SlackRepository,
     private val slackMessageFactory: SlackMessageFactory,
 ) : SlackShuffleSearchUseCase {

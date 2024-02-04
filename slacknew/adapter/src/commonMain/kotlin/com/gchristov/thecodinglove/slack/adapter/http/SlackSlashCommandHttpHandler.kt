@@ -11,7 +11,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toPubSubMessage
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackRequestVerificationDto
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackSlashCommand
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubMessage
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSlashCommandPubSubMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackVerifyRequestUseCase
 import io.ktor.http.*

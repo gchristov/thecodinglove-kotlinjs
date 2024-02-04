@@ -5,6 +5,7 @@ import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
+import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
@@ -12,10 +13,12 @@ import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
 import com.gchristov.thecodinglove.slack.adapter.http.SlackAuthHttpHandler
 import com.gchristov.thecodinglove.slack.adapter.http.SlackEventHttpHandler
 import com.gchristov.thecodinglove.slack.adapter.http.SlackSlashCommandHttpHandler
-import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionShuffle
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
+import com.gchristov.thecodinglove.slack.adapter.search.RealSearchEngine
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionStorage
+import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionShuffle
+import com.gchristov.thecodinglove.slack.domain.ports.SearchEngine
 import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
@@ -78,6 +81,16 @@ object SlackAdapterModule : DiModule() {
                     pubSubPublisher = instance(),
                 )
             }
+            bindSingleton {
+                provideSlackSlashCommandPubSubHttpHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    slackRepository = instance(),
+                    slackMessageFactory = instance(),
+                    searchEngine = instance(),
+                    pubSubDecoder = instance(),
+                )
+            }
         }
     }
 
@@ -110,8 +123,8 @@ object SlackAdapterModule : DiModule() {
     private fun provideSearchSessionStorage(searchRepository: SearchRepository): SearchSessionStorage =
         RealSearchSessionStorage(searchRepository = searchRepository)
 
-    private fun provideSearchSessionShuffle(searchUseCase: SearchUseCase): SearchSessionShuffle =
-        RealSearchSessionShuffle(searchUseCase = searchUseCase)
+    private fun provideSearchSessionShuffle(searchUseCase: SearchUseCase): SearchEngine =
+        RealSearchEngine(searchUseCase = searchUseCase)
 
     private fun provideSlackEventHttpHandler(
         jsonSerializer: JsonSerializer.Default,
@@ -154,5 +167,22 @@ object SlackAdapterModule : DiModule() {
         slackVerifyRequestUseCase = slackVerifyRequestUseCase,
         slackConfig = slackConfig,
         pubSubPublisher = pubSubPublisher,
+    )
+
+    private fun provideSlackSlashCommandPubSubHttpHandler(
+        jsonSerializer: JsonSerializer.Default,
+        log: Logger,
+        slackRepository: SlackRepository,
+        slackMessageFactory: SlackMessageFactory,
+        searchEngine: SearchEngine,
+        pubSubDecoder: PubSubDecoder,
+    ): SlackSlashCommandPubSubHandler = SlackSlashCommandPubSubHandler(
+        dispatcher = Dispatchers.Default,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        slackRepository = slackRepository,
+        slackMessageFactory = slackMessageFactory,
+        searchEngine = searchEngine,
+        pubSubDecoder = pubSubDecoder,
     )
 }
