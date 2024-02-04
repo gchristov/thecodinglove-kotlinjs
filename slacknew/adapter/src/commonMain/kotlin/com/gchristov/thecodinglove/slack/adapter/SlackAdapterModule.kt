@@ -9,10 +9,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
-import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
-import com.gchristov.thecodinglove.slack.adapter.http.SlackAuthHttpHandler
-import com.gchristov.thecodinglove.slack.adapter.http.SlackEventHttpHandler
-import com.gchristov.thecodinglove.slack.adapter.http.SlackSlashCommandHttpHandler
+import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchEngine
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionStorage
@@ -89,6 +86,15 @@ object SlackAdapterModule : DiModule() {
                     slackMessageFactory = instance(),
                     searchEngine = instance(),
                     pubSubDecoder = instance(),
+                )
+            }
+            bindSingleton {
+                provideSlackInteractivityHttpHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    slackVerifyRequestUseCase = instance(),
+                    slackConfig = instance(),
+                    pubSubPublisher = instance(),
                 )
             }
         }
@@ -184,5 +190,20 @@ object SlackAdapterModule : DiModule() {
         slackMessageFactory = slackMessageFactory,
         searchEngine = searchEngine,
         pubSubDecoder = pubSubDecoder,
+    )
+
+    private fun provideSlackInteractivityHttpHandler(
+        jsonSerializer: JsonSerializer.Default,
+        log: Logger,
+        slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
+        slackConfig: SlackConfig,
+        pubSubPublisher: PubSubPublisher,
+    ): SlackInteractivityHttpHandler = SlackInteractivityHttpHandler(
+        dispatcher = Dispatchers.Default,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        slackVerifyRequestUseCase = slackVerifyRequestUseCase,
+        slackConfig = slackConfig,
+        pubSubPublisher = pubSubPublisher,
     )
 }
