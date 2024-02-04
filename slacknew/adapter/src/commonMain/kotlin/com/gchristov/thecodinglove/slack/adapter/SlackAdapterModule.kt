@@ -5,11 +5,13 @@ import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
+import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
 import com.gchristov.thecodinglove.slack.adapter.http.SlackAuthHttpHandler
 import com.gchristov.thecodinglove.slack.adapter.http.SlackEventHttpHandler
+import com.gchristov.thecodinglove.slack.adapter.http.SlackSlashCommandHttpHandler
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionShuffle
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
@@ -65,6 +67,15 @@ object SlackAdapterModule : DiModule() {
                     log = instance(),
                     slackAuthUseCase = instance(),
                     slackSendSearchUseCase = instance(),
+                )
+            }
+            bindSingleton {
+                provideSlackSlashCommandHttpHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    slackVerifyRequestUseCase = instance(),
+                    slackConfig = instance(),
+                    pubSubPublisher = instance(),
                 )
             }
         }
@@ -128,5 +139,20 @@ object SlackAdapterModule : DiModule() {
         log = log,
         slackAuthUseCase = slackAuthUseCase,
         slackSendSearchUseCase = slackSendSearchUseCase,
+    )
+
+    private fun provideSlackSlashCommandHttpHandler(
+        jsonSerializer: JsonSerializer.Default,
+        log: Logger,
+        slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
+        slackConfig: SlackConfig,
+        pubSubPublisher: PubSubPublisher,
+    ): SlackSlashCommandHttpHandler = SlackSlashCommandHttpHandler(
+        dispatcher = Dispatchers.Default,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        slackVerifyRequestUseCase = slackVerifyRequestUseCase,
+        slackConfig = slackConfig,
+        pubSubPublisher = pubSubPublisher,
     )
 }

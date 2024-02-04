@@ -12,6 +12,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.common.network)
+                implementation(projects.common.pubsub)
                 implementation(projects.common.firebase)
                 implementation(projects.slacknew.domain)
                 // TODO: Remove when migrated to microservice
