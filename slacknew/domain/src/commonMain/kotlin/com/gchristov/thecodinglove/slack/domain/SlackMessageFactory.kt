@@ -5,7 +5,7 @@ import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessageResponseType
-import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
+import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
 
 interface SlackMessageFactory {
     fun message(

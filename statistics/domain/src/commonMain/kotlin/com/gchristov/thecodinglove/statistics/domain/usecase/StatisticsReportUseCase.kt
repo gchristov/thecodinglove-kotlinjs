@@ -5,7 +5,7 @@ import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.statistics.domain.model.StatisticsReport
-import com.gchristov.thecodinglove.statistics.domain.ports.StatisticsReportSource
+import com.gchristov.thecodinglove.statistics.domain.port.StatisticsReportSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext

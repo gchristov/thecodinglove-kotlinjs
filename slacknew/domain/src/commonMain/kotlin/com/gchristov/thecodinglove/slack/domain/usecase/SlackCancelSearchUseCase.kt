@@ -5,8 +5,8 @@ import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
-import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
+import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStorage
+import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 

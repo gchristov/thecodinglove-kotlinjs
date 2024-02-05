@@ -4,9 +4,9 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.domain.SearchSession
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionPostDto
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStateDto
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
+import com.gchristov.thecodinglove.slack.domain.port.SearchSessionPostDto
+import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStateDto
+import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStorage
 
 class RealSearchSessionStorage(private val searchRepository: SearchRepository) : SearchSessionStorage {
     override suspend fun deleteSearchSession(searchSessionId: String) =

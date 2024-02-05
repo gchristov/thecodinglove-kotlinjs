@@ -14,8 +14,8 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSlashCommandPubSubMessage
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
-import com.gchristov.thecodinglove.slack.domain.ports.SearchEngine
-import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
+import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
+import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 

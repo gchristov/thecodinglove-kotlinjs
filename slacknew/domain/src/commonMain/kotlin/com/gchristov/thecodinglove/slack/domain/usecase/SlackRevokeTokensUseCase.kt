@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
-import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
+import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 

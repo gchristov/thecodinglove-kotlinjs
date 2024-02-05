@@ -16,6 +16,7 @@ import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.selfdestruct.adapter.SelfDestructAdapterModule
 import com.gchristov.thecodinglove.selfdestruct.adapter.http.SelfDestructHttpHandler
+import com.gchristov.thecodinglove.selfdestruct.domain.SelfDestructDomainModule
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
 
 suspend fun main() {
@@ -44,6 +45,7 @@ private fun setupDi(): Either<Throwable, Unit> {
             CommonMonitoringModule.module,
             SlackDataModule.module,
             SelfDestructAdapterModule.module,
+            SelfDestructDomainModule.module,
         )
     )
     return Either.Right(Unit)

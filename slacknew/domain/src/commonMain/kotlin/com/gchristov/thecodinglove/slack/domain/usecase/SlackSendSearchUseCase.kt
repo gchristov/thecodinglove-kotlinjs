@@ -8,9 +8,9 @@ import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStateDto
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
-import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
+import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStateDto
+import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStorage
+import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock

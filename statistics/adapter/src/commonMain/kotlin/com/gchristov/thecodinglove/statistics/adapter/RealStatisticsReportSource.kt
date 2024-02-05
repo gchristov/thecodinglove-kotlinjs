@@ -4,7 +4,7 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.domain.SearchSession
 import com.gchristov.thecodinglove.slackdata.SlackRepository
-import com.gchristov.thecodinglove.statistics.domain.ports.StatisticsReportSource
+import com.gchristov.thecodinglove.statistics.domain.port.StatisticsReportSource
 
 class RealStatisticsReportSource(
     private val slackRepository: SlackRepository,

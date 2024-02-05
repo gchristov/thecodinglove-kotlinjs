@@ -3,10 +3,10 @@ package com.gchristov.thecodinglove.slack.domain
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
-import com.gchristov.thecodinglove.slack.domain.ports.SearchEngine
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
-import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
-import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
+import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
+import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStorage
+import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
+import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import com.gchristov.thecodinglove.slack.domain.usecase.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock

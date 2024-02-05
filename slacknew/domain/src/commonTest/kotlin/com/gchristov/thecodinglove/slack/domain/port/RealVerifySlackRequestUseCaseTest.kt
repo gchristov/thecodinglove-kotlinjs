@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slack.domain.ports
+package com.gchristov.thecodinglove.slack.domain.port
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher

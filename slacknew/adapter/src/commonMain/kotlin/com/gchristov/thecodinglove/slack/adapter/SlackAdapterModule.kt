@@ -16,10 +16,10 @@ import com.gchristov.thecodinglove.slack.adapter.search.RealSearchEngine
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionStorage
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
-import com.gchristov.thecodinglove.slack.domain.ports.SearchEngine
-import com.gchristov.thecodinglove.slack.domain.ports.SearchSessionStorage
-import com.gchristov.thecodinglove.slack.domain.ports.SlackAuthStateSerializer
-import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
+import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
+import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStorage
+import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
+import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import com.gchristov.thecodinglove.slack.domain.usecase.*
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
@@ -103,6 +103,13 @@ object SlackAdapterModule : DiModule() {
                     slackShuffleSearchUseCase = instance(),
                     slackCancelSearchUseCase = instance(),
                     pubSubDecoder = instance(),
+                )
+            }
+            bindSingleton {
+                provideSlackSelfDestructHttpHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    selfDestructUseCase = instance(),
                 )
             }
         }
@@ -230,5 +237,16 @@ object SlackAdapterModule : DiModule() {
         slackShuffleSearchUseCase = slackShuffleSearchUseCase,
         slackCancelSearchUseCase = slackCancelSearchUseCase,
         pubSubDecoder = pubSubDecoder,
+    )
+
+    private fun provideSlackSelfDestructHttpHandler(
+        jsonSerializer: JsonSerializer.Default,
+        log: Logger,
+        selfDestructUseCase: SlackSelfDestructUseCase,
+    ): SlackSelfDestructHttpHandler = SlackSelfDestructHttpHandler(
+        dispatcher = Dispatchers.Default,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        selfDestructUseCase = selfDestructUseCase,
     )
 }

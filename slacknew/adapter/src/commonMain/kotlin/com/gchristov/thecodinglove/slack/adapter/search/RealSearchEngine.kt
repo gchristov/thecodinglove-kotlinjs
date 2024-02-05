@@ -3,8 +3,8 @@ package com.gchristov.thecodinglove.slack.adapter.search
 import arrow.core.Either
 import arrow.core.flatMap
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
-import com.gchristov.thecodinglove.slack.domain.ports.SearchEngine
-import com.gchristov.thecodinglove.slack.domain.ports.SearchEngineDto
+import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
+import com.gchristov.thecodinglove.slack.domain.port.SearchEngineDto
 
 class RealSearchEngine(private val searchUseCase: SearchUseCase) : SearchEngine {
     override suspend fun search(query: String): Either<Throwable, SearchEngineDto> =

@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slack.domain.ports
+package com.gchristov.thecodinglove.slack.domain.port
 
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 

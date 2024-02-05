@@ -19,7 +19,7 @@ import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackReplyWithMes
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthToken
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
-import com.gchristov.thecodinglove.slack.domain.ports.SlackRepository
+import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

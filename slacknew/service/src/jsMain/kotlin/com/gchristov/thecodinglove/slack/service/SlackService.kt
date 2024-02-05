@@ -18,10 +18,7 @@ import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slack.adapter.SlackAdapterModule
-import com.gchristov.thecodinglove.slack.adapter.http.SlackAuthHttpHandler
-import com.gchristov.thecodinglove.slack.adapter.http.SlackEventHttpHandler
-import com.gchristov.thecodinglove.slack.adapter.http.SlackInteractivityHttpHandler
-import com.gchristov.thecodinglove.slack.adapter.http.SlackSlashCommandHttpHandler
+import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slack.domain.SlackDomainModule
@@ -77,6 +74,7 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
         DiGraph.inject<SlackInteractivityPubSubHandler>(),
         DiGraph.inject<SlackAuthHttpHandler>(),
         DiGraph.inject<SlackEventHttpHandler>(),
+        DiGraph.inject<SlackSelfDestructHttpHandler>(),
     )
     val service = DiGraph.inject<HttpService>()
     return service.initialise(
