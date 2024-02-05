@@ -10,7 +10,15 @@ server {
   location /${SELF_DESTRUCT_SERVICE_PATH} {
       proxy_pass ${SELF_DESTRUCT_SERVICE_HOST}/${SELF_DESTRUCT_SERVICE_PATH};
       proxy_ssl_server_name on;
-    }
+  }
+  location /${SLACK_SERVICE_PATH} {
+      proxy_pass ${SLACK_SERVICE_HOST}/${SLACK_SERVICE_PATH};
+      proxy_ssl_server_name on;
+  }
+  location /${SLACK_SERVICE_PUBSUB_PATH} {
+      proxy_pass ${SLACK_SERVICE_HOST}/${SLACK_SERVICE_PUBSUB_PATH};
+      proxy_ssl_server_name on;
+  }
   # Keep this last as the monolith service handles a few api/ paths.
   location /${APP_SERVICE_PATH} {
     proxy_pass ${APP_SERVICE_HOST}/${APP_SERVICE_PATH};

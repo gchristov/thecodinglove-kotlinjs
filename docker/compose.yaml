@@ -17,6 +17,12 @@ services:
       - "8083:8083"
     environment:
       - PORT=8083
+  slacknew-service:
+    build: ../build/services/slacknew-service/.
+    ports:
+      - "8084:8084"
+    environment:
+      - PORT=8084
   landing-page-service:
     build: ../build/services/landing-page-service/.
     ports:
@@ -28,3 +34,6 @@ services:
       - STATISTICS_SERVICE_PATH=api/stats
       - SELF_DESTRUCT_SERVICE_HOST=http://self-destruct-service:8083
       - SELF_DESTRUCT_SERVICE_PATH=api/self-destruct
+      - SLACK_SERVICE_HOST=http://slacknew-service:8084
+      - SLACK_SERVICE_PATH=api/slack
+      - SLACK_SERVICE_PUBSUB_PATH=api/pubsub/slack
