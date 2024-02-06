@@ -5,10 +5,10 @@ import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
+import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
 import com.gchristov.thecodinglove.common.kotlin.di.inject
 import com.gchristov.thecodinglove.common.kotlin.di.registerModules
-import com.gchristov.thecodinglove.common.kotlin.parseMainArgs
 import com.gchristov.thecodinglove.common.kotlin.process
 import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
 import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
@@ -17,26 +17,29 @@ import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.selfdestruct.adapter.SelfDestructAdapterModule
 import com.gchristov.thecodinglove.selfdestruct.adapter.http.SelfDestructHttpHandler
 import com.gchristov.thecodinglove.selfdestruct.domain.SelfDestructDomainModule
+import com.gchristov.thecodinglove.selfdestruct.domain.model.Environment
 import com.gchristov.thecodinglove.slackdata.SlackDataModule
 
 suspend fun main() {
-    // Remove the first two default Node arguments
-    val args = parseMainArgs(process.argv.slice(2) as Array<String>)
-    val port = requireNotNull(args["-port"]) { "Port number not specified." }.first().toInt()
+    // Ignore default Node arguments
+    val environment = Environment.of(process.argv.slice(2) as Array<String>)
+    val tag = "SelfDestructService"
 
-    setupDi()
+    setupDi(environment)
         .flatMap { setupMonitoring() }
-        .flatMap { setupService(port) }
+        .flatMap { setupService(environment.port) }
         .flatMap { startService(it) }
         .fold(ifLeft = { error ->
-            println("Error starting self-destruct-service${error.message?.let { ": $it" } ?: ""}")
+            val log = DiGraph.inject<Logger>()
+            log.debug(tag, "Error starting self-destruct-service${error.message?.let { ": $it" } ?: ""}")
             error.printStackTrace()
         }, ifRight = {
-            // TODO: Add start-up metrics
+            val log = DiGraph.inject<Logger>()
+            log.debug(tag, "Started: environment=$environment")
         })
 }
 
-private fun setupDi(): Either<Throwable, Unit> {
+private fun setupDi(environment: Environment): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             CommonKotlinModule.module,
@@ -46,6 +49,7 @@ private fun setupDi(): Either<Throwable, Unit> {
             SlackDataModule.module,
             SelfDestructAdapterModule.module,
             SelfDestructDomainModule.module,
+            SelfDestructServiceModule(environment).module,
         )
     )
     return Either.Right(Unit)

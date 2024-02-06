@@ -17,6 +17,7 @@ services:
       - "8083:8083"
     environment:
       - PORT=8083
+      - API_URL=http://host.docker.internal:8080/api
   slacknew-service:
     build: ../build/services/slacknew-service/.
     ports:

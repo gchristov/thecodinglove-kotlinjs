@@ -20,7 +20,7 @@ class SlackSelfDestructHttpHandler(
     log = log,
 ) {
     override fun httpConfig() = HttpHandler.HttpConfig(
-        method = HttpMethod.Post,
+        method = HttpMethod.Get,
         path = "/api/slack/self-destruct",
         contentType = ContentType.Application.Json,
     )

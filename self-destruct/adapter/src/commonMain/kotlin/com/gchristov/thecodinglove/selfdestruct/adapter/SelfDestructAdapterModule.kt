@@ -6,6 +6,8 @@ import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.selfdestruct.adapter.http.SelfDestructHttpHandler
 import com.gchristov.thecodinglove.selfdestruct.adapter.slack.RealSlackSelfDestructRepository
+import com.gchristov.thecodinglove.selfdestruct.adapter.slack.SlackSelfDestructApi
+import com.gchristov.thecodinglove.selfdestruct.domain.model.Environment
 import com.gchristov.thecodinglove.selfdestruct.domain.port.SlackSelfDestructRepository
 import com.gchristov.thecodinglove.selfdestruct.domain.usecase.SelfDestructUseCase
 import kotlinx.coroutines.Dispatchers
@@ -26,8 +28,14 @@ object SelfDestructAdapterModule : DiModule() {
                 )
             }
             bindSingleton {
-                provideSlackSelfDestructRepository(
+                provideSlackSelfDestructApi(
                     networkClient = instance(),
+                    environment = instance(),
+                )
+            }
+            bindSingleton {
+                provideSlackSelfDestructRepository(
+                    api = instance(),
                 )
             }
         }
@@ -44,10 +52,17 @@ object SelfDestructAdapterModule : DiModule() {
         selfDestructUseCase = selfDestructUseCase,
     )
 
-    private fun provideSlackSelfDestructRepository(
+    private fun provideSlackSelfDestructApi(
         networkClient: NetworkClient.Json,
-    ): SlackSelfDestructRepository = RealSlackSelfDestructRepository(
-        dispatcher = Dispatchers.Default,
+        environment: Environment,
+    ): SlackSelfDestructApi = SlackSelfDestructApi(
         client = networkClient,
+        environment = environment,
+    )
+
+    private fun provideSlackSelfDestructRepository(
+        api: SlackSelfDestructApi,
+    ): SlackSelfDestructRepository = RealSlackSelfDestructRepository(
+        apiService = api,
     )
 }
