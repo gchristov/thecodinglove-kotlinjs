@@ -16,7 +16,6 @@ import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
-import com.gchristov.thecodinglove.slackdata.SlackDataModule
 import com.gchristov.thecodinglove.statistics.adapter.StatisticsAdapterModule
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
 import com.gchristov.thecodinglove.statistics.domain.StatisticsDomainModule
@@ -50,7 +49,6 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
             CommonFirebaseModule.module,
             HtmlParseDataModule.module,
             SearchDataModule.module,
-            SlackDataModule.module,
             StatisticsDomainModule.module,
             StatisticsAdapterModule.module,
             StatisticsServiceModule(environment).module,

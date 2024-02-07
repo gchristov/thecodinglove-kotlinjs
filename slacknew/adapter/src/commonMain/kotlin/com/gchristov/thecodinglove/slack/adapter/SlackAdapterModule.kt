@@ -119,6 +119,13 @@ object SlackAdapterModule : DiModule() {
                     statisticsUseCase = instance(),
                 )
             }
+            bindSingleton {
+                provideSlackReportExceptionHttpHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    reportExceptionUseCase = instance(),
+                )
+            }
         }
     }
 
@@ -266,5 +273,16 @@ object SlackAdapterModule : DiModule() {
         jsonSerializer = jsonSerializer,
         log = log,
         statisticsUseCase = statisticsUseCase,
+    )
+
+    private fun provideSlackReportExceptionHttpHandler(
+        jsonSerializer: JsonSerializer.Default,
+        log: Logger,
+        reportExceptionUseCase: SlackReportExceptionUseCase,
+    ): SlackReportExceptionHttpHandler = SlackReportExceptionHttpHandler(
+        dispatcher = Dispatchers.Default,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        reportExceptionUseCase = reportExceptionUseCase,
     )
 }

@@ -22,7 +22,6 @@ import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slack.domain.SlackDomainModule
-import com.gchristov.thecodinglove.slackdata.SlackDataModule
 
 suspend fun main() {
     // Remove the first two default Node arguments
@@ -51,7 +50,6 @@ private fun setupDi(): Either<Throwable, Unit> {
             CommonFirebaseModule.module,
             HtmlParseDataModule.module,
             SearchDataModule.module,
-            SlackDataModule.module,
             SlackDomainModule.module,
             SlackAdapterModule.module,
         )
@@ -76,6 +74,7 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
         DiGraph.inject<SlackEventHttpHandler>(),
         DiGraph.inject<SlackSelfDestructHttpHandler>(),
         DiGraph.inject<SlackStatisticsHttpHandler>(),
+        DiGraph.inject<SlackReportExceptionHttpHandler>(),
     )
     val service = DiGraph.inject<HttpService>()
     return service.initialise(
