@@ -31,7 +31,7 @@ suspend fun main() {
         .flatMap { startService(it) }
         .fold(ifLeft = { error ->
             val log = DiGraph.inject<Logger>()
-            log.debug(tag, "Error starting self-destruct-service${error.message?.let { ": $it" } ?: ""}")
+            log.debug(tag, "Error starting${error.message?.let { ": $it" } ?: ""}")
             error.printStackTrace()
         }, ifRight = {
             val log = DiGraph.inject<Logger>()

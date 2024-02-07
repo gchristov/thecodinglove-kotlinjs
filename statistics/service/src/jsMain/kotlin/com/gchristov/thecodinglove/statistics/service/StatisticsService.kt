@@ -5,10 +5,10 @@ import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
+import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
 import com.gchristov.thecodinglove.common.kotlin.di.inject
 import com.gchristov.thecodinglove.common.kotlin.di.registerModules
-import com.gchristov.thecodinglove.common.kotlin.parseMainArgs
 import com.gchristov.thecodinglove.common.kotlin.process
 import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
 import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
@@ -20,25 +20,28 @@ import com.gchristov.thecodinglove.slackdata.SlackDataModule
 import com.gchristov.thecodinglove.statistics.adapter.StatisticsAdapterModule
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
 import com.gchristov.thecodinglove.statistics.domain.StatisticsDomainModule
+import com.gchristov.thecodinglove.statistics.domain.model.Environment
 
 suspend fun main() {
-    // Remove the first two default Node arguments
-    val args = parseMainArgs(process.argv.slice(2) as Array<String>)
-    val port = requireNotNull(args["-port"]) { "Port number not specified." }.first().toInt()
+    // Ignore default Node arguments
+    val environment = Environment.of(process.argv.slice(2) as Array<String>)
+    val tag = "StatisticsService"
 
-    setupDi()
+    setupDi(environment)
         .flatMap { setupMonitoring() }
-        .flatMap { setupService(port) }
+        .flatMap { setupService(environment.port) }
         .flatMap { startService(it) }
         .fold(ifLeft = { error ->
-            println("Error starting statistics-service${error.message?.let { ": $it" } ?: ""}")
+            val log = DiGraph.inject<Logger>()
+            log.debug(tag, "Error starting${error.message?.let { ": $it" } ?: ""}")
             error.printStackTrace()
         }, ifRight = {
-            // TODO: Add start-up metrics
+            val log = DiGraph.inject<Logger>()
+            log.debug(tag, "Started: environment=$environment")
         })
 }
 
-private fun setupDi(): Either<Throwable, Unit> {
+private fun setupDi(environment: Environment): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             CommonKotlinModule.module,
@@ -50,6 +53,7 @@ private fun setupDi(): Either<Throwable, Unit> {
             SlackDataModule.module,
             StatisticsDomainModule.module,
             StatisticsAdapterModule.module,
+            StatisticsServiceModule(environment).module,
         )
     )
     return Either.Right(Unit)

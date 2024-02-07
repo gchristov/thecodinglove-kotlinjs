@@ -2,7 +2,8 @@ package com.gchristov.thecodinglove.statistics.domain
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
-import com.gchristov.thecodinglove.statistics.domain.port.StatisticsReportSource
+import com.gchristov.thecodinglove.statistics.domain.port.SearchStatisticsRepository
+import com.gchristov.thecodinglove.statistics.domain.port.SlackStatisticsRepository
 import com.gchristov.thecodinglove.statistics.domain.usecase.RealStatisticsReportUseCase
 import com.gchristov.thecodinglove.statistics.domain.usecase.StatisticsReportUseCase
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +19,8 @@ object StatisticsDomainModule : DiModule() {
             bindProvider {
                 provideStatisticsReportUseCase(
                     log = instance(),
-                    statisticsReportSource = instance(),
+                    searchStatisticsRepository = instance(),
+                    slackStatisticsRepository = instance(),
                 )
             }
         }
@@ -26,10 +28,12 @@ object StatisticsDomainModule : DiModule() {
 
     private fun provideStatisticsReportUseCase(
         log: Logger,
-        statisticsReportSource: StatisticsReportSource,
+        searchStatisticsRepository: SearchStatisticsRepository,
+        slackStatisticsRepository: SlackStatisticsRepository,
     ): StatisticsReportUseCase = RealStatisticsReportUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
-        statisticsReportSource = statisticsReportSource,
+        searchStatisticsRepository = searchStatisticsRepository,
+        slackStatisticsRepository = slackStatisticsRepository,
     )
 }
