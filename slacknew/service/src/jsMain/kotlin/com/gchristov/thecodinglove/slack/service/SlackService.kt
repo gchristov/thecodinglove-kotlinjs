@@ -75,6 +75,7 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
         DiGraph.inject<SlackAuthHttpHandler>(),
         DiGraph.inject<SlackEventHttpHandler>(),
         DiGraph.inject<SlackSelfDestructHttpHandler>(),
+        DiGraph.inject<SlackStatisticsHttpHandler>(),
     )
     val service = DiGraph.inject<HttpService>()
     return service.initialise(

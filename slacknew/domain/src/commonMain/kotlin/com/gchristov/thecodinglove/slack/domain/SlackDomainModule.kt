@@ -72,6 +72,12 @@ object SlackDomainModule : DiModule() {
                     slackMessageFactory = instance(),
                 )
             }
+            bindProvider {
+                provideStatisticsUseCase(
+                    log = instance(),
+                    slackRepository = instance(),
+                )
+            }
         }
     }
 
@@ -158,5 +164,14 @@ object SlackDomainModule : DiModule() {
         searchSessionShuffle = searchSessionShuffle,
         slackRepository = slackRepository,
         slackMessageFactory = slackMessageFactory,
+    )
+
+    private fun provideStatisticsUseCase(
+        log: Logger,
+        slackRepository: SlackRepository,
+    ): SlackStatisticsUseCase = RealSlackStatisticsUseCase(
+        dispatcher = Dispatchers.Default,
+        log = log,
+        slackRepository = slackRepository,
     )
 }
