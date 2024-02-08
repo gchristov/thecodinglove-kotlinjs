@@ -4,20 +4,20 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiSlackPostMessageResponse(
+internal data class ApiSlackPostMessageResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("error") val error: String?,
     @SerialName("ts") val messageTs: String,
 )
 
 @Serializable
-data class ApiSlackReplyWithMessageResponse(
+internal data class ApiSlackReplyWithMessageResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("error") val error: String?,
 )
 
 @Serializable
-data class ApiSlackMessage(
+internal data class ApiSlackMessage(
     @SerialName("text") val text: String?,
     @SerialName("user_id") val userId: String?,
     @SerialName("channel") val channelId: String?,

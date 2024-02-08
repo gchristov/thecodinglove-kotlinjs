@@ -7,7 +7,7 @@ import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
 import io.ktor.util.*
 import kotlinx.serialization.encodeToString
 
-class RealSlackAuthStateSerializer(private val jsonSerializer: JsonSerializer) : SlackAuthStateSerializer {
+internal class RealSlackAuthStateSerializer(private val jsonSerializer: JsonSerializer) : SlackAuthStateSerializer {
     override fun serialize(authState: SlackAuthState): String {
         return jsonSerializer.json.encodeToString(authState.toAuthState()).encodeBase64()
     }

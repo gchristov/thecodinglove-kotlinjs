@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiStatisticsReport(
+internal data class ApiStatisticsReport(
     @SerialName("search_statistics") val searchStatistics: ApiSearchStatistics,
     @SerialName("slack_statistics") val slackStatistics: ApiSlackStatistics,
 ) {

@@ -7,8 +7,8 @@ import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.slack.adapter.db.DbSlackAuthToken
 import com.gchristov.thecodinglove.slack.adapter.db.DbSlackSelfDestructMessage
-import com.gchristov.thecodinglove.slack.adapter.db.toAuthToken
-import com.gchristov.thecodinglove.slack.adapter.db.toSelfDestructMessage
+import com.gchristov.thecodinglove.slack.adapter.db.mapper.toAuthToken
+import com.gchristov.thecodinglove.slack.adapter.db.mapper.toSelfDestructMessage
 import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toAuthToken
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackMessage
@@ -94,7 +94,7 @@ internal class RealSlackRepository(
         .set(
             jsonSerializer = jsonSerializer,
             strategy = DbSlackAuthToken.serializer(),
-            data = DbSlackAuthToken.of(token),
+            data = token.toAuthToken(),
             merge = true,
         )
 
@@ -188,7 +188,7 @@ internal class RealSlackRepository(
             .set(
                 jsonSerializer = jsonSerializer,
                 strategy = DbSlackSelfDestructMessage.serializer(),
-                data = DbSlackSelfDestructMessage.of(message),
+                data = message.toSelfDestructMessage(),
                 merge = true,
             )
 

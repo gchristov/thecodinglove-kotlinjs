@@ -8,7 +8,7 @@ import com.gchristov.thecodinglove.slack.domain.port.SearchSessionPostDto
 import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStateDto
 import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStorage
 
-class RealSearchSessionStorage(private val searchRepository: SearchRepository) : SearchSessionStorage {
+internal class RealSearchSessionStorage(private val searchRepository: SearchRepository) : SearchSessionStorage {
     override suspend fun deleteSearchSession(searchSessionId: String) =
         searchRepository.deleteSearchSession(searchSessionId)
 

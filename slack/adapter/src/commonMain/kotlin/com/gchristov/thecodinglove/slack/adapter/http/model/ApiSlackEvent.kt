@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class ApiSlackEvent {
+internal sealed class ApiSlackEvent {
     @Serializable
     @SerialName("url_verification")
     data class ApiUrlVerification(

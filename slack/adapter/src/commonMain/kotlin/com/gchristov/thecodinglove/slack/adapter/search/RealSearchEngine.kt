@@ -6,7 +6,7 @@ import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
 import com.gchristov.thecodinglove.slack.domain.port.SearchEngineDto
 
-class RealSearchEngine(private val searchUseCase: SearchUseCase) : SearchEngine {
+internal class RealSearchEngine(private val searchUseCase: SearchUseCase) : SearchEngine {
     override suspend fun search(query: String): Either<Throwable, SearchEngineDto> =
         search(SearchUseCase.Type.NewSession(query))
 

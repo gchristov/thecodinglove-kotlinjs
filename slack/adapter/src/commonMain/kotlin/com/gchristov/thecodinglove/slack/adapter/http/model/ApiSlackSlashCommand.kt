@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiSlackSlashCommand(
+internal data class ApiSlackSlashCommand(
     @SerialName("team_id") val teamId: String,
     @SerialName("team_domain") val teamDomain: String,
     @SerialName("channel_id") val channelId: String,

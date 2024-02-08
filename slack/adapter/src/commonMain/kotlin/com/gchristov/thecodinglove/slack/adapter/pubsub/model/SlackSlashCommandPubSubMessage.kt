@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.slack.adapter.pubsub.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SlackSlashCommandPubSubMessage(
+internal data class SlackSlashCommandPubSubMessage(
     val teamId: String,
     val teamDomain: String,
     val channelId: String,

@@ -14,7 +14,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Serializable
-data class ApiSlackInteractivity(
+internal data class ApiSlackInteractivity(
     @SerialName("payload") @Serializable(with = PayloadSerializer::class) val payload: ApiSlackInteractivityPayload,
 ) {
     @Serializable
