@@ -14,4 +14,4 @@ COPY /bin/. .
 # Step 3: Run binaries
 FROM npm AS run
 WORKDIR /app
-CMD exec node --enable-source-maps thecodinglove-kotlinjs-slacknew-service.js -port ${PORT} -apiUrl ${API_URL}
+CMD exec node --enable-source-maps thecodinglove-kotlinjs-slack-service.js -port ${PORT} -apiUrl ${API_URL}

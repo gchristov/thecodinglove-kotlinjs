@@ -9,7 +9,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.search)
-                implementation(projects.slack)
                 implementation(projects.htmlParseData)
             }
         }

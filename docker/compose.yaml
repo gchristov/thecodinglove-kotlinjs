@@ -20,8 +20,8 @@ services:
     environment:
       - PORT=8083
       - API_URL=http://host.docker.internal:8080/api
-  slacknew-service:
-    build: ../build/services/slacknew-service/.
+  slack-service:
+    build: ../build/services/slack-service/.
     ports:
       - "8084:8084"
     environment:
@@ -38,6 +38,6 @@ services:
       - STATISTICS_SERVICE_PATH=api/statistics
       - SELF_DESTRUCT_SERVICE_HOST=http://self-destruct-service:8083
       - SELF_DESTRUCT_SERVICE_PATH=api/self-destruct
-      - SLACK_SERVICE_HOST=http://slacknew-service:8084
+      - SLACK_SERVICE_HOST=http://slack-service:8084
       - SLACK_SERVICE_PATH=api/slack
       - SLACK_SERVICE_PUBSUB_PATH=api/pubsub/slack

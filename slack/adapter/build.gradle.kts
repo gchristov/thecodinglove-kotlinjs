@@ -14,7 +14,7 @@ kotlin {
                 implementation(projects.common.network)
                 implementation(projects.common.pubsub)
                 implementation(projects.common.firebase)
-                implementation(projects.slacknew.domain)
+                implementation(projects.slack.domain)
                 // TODO: Remove when migrated to microservice
                 implementation(projects.searchData)
             }

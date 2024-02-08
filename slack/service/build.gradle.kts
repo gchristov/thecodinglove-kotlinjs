@@ -8,8 +8,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.slacknew.domain)
-                implementation(projects.slacknew.adapter)
+                implementation(projects.slack.domain)
+                implementation(projects.slack.adapter)
                 // TODO: Update these once the services have been migrated to hexagonal architecture
                 implementation(projects.htmlParseData)
                 implementation(projects.searchData)

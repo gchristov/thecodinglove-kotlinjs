@@ -23,14 +23,6 @@ import com.gchristov.thecodinglove.search.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.SearchHttpHandler
 import com.gchristov.thecodinglove.search.SearchModule
 import com.gchristov.thecodinglove.searchdata.SearchDataModule
-import com.gchristov.thecodinglove.slack.SlackAuthHttpHandler
-import com.gchristov.thecodinglove.slack.SlackEventHttpHandler
-import com.gchristov.thecodinglove.slack.SlackModule
-import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityHttpHandler
-import com.gchristov.thecodinglove.slack.interactivity.SlackInteractivityPubSubHandler
-import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandHttpHandler
-import com.gchristov.thecodinglove.slack.slashcommand.SlackSlashCommandPubSubHandler
-import com.gchristov.thecodinglove.slackdata.SlackDataModule
 
 suspend fun main() {
     // Remove the first two default Node arguments
@@ -62,8 +54,6 @@ private fun setupDi(monitoringEnvironment: MonitoringEnvironment): Either<Throwa
             HtmlParseDataModule.module,
             SearchModule.module,
             SearchDataModule.module,
-            SlackModule.module,
-            SlackDataModule.module,
         )
     )
     return Either.Right(Unit)
@@ -80,12 +70,6 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
     val handlers = listOf(
         DiGraph.inject<SearchHttpHandler>(),
         DiGraph.inject<PreloadSearchPubSubHandler>(),
-        DiGraph.inject<SlackSlashCommandHttpHandler>(),
-        DiGraph.inject<SlackSlashCommandPubSubHandler>(),
-        DiGraph.inject<SlackInteractivityHttpHandler>(),
-        DiGraph.inject<SlackInteractivityPubSubHandler>(),
-        DiGraph.inject<SlackAuthHttpHandler>(),
-        DiGraph.inject<SlackEventHttpHandler>(),
     )
     val service = DiGraph.inject<HttpService>()
     return service.initialise(
