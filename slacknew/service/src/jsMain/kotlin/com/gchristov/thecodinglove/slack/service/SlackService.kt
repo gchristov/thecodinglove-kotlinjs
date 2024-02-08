@@ -5,13 +5,14 @@ import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
+import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
 import com.gchristov.thecodinglove.common.kotlin.di.inject
 import com.gchristov.thecodinglove.common.kotlin.di.registerModules
-import com.gchristov.thecodinglove.common.kotlin.parseMainArgs
 import com.gchristov.thecodinglove.common.kotlin.process
 import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
 import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
+import com.gchristov.thecodinglove.common.monitoring.domain.MonitoringEnvironment
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
@@ -22,31 +23,37 @@ import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slack.domain.SlackDomainModule
+import com.gchristov.thecodinglove.slack.domain.model.Environment
 
 suspend fun main() {
-    // Remove the first two default Node arguments
-    val args = parseMainArgs(process.argv.slice(2) as Array<String>)
-    val port = requireNotNull(args["-port"]) { "Port number not specified." }.first().toInt()
+    // Ignore default Node arguments
+    val environment = Environment.of(process.argv.slice(2) as Array<String>)
+    val monitoringEnvironment = MonitoringEnvironment.of(process.argv.slice(2) as Array<String>)
+    val tag = "SlackService"
 
-    setupDi()
+    setupDi(
+        monitoringEnvironment = monitoringEnvironment,
+    )
         .flatMap { setupMonitoring() }
-        .flatMap { setupService(port) }
+        .flatMap { setupService(environment.port) }
         .flatMap { startService(it) }
         .fold(ifLeft = { error ->
-            println("Error starting slack-service${error.message?.let { ": $it" } ?: ""}")
+            val log = DiGraph.inject<Logger>()
+            log.debug(tag, "Error starting${error.message?.let { ": $it" } ?: ""}")
             error.printStackTrace()
         }, ifRight = {
-            // TODO: Add start-up metrics
+            val log = DiGraph.inject<Logger>()
+            log.debug(tag, "Started: environment=$environment")
         })
 }
 
-private fun setupDi(): Either<Throwable, Unit> {
+private fun setupDi(monitoringEnvironment: MonitoringEnvironment): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonPubSubModule.module,
-            CommonMonitoringModule.module,
+            CommonMonitoringModule(monitoringEnvironment).module,
             CommonFirebaseModule.module,
             HtmlParseDataModule.module,
             SearchDataModule.module,

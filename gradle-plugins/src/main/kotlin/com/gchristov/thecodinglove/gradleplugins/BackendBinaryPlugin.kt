@@ -56,10 +56,9 @@ class BackendNestedServicePlugin : Plugin<Project> {
                     implementation(project(":common:firebase"))
                 }
                 sourceSets.maybeCreate("jsMain").dependencies {
-                    // Ideally these would be linked from corresponding submodules but that is currently
-                    // not supported out of the box or through the npm-publish plugin and causes "module
-                    // not found" errors. As a workaround, all NPM dependencies will be listed here,
-                    // making them available to all submodules.
+                    // Ideally these would be linked from corresponding submodules but that is currently not supported out
+                    // of the box or through the npm-publish plugin and causes "module not found" errors. As a workaround,
+                    // all NPM dependencies will be listed at the top level here.
                     implementation(npm(Deps.Google.pubSub.name, Deps.Google.pubSub.version))
                     implementation(npm(Deps.Node.express.name, Deps.Node.express.version))
                     implementation(npm(Deps.Google.firebaseAdmin.name, Deps.Google.firebaseAdmin.version))
@@ -92,10 +91,9 @@ class BackendBinaryPlugin2 : Plugin<Project> {
                     implementation(project(":common:firebase"))
                 }
                 sourceSets.maybeCreate("jsMain").dependencies {
-                    // Ideally these would be linked from corresponding submodules but that is currently
-                    // not supported out of the box or through the npm-publish plugin and causes "module
-                    // not found" errors. As a workaround, all NPM dependencies will be listed here,
-                    // making them available to all submodules.
+                    // Ideally these would be linked from corresponding submodules but that is currently not supported out
+                    // of the box or through the npm-publish plugin and causes "module not found" errors. As a workaround,
+                    // all NPM dependencies will be listed at the top level here.
                     implementation(npm(Deps.Google.pubSub.name, Deps.Google.pubSub.version))
                     implementation(npm(Deps.Node.express.name, Deps.Node.express.version))
                     implementation(npm(Deps.Google.firebaseAdmin.name, Deps.Google.firebaseAdmin.version))

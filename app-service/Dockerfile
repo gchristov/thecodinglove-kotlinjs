@@ -14,4 +14,4 @@ COPY /bin/. .
 # Step 3: Run binaries
 FROM npm AS run
 WORKDIR /app
-CMD exec node --enable-source-maps thecodinglove-kotlinjs-app-service.js -port ${PORT}
+CMD exec node --enable-source-maps thecodinglove-kotlinjs-app-service.js -port ${PORT} -apiUrl ${API_URL}

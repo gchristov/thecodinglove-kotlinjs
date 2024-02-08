@@ -12,10 +12,7 @@ import com.gchristov.thecodinglove.slack.adapter.db.toSelfDestructMessage
 import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toAuthToken
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackMessage
-import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackAuthResponse
-import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackDeleteMessageResponse
-import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackPostMessageResponse
-import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackReplyWithMessageResponse
+import com.gchristov.thecodinglove.slack.adapter.http.model.*
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthToken
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
@@ -166,8 +163,10 @@ internal class RealSlackRepository(
     ): Either<Throwable, Unit> = try {
         val slackResponse: ApiSlackDeleteMessageResponse = apiService.deleteMessage(
             authToken = authToken,
-            channelId = channelId,
-            messageTs = messageTs,
+            deleteMessage = ApiSlackDeleteMessage(
+                channelId = channelId,
+                messageTs = messageTs,
+            ),
         ).body()
         if (slackResponse.ok) {
             Either.Right(Unit)

@@ -12,6 +12,7 @@ import com.gchristov.thecodinglove.common.kotlin.di.registerModules
 import com.gchristov.thecodinglove.common.kotlin.process
 import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
 import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
+import com.gchristov.thecodinglove.common.monitoring.domain.MonitoringEnvironment
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.selfdestruct.adapter.SelfDestructAdapterModule
@@ -22,9 +23,13 @@ import com.gchristov.thecodinglove.selfdestruct.domain.model.Environment
 suspend fun main() {
     // Ignore default Node arguments
     val environment = Environment.of(process.argv.slice(2) as Array<String>)
+    val monitoringEnvironment = MonitoringEnvironment.of(process.argv.slice(2) as Array<String>)
     val tag = "SelfDestructService"
 
-    setupDi(environment)
+    setupDi(
+        environment = environment,
+        monitoringEnvironment = monitoringEnvironment,
+    )
         .flatMap { setupMonitoring() }
         .flatMap { setupService(environment.port) }
         .flatMap { startService(it) }
@@ -38,13 +43,16 @@ suspend fun main() {
         })
 }
 
-private fun setupDi(environment: Environment): Either<Throwable, Unit> {
+private fun setupDi(
+    environment: Environment,
+    monitoringEnvironment: MonitoringEnvironment,
+): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonFirebaseModule.module,
-            CommonMonitoringModule.module,
+            CommonMonitoringModule(monitoringEnvironment).module,
             SelfDestructAdapterModule.module,
             SelfDestructDomainModule.module,
             SelfDestructServiceModule(environment).module,

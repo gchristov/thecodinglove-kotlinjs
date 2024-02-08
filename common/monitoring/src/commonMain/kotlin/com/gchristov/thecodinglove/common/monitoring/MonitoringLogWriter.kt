@@ -1,15 +1,15 @@
 package com.gchristov.thecodinglove.common.monitoring
 
+import arrow.core.raise.either
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import com.gchristov.thecodinglove.common.monitoring.slack.SlackReportExceptionRepository
+import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 class MonitoringLogWriter(
     private val dispatcher: CoroutineDispatcher,
+    private val slackReportExceptionRepository: SlackReportExceptionRepository,
 ) : LogWriter(), CoroutineScope {
     private val job = Job()
 
@@ -29,30 +29,39 @@ class MonitoringLogWriter(
 
             Severity.Warn,
             Severity.Error,
-            Severity.Assert -> launch(dispatcher) {
-//                val attachment = throwable?.let {
-//                    ApiSlackMessageFactory.attachment(
-//                        text = it.stackTraceToString(),
-//                        color = "#D00000",
-//                    )
-//                }
-//                val slackMessage = ApiSlackMessageFactory.message(
-//                    text = message,
-//                    attachments = listOfNotNull(attachment),
-//                )
-//                slackRepository.postMessageToUrl(
-//                    url = slackConfig.monitoringUrl,
-//                    message = slackMessage,
-//                ).fold(
-//                    ifLeft = {
-//                        // The logger has already attempted to post to Slack but has failed, so just log the error locally.
-//                        it.printStackTrace()
-//                    },
-//                    ifRight = {
-//                        // No-op
-//                    }
-//                )
-            }
+            Severity.Assert -> reportException(message, throwable)
         }
     }
+
+    private fun reportException(
+        message: String,
+        throwable: Throwable?,
+    ) = launch(dispatcher) {
+        val stacktrace = throwable?.stackTraceToString() ?: "Missing stacktrace"
+        val slack = async {
+            reportToSlack(
+                message = message,
+                stacktrace = stacktrace,
+            )
+        }
+        either {
+            slack.await().bind()
+        }.fold(
+            ifLeft = {
+                // The logger has already attempted to post to Slack but has failed, so just log the error locally.
+                it.printStackTrace()
+            },
+            ifRight = {
+                // No-op
+            }
+        )
+    }
+
+    private suspend fun reportToSlack(
+        message: String,
+        stacktrace: String,
+    ) = slackReportExceptionRepository.reportException(
+        message = message,
+        stacktrace = stacktrace,
+    )
 }

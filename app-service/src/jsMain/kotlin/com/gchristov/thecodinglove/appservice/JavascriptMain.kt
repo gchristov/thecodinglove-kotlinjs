@@ -14,6 +14,7 @@ import com.gchristov.thecodinglove.common.kotlin.parseMainArgs
 import com.gchristov.thecodinglove.common.kotlin.process
 import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
 import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
+import com.gchristov.thecodinglove.common.monitoring.domain.MonitoringEnvironment
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
@@ -35,8 +36,9 @@ suspend fun main() {
     // Remove the first two default Node arguments
     val args = parseMainArgs(process.argv.slice(2) as Array<String>)
     val port = requireNotNull(args["-port"]) { "Port number not specified." }.first().toInt()
+    val monitoringEnvironment = MonitoringEnvironment.of(process.argv.slice(2) as Array<String>)
 
-    setupDi()
+    setupDi(monitoringEnvironment)
         .flatMap { setupMonitoring() }
         .flatMap { setupService(port) }
         .flatMap { startService(it) }
@@ -49,14 +51,14 @@ suspend fun main() {
         })
 }
 
-private fun setupDi(): Either<Throwable, Unit> {
+private fun setupDi(monitoringEnvironment: MonitoringEnvironment): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonPubSubModule.module,
             CommonFirebaseModule.module,
-            CommonMonitoringModule.module,
+            CommonMonitoringModule(monitoringEnvironment).module,
             HtmlParseDataModule.module,
             SearchModule.module,
             SearchDataModule.module,

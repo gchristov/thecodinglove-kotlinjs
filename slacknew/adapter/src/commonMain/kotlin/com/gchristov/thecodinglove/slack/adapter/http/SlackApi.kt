@@ -34,16 +34,10 @@ internal class SlackApi(private val client: NetworkClient.Json) {
 
     suspend fun deleteMessage(
         authToken: String,
-        channelId: String,
-        messageTs: String,
+        deleteMessage: ApiSlackDeleteMessage,
     ): HttpResponse = client.http.post("https://slack.com/api/chat.delete") {
         bearerAuth(authToken)
         contentType(ContentType.Application.Json)
-        setBody(
-            ApiSlackDeleteMessage(
-                channelId = channelId,
-                messageTs = messageTs,
-            )
-        )
+        setBody(deleteMessage)
     }
 }
