@@ -1,6 +1,10 @@
 FROM node:16-slim AS npm
 
 ARG PORT
+ARG API_URL
+# Args get wiped on multistage builds so we persist them in the environment
+ENV PORT=${PORT}
+ENV API_URL=${API_URL}
 
 WORKDIR /app
 

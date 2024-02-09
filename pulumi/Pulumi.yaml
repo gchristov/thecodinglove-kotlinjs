@@ -2,6 +2,9 @@ name: thecodinglove
 runtime: yaml
 description: Infrastructure as code for the app.
 
+variables:
+  domain: thecodinglove.crowdstandout.com
+
 resources:
 
   ########################################
@@ -146,6 +149,9 @@ resources:
     type: docker:Image
     properties:
       build:
+        args:
+          PORT: "8081"
+          API_URL: https://${domain}/api
         platform: linux/amd64
         context: ../build/services/app-service
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/app-service:latest
@@ -185,7 +191,7 @@ resources:
         maxInstanceRequestConcurrency: 80
         scaling:
           maxInstanceCount: 100
-          minInstanceCount: 1
+          minInstanceCount: 0
         timeout: 300s
       traffics:
         - percent: 100
@@ -224,6 +230,9 @@ resources:
     type: docker:Image
     properties:
       build:
+        args:
+          PORT: "8082"
+          API_URL: https://${domain}/api
         platform: linux/amd64
         context: ../build/services/statistics-service
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/statistics-service:latest
@@ -300,6 +309,9 @@ resources:
     type: docker:Image
     properties:
       build:
+        args:
+          PORT: "8083"
+          API_URL: https://${domain}/api
         platform: linux/amd64
         context: ../build/services/self-destruct-service
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/self-destruct-service:latest
@@ -368,6 +380,85 @@ resources:
       protect: true
 
   ########################################
+  # slack-service
+  ########################################
+
+  # Manages the binary.
+  slack-service-binary:
+    type: docker:Image
+    properties:
+      build:
+        args:
+          PORT: "8084"
+          API_URL: https://${domain}/api
+        platform: linux/amd64
+        context: ../build/services/slack-service
+      imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/slack-service:latest
+      registry:
+        server: ${artifact-registry.location}-docker.pkg.dev
+        username: _json_key
+        password:
+          fn::secret:
+            fn::readFile: credentials-gcp-infra.json
+    options:
+      protect: true
+  # Manages the Cloud Run service.
+  slack-service:
+    type: gcp:cloudrunv2:Service
+    properties:
+      ingress: INGRESS_TRAFFIC_ALL
+      location: ${artifact-registry.location}
+      name: slack-service
+      template:
+        containers:
+          - image: ${slack-service-binary.repoDigest}
+            ports:
+              - containerPort: 8084
+                name: http1
+            resources:
+              cpuIdle: true
+              limits:
+                cpu: 1000m
+                memory: 512Mi
+            startupProbe:
+              failureThreshold: 1
+              periodSeconds: 240
+              tcpSocket:
+                port: 8084
+              timeoutSeconds: 240
+        maxInstanceRequestConcurrency: 80
+        scaling:
+          maxInstanceCount: 100
+          minInstanceCount: 1
+        timeout: 300s
+      traffics:
+        - percent: 100
+          type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
+    options:
+      protect: true
+      dependsOn:
+        - ${cloud-run-admin-api}
+  # Manages the Cloud Run service policy.
+  slack-service-policy:
+    type: gcp:cloudrunv2:ServiceIamPolicy
+    properties:
+      name: ${slack-service.name}
+      location: ${slack-service.location}
+      policyData: |
+        {
+          "bindings": [
+            {
+              "role": "roles/run.invoker",
+              "members": [
+                "allUsers"
+              ]
+            }
+          ]
+        }
+    options:
+      protect: true
+
+  ########################################
   # landing-page-service
   ########################################
 
@@ -380,9 +471,12 @@ resources:
           APP_SERVICE_HOST: ${app-service.uri}
           APP_SERVICE_PATH: api
           STATISTICS_SERVICE_HOST: ${statistics-service.uri}
-          STATISTICS_SERVICE_PATH: api/stats
+          STATISTICS_SERVICE_PATH: api/statistics
           SELF_DESTRUCT_SERVICE_HOST: ${self-destruct-service.uri}
           SELF_DESTRUCT_SERVICE_PATH: api/self-destruct
+          SLACK_SERVICE_HOST: ${slack-service.uri}
+          SLACK_SERVICE_PATH: api/slack
+          SLACK_SERVICE_PUBSUB_PATH: api/pubsub/slack
         platform: linux/amd64
         context: ../build/services/landing-page-service
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/landing-page-service:latest
@@ -456,7 +550,7 @@ resources:
       location: ${landing-page-service.location}
       metadata:
         namespace: ${landing-page-service.project}
-      name: thecodinglove.crowdstandout.com
+      name: ${domain}
       spec:
         routeName: landing-page-service
     options:
