@@ -3,14 +3,18 @@ package com.gchristov.thecodinglove.statistics.adapter
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
+import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.searchdata.SearchRepository
-import com.gchristov.thecodinglove.slackdata.SlackRepository
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
-import com.gchristov.thecodinglove.statistics.core.ports.StatisticsReportSource
-import com.gchristov.thecodinglove.statistics.core.usecase.StatisticsReportUseCase
+import com.gchristov.thecodinglove.statistics.adapter.search.RealSearchStatisticsRepository
+import com.gchristov.thecodinglove.statistics.adapter.slack.RealSlackStatisticsRepository
+import com.gchristov.thecodinglove.statistics.adapter.slack.SlackStatisticsApi
+import com.gchristov.thecodinglove.statistics.domain.model.Environment
+import com.gchristov.thecodinglove.statistics.domain.port.SearchStatisticsRepository
+import com.gchristov.thecodinglove.statistics.domain.port.SlackStatisticsRepository
+import com.gchristov.thecodinglove.statistics.domain.usecase.StatisticsReportUseCase
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
@@ -26,10 +30,21 @@ object StatisticsAdapterModule : DiModule() {
                     statisticsReportUseCase = instance(),
                 )
             }
-            bindProvider {
-                provideStatisticsReportSource(
-                    slackRepository = instance(),
+            bindSingleton {
+                provideSlackStatisticsApi(
+                    networkClient = instance(),
+                    environment = instance(),
+                )
+            }
+            bindSingleton {
+                provideSearchStatisticsRepository(
+                    log = instance(),
                     searchRepository = instance(),
+                )
+            }
+            bindSingleton {
+                provideSlackStatisticsRepository(
+                    api = instance(),
                 )
             }
         }
@@ -46,11 +61,26 @@ object StatisticsAdapterModule : DiModule() {
         statisticsReportUseCase = statisticsReportUseCase,
     )
 
-    private fun provideStatisticsReportSource(
-        slackRepository: SlackRepository,
+    private fun provideSearchStatisticsRepository(
+        log: Logger,
         searchRepository: SearchRepository,
-    ): StatisticsReportSource = RealStatisticsReportSource(
-        slackRepository = slackRepository,
+    ): SearchStatisticsRepository = RealSearchStatisticsRepository(
+        dispatcher = Dispatchers.Default,
+        log = log,
         searchRepository = searchRepository,
+    )
+
+    private fun provideSlackStatisticsRepository(
+        api: SlackStatisticsApi,
+    ): SlackStatisticsRepository = RealSlackStatisticsRepository(
+        apiService = api,
+    )
+
+    private fun provideSlackStatisticsApi(
+        networkClient: NetworkClient.Json,
+        environment: Environment,
+    ): SlackStatisticsApi = SlackStatisticsApi(
+        client = networkClient,
+        environment = environment,
     )
 }

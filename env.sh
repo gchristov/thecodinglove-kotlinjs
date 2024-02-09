@@ -4,12 +4,12 @@ set -e
 echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
 echo "$GCP_SA_KEY_INFRA" >> ./pulumi/credentials-gcp-infra.json
 # slack-data
-echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack-data/env.properties
-echo SLACK_REQUEST_VERIFICATION_ENABLED="$SLACK_REQUEST_VERIFICATION_ENABLED" >> ./slack-data/env.properties
-echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack-data/env.properties
-echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack-data/env.properties
-echo SLACK_INTERACTIVITY_PUBSUB_TOPIC="$SLACK_INTERACTIVITY_PUBSUB_TOPIC" >> ./slack-data/env.properties
-echo SLACK_SLASH_COMMAND_PUBSUB_TOPIC="$SLACK_SLASH_COMMAND_PUBSUB_TOPIC" >> ./slack-data/env.properties
-echo SLACK_MONITORING_URL="$SLACK_MONITORING_URL" >> ./slack-data/env.properties
+echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/adapter/env.properties
+echo SLACK_REQUEST_VERIFICATION_ENABLED="$SLACK_REQUEST_VERIFICATION_ENABLED" >> ./slack/adapter/env.properties
+echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/adapter/env.properties
+echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack/adapter/env.properties
+echo SLACK_INTERACTIVITY_PUBSUB_TOPIC="$SLACK_INTERACTIVITY_PUBSUB_TOPIC" >> ./slack/adapter/env.properties
+echo SLACK_SLASH_COMMAND_PUBSUB_TOPIC="$SLACK_SLASH_COMMAND_PUBSUB_TOPIC" >> ./slack/adapter/env.properties
+echo SLACK_MONITORING_URL="$SLACK_MONITORING_URL" >> ./slack/adapter/env.properties
 # search-data
 echo SEARCH_PRELOAD_PUBSUB_TOPIC="$SEARCH_PRELOAD_PUBSUB_TOPIC" >> ./search-data/env.properties

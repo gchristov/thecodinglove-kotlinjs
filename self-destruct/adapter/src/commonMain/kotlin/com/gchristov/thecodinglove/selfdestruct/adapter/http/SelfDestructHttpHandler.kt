@@ -5,7 +5,7 @@ import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
-import com.gchristov.thecodinglove.slackdata.usecase.SlackSelfDestructUseCase
+import com.gchristov.thecodinglove.selfdestruct.domain.usecase.SelfDestructUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -13,7 +13,7 @@ class SelfDestructHttpHandler(
     dispatcher: CoroutineDispatcher,
     jsonSerializer: JsonSerializer,
     log: Logger,
-    private val slackSelfDestructUseCase: SlackSelfDestructUseCase,
+    private val selfDestructUseCase: SelfDestructUseCase,
 ) : BaseHttpHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
@@ -28,5 +28,5 @@ class SelfDestructHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = slackSelfDestructUseCase().flatMap { response.sendEmpty() }
+    ): Either<Throwable, Unit> = selfDestructUseCase().flatMap { response.sendEmpty() }
 }

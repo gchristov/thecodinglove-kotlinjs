@@ -1,33 +1,58 @@
 package com.gchristov.thecodinglove.common.monitoring
 
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
-import com.gchristov.thecodinglove.slackdata.SlackRepository
-import com.gchristov.thecodinglove.slackdata.domain.SlackConfig
+import com.gchristov.thecodinglove.common.monitoring.domain.MonitoringEnvironment
+import com.gchristov.thecodinglove.common.monitoring.slack.RealSlackReportExceptionRepository
+import com.gchristov.thecodinglove.common.monitoring.slack.SlackReportExceptionApi
+import com.gchristov.thecodinglove.common.monitoring.slack.SlackReportExceptionRepository
+import com.gchristov.thecodinglove.common.network.NetworkClient
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-object CommonMonitoringModule : DiModule() {
+data class CommonMonitoringModule(val environment: MonitoringEnvironment) : DiModule() {
     override fun name() = "common-monitoring"
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindSingleton {
+                provideSlackReportExceptionApi(
+                    networkClient = instance(),
+                    environment = environment,
+                )
+            }
+            bindSingleton {
+                provideSlackReportExceptionRepository(
+                    api = instance(),
+                )
+            }
+            bindSingleton {
                 provideMonitoringLogWriter(
-                    slackRepository = instance(),
-                    slackConfig = instance(),
+                    slackReportExceptionRepository = instance(),
                 )
             }
         }
     }
 
+    private fun provideSlackReportExceptionApi(
+        networkClient: NetworkClient.Json,
+        environment: MonitoringEnvironment,
+    ): SlackReportExceptionApi = SlackReportExceptionApi(
+        client = networkClient,
+        environment = environment,
+    )
+
+    private fun provideSlackReportExceptionRepository(
+        api: SlackReportExceptionApi,
+    ): SlackReportExceptionRepository = RealSlackReportExceptionRepository(
+        apiService = api,
+    )
+
     private fun provideMonitoringLogWriter(
-        slackRepository: SlackRepository,
-        slackConfig: SlackConfig,
+        slackReportExceptionRepository: SlackReportExceptionRepository,
     ): MonitoringLogWriter = MonitoringLogWriter(
         dispatcher = Dispatchers.Default,
-        slackRepository = slackRepository,
-        slackConfig = slackConfig,
+        slackReportExceptionRepository = slackReportExceptionRepository,
     )
 }

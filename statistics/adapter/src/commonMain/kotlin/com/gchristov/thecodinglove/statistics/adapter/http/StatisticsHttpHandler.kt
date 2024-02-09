@@ -5,7 +5,8 @@ import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
-import com.gchristov.thecodinglove.statistics.core.usecase.StatisticsReportUseCase
+import com.gchristov.thecodinglove.statistics.adapter.http.mapper.toStatisticsReport
+import com.gchristov.thecodinglove.statistics.domain.usecase.StatisticsReportUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -21,7 +22,7 @@ class StatisticsHttpHandler(
 ) {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Get,
-        path = "/api/stats",
+        path = "/api/statistics",
         contentType = ContentType.Application.Json,
     )
 
@@ -30,7 +31,7 @@ class StatisticsHttpHandler(
         response: HttpResponse,
     ): Either<Throwable, Unit> = statisticsReportUseCase().flatMap { report ->
         response.sendJson(
-            data = ApiStatisticsReport.of(report),
+            data = report.toStatisticsReport(),
             jsonSerializer = jsonSerializer,
         )
     }

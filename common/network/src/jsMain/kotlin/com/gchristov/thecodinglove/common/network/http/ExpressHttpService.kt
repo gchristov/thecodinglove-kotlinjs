@@ -53,7 +53,6 @@ internal class ExpressHttpService(
 
     override suspend fun start(): Either<Throwable, Unit> = try {
         app.listen(requireNotNull(port))
-        log.debug(tag, "Started on port $port")
         Either.Right(Unit)
     } catch (error: Throwable) {
         Either.Left(Throwable(

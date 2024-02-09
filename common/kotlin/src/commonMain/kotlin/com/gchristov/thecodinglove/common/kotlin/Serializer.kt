@@ -7,7 +7,7 @@ import kotlinx.serialization.json.Json
 sealed class JsonSerializer {
     abstract val json: Json
 
-    object Default : JsonSerializer() {
+    data object Default : JsonSerializer() {
         override val json: Json = Json {
             ignoreUnknownKeys = true
             encodeDefaults = true
@@ -15,7 +15,7 @@ sealed class JsonSerializer {
         }
     }
 
-    object ExplicitNulls : JsonSerializer() {
+    data object ExplicitNulls : JsonSerializer() {
         override val json: Json = Json {
             ignoreUnknownKeys = true
             encodeDefaults = true

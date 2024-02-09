@@ -5,18 +5,28 @@ services:
       - "8081:8081"
     environment:
       - PORT=8081
+      - API_URL=http://host.docker.internal:8080/api
   statistics-service:
     build: ../build/services/statistics-service/.
     ports:
       - "8082:8082"
     environment:
       - PORT=8082
+      - API_URL=http://host.docker.internal:8080/api
   self-destruct-service:
     build: ../build/services/self-destruct-service/.
     ports:
       - "8083:8083"
     environment:
       - PORT=8083
+      - API_URL=http://host.docker.internal:8080/api
+  slack-service:
+    build: ../build/services/slack-service/.
+    ports:
+      - "8084:8084"
+    environment:
+      - PORT=8084
+      - API_URL=http://host.docker.internal:8080/api
   landing-page-service:
     build: ../build/services/landing-page-service/.
     ports:
@@ -25,6 +35,9 @@ services:
       - APP_SERVICE_HOST=http://app-service:8081
       - APP_SERVICE_PATH=api
       - STATISTICS_SERVICE_HOST=http://statistics-service:8082
-      - STATISTICS_SERVICE_PATH=api/stats
+      - STATISTICS_SERVICE_PATH=api/statistics
       - SELF_DESTRUCT_SERVICE_HOST=http://self-destruct-service:8083
       - SELF_DESTRUCT_SERVICE_PATH=api/self-destruct
+      - SLACK_SERVICE_HOST=http://slack-service:8084
+      - SLACK_SERVICE_PATH=api/slack
+      - SLACK_SERVICE_PUBSUB_PATH=api/pubsub/slack
