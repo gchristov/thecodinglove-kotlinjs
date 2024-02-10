@@ -26,7 +26,7 @@ class RealSearchUseCaseTest {
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
             searchSession = null,
         ) { useCase, _, searchRepository, searchWithHistoryUseCase ->
-            useCase.invoke(searchType)
+            useCase.invoke(SearchUseCase.Dto(searchType))
             searchWithHistoryUseCase.assertInvokedOnce()
             searchRepository.assertSessionNotFetched()
         }
@@ -47,7 +47,7 @@ class RealSearchUseCaseTest {
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
             searchSession = searchSession,
         ) { useCase, _, searchRepository, searchWithHistoryUseCase ->
-            useCase.invoke(type = searchType)
+            useCase.invoke(SearchUseCase.Dto(searchType))
             searchWithHistoryUseCase.assertInvokedOnce()
             searchRepository.assertSessionFetched()
         }
@@ -70,7 +70,7 @@ class RealSearchUseCaseTest {
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
             searchSession = searchSession,
         ) { useCase, pubSub, searchRepository, searchWithHistoryUseCase ->
-            val actualResult = useCase.invoke(type = searchType)
+            val actualResult = useCase.invoke(SearchUseCase.Dto(searchType))
             searchWithHistoryUseCase.assertNotInvoked()
             searchRepository.assertSessionFetched()
             searchRepository.assertSessionSaved(
@@ -111,7 +111,7 @@ class RealSearchUseCaseTest {
             singleSearchWithHistoryInvocationResult = searchWithHistoryResult,
             searchSession = null,
         ) { useCase, pubSub, _, searchWithHistoryUseCase ->
-            val actualResult = useCase.invoke(searchType)
+            val actualResult = useCase.invoke(SearchUseCase.Dto(searchType))
             searchWithHistoryUseCase.assertInvokedOnce()
             assertEquals(
                 expected = searchWithHistoryResult,
@@ -138,7 +138,7 @@ class RealSearchUseCaseTest {
             multiSearchWithHistoryInvocationResults = searchWithHistoryResults,
             searchSession = searchSession,
         ) { useCase, _, searchRepository, searchWithHistoryUseCase ->
-            useCase.invoke(searchType)
+            useCase.invoke(SearchUseCase.Dto(searchType))
             searchWithHistoryUseCase.assertInvokedTwice()
             searchRepository.assertSessionSaved(
                 SearchSession(
@@ -175,7 +175,7 @@ class RealSearchUseCaseTest {
             singleSearchWithHistoryInvocationResult = Either.Right(searchWithHistoryResult),
             searchSession = searchSession,
         ) { useCase, pubSub, searchRepository, searchWithHistoryUseCase ->
-            val actualResult = useCase.invoke(searchType)
+            val actualResult = useCase.invoke(SearchUseCase.Dto(searchType))
             searchWithHistoryUseCase.assertInvokedOnce()
             assertEquals(
                 expected = Either.Right(expectedSearchResult),

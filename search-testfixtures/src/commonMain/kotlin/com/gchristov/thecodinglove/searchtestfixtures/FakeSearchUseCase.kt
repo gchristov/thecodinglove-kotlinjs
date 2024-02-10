@@ -15,9 +15,9 @@ class FakeSearchUseCase(
     private var lastType: SearchUseCase.Type? = null
 
     override suspend fun invoke(
-        type: SearchUseCase.Type
+        dto: SearchUseCase.Dto
     ): Either<SearchError, SearchUseCase.Result> {
-        lastType = type
+        lastType = dto.type
         invocations++
         return searchResponse.execute(invocationResult)
     }

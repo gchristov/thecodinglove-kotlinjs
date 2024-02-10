@@ -30,7 +30,7 @@ class SearchHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = searchUseCase(request.toSearchType())
+    ): Either<Throwable, Unit> = searchUseCase(SearchUseCase.Dto(request.toSearchType()))
         .flatMap { searchResult ->
             response.sendJson(
                 data = searchResult.toSearchResult(),

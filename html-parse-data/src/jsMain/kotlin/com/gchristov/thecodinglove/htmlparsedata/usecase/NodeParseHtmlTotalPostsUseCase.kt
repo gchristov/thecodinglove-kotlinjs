@@ -8,9 +8,9 @@ import kotlinx.coroutines.withContext
 internal class NodeParseHtmlTotalPostsUseCase(
     private val dispatcher: CoroutineDispatcher,
 ) : ParseHtmlTotalPostsUseCase {
-    override suspend fun invoke(html: String): Either<Throwable, Int> = withContext(dispatcher) {
+    override suspend fun invoke(dto: ParseHtmlTotalPostsUseCase.Dto): Either<Throwable, Int> = withContext(dispatcher) {
         try {
-            val root = acquireRootNode(html)
+            val root = acquireRootNode(dto.html)
             val resultsCountNode = root.querySelectorAll(TotalPostsSelector)[0]
             val count = (resultsCountNode.text as? String)?.toInt() ?: 0
             Either.Right(count)

@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 interface SearchUseCase {
-    suspend operator fun invoke(type: Type): Either<SearchError, Result>
+    suspend operator fun invoke(dto: Dto): Either<SearchError, Result>
 
     sealed class Type {
         data class WithSessionId(val sessionId: String) : Type()
@@ -24,6 +24,8 @@ interface SearchUseCase {
         val post: Post,
         val totalPosts: Int
     )
+
+    data class Dto(val type: Type)
 }
 
 internal class RealSearchUseCase(
@@ -35,9 +37,9 @@ internal class RealSearchUseCase(
     private val searchConfig: SearchConfig,
 ) : SearchUseCase {
     override suspend operator fun invoke(
-        type: SearchUseCase.Type
+        dto: SearchUseCase.Dto
     ): Either<SearchError, SearchUseCase.Result> = withContext(dispatcher) {
-        search(type)
+        search(dto.type)
             .flatMap { searchResult ->
                 publishSearchPreloadMessage(
                     searchSessionId = searchResult.searchSessionId,
@@ -70,9 +72,11 @@ internal class RealSearchUseCase(
             } else {
                 // Else, run normal search
                 searchWithHistoryUseCase(
-                    query = searchSession.query,
-                    totalPosts = searchSession.totalPosts,
-                    searchHistory = searchSession.searchHistory,
+                    SearchWithHistoryUseCase.Dto(
+                        query = searchSession.query,
+                        totalPosts = searchSession.totalPosts,
+                        searchHistory = searchSession.searchHistory,
+                    )
                 ).fold(
                     ifLeft = { searchError ->
                         when (searchError) {
@@ -80,7 +84,7 @@ internal class RealSearchUseCase(
                                 searchSession
                                     .clearExhaustedHistory(searchRepository)
                                     .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
-                                    .flatMap { invoke(type = type) }
+                                    .flatMap { invoke(SearchUseCase.Dto(type)) }
                             }
 
                             else -> Either.Left(searchError)

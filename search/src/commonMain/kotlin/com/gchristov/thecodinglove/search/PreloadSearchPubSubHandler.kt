@@ -42,7 +42,7 @@ class PreloadSearchPubSubHandler(
             strategy = PreloadSearchPubSubMessage.serializer(),
         )
             .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
-            .flatMap { preloadSearchResultUseCase(searchSessionId = it.searchSessionId) }
+            .flatMap { preloadSearchResultUseCase(PreloadSearchResultUseCase.Dto(searchSessionId = it.searchSessionId)) }
             .fold(
                 ifLeft = {
                     // Swallow but report the error, so that we can investigate. Preload errors should not retry if the

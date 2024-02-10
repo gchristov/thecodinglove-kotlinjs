@@ -14,8 +14,8 @@ class FakePreloadSearchResultUseCase(
     private var invocations = 0
     private var lastSearchSessionId: String? = null
 
-    override suspend fun invoke(searchSessionId: String): Either<SearchError, Unit> {
-        lastSearchSessionId = searchSessionId
+    override suspend fun invoke(dto: PreloadSearchResultUseCase.Dto): Either<SearchError, Unit> {
+        lastSearchSessionId = dto.searchSessionId
         invocations++
         return searchResponse.execute(invocationResult)
     }
