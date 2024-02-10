@@ -11,11 +11,7 @@ import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 interface SearchWithHistoryUseCase {
-    suspend operator fun invoke(
-        query: String,
-        totalPosts: Int? = null,
-        searchHistory: Map<Int, List<Int>>,
-    ): Either<SearchError, Result>
+    suspend operator fun invoke(dto: Dto): Either<SearchError, Result>
 
     data class Result(
         val query: String,
@@ -25,6 +21,12 @@ interface SearchWithHistoryUseCase {
         val postIndexOnPage: Int,
         val postPageSize: Int
     )
+
+    data class Dto(
+        val query: String,
+        val totalPosts: Int? = null,
+        val searchHistory: Map<Int, List<Int>>,
+    )
 }
 
 internal class RealSearchWithHistoryUseCase(
@@ -33,44 +35,42 @@ internal class RealSearchWithHistoryUseCase(
     private val searchConfig: SearchConfig
 ) : SearchWithHistoryUseCase {
     override suspend operator fun invoke(
-        query: String,
-        totalPosts: Int?,
-        searchHistory: Map<Int, List<Int>>,
+        dto: SearchWithHistoryUseCase.Dto
     ): Either<SearchError, SearchWithHistoryUseCase.Result> = withContext(dispatcher) {
         // Find total number of posts
-        (totalPosts?.let { Either.Right(it) } ?: searchRepository.getTotalPosts(query))
+        (dto.totalPosts?.let { Either.Right(it) } ?: searchRepository.getTotalPosts(dto.query))
             .mapLeft { SearchError.Empty(additionalInfo = it.message) }
             .flatMap { totalResults ->
                 if (totalResults <= 0) {
-                    return@withContext Either.Left(SearchError.Empty(additionalInfo = "query=$query"))
+                    return@withContext Either.Left(SearchError.Empty(additionalInfo = "query=${dto.query}"))
                 }
                 // Generate random page number
                 Random.nextRandomPage(
                     totalResults = totalResults,
                     resultsPerPage = searchConfig.postsPerPage,
-                    exclusions = searchHistory.getExcludedPages()
+                    exclusions = dto.searchHistory.getExcludedPages()
                 )
-                    .mapLeft { it.toSearchError(query) }
+                    .mapLeft { it.toSearchError(dto.query) }
                     .flatMap { postPage ->
                         // Get all posts on the random page
                         searchRepository.search(
                             page = postPage,
-                            query = query
+                            query = dto.query
                         )
                             .mapLeft { SearchError.Empty(additionalInfo = it.message) }
                             .flatMap { searchResults ->
                                 if (searchResults.isEmpty()) {
-                                    return@withContext Either.Left(SearchError.Empty(additionalInfo = "query=$query"))
+                                    return@withContext Either.Left(SearchError.Empty(additionalInfo = "query=${dto.query}"))
                                 }
                                 // Pick a post randomly from the page
                                 Random.nextRandomPostIndex(
                                     posts = searchResults,
-                                    exclusions = searchHistory.getExcludedPostIndexes(postPage)
+                                    exclusions = dto.searchHistory.getExcludedPostIndexes(postPage)
                                 )
-                                    .mapLeft { it.toSearchError(query) }
+                                    .mapLeft { it.toSearchError(dto.query) }
                                     .map { postIndexOnPage ->
                                         SearchWithHistoryUseCase.Result(
-                                            query = query,
+                                            query = dto.query,
                                             totalPosts = totalResults,
                                             post = searchResults[postIndexOnPage],
                                             postPage = postPage,

@@ -12,7 +12,7 @@ internal class RealSearchEngine(private val searchUseCase: SearchUseCase) : Sear
 
     override suspend fun shuffle(searchSessionId: String) = search(SearchUseCase.Type.WithSessionId(searchSessionId))
 
-    private suspend fun search(type: SearchUseCase.Type) = searchUseCase(type).flatMap {
+    private suspend fun search(type: SearchUseCase.Type) = searchUseCase(SearchUseCase.Dto(type)).flatMap {
         Either.Right(
             SearchEngineDto(
                 searchSessionId = it.searchSessionId,

@@ -9,11 +9,11 @@ import kotlinx.coroutines.withContext
 internal class NodeParseHtmlPostsUseCase(
     private val dispatcher: CoroutineDispatcher,
 ) : ParseHtmlPostsUseCase {
-    override suspend operator fun invoke(html: String): Either<Throwable, List<HtmlPost>> =
+    override suspend operator fun invoke(dto: ParseHtmlPostsUseCase.Dto): Either<Throwable, List<HtmlPost>> =
         withContext(dispatcher) {
             try {
                 val posts = mutableListOf<HtmlPost>()
-                val root = acquireRootNode(html)
+                val root = acquireRootNode(dto.html)
                 val postNodes = root.querySelectorAll(PostSelector)
                 val numPosts = postNodes.length as Int
                 for (i in 0 until numPosts) {

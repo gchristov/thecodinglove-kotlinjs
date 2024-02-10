@@ -16,9 +16,7 @@ class FakeSearchWithHistoryUseCase(
     private var invocations = 0
 
     override suspend fun invoke(
-        query: String,
-        totalPosts: Int?,
-        searchHistory: Map<Int, List<Int>>,
+        dto: SearchWithHistoryUseCase.Dto
     ): Either<SearchError, SearchWithHistoryUseCase.Result> =
         searchResponse.execute(invocationResults[invocations++])
 

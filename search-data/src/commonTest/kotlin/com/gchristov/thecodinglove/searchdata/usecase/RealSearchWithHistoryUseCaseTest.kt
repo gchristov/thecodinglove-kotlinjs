@@ -25,8 +25,10 @@ class RealSearchWithHistoryUseCaseTest {
             pages = pages
         ) {
             val actualResult = it.invoke(
-                query = TestSearchQuery,
-                searchHistory = mutableMapOf(),
+                SearchWithHistoryUseCase.Dto(
+                    query = TestSearchQuery,
+                    searchHistory = mutableMapOf(),
+                )
             )
             assertEquals(
                 expected = Either.Left(SearchError.Empty(additionalInfo = "query=$TestSearchQuery")),
@@ -45,8 +47,10 @@ class RealSearchWithHistoryUseCaseTest {
             pages = pages
         ) {
             val actualResult = it.invoke(
-                query = TestSearchQuery,
-                searchHistory = mutableMapOf(),
+                SearchWithHistoryUseCase.Dto(
+                    query = TestSearchQuery,
+                    searchHistory = mutableMapOf(),
+                )
             )
             assertEquals(
                 expected = Either.Left(SearchError.Empty(additionalInfo = "query=$TestSearchQuery")),
@@ -65,8 +69,10 @@ class RealSearchWithHistoryUseCaseTest {
             pages = pages
         ) {
             val actualResult = it.invoke(
-                query = TestSearchQuery,
-                searchHistory = mutableMapOf(),
+                SearchWithHistoryUseCase.Dto(
+                    query = TestSearchQuery,
+                    searchHistory = mutableMapOf(),
+                )
             )
             assertEquals(
                 expected = Either.Right(
@@ -101,8 +107,10 @@ class RealSearchWithHistoryUseCaseTest {
 
             for (i in 0 until totalPosts) {
                 val actualResult = (it.invoke(
-                    query = TestSearchQuery,
-                    searchHistory = searchHistory,
+                    SearchWithHistoryUseCase.Dto(
+                        query = TestSearchQuery,
+                        searchHistory = searchHistory,
+                    )
                 ) as Either.Right).value
                 // Ensure post isn't already picked
                 assertFalse {
@@ -136,8 +144,10 @@ class RealSearchWithHistoryUseCaseTest {
 
             for (i in 0 until totalPosts) {
                 val actualResult = (it.invoke(
-                    query = TestSearchQuery,
-                    searchHistory = searchHistory,
+                    SearchWithHistoryUseCase.Dto(
+                        query = TestSearchQuery,
+                        searchHistory = searchHistory,
+                    )
                 ) as Either.Right).value
                 searchHistory.insert(
                     postPage = actualResult.postPage,
@@ -157,8 +167,10 @@ class RealSearchWithHistoryUseCaseTest {
             }
             // If all options are exhausted we shouldn't be able to search for an element
             val actualResult = it.invoke(
-                query = TestSearchQuery,
-                searchHistory = searchHistory,
+                SearchWithHistoryUseCase.Dto(
+                    query = TestSearchQuery,
+                    searchHistory = searchHistory,
+                )
             )
             assertTrue { actualResult == Either.Left(SearchError.Exhausted(additionalInfo = "query=$TestSearchQuery")) }
         }

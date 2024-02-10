@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 class NodeParseHtmlPostsUseCaseTest {
     @Test
     fun parsePosts() = runBlockingTest { parser ->
-        val actualPosts = parser(HtmlCreator.defaultHtml())
+        val actualPosts = parser(ParseHtmlPostsUseCase.Dto(HtmlCreator.defaultHtml()))
         assertEquals(
             expected = Either.Right(TestActualPostList),
             actual = actualPosts
@@ -20,7 +20,7 @@ class NodeParseHtmlPostsUseCaseTest {
 
     @Test
     fun parseInvalidPosts() = runBlockingTest { parser ->
-        val actualPosts = parser(HtmlCreator.invalidHtml())
+        val actualPosts = parser(ParseHtmlPostsUseCase.Dto(HtmlCreator.invalidHtml()))
         assertEquals(
             expected = Either.Right(emptyList()),
             actual = actualPosts

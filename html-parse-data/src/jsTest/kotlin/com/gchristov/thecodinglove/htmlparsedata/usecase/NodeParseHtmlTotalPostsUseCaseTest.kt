@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 class NodeParseHtmlTotalPostsUseCaseTest {
     @Test
     fun parseTotalPosts() = runBlockingTest { parser ->
-        val actualCount = parser(HtmlCreator.defaultHtml())
+        val actualCount = parser(ParseHtmlTotalPostsUseCase.Dto(HtmlCreator.defaultHtml()))
         assertEquals(
             expected = Either.Right(314),
             actual = actualCount
@@ -20,7 +20,7 @@ class NodeParseHtmlTotalPostsUseCaseTest {
 
     @Test
     fun parseInvalidTotalPosts() = runBlockingTest { parser ->
-        val actualCount = parser(HtmlCreator.invalidResultsCountHtml())
+        val actualCount = parser(ParseHtmlTotalPostsUseCase.Dto(HtmlCreator.invalidResultsCountHtml()))
         assertTrue { actualCount.isLeft() }
     }
 

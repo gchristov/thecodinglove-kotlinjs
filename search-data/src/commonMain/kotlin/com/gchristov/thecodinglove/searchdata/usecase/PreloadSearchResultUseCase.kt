@@ -9,7 +9,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 interface PreloadSearchResultUseCase {
-    suspend operator fun invoke(searchSessionId: String) : Either<SearchError, Unit>
+    suspend operator fun invoke(dto: Dto): Either<SearchError, Unit>
+
+    data class Dto(val searchSessionId: String)
 }
 
 internal class RealPreloadSearchResultUseCase(
@@ -18,16 +20,18 @@ internal class RealPreloadSearchResultUseCase(
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
 ) : PreloadSearchResultUseCase {
     override suspend operator fun invoke(
-        searchSessionId: String
+        dto: PreloadSearchResultUseCase.Dto
     ): Either<SearchError, Unit> = withContext(dispatcher) {
         searchRepository
-            .getSearchSession(searchSessionId)
+            .getSearchSession(dto.searchSessionId)
             .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
             .flatMap { searchSession ->
                 searchWithHistoryUseCase(
-                    query = searchSession.query,
-                    totalPosts = searchSession.totalPosts,
-                    searchHistory = searchSession.searchHistory,
+                    SearchWithHistoryUseCase.Dto(
+                        query = searchSession.query,
+                        totalPosts = searchSession.totalPosts,
+                        searchHistory = searchSession.searchHistory,
+                    )
                 ).fold(
                     ifLeft = { searchError ->
                         when (searchError) {

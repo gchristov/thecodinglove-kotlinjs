@@ -42,7 +42,7 @@ internal class RealSearchRepository(
             page = 1,
             query = query
         ).bodyAsText()
-        parseHtmlTotalPostsUseCase(responseHtml)
+        parseHtmlTotalPostsUseCase(ParseHtmlTotalPostsUseCase.Dto(responseHtml))
     } catch (error: Throwable) {
         Either.Left(Throwable(
             message = "Error during finding total posts${error.message?.let { ": $it" } ?: ""}",
@@ -58,7 +58,7 @@ internal class RealSearchRepository(
             page = page,
             query = query
         ).bodyAsText()
-        parseHtmlPostsUseCase(responseHtml).map { posts -> posts.map { it.toPost() } }
+        parseHtmlPostsUseCase(ParseHtmlPostsUseCase.Dto(responseHtml)).map { posts -> posts.map { it.toPost() } }
     } catch (error: Throwable) {
         Either.Left(Throwable(
             message = "Error during search${error.message?.let { ": $it" } ?: ""}",
