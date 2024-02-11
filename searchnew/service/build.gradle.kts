@@ -8,6 +8,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(projects.common.firebase)
                 implementation(projects.searchnew.domain)
                 implementation(projects.searchnew.adapter)
             }

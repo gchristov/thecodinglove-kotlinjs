@@ -8,6 +8,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(projects.common.firebase)
                 implementation(projects.slack.domain)
                 implementation(projects.slack.adapter)
                 // TODO: Update these once the services have been migrated to hexagonal architecture

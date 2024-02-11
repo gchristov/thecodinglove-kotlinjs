@@ -19,7 +19,7 @@ import kotlin.test.assertTrue
 
 class PreloadSearchPubSubHttpHandlerTest {
     @Test
-    fun httpConfig(): TestResult = runBlockingTest(
+    fun config(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = null,
         preloadSearchResultInvocationResult = Either.Left(SearchError.Empty()),
     ) { handler, _, _ ->
@@ -30,7 +30,7 @@ class PreloadSearchPubSubHttpHandlerTest {
     }
 
     @Test
-    fun handleRequestSuccess(): TestResult = runBlockingTest(
+    fun handleRequestSuccessPreloads(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = PreloadSearchPubSubCreator.defaultMessage(),
         preloadSearchResultInvocationResult = Either.Right(Unit)
     ) { handler, preloadUseCase, request ->
@@ -41,7 +41,7 @@ class PreloadSearchPubSubHttpHandlerTest {
     }
 
     @Test
-    fun handleRequestParseError(): TestResult = runBlockingTest(
+    fun handleRequestParseErrorDoesNotPreload(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = null,
         preloadSearchResultInvocationResult = Either.Left(SearchError.Empty())
     ) { handler, preloadUseCase, request ->
@@ -51,7 +51,7 @@ class PreloadSearchPubSubHttpHandlerTest {
     }
 
     @Test
-    fun handleRequestSearchError(): TestResult = runBlockingTest(
+    fun handleRequestSearchErrorPreloads(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = PreloadSearchPubSubCreator.defaultMessage(),
         preloadSearchResultInvocationResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
     ) { handler, preloadUseCase, request ->

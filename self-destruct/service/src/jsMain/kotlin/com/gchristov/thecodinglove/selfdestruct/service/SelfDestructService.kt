@@ -3,7 +3,6 @@ package com.gchristov.thecodinglove.selfdestruct.service
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
@@ -51,7 +50,6 @@ private fun setupDi(
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
-            CommonFirebaseModule.module,
             CommonMonitoringModule(monitoringEnvironment).module,
             SelfDestructAdapterModule.module,
             SelfDestructDomainModule.module,
