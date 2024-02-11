@@ -1,5 +1,4 @@
 includeBuild("gradle-plugins")
-include("app-service")
 include("common")
 include("common:pubsub")
 include("common:pubsub-testfixtures")
