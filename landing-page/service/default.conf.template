@@ -19,9 +19,12 @@ server {
       proxy_pass ${SLACK_SERVICE_HOST}/${SLACK_SERVICE_PUBSUB_PATH};
       proxy_ssl_server_name on;
   }
-  # Keep this last as the monolith service handles a few api/ paths.
-  location /${APP_SERVICE_PATH} {
-    proxy_pass ${APP_SERVICE_HOST}/${APP_SERVICE_PATH};
+  location /${SEARCH_SERVICE_PATH} {
+    proxy_pass ${SEARCH_SERVICE_HOST}/${SEARCH_SERVICE_PATH};
+    proxy_ssl_server_name on;
+  }
+  location /${SEARCH_SERVICE_PUBSUB_PATH} {
+    proxy_pass ${SEARCH_SERVICE_HOST}/${SEARCH_SERVICE_PUBSUB_PATH};
     proxy_ssl_server_name on;
   }
 

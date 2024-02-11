@@ -2,8 +2,10 @@ package com.gchristov.thecodinglove.search.service
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
+import com.gchristov.thecodinglove.common.firebase.firestore.FirestoreMigration
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
@@ -34,6 +36,7 @@ suspend fun main() {
         .flatMap { setupMonitoring() }
         .flatMap { setupService(environment.port) }
         .flatMap { startService(it) }
+        .flatMap { runDatabaseMigrations() }
         .fold(ifLeft = { error ->
             val log = DiGraph.inject<Logger>()
             log.debug(tag, "Error starting${error.message?.let { ": $it" } ?: ""}")
@@ -81,3 +84,10 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
 private suspend fun startService(service: HttpService): Either<Throwable, Unit> = service
     .start()
     .flatMap { Either.Right(Unit) }
+
+private suspend fun runDatabaseMigrations(): Either<Throwable, Unit> {
+    val migrations = DiGraph.inject<List<FirestoreMigration>>()
+    return migrations
+        .map { it.invoke() }
+        .let { l -> either { l.bindAll() } }
+}
