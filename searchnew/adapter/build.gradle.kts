@@ -17,6 +17,13 @@ kotlin {
                 implementation(projects.searchnew.domain)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(projects.common.networkTestfixtures)
+                implementation(projects.common.pubsubTestfixtures)
+                implementation(projects.searchnew.testFixtures)
+            }
+        }
     }
 }
 

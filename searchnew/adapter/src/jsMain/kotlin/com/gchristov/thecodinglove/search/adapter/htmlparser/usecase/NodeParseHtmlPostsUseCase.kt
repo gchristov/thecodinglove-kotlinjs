@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.htmlparsedata.usecase
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.kotlin.requireModule
 import com.gchristov.thecodinglove.search.adapter.htmlparser.model.HtmlPost
+import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 

@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.htmlparsedata.usecase
+package com.gchristov.thecodinglove.search.adapter.htmlparser.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.search.adapter.htmlparser.model.HtmlPost

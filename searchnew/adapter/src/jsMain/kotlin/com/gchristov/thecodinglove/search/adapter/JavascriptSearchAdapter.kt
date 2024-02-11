@@ -2,8 +2,8 @@ package com.gchristov.thecodinglove.search.adapter
 
 import com.gchristov.thecodinglove.htmlparsedata.usecase.NodeParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.htmlparsedata.usecase.NodeParseHtmlTotalPostsUseCase
-import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
-import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
+import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
+import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
 import kotlinx.coroutines.Dispatchers
 
 actual fun provideParseHtmlTotalPostsUseCase(): ParseHtmlTotalPostsUseCase = NodeParseHtmlTotalPostsUseCase(

@@ -6,8 +6,8 @@ import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
-import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlPostsUseCase
-import com.gchristov.thecodinglove.htmlparsedata.usecase.ParseHtmlTotalPostsUseCase
+import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
+import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.http.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.adapter.http.SearchApi
 import com.gchristov.thecodinglove.search.adapter.http.SearchHttpHandler
