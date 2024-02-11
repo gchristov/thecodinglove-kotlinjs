@@ -6,6 +6,7 @@ import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
+import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.http.PreloadSearchPubSubHandler
@@ -44,6 +45,8 @@ object SearchAdapterModule : DiModule() {
                     jsonSerializer = instance(),
                     log = instance(),
                     searchUseCase = instance(),
+                    pubSubPublisher = instance(),
+                    searchConfig = instance(),
                 )
             }
             bindSingleton {
@@ -82,11 +85,15 @@ object SearchAdapterModule : DiModule() {
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         searchUseCase: SearchUseCase,
+        pubSubPublisher: PubSubPublisher,
+        searchConfig: SearchConfig,
     ): SearchHttpHandler = SearchHttpHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         searchUseCase = searchUseCase,
+        pubSubPublisher = pubSubPublisher,
+        searchConfig = searchConfig,
     )
 
     private fun providePreloadSearchPubSubHttpHandler(
