@@ -32,6 +32,7 @@ suspend fun main() {
     val tag = "SlackService"
 
     setupDi(
+        environment = environment,
         monitoringEnvironment = monitoringEnvironment,
     )
         .flatMap { setupMonitoring() }
@@ -47,7 +48,10 @@ suspend fun main() {
         })
 }
 
-private fun setupDi(monitoringEnvironment: MonitoringEnvironment): Either<Throwable, Unit> {
+private fun setupDi(
+    environment: Environment,
+    monitoringEnvironment: MonitoringEnvironment
+): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             CommonKotlinModule.module,
@@ -59,6 +63,7 @@ private fun setupDi(monitoringEnvironment: MonitoringEnvironment): Either<Throwa
             SearchDataModule.module,
             SlackDomainModule.module,
             SlackAdapterModule.module,
+            SlackServiceModule(environment).module,
         )
     )
     return Either.Right(Unit)

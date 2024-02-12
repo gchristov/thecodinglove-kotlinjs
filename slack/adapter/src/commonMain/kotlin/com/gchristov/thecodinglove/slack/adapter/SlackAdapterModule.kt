@@ -7,14 +7,15 @@ import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
-import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchEngine
 import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionStorage
+import com.gchristov.thecodinglove.slack.adapter.search.SearchApi
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
+import com.gchristov.thecodinglove.slack.domain.model.Environment
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
 import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStorage
@@ -41,11 +42,17 @@ object SlackAdapterModule : DiModule() {
                     jsonSerializer = instance(),
                 )
             }
+            bindSingleton {
+                provideSearchApi(
+                    networkClient = instance(),
+                    environment = instance(),
+                )
+            }
             bindProvider {
                 provideSlackAuthStateSerializer(jsonSerializer = instance())
             }
             bindSingleton {
-                provideSearchSessionStorage(searchRepository = instance())
+                provideSearchSessionStorage(searchApi = instance())
             }
             bindProvider {
                 provideSearchSessionShuffle(searchUseCase = instance())
@@ -155,8 +162,8 @@ object SlackAdapterModule : DiModule() {
     private fun provideSlackAuthStateSerializer(jsonSerializer: JsonSerializer.Default): SlackAuthStateSerializer =
         RealSlackAuthStateSerializer(jsonSerializer = jsonSerializer)
 
-    private fun provideSearchSessionStorage(searchRepository: SearchRepository): SearchSessionStorage =
-        RealSearchSessionStorage(searchRepository = searchRepository)
+    private fun provideSearchSessionStorage(searchApi: SearchApi): SearchSessionStorage =
+        RealSearchSessionStorage(apiService = searchApi)
 
     private fun provideSearchSessionShuffle(searchUseCase: SearchUseCase): SearchEngine =
         RealSearchEngine(searchUseCase = searchUseCase)
@@ -284,5 +291,13 @@ object SlackAdapterModule : DiModule() {
         jsonSerializer = jsonSerializer,
         log = log,
         reportExceptionUseCase = reportExceptionUseCase,
+    )
+
+    private fun provideSearchApi(
+        networkClient: NetworkClient.Json,
+        environment: Environment,
+    ): SearchApi = SearchApi(
+        client = networkClient,
+        environment = environment,
     )
 }
