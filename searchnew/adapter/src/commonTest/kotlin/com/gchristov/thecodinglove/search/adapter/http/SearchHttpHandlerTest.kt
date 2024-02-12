@@ -21,7 +21,7 @@ import kotlin.test.assertEquals
 
 class SearchHttpHandlerTest {
     @Test
-    fun config(): TestResult = runBlockingTest(
+    fun httpConfig(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchError.Empty())
@@ -41,7 +41,7 @@ class SearchHttpHandlerTest {
         return runBlockingTest(
             searchSessionId = null,
             searchInvocationResult = Either.Right(expectedResult)
-        ) { handler, pubSub, searchUseCase, request, response ->
+        ) { handler, _, searchUseCase, request, response ->
             handler.handleHttpRequest(
                 request = request,
                 response = response
@@ -62,7 +62,7 @@ class SearchHttpHandlerTest {
         return runBlockingTest(
             searchSessionId = null,
             searchInvocationResult = Either.Right(expectedResult)
-        ) { handler, pubSub, searchUseCase, request, response ->
+        ) { handler, pubSub, _, request, response ->
             handler.handleHttpRequest(
                 request = request,
                 response = response
@@ -83,7 +83,7 @@ class SearchHttpHandlerTest {
         return runBlockingTest(
             searchSessionId = null,
             searchInvocationResult = Either.Right(expectedResult)
-        ) { handler, pubSub, searchUseCase, request, response ->
+        ) { handler, _, _, request, response ->
             handler.handleHttpRequest(
                 request = request,
                 response = response
@@ -110,7 +110,7 @@ class SearchHttpHandlerTest {
             searchSessionId = TestSearchSessionId,
             searchQuery = TestSearchQuery,
             searchInvocationResult = Either.Right(expectedResult)
-        ) { handler, pubSub, searchUseCase, request, response ->
+        ) { handler, _, searchUseCase, request, response ->
             handler.handleHttpRequest(
                 request = request,
                 response = response
@@ -127,7 +127,7 @@ class SearchHttpHandlerTest {
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
-    ) { handler, pubSub, searchUseCase, request, response ->
+    ) { handler, _, searchUseCase, request, response ->
         handler.handleHttpRequest(
             request = request,
             response = response
@@ -140,7 +140,7 @@ class SearchHttpHandlerTest {
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
-    ) { handler, pubSub, searchUseCase, request, response ->
+    ) { handler, pubSub, _, request, response ->
         handler.handleHttpRequest(
             request = request,
             response = response
@@ -153,7 +153,7 @@ class SearchHttpHandlerTest {
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
-    ) { handler, pubSub, searchUseCase, request, response ->
+    ) { handler, _, _, request, response ->
         handler.handleHttpRequest(
             request = request,
             response = response
@@ -172,7 +172,7 @@ class SearchHttpHandlerTest {
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchError.Exhausted(additionalInfo = "test"))
-    ) { handler, pubSub, searchUseCase, request, response ->
+    ) { handler, _, _, request, response ->
         handler.handleHttpRequest(
             request = request,
             response = response
@@ -191,7 +191,7 @@ class SearchHttpHandlerTest {
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchError.SessionNotFound(additionalInfo = "test"))
-    ) { handler, pubSub, searchUseCase, request, response ->
+    ) { handler, _, _, request, response ->
         handler.handleHttpRequest(
             request = request,
             response = response

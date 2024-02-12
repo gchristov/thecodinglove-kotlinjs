@@ -19,7 +19,7 @@ import kotlin.test.assertTrue
 
 class PreloadSearchPubSubHttpHandlerTest {
     @Test
-    fun config(): TestResult = runBlockingTest(
+    fun httpConfig(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = null,
         preloadSearchResultInvocationResult = Either.Left(SearchError.Empty()),
     ) { handler, _, _ ->

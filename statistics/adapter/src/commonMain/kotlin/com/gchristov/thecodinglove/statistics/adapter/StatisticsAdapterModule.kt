@@ -4,9 +4,9 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
-import com.gchristov.thecodinglove.searchdata.SearchRepository
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
 import com.gchristov.thecodinglove.statistics.adapter.search.RealSearchStatisticsRepository
+import com.gchristov.thecodinglove.statistics.adapter.search.SearchStatisticsApi
 import com.gchristov.thecodinglove.statistics.adapter.slack.RealSlackStatisticsRepository
 import com.gchristov.thecodinglove.statistics.adapter.slack.SlackStatisticsApi
 import com.gchristov.thecodinglove.statistics.domain.model.Environment
@@ -37,9 +37,14 @@ object StatisticsAdapterModule : DiModule() {
                 )
             }
             bindSingleton {
+                provideSearchStatisticsApi(
+                    networkClient = instance(),
+                    environment = instance(),
+                )
+            }
+            bindSingleton {
                 provideSearchStatisticsRepository(
-                    log = instance(),
-                    searchRepository = instance(),
+                    api = instance(),
                 )
             }
             bindSingleton {
@@ -62,12 +67,9 @@ object StatisticsAdapterModule : DiModule() {
     )
 
     private fun provideSearchStatisticsRepository(
-        log: Logger,
-        searchRepository: SearchRepository,
+        api: SearchStatisticsApi,
     ): SearchStatisticsRepository = RealSearchStatisticsRepository(
-        dispatcher = Dispatchers.Default,
-        log = log,
-        searchRepository = searchRepository,
+        apiService = api,
     )
 
     private fun provideSlackStatisticsRepository(
@@ -80,6 +82,14 @@ object StatisticsAdapterModule : DiModule() {
         networkClient: NetworkClient.Json,
         environment: Environment,
     ): SlackStatisticsApi = SlackStatisticsApi(
+        client = networkClient,
+        environment = environment,
+    )
+
+    private fun provideSearchStatisticsApi(
+        networkClient: NetworkClient.Json,
+        environment: Environment,
+    ): SearchStatisticsApi = SearchStatisticsApi(
         client = networkClient,
         environment = environment,
     )

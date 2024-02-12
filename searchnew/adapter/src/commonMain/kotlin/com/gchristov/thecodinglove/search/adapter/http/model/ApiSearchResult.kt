@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 data class ApiSearchResult(
     @SerialName("search_session_id") val searchSessionId: String,
     @SerialName("query") val query: String,
-    @SerialName("post") val post: ApiPost,
+    @SerialName("post") val post: ApiSearchPost,
     @SerialName("total_posts") val totalPosts: Int
 )

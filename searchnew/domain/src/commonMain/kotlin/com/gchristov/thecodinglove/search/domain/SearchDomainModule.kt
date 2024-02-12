@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.search.domain
 
+import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
@@ -32,6 +33,12 @@ object SearchDomainModule : DiModule() {
                     searchWithHistoryUseCase = instance(),
                 )
             }
+            bindProvider {
+                provideStatisticsUseCase(
+                    log = instance(),
+                    searchRepository = instance(),
+                )
+            }
         }
     }
 
@@ -60,5 +67,14 @@ object SearchDomainModule : DiModule() {
         dispatcher = Dispatchers.Default,
         searchRepository = searchRepository,
         searchWithHistoryUseCase = searchWithHistoryUseCase
+    )
+
+    private fun provideStatisticsUseCase(
+        log: Logger,
+        searchRepository: SearchRepository,
+    ): SearchStatisticsUseCase = RealSearchStatisticsUseCase(
+        dispatcher = Dispatchers.Default,
+        log = log,
+        searchRepository = searchRepository,
     )
 }

@@ -6,8 +6,7 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
-import com.gchristov.thecodinglove.search.adapter.http.mapper.toPost
-import com.gchristov.thecodinglove.search.adapter.http.model.ApiSearchResult
+import com.gchristov.thecodinglove.search.adapter.http.mapper.toSearchResult
 import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubMessage
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.model.SearchError
@@ -72,10 +71,3 @@ private fun HttpRequest.toSearchType(): SearchUseCase.Type {
         SearchUseCase.Type.WithSessionId(sessionId = it)
     } ?: SearchUseCase.Type.NewSession(searchQuery)
 }
-
-private fun SearchUseCase.Result.toSearchResult() = ApiSearchResult(
-    searchSessionId = searchSessionId,
-    query = query,
-    post = post.toPost(),
-    totalPosts = totalPosts
-)

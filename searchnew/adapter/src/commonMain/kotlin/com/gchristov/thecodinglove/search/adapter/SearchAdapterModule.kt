@@ -12,9 +12,11 @@ import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTo
 import com.gchristov.thecodinglove.search.adapter.http.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.adapter.http.SearchApi
 import com.gchristov.thecodinglove.search.adapter.http.SearchHttpHandler
+import com.gchristov.thecodinglove.search.adapter.http.SearchStatisticsHttpHandler
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
 import com.gchristov.thecodinglove.search.domain.usecase.PreloadSearchResultUseCase
+import com.gchristov.thecodinglove.search.domain.usecase.SearchStatisticsUseCase
 import com.gchristov.thecodinglove.search.domain.usecase.SearchUseCase
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
@@ -55,6 +57,13 @@ object SearchAdapterModule : DiModule() {
                     log = instance(),
                     preloadSearchResultUseCase = instance(),
                     pubSubSubDecoder = instance(),
+                )
+            }
+            bindSingleton {
+                provideSearchStatisticsHttpHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    statisticsUseCase = instance(),
                 )
             }
         }
@@ -107,6 +116,17 @@ object SearchAdapterModule : DiModule() {
         log = log,
         preloadSearchResultUseCase = preloadSearchResultUseCase,
         pubSubDecoder = pubSubSubDecoder,
+    )
+
+    private fun provideSearchStatisticsHttpHandler(
+        jsonSerializer: JsonSerializer.Default,
+        log: Logger,
+        statisticsUseCase: SearchStatisticsUseCase,
+    ): SearchStatisticsHttpHandler = SearchStatisticsHttpHandler(
+        dispatcher = Dispatchers.Default,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        statisticsUseCase = statisticsUseCase,
     )
 }
 
