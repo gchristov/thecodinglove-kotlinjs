@@ -16,8 +16,6 @@ import com.gchristov.thecodinglove.common.monitoring.domain.MonitoringEnvironmen
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
-import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
-import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slack.adapter.SlackAdapterModule
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
@@ -59,8 +57,6 @@ private fun setupDi(
             CommonPubSubModule.module,
             CommonMonitoringModule(monitoringEnvironment).module,
             CommonFirebaseModule.module,
-            HtmlParseDataModule.module,
-            SearchDataModule.module,
             SlackDomainModule.module,
             SlackAdapterModule.module,
             SlackServiceModule(environment).module,

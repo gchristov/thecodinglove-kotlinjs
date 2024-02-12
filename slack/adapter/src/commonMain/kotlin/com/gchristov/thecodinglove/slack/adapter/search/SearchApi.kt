@@ -35,4 +35,22 @@ internal class SearchApi(
         contentType(ContentType.Application.Json)
         setBody(updateSearchSessionState)
     }
+
+    suspend fun search(
+        query: String,
+    ): HttpResponse = client.http.get("${environment.apiUrl}/search") {
+        contentType(ContentType.Application.Json)
+        url {
+            parameters.append("searchQuery", query)
+        }
+    }
+
+    suspend fun shuffle(
+        searchSessionId: String,
+    ): HttpResponse = client.http.get("${environment.apiUrl}/search") {
+        contentType(ContentType.Application.Json)
+        url {
+            parameters.append("searchSessionId", searchSessionId)
+        }
+    }
 }

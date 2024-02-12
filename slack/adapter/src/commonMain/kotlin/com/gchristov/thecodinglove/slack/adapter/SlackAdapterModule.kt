@@ -7,7 +7,6 @@ import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
-import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
@@ -55,7 +54,7 @@ object SlackAdapterModule : DiModule() {
                 provideSearchSessionStorage(searchApi = instance())
             }
             bindProvider {
-                provideSearchSessionShuffle(searchUseCase = instance())
+                provideSearchSessionShuffle(searchApi = instance())
             }
             bindSingleton {
                 provideSlackEventHttpHandler(
@@ -165,8 +164,8 @@ object SlackAdapterModule : DiModule() {
     private fun provideSearchSessionStorage(searchApi: SearchApi): SearchSessionStorage =
         RealSearchSessionStorage(apiService = searchApi)
 
-    private fun provideSearchSessionShuffle(searchUseCase: SearchUseCase): SearchEngine =
-        RealSearchEngine(searchUseCase = searchUseCase)
+    private fun provideSearchSessionShuffle(searchApi: SearchApi): SearchEngine =
+        RealSearchEngine(apiService = searchApi)
 
     private fun provideSlackEventHttpHandler(
         jsonSerializer: JsonSerializer.Default,

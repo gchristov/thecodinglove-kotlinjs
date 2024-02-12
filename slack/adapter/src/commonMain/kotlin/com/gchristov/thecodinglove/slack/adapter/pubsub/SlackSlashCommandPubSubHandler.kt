@@ -11,7 +11,6 @@ import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
-import com.gchristov.thecodinglove.searchdata.domain.SearchError
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSlashCommandPubSubMessage
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
@@ -73,7 +72,7 @@ class SlackSlashCommandPubSubHandler(
                 // the reply back fails, the entire PubSub chain will be retried automatically.
                 log.error(tag, it) { "Error handling request" }
                 val userErrorMessage = when {
-                    it is SearchError.Empty -> "No results found for '$text'. Please try a different search query."
+//                    it is SearchError.Empty -> "No results found for '$text'. Please try a different search query."
                     else -> "⚠️ Something has gone wrong. Please try again while we investigate."
                 }
                 slackRepository.postMessageToUrl(

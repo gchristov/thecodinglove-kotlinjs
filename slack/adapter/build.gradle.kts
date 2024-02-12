@@ -15,8 +15,6 @@ kotlin {
                 implementation(projects.common.pubsub)
                 implementation(projects.common.firebase)
                 implementation(projects.slack.domain)
-                // TODO: Remove when migrated to microservice
-                implementation(projects.searchData)
             }
         }
     }

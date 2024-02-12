@@ -1,6 +1,6 @@
 services:
   search-service:
-    build: ../build/services/searchnew-service/.
+    build: ../build/services/search-service/.
     ports:
       - "8081:8081"
     environment:
