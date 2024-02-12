@@ -73,6 +73,12 @@ private fun HttpHandler.attach(app: dynamic) {
         HttpMethod.Post -> app.post(handlerConfig.path, contentConfig) { req, res ->
             handleHttpRequest(ExpressHttpRequest(req), ExpressHttpResponse(res))
         }
+
+        HttpMethod.Delete -> app.delete(handlerConfig.path, contentConfig) { req, res ->
+            handleHttpRequest(ExpressHttpRequest(req), ExpressHttpResponse(res))
+        }
+
+        else -> throw IllegalStateException("Unsupported HTTP method used: method=${handlerConfig.method}")
     }
 }
 

@@ -9,10 +9,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
-import com.gchristov.thecodinglove.search.adapter.http.PreloadSearchPubSubHandler
-import com.gchristov.thecodinglove.search.adapter.http.SearchApi
-import com.gchristov.thecodinglove.search.adapter.http.SearchHttpHandler
-import com.gchristov.thecodinglove.search.adapter.http.SearchStatisticsHttpHandler
+import com.gchristov.thecodinglove.search.adapter.http.*
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
 import com.gchristov.thecodinglove.search.domain.usecase.PreloadSearchResultUseCase
@@ -64,6 +61,13 @@ object SearchAdapterModule : DiModule() {
                     jsonSerializer = instance(),
                     log = instance(),
                     statisticsUseCase = instance(),
+                )
+            }
+            bindSingleton {
+                provideDeleteSearchSessionHttpHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    searchRepository = instance(),
                 )
             }
         }
@@ -127,6 +131,17 @@ object SearchAdapterModule : DiModule() {
         jsonSerializer = jsonSerializer,
         log = log,
         statisticsUseCase = statisticsUseCase,
+    )
+
+    private fun provideDeleteSearchSessionHttpHandler(
+        jsonSerializer: JsonSerializer.Default,
+        log: Logger,
+        searchRepository: SearchRepository,
+    ): DeleteSearchSessionHttpHandler = DeleteSearchSessionHttpHandler(
+        dispatcher = Dispatchers.Default,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        searchRepository = searchRepository,
     )
 }
 

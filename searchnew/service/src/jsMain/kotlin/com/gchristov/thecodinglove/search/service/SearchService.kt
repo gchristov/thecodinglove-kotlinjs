@@ -19,6 +19,7 @@ import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
 import com.gchristov.thecodinglove.search.adapter.SearchAdapterModule
+import com.gchristov.thecodinglove.search.adapter.http.DeleteSearchSessionHttpHandler
 import com.gchristov.thecodinglove.search.adapter.http.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.adapter.http.SearchHttpHandler
 import com.gchristov.thecodinglove.search.adapter.http.SearchStatisticsHttpHandler
@@ -75,6 +76,7 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
         DiGraph.inject<SearchHttpHandler>(),
         DiGraph.inject<PreloadSearchPubSubHandler>(),
         DiGraph.inject<SearchStatisticsHttpHandler>(),
+        DiGraph.inject<DeleteSearchSessionHttpHandler>(),
     )
     val service = DiGraph.inject<HttpService>()
     return service.initialise(
