@@ -74,6 +74,10 @@ private fun HttpHandler.attach(app: dynamic) {
             handleHttpRequest(ExpressHttpRequest(req), ExpressHttpResponse(res))
         }
 
+        HttpMethod.Put -> app.put(handlerConfig.path, contentConfig) { req, res ->
+            handleHttpRequest(ExpressHttpRequest(req), ExpressHttpResponse(res))
+        }
+
         HttpMethod.Delete -> app.delete(handlerConfig.path, contentConfig) { req, res ->
             handleHttpRequest(ExpressHttpRequest(req), ExpressHttpResponse(res))
         }

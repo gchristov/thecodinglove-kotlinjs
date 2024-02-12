@@ -77,6 +77,13 @@ object SearchAdapterModule : DiModule() {
                     searchRepository = instance(),
                 )
             }
+            bindSingleton {
+                provideUpdateSearchSessionStateHttpHandler(
+                    jsonSerializer = instance(),
+                    log = instance(),
+                    searchRepository = instance(),
+                )
+            }
         }
     }
 
@@ -156,6 +163,17 @@ object SearchAdapterModule : DiModule() {
         log: Logger,
         searchRepository: SearchRepository,
     ): SearchSessionPostHttpHandler = SearchSessionPostHttpHandler(
+        dispatcher = Dispatchers.Default,
+        jsonSerializer = jsonSerializer,
+        log = log,
+        searchRepository = searchRepository,
+    )
+
+    private fun provideUpdateSearchSessionStateHttpHandler(
+        jsonSerializer: JsonSerializer.Default,
+        log: Logger,
+        searchRepository: SearchRepository,
+    ): UpdateSearchSessionStateHttpHandler = UpdateSearchSessionStateHttpHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,

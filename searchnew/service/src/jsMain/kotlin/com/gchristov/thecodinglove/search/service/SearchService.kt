@@ -75,6 +75,7 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
         DiGraph.inject<SearchStatisticsHttpHandler>(),
         DiGraph.inject<DeleteSearchSessionHttpHandler>(),
         DiGraph.inject<SearchSessionPostHttpHandler>(),
+        DiGraph.inject<UpdateSearchSessionStateHttpHandler>(),
     )
     val service = DiGraph.inject<HttpService>()
     return service.initialise(
