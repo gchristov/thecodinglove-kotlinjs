@@ -3,7 +3,6 @@ package com.gchristov.thecodinglove.statistics.service
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
@@ -15,8 +14,6 @@ import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
 import com.gchristov.thecodinglove.common.monitoring.domain.MonitoringEnvironment
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
-import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
-import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.statistics.adapter.StatisticsAdapterModule
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
 import com.gchristov.thecodinglove.statistics.domain.StatisticsDomainModule
@@ -54,9 +51,6 @@ private fun setupDi(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonMonitoringModule(monitoringEnvironment).module,
-            CommonFirebaseModule.module,
-            HtmlParseDataModule.module,
-            SearchDataModule.module,
             StatisticsDomainModule.module,
             StatisticsAdapterModule.module,
             StatisticsServiceModule(environment).module,

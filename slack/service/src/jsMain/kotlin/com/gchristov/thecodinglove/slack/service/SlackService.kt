@@ -16,8 +16,6 @@ import com.gchristov.thecodinglove.common.monitoring.domain.MonitoringEnvironmen
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
-import com.gchristov.thecodinglove.htmlparsedata.HtmlParseDataModule
-import com.gchristov.thecodinglove.searchdata.SearchDataModule
 import com.gchristov.thecodinglove.slack.adapter.SlackAdapterModule
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
@@ -32,6 +30,7 @@ suspend fun main() {
     val tag = "SlackService"
 
     setupDi(
+        environment = environment,
         monitoringEnvironment = monitoringEnvironment,
     )
         .flatMap { setupMonitoring() }
@@ -47,7 +46,10 @@ suspend fun main() {
         })
 }
 
-private fun setupDi(monitoringEnvironment: MonitoringEnvironment): Either<Throwable, Unit> {
+private fun setupDi(
+    environment: Environment,
+    monitoringEnvironment: MonitoringEnvironment
+): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             CommonKotlinModule.module,
@@ -55,10 +57,9 @@ private fun setupDi(monitoringEnvironment: MonitoringEnvironment): Either<Throwa
             CommonPubSubModule.module,
             CommonMonitoringModule(monitoringEnvironment).module,
             CommonFirebaseModule.module,
-            HtmlParseDataModule.module,
-            SearchDataModule.module,
             SlackDomainModule.module,
             SlackAdapterModule.module,
+            SlackServiceModule(environment).module,
         )
     )
     return Either.Right(Unit)

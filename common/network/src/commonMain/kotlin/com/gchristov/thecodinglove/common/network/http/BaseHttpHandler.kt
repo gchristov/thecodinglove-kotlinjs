@@ -45,7 +45,8 @@ abstract class BaseHttpHandler(
         response: HttpResponse,
     ) {
         launch(dispatcher) {
-            request.bodyString?.let { log.debug(tag, "Received request: bodyString=$it") }
+            request.bodyString.takeIf { it?.isNotBlank() == true }
+                ?.let { log.debug(tag, "Received request: bodyString=$it") }
                 ?: log.debug(tag, "Received request")
             try {
                 handleHttpRequestAsync(

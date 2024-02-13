@@ -1,27 +1,29 @@
 package com.gchristov.thecodinglove.slack.adapter.search
 
 import arrow.core.Either
-import arrow.core.flatMap
-import com.gchristov.thecodinglove.searchdata.usecase.SearchUseCase
+import com.gchristov.thecodinglove.slack.adapter.search.mapper.toSearchResult
+import com.gchristov.thecodinglove.slack.adapter.search.model.ApiSearchResult
 import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
-import com.gchristov.thecodinglove.slack.domain.port.SearchEngineDto
+import io.ktor.client.call.*
 
-internal class RealSearchEngine(private val searchUseCase: SearchUseCase) : SearchEngine {
-    override suspend fun search(query: String): Either<Throwable, SearchEngineDto> =
-        search(SearchUseCase.Type.NewSession(query))
+internal class RealSearchEngine(private val apiService: SearchApi) : SearchEngine {
+    override suspend fun search(query: String) = try {
+        val response: ApiSearchResult = apiService.search(query).body()
+        Either.Right(response.toSearchResult())
+    } catch (error: Throwable) {
+        Either.Left(Throwable(
+            message = "Error during search${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
+    }
 
-    override suspend fun shuffle(searchSessionId: String) = search(SearchUseCase.Type.WithSessionId(searchSessionId))
-
-    private suspend fun search(type: SearchUseCase.Type) = searchUseCase(SearchUseCase.Dto(type)).flatMap {
-        Either.Right(
-            SearchEngineDto(
-                searchSessionId = it.searchSessionId,
-                searchQuery = it.query,
-                searchResults = it.totalPosts,
-                attachmentTitle = it.post.title,
-                attachmentUrl = it.post.url,
-                attachmentImageUrl = it.post.imageUrl,
-            )
-        )
+    override suspend fun shuffle(searchSessionId: String) = try {
+        val response: ApiSearchResult = apiService.shuffle(searchSessionId).body()
+        Either.Right(response.toSearchResult())
+    } catch (error: Throwable) {
+        Either.Left(Throwable(
+            message = "Error during shuffle${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
     }
 }

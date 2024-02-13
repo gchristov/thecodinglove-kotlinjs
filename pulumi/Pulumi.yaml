@@ -141,11 +141,11 @@ resources:
       protect: true
 
   ########################################
-  # app-service
+  # search-service
   ########################################
 
   # Manages the binary.
-  app-service-binary:
+  search-service-binary:
     type: docker:Image
     properties:
       build:
@@ -153,8 +153,8 @@ resources:
           PORT: "8081"
           API_URL: https://${domain}/api
         platform: linux/amd64
-        context: ../build/services/app-service
-      imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/app-service:latest
+        context: ../build/services/search-service
+      imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/search-service:latest
       registry:
         server: ${artifact-registry.location}-docker.pkg.dev
         username: _json_key
@@ -164,16 +164,16 @@ resources:
     options:
       protect: true
   # Manages the Cloud Run service.
-  # pulumi import gcp:cloudrunv2/service:Service app-service REGION/SERVICE_NAME
-  app-service:
+  # pulumi import gcp:cloudrunv2/service:Service search-service REGION/SERVICE_NAME
+  search-service:
     type: gcp:cloudrunv2:Service
     properties:
       ingress: INGRESS_TRAFFIC_ALL
       location: ${artifact-registry.location}
-      name: app-service
+      name: search-service
       template:
         containers:
-          - image: ${app-service-binary.repoDigest}
+          - image: ${search-service-binary.repoDigest}
             ports:
               - containerPort: 8081
                 name: http1
@@ -201,12 +201,12 @@ resources:
       dependsOn:
         - ${cloud-run-admin-api}
   # Manages the Cloud Run service policy.
-  # pulumi import gcp:cloudrunv2/serviceIamPolicy:ServiceIamPolicy app-service-policy projects/PROJECT_ID/locations/REGION/services/SERVICE_NAME
-  app-service-policy:
+  # pulumi import gcp:cloudrunv2/serviceIamPolicy:ServiceIamPolicy search-service-policy projects/PROJECT_ID/locations/REGION/services/SERVICE_NAME
+  search-service-policy:
     type: gcp:cloudrunv2:ServiceIamPolicy
     properties:
-      name: ${app-service.name}
-      location: ${app-service.location}
+      name: ${search-service.name}
+      location: ${search-service.location}
       policyData: |
         {
           "bindings": [
@@ -468,8 +468,9 @@ resources:
     properties:
       build:
         args:
-          APP_SERVICE_HOST: ${app-service.uri}
-          APP_SERVICE_PATH: api
+          SEARCH_SERVICE_HOST: ${search-service.uri}
+          SEARCH_SERVICE_PATH: api/search
+          SEARCH_SERVICE_PUBSUB_PATH: api/pubsub/search
           STATISTICS_SERVICE_HOST: ${statistics-service.uri}
           STATISTICS_SERVICE_PATH: api/statistics
           SELF_DESTRUCT_SERVICE_HOST: ${self-destruct-service.uri}
@@ -579,7 +580,7 @@ resources:
       messageRetentionDuration: 600s
       name: preload_search_subscription
       pushConfig:
-        pushEndpoint: ${app-service.uri}/api/pubsub/search
+        pushEndpoint: ${search-service.uri}/api/pubsub/search
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s
