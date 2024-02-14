@@ -8,9 +8,9 @@ import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStateDto
 import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStorage
 import io.ktor.client.call.*
 
-internal class RealSearchSessionStorage(private val apiService: SearchApi) : SearchSessionStorage {
+internal class RealSearchSessionStorage(private val searchApi: SearchApi) : SearchSessionStorage {
     override suspend fun deleteSearchSession(searchSessionId: String) = try {
-        apiService.deleteSearchSession(searchSessionId)
+        searchApi.deleteSearchSession(searchSessionId)
         Either.Right(Unit)
     } catch (error: Throwable) {
         Either.Left(Throwable(
@@ -23,7 +23,7 @@ internal class RealSearchSessionStorage(private val apiService: SearchApi) : Sea
         searchSessionId: String,
         state: SearchSessionStateDto
     ): Either<Throwable, Unit> = try {
-        apiService.updateSearchSessionState(
+        searchApi.updateSearchSessionState(
             ApiUpdateSearchSessionState(
                 searchSessionId = searchSessionId,
                 state = when (state) {
@@ -41,7 +41,7 @@ internal class RealSearchSessionStorage(private val apiService: SearchApi) : Sea
     }
 
     override suspend fun getSearchSessionPost(searchSessionId: String) = try {
-        val response: ApiSearchSessionPost = apiService.getSearchSessionPost(searchSessionId).body()
+        val response: ApiSearchSessionPost = searchApi.getSearchSessionPost(searchSessionId).body()
         Either.Right(response.toSearchSessionPost())
     } catch (error: Throwable) {
         Either.Left(Throwable(

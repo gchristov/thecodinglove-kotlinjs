@@ -44,12 +44,12 @@ object StatisticsAdapterModule : DiModule() {
             }
             bindSingleton {
                 provideSearchStatisticsRepository(
-                    api = instance(),
+                    searchStatisticsApi = instance(),
                 )
             }
             bindSingleton {
                 provideSlackStatisticsRepository(
-                    api = instance(),
+                    slackStatisticsApi = instance(),
                 )
             }
         }
@@ -67,15 +67,15 @@ object StatisticsAdapterModule : DiModule() {
     )
 
     private fun provideSearchStatisticsRepository(
-        api: SearchStatisticsApi,
+        searchStatisticsApi: SearchStatisticsApi,
     ): SearchStatisticsRepository = RealSearchStatisticsRepository(
-        apiService = api,
+        searchStatisticsApi = searchStatisticsApi,
     )
 
     private fun provideSlackStatisticsRepository(
-        api: SlackStatisticsApi,
+        slackStatisticsApi: SlackStatisticsApi,
     ): SlackStatisticsRepository = RealSlackStatisticsRepository(
-        apiService = api,
+        slackStatisticsApi = slackStatisticsApi,
     )
 
     private fun provideSlackStatisticsApi(

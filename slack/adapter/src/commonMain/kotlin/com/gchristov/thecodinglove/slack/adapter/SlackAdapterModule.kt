@@ -36,7 +36,7 @@ object SlackAdapterModule : DiModule() {
             bindSingleton { provideSlackConfig() }
             bindSingleton {
                 provideSlackRepository(
-                    api = instance(),
+                    slackApi = instance(),
                     firebaseAdmin = instance(),
                     jsonSerializer = instance(),
                 )
@@ -149,11 +149,11 @@ object SlackAdapterModule : DiModule() {
     )
 
     private fun provideSlackRepository(
-        api: SlackApi,
+        slackApi: SlackApi,
         firebaseAdmin: FirebaseAdmin,
         jsonSerializer: JsonSerializer.ExplicitNulls,
     ): SlackRepository = RealSlackRepository(
-        apiService = api,
+        slackApi = slackApi,
         firebaseAdmin = firebaseAdmin,
         jsonSerializer = jsonSerializer,
     )
@@ -162,10 +162,10 @@ object SlackAdapterModule : DiModule() {
         RealSlackAuthStateSerializer(jsonSerializer = jsonSerializer)
 
     private fun provideSearchSessionStorage(searchApi: SearchApi): SearchSessionStorage =
-        RealSearchSessionStorage(apiService = searchApi)
+        RealSearchSessionStorage(searchApi = searchApi)
 
     private fun provideSearchSessionShuffle(searchApi: SearchApi): SearchEngine =
-        RealSearchEngine(apiService = searchApi)
+        RealSearchEngine(searchApi = searchApi)
 
     private fun provideSlackEventHttpHandler(
         jsonSerializer: JsonSerializer.Default,

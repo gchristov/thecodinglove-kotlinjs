@@ -6,9 +6,9 @@ import com.gchristov.thecodinglove.slack.adapter.search.model.ApiSearchResult
 import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
 import io.ktor.client.call.*
 
-internal class RealSearchEngine(private val apiService: SearchApi) : SearchEngine {
+internal class RealSearchEngine(private val searchApi: SearchApi) : SearchEngine {
     override suspend fun search(query: String) = try {
-        val response: ApiSearchResult = apiService.search(query).body()
+        val response: ApiSearchResult = searchApi.search(query).body()
         Either.Right(response.toSearchResult())
     } catch (error: Throwable) {
         Either.Left(Throwable(
@@ -18,7 +18,7 @@ internal class RealSearchEngine(private val apiService: SearchApi) : SearchEngin
     }
 
     override suspend fun shuffle(searchSessionId: String) = try {
-        val response: ApiSearchResult = apiService.shuffle(searchSessionId).body()
+        val response: ApiSearchResult = searchApi.shuffle(searchSessionId).body()
         Either.Right(response.toSearchResult())
     } catch (error: Throwable) {
         Either.Left(Throwable(

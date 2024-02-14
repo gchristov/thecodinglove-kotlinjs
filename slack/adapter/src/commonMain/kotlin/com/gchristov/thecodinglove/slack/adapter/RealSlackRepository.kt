@@ -22,7 +22,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 
 internal class RealSlackRepository(
-    private val apiService: SlackApi,
+    private val slackApi: SlackApi,
     private val firebaseAdmin: FirebaseAdmin,
     private val jsonSerializer: JsonSerializer,
 ) : SlackRepository {
@@ -31,7 +31,7 @@ internal class RealSlackRepository(
         clientId: String,
         clientSecret: String
     ) = try {
-        val slackResponse: ApiSlackAuthResponse = apiService.authUser(
+        val slackResponse: ApiSlackAuthResponse = slackApi.authUser(
             code = code,
             clientId = clientId,
             clientSecret = clientSecret
@@ -108,7 +108,7 @@ internal class RealSlackRepository(
         url: String,
         message: SlackMessage,
     ) = try {
-        val slackResponse = apiService.postMessageToUrl(
+        val slackResponse = slackApi.postMessageToUrl(
             url = url,
             message = message.toSlackMessage(),
         )
@@ -140,7 +140,7 @@ internal class RealSlackRepository(
         authToken: String,
         message: SlackMessage,
     ) = try {
-        val slackResponse: ApiSlackPostMessageResponse = apiService.postMessage(
+        val slackResponse: ApiSlackPostMessageResponse = slackApi.postMessage(
             authToken = authToken,
             message = message.toSlackMessage(),
         ).body()
@@ -161,7 +161,7 @@ internal class RealSlackRepository(
         channelId: String,
         messageTs: String,
     ): Either<Throwable, Unit> = try {
-        val slackResponse: ApiSlackDeleteMessageResponse = apiService.deleteMessage(
+        val slackResponse: ApiSlackDeleteMessageResponse = slackApi.deleteMessage(
             authToken = authToken,
             deleteMessage = ApiSlackDeleteMessage(
                 channelId = channelId,

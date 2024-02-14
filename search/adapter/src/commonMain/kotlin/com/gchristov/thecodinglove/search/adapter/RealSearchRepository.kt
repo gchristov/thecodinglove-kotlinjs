@@ -10,7 +10,7 @@ import com.gchristov.thecodinglove.search.adapter.db.mapper.toSearchSession
 import com.gchristov.thecodinglove.search.adapter.htmlparser.mapper.toPost
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
-import com.gchristov.thecodinglove.search.adapter.http.SearchApi
+import com.gchristov.thecodinglove.search.adapter.http.TheCodingLoveApi
 import com.gchristov.thecodinglove.search.domain.model.SearchError
 import com.gchristov.thecodinglove.search.domain.model.SearchPost
 import com.gchristov.thecodinglove.search.domain.model.SearchSession
@@ -18,14 +18,14 @@ import com.gchristov.thecodinglove.search.domain.port.SearchRepository
 import io.ktor.client.statement.*
 
 internal class RealSearchRepository(
-    private val apiService: SearchApi,
+    private val theCodingLoveApi: TheCodingLoveApi,
     private val parseHtmlTotalPostsUseCase: ParseHtmlTotalPostsUseCase,
     private val parseHtmlPostsUseCase: ParseHtmlPostsUseCase,
     private val firebaseAdmin: FirebaseAdmin,
     private val jsonSerializer: JsonSerializer,
 ) : SearchRepository {
     override suspend fun getTotalPosts(query: String): Either<Throwable, Int> = try {
-        val responseHtml = apiService.search(
+        val responseHtml = theCodingLoveApi.search(
             // First page should always exist if there are results
             page = 1,
             query = query
@@ -42,7 +42,7 @@ internal class RealSearchRepository(
         page: Int,
         query: String
     ): Either<Throwable, List<SearchPost>> = try {
-        val responseHtml = apiService.search(
+        val responseHtml = theCodingLoveApi.search(
             page = page,
             query = query
         ).bodyAsText()

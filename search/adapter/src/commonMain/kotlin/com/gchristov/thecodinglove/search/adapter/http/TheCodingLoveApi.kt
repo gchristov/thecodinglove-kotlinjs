@@ -5,7 +5,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 
-internal class SearchApi(private val client: NetworkClient.Html) {
+internal class TheCodingLoveApi(private val client: NetworkClient.Html) {
     suspend fun search(
         page: Int,
         query: String
