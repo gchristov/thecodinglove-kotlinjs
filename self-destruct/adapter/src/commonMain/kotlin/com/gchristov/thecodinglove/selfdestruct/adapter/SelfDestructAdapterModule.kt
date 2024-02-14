@@ -35,7 +35,7 @@ object SelfDestructAdapterModule : DiModule() {
             }
             bindSingleton {
                 provideSlackSelfDestructRepository(
-                    api = instance(),
+                    slackSelfDestructApi = instance(),
                 )
             }
         }
@@ -61,8 +61,8 @@ object SelfDestructAdapterModule : DiModule() {
     )
 
     private fun provideSlackSelfDestructRepository(
-        api: SlackSelfDestructApi,
+        slackSelfDestructApi: SlackSelfDestructApi,
     ): SlackSelfDestructRepository = RealSlackSelfDestructRepository(
-        apiService = api,
+        slackSelfDestructApi = slackSelfDestructApi,
     )
 }

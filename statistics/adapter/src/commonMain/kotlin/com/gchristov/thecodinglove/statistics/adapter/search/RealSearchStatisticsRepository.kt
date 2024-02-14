@@ -8,10 +8,10 @@ import com.gchristov.thecodinglove.statistics.domain.port.SearchStatisticsReposi
 import io.ktor.client.call.*
 
 internal class RealSearchStatisticsRepository(
-    private val apiService: SearchStatisticsApi,
+    private val searchStatisticsApi: SearchStatisticsApi,
 ) : SearchStatisticsRepository {
     override suspend fun statistics(): Either<Throwable, StatisticsReport.SearchStatistics> = try {
-        val response: ApiSearchStatistics = apiService.statistics().body()
+        val response: ApiSearchStatistics = searchStatisticsApi.statistics().body()
         Either.Right(response.toStatistics())
     } catch (error: Throwable) {
         Either.Left(Throwable(

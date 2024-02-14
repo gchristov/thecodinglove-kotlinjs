@@ -24,7 +24,7 @@ data class CommonMonitoringModule(val environment: MonitoringEnvironment) : DiMo
             }
             bindSingleton {
                 provideSlackReportExceptionRepository(
-                    api = instance(),
+                    slackReportExceptionApi = instance(),
                 )
             }
             bindSingleton {
@@ -44,9 +44,9 @@ data class CommonMonitoringModule(val environment: MonitoringEnvironment) : DiMo
     )
 
     private fun provideSlackReportExceptionRepository(
-        api: SlackReportExceptionApi,
+        slackReportExceptionApi: SlackReportExceptionApi,
     ): SlackReportExceptionRepository = RealSlackReportExceptionRepository(
-        apiService = api,
+        slackReportExceptionApi = slackReportExceptionApi,
     )
 
     private fun provideMonitoringLogWriter(

@@ -26,10 +26,10 @@ object SearchAdapterModule : DiModule() {
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
-            bindSingleton { provideSearchApi(client = instance()) }
+            bindSingleton { provideTheCodingLoveApi(client = instance()) }
             bindSingleton {
                 provideSearchRepository(
-                    api = instance(),
+                    theCodingLoveApi = instance(),
                     parseHtmlTotalPostsUseCase = instance(),
                     parseHtmlPostsUseCase = instance(),
                     firebaseAdmin = instance(),
@@ -87,16 +87,16 @@ object SearchAdapterModule : DiModule() {
         }
     }
 
-    private fun provideSearchApi(client: NetworkClient.Html) = SearchApi(client)
+    private fun provideTheCodingLoveApi(client: NetworkClient.Html) = TheCodingLoveApi(client)
 
     private fun provideSearchRepository(
-        api: SearchApi,
+        theCodingLoveApi: TheCodingLoveApi,
         parseHtmlTotalPostsUseCase: ParseHtmlTotalPostsUseCase,
         parseHtmlPostsUseCase: ParseHtmlPostsUseCase,
         firebaseAdmin: FirebaseAdmin,
         jsonSerializer: JsonSerializer.ExplicitNulls,
     ): SearchRepository = RealSearchRepository(
-        apiService = api,
+        theCodingLoveApi = theCodingLoveApi,
         parseHtmlTotalPostsUseCase = parseHtmlTotalPostsUseCase,
         parseHtmlPostsUseCase = parseHtmlPostsUseCase,
         firebaseAdmin = firebaseAdmin,

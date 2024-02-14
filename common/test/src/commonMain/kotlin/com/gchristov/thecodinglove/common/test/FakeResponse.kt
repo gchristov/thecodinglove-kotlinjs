@@ -6,8 +6,8 @@ import kotlinx.coroutines.withContext
 
 sealed class FakeResponse {
     data class Error(val message: String? = null) : FakeResponse()
-    object CompletesNormally : FakeResponse()
-    object LoadsForever : FakeResponse()
+    data object CompletesNormally : FakeResponse()
+    data object LoadsForever : FakeResponse()
 }
 
 suspend fun <T> FakeResponse.execute(value: T): T = when (this) {

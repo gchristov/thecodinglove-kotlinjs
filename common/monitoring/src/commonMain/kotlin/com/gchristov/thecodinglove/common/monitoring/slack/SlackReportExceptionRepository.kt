@@ -10,13 +10,13 @@ interface SlackReportExceptionRepository {
 }
 
 internal class RealSlackReportExceptionRepository(
-    private val apiService: SlackReportExceptionApi,
+    private val slackReportExceptionApi: SlackReportExceptionApi,
 ) : SlackReportExceptionRepository {
     override suspend fun reportException(
         message: String,
         stacktrace: String,
     ): Either<Throwable, Unit> = try {
-        apiService.reportException(
+        slackReportExceptionApi.reportException(
             ApiSlackReportException(
                 message = message,
                 stacktrace = stacktrace,

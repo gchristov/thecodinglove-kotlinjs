@@ -4,10 +4,10 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.selfdestruct.domain.port.SlackSelfDestructRepository
 
 internal class RealSlackSelfDestructRepository(
-    private val apiService: SlackSelfDestructApi,
+    private val slackSelfDestructApi: SlackSelfDestructApi,
 ) : SlackSelfDestructRepository {
     override suspend fun selfDestruct(): Either<Throwable, Unit> = try {
-        apiService.selfDestruct()
+        slackSelfDestructApi.selfDestruct()
         Either.Right(Unit)
     } catch (error: Throwable) {
         Either.Left(Throwable(

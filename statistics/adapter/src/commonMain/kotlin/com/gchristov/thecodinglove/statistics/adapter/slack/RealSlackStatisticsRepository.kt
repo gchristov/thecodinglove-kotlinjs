@@ -8,10 +8,10 @@ import com.gchristov.thecodinglove.statistics.domain.port.SlackStatisticsReposit
 import io.ktor.client.call.*
 
 internal class RealSlackStatisticsRepository(
-    private val apiService: SlackStatisticsApi,
+    private val slackStatisticsApi: SlackStatisticsApi,
 ) : SlackStatisticsRepository {
     override suspend fun statistics(): Either<Throwable, StatisticsReport.SlackStatistics> = try {
-        val response: ApiSlackStatistics = apiService.statistics().body()
+        val response: ApiSlackStatistics = slackStatisticsApi.statistics().body()
         Either.Right(response.toStatistics())
     } catch (error: Throwable) {
         Either.Left(Throwable(
