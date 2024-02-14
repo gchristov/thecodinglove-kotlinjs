@@ -5,19 +5,15 @@ plugins {
 gradlePlugin {
     plugins.register("base-node-plugin") {
         id = "base-node-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.BaseNodePlugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.BaseNodePlugin"
     }
     plugins.register("base-browser-plugin") {
         id = "base-browser-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.BaseBrowserPlugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.BaseBrowserPlugin"
     }
     plugins.register("module-plugin") {
         id = "module-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.ModulePlugin"
-    }
-    plugins.register("data-plugin") {
-        id = "data-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.common.DataPlugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.ModulePlugin"
     }
     plugins.register("build-config-plugin") {
         id = "build-config-plugin"

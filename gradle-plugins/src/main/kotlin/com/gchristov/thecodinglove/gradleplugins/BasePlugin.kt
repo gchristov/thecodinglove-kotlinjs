@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.gradleplugins.common
+package com.gchristov.thecodinglove.gradleplugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -49,9 +49,7 @@ class BaseBrowserPlugin : BaseMultiplatformPlugin() {
     }
 }
 
-fun Project.binaryDestination(): Provider<Directory> = rootProject.layout.buildDirectory.dir("services/${project.name}")
-
-fun Project.binaryDestination2(): Provider<Directory> {
+fun Project.binaryDestination(): Provider<Directory> {
     var currentProject = project.parent
     var name = project.name
     while (currentProject != null && currentProject != rootProject) {

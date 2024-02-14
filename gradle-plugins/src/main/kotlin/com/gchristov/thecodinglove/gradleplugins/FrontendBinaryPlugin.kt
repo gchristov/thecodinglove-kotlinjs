@@ -1,6 +1,5 @@
 package com.gchristov.thecodinglove.gradleplugins
 
-import com.gchristov.thecodinglove.gradleplugins.common.binaryDestination2
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -19,11 +18,11 @@ class FrontendBinaryPlugin : Plugin<Project> {
                 doLast {
                     copy {
                         from(layout.buildDirectory.dir("dist/js/productionExecutable").get().asFile)
-                        into(binaryDestination2().get().dir("bin").asFile)
+                        into(binaryDestination().get().dir("bin").asFile)
                     }
                     copy {
                         from(file(layout.projectDirectory.file("Dockerfile")))
-                        into(binaryDestination2().get())
+                        into(binaryDestination().get())
                     }
                 }
             }

@@ -1,4 +1,4 @@
-import com.gchristov.thecodinglove.gradleplugins.common.binaryDestination2
+import com.gchristov.thecodinglove.gradleplugins.binaryDestination
 
 plugins {
     id("frontend-binary-plugin")
@@ -9,7 +9,7 @@ tasks.named("assemble") {
     doLast {
         copy {
             from(file(layout.projectDirectory.file("default.conf.template")))
-            into(binaryDestination2().get())
+            into(binaryDestination().get())
         }
     }
 }
