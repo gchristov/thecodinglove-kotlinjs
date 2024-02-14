@@ -1,4 +1,4 @@
-import com.gchristov.thecodinglove.gradleplugins.common.envVar
+import com.gchristov.thecodinglove.gradleplugins.envVar
 
 val packageId = "com.gchristov.thecodinglove.search.adapter"
 

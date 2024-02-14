@@ -9,7 +9,7 @@ internal class SearchApi(private val client: NetworkClient.Html) {
     suspend fun search(
         page: Int,
         query: String
-    ): HttpResponse = NetworkClient.Html.http.get("${Domain}/page/$page?s=$query") {
+    ): HttpResponse = client.http.get("${Domain}/page/$page?s=$query") {
         accept(ContentType.Text.Html)
     }
 }
