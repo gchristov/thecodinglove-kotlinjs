@@ -2,7 +2,8 @@ package com.gchristov.thecodinglove.search.domain.usecase
 
 import arrow.core.Either
 import arrow.core.flatMap
-import com.gchristov.thecodinglove.search.domain.model.SearchError
+import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.common.kotlin.error
 import com.gchristov.thecodinglove.search.domain.model.SearchSession
 import com.gchristov.thecodinglove.search.domain.model.insert
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
@@ -10,7 +11,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 interface PreloadSearchResultUseCase {
-    suspend operator fun invoke(dto: Dto): Either<SearchError, Unit>
+    suspend operator fun invoke(dto: Dto): Either<Throwable, Unit>
 
     data class Dto(val searchSessionId: String)
 }
@@ -19,13 +20,15 @@ internal class RealPreloadSearchResultUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
+    private val log: Logger,
 ) : PreloadSearchResultUseCase {
+    private val tag = this::class.simpleName
+
     override suspend operator fun invoke(
         dto: PreloadSearchResultUseCase.Dto
-    ): Either<SearchError, Unit> = withContext(dispatcher) {
+    ): Either<Throwable, Unit> = withContext(dispatcher) {
         searchRepository
             .getSearchSession(dto.searchSessionId)
-            .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
             .flatMap { searchSession ->
                 searchWithHistoryUseCase(
                     SearchWithHistoryUseCase.Dto(
@@ -36,25 +39,25 @@ internal class RealPreloadSearchResultUseCase(
                 ).fold(
                     ifLeft = { searchError ->
                         when (searchError) {
-                            is SearchError.Exhausted -> {
+                            is SearchWithHistoryUseCase.Error.Exhausted -> {
                                 // Only clear the preloaded post and let session search deal with
                                 // updating the history
                                 searchSession
                                     .clearPreloadedPost(searchRepository)
-                                    .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
-                                    .flatMap { Either.Left(searchError) }
+                                    .flatMap {
+                                        log.error(tag, searchError) { "Search exhausted" }
+                                        Either.Right(Unit)
+                                    }
                             }
 
-                            else -> Either.Left(searchError)
+                            is SearchWithHistoryUseCase.Error.Empty -> Either.Left(searchError)
                         }
                     },
                     ifRight = { searchResult ->
-                        searchSession
-                            .insertPreloadedPost(
-                                searchResult = searchResult,
-                                searchRepository = searchRepository
-                            )
-                            .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
+                        searchSession.insertPreloadedPost(
+                            searchResult = searchResult,
+                            searchRepository = searchRepository
+                        )
                     }
                 )
             }

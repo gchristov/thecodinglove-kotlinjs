@@ -11,7 +11,6 @@ import com.gchristov.thecodinglove.search.adapter.htmlparser.mapper.toPost
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.http.TheCodingLoveApi
-import com.gchristov.thecodinglove.search.domain.model.SearchError
 import com.gchristov.thecodinglove.search.domain.model.SearchPost
 import com.gchristov.thecodinglove.search.domain.model.SearchSession
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
@@ -67,10 +66,10 @@ internal class RealSearchRepository(
                 ).flatMap { dbSearchSession ->
                     dbSearchSession?.let {
                         Either.Right(it.toSearchSession())
-                    } ?: Either.Left(SearchError.SessionNotFound())
+                    } ?: Either.Left(Throwable("Search session not found: searchSessionId=$id"))
                 }
             } else {
-                Either.Left(SearchError.SessionNotFound())
+                Either.Left(Throwable("Search session not found: searchSessionId=$id"))
             }
         }
 
@@ -84,6 +83,7 @@ internal class RealSearchRepository(
             data = searchSession.toSearchSession(),
             merge = true,
         )
+        .mapLeft { Throwable("Search session not found: searchSessionId=${searchSession.id}") }
 
     override suspend fun deleteSearchSession(id: String): Either<Throwable, Unit> = firebaseAdmin
         .firestore()

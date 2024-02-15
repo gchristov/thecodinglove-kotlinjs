@@ -3,7 +3,10 @@ package com.gchristov.thecodinglove.search.domain.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import com.gchristov.thecodinglove.search.domain.RangeError
-import com.gchristov.thecodinglove.search.domain.model.*
+import com.gchristov.thecodinglove.search.domain.model.SearchConfig
+import com.gchristov.thecodinglove.search.domain.model.SearchPost
+import com.gchristov.thecodinglove.search.domain.model.getExcludedPages
+import com.gchristov.thecodinglove.search.domain.model.getExcludedPostIndexes
 import com.gchristov.thecodinglove.search.domain.nextRandomPage
 import com.gchristov.thecodinglove.search.domain.nextRandomPostIndex
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
@@ -12,7 +15,7 @@ import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 interface SearchWithHistoryUseCase {
-    suspend operator fun invoke(dto: Dto): Either<SearchError, Result>
+    suspend operator fun invoke(dto: Dto): Either<Error, Result>
 
     data class Result(
         val query: String,
@@ -28,6 +31,18 @@ interface SearchWithHistoryUseCase {
         val totalPosts: Int? = null,
         val searchHistory: Map<Int, List<Int>>,
     )
+
+    sealed class Error(override val message: String? = null) : Throwable(message) {
+        abstract val additionalInfo: String?
+
+        data class Empty(
+            override val additionalInfo: String? = null
+        ) : Error("No results found${additionalInfo?.let { ": $it" } ?: ""}")
+
+        data class Exhausted(
+            override val additionalInfo: String? = null
+        ) : Error("Results exhausted${additionalInfo?.let { ": $it" } ?: ""}")
+    }
 }
 
 internal class RealSearchWithHistoryUseCase(
@@ -37,13 +52,13 @@ internal class RealSearchWithHistoryUseCase(
 ) : SearchWithHistoryUseCase {
     override suspend operator fun invoke(
         dto: SearchWithHistoryUseCase.Dto
-    ): Either<SearchError, SearchWithHistoryUseCase.Result> = withContext(dispatcher) {
+    ): Either<SearchWithHistoryUseCase.Error, SearchWithHistoryUseCase.Result> = withContext(dispatcher) {
         // Find total number of posts
         (dto.totalPosts?.let { Either.Right(it) } ?: searchRepository.getTotalPosts(dto.query))
-            .mapLeft { SearchError.Empty(additionalInfo = it.message) }
+            .mapLeft { SearchWithHistoryUseCase.Error.Empty(additionalInfo = it.message) }
             .flatMap { totalResults ->
                 if (totalResults <= 0) {
-                    return@withContext Either.Left(SearchError.Empty(additionalInfo = "query=${dto.query}"))
+                    return@withContext Either.Left(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "query=${dto.query}"))
                 }
                 // Generate random page number
                 Random.nextRandomPage(
@@ -58,10 +73,10 @@ internal class RealSearchWithHistoryUseCase(
                             page = postPage,
                             query = dto.query
                         )
-                            .mapLeft { SearchError.Empty(additionalInfo = it.message) }
+                            .mapLeft { SearchWithHistoryUseCase.Error.Empty(additionalInfo = it.message) }
                             .flatMap { searchResults ->
                                 if (searchResults.isEmpty()) {
-                                    return@withContext Either.Left(SearchError.Empty(additionalInfo = "query=${dto.query}"))
+                                    return@withContext Either.Left(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "query=${dto.query}"))
                                 }
                                 // Pick a post randomly from the page
                                 Random.nextRandomPostIndex(
@@ -86,6 +101,6 @@ internal class RealSearchWithHistoryUseCase(
 }
 
 private fun RangeError.toSearchError(query: String) = when (this) {
-    is RangeError.Empty -> SearchError.Empty(additionalInfo = "could not randomize")
-    is RangeError.Exhausted -> SearchError.Exhausted(additionalInfo = "query=$query")
+    is RangeError.Empty -> SearchWithHistoryUseCase.Error.Empty(additionalInfo = "no results to randomize")
+    is RangeError.Exhausted -> SearchWithHistoryUseCase.Error.Exhausted(additionalInfo = "query=$query")
 }

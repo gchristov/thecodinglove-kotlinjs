@@ -25,7 +25,7 @@ class RealVerifySlackRequestUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(SlackVerifyRequestUseCase.Error.TooOld),
+                expected = Either.Left(SlackVerifyRequestUseCase.Error.TooOld()),
                 actual = actualResult
             )
         }
@@ -42,7 +42,7 @@ class RealVerifySlackRequestUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(SlackVerifyRequestUseCase.Error.SignatureMismatch),
+                expected = Either.Left(SlackVerifyRequestUseCase.Error.SignatureMismatch()),
                 actual = actualResult
             )
         }
@@ -59,7 +59,7 @@ class RealVerifySlackRequestUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(SlackVerifyRequestUseCase.Error.SignatureMismatch),
+                expected = Either.Left(SlackVerifyRequestUseCase.Error.SignatureMismatch()),
                 actual = actualResult
             )
         }

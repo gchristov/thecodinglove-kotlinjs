@@ -3,12 +3,11 @@ package com.gchristov.thecodinglove.search.testfixtures
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.test.FakeResponse
 import com.gchristov.thecodinglove.common.test.execute
-import com.gchristov.thecodinglove.search.domain.model.SearchError
 import com.gchristov.thecodinglove.search.domain.usecase.SearchUseCase
 import kotlin.test.assertEquals
 
 class FakeSearchUseCase(
-    var invocationResult: Either<SearchError, SearchUseCase.Result>
+    var invocationResult: Either<SearchUseCase.Error, SearchUseCase.Result>
 ) : SearchUseCase {
     private val searchResponse: FakeResponse = FakeResponse.CompletesNormally
     private var invocations = 0
@@ -16,7 +15,7 @@ class FakeSearchUseCase(
 
     override suspend fun invoke(
         dto: SearchUseCase.Dto
-    ): Either<SearchError, SearchUseCase.Result> {
+    ): Either<SearchUseCase.Error, SearchUseCase.Result> {
         lastType = dto.type
         invocations++
         return searchResponse.execute(invocationResult)

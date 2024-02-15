@@ -7,7 +7,6 @@ import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubMessage
-import com.gchristov.thecodinglove.search.domain.model.SearchError
 import com.gchristov.thecodinglove.search.testfixtures.FakePreloadSearchResultUseCase
 import com.gchristov.thecodinglove.search.testfixtures.PreloadSearchPubSubCreator
 import io.ktor.http.*
@@ -21,7 +20,7 @@ class PreloadSearchPubSubHttpHandlerTest {
     @Test
     fun httpConfig(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = null,
-        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty()),
+        preloadSearchResultInvocationResult = Either.Left(Throwable()),
     ) { handler, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
@@ -43,7 +42,7 @@ class PreloadSearchPubSubHttpHandlerTest {
     @Test
     fun handleRequestParseErrorDoesNotPreload(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = null,
-        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty())
+        preloadSearchResultInvocationResult = Either.Left(Throwable())
     ) { handler, preloadUseCase, request ->
         val result = handler.handlePubSubRequest(request)
         preloadUseCase.assertNotInvoked()
@@ -53,7 +52,7 @@ class PreloadSearchPubSubHttpHandlerTest {
     @Test
     fun handleRequestSearchErrorPreloads(): TestResult = runBlockingTest(
         preloadSearchPubSubMessage = PreloadSearchPubSubCreator.defaultMessage(),
-        preloadSearchResultInvocationResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
+        preloadSearchResultInvocationResult = Either.Left(Throwable())
     ) { handler, preloadUseCase, request ->
         val result = handler.handlePubSubRequest(request)
         preloadUseCase.assertInvokedOnce()
@@ -63,7 +62,7 @@ class PreloadSearchPubSubHttpHandlerTest {
 
     private fun runBlockingTest(
         preloadSearchPubSubMessage: PreloadSearchPubSubMessage?,
-        preloadSearchResultInvocationResult: Either<SearchError, Unit>,
+        preloadSearchResultInvocationResult: Either<Throwable, Unit>,
         testBlock: suspend (PreloadSearchPubSubHandler, FakePreloadSearchResultUseCase, FakePubSubRequest<PreloadSearchPubSubMessage>) -> Unit
     ): TestResult = runTest {
         val preloadSearchResultUseCase = FakePreloadSearchResultUseCase(

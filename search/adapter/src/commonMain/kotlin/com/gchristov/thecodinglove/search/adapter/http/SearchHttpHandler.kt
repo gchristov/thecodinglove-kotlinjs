@@ -9,7 +9,6 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.http.mapper.toSearchResult
 import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubMessage
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
-import com.gchristov.thecodinglove.search.domain.model.SearchError
 import com.gchristov.thecodinglove.search.domain.usecase.SearchUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
@@ -54,14 +53,12 @@ class SearchHttpHandler(
     private suspend fun publishSearchPreloadMessage(
         searchSessionId: String,
         searchConfig: SearchConfig,
-    ) = pubSubPublisher
-        .publishJson(
-            topic = searchConfig.preloadPubSubTopic,
-            body = PreloadSearchPubSubMessage(searchSessionId),
-            jsonSerializer = jsonSerializer,
-            strategy = PreloadSearchPubSubMessage.serializer(),
-        )
-        .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
+    ) = pubSubPublisher.publishJson(
+        topic = searchConfig.preloadPubSubTopic,
+        body = PreloadSearchPubSubMessage(searchSessionId),
+        jsonSerializer = jsonSerializer,
+        strategy = PreloadSearchPubSubMessage.serializer(),
+    )
 }
 
 private fun HttpRequest.toSearchType(): SearchUseCase.Type {
