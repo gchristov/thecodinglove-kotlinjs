@@ -31,6 +31,7 @@ object SearchDomainModule : DiModule() {
                 providePreloadSearchResultUseCase(
                     searchRepository = instance(),
                     searchWithHistoryUseCase = instance(),
+                    log = instance(),
                 )
             }
             bindProvider {
@@ -62,11 +63,13 @@ object SearchDomainModule : DiModule() {
 
     private fun providePreloadSearchResultUseCase(
         searchRepository: SearchRepository,
-        searchWithHistoryUseCase: SearchWithHistoryUseCase
+        searchWithHistoryUseCase: SearchWithHistoryUseCase,
+        log: Logger,
     ): PreloadSearchResultUseCase = RealPreloadSearchResultUseCase(
         dispatcher = Dispatchers.Default,
         searchRepository = searchRepository,
-        searchWithHistoryUseCase = searchWithHistoryUseCase
+        searchWithHistoryUseCase = searchWithHistoryUseCase,
+        log = log,
     )
 
     private fun provideStatisticsUseCase(

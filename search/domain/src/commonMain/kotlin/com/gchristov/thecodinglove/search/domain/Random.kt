@@ -5,7 +5,7 @@ import com.gchristov.thecodinglove.search.domain.model.SearchPost
 import kotlin.math.max
 import kotlin.random.Random
 
-fun Random.nextRandomPage(
+internal fun Random.nextRandomPage(
     totalResults: Int,
     resultsPerPage: Int,
     exclusions: List<Int>
@@ -22,7 +22,7 @@ fun Random.nextRandomPage(
     )
 }
 
-fun Random.nextRandomPostIndex(
+internal fun Random.nextRandomPostIndex(
     posts: List<SearchPost>,
     exclusions: List<Int>
 ): Either<RangeError, Int> {
@@ -68,7 +68,7 @@ private fun Random.nextRandomIntInRange(
     return Either.Right(randomInt)
 }
 
-sealed class RangeError : Throwable() {
+internal sealed class RangeError : Throwable() {
     object Empty : RangeError()
     object Exhausted : RangeError()
 }

@@ -3,7 +3,6 @@ package com.gchristov.thecodinglove.search.testfixtures
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.test.FakeResponse
 import com.gchristov.thecodinglove.common.test.execute
-import com.gchristov.thecodinglove.search.domain.model.SearchError
 import com.gchristov.thecodinglove.search.domain.model.SearchPost
 import com.gchristov.thecodinglove.search.domain.model.SearchSession
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
@@ -37,7 +36,7 @@ class FakeSearchRepository(
     override suspend fun getSearchSession(id: String): Either<Throwable, SearchSession> {
         searchSessionGetCalled = true
         return searchSession?.let { Either.Right(searchSessionResponse.execute(it)) }
-            ?: Either.Left(SearchError.SessionNotFound())
+            ?: Either.Left(Exception("Search session not found: searchSessionId=$id"))
     }
 
     override suspend fun saveSearchSession(searchSession: SearchSession): Either<Throwable, Unit> {

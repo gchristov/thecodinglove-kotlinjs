@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.benasher44.uuid.uuid4
 import com.gchristov.thecodinglove.search.domain.model.SearchPost
-import com.gchristov.thecodinglove.search.domain.model.SearchError
 import com.gchristov.thecodinglove.search.domain.model.SearchSession
 import com.gchristov.thecodinglove.search.domain.model.insert
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
@@ -12,7 +11,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 interface SearchUseCase {
-    suspend operator fun invoke(dto: Dto): Either<SearchError, Result>
+    suspend operator fun invoke(dto: Dto): Either<Error, Result>
 
     sealed class Type {
         data class WithSessionId(val sessionId: String) : Type()
@@ -27,6 +26,18 @@ interface SearchUseCase {
     )
 
     data class Dto(val type: Type)
+
+    sealed class Error(override val message: String? = null) : Throwable(message) {
+        abstract val additionalInfo: String?
+
+        data class Empty(
+            override val additionalInfo: String? = null
+        ) : Error("No results found${additionalInfo?.let { ": $it" } ?: ""}")
+
+        data class SessionNotFound(
+            override val additionalInfo: String? = null
+        ) : Error("Session not found${additionalInfo?.let { ": $it" } ?: ""}")
+    }
 }
 
 internal class RealSearchUseCase(
@@ -36,7 +47,7 @@ internal class RealSearchUseCase(
 ) : SearchUseCase {
     override suspend operator fun invoke(
         dto: SearchUseCase.Dto
-    ): Either<SearchError, SearchUseCase.Result> = withContext(dispatcher) {
+    ): Either<SearchUseCase.Error, SearchUseCase.Result> = withContext(dispatcher) {
         dto.type
             .getSearchSession(searchRepository)
             .flatMap { searchSession ->
@@ -47,7 +58,7 @@ internal class RealSearchUseCase(
                         preloadedPost = preloadedPost,
                         searchRepository = searchRepository
                     )
-                        .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
+                        .mapLeft { SearchUseCase.Error.SessionNotFound(additionalInfo = it.message) }
                         .map {
                             SearchUseCase.Result(
                                 searchSessionId = searchSession.id,
@@ -67,14 +78,16 @@ internal class RealSearchUseCase(
                     ).fold(
                         ifLeft = { searchError ->
                             when (searchError) {
-                                is SearchError.Exhausted -> {
+                                is SearchWithHistoryUseCase.Error.Exhausted -> {
                                     searchSession
                                         .clearExhaustedHistory(searchRepository)
-                                        .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
+                                        .mapLeft { SearchUseCase.Error.SessionNotFound(additionalInfo = it.message) }
                                         .flatMap { invoke(dto) }
                                 }
 
-                                else -> Either.Left(searchError)
+                                is SearchWithHistoryUseCase.Error.Empty -> Either.Left(
+                                    SearchUseCase.Error.Empty(additionalInfo = searchError.additionalInfo)
+                                )
                             }
                         },
                         ifRight = { searchResult ->
@@ -83,7 +96,7 @@ internal class RealSearchUseCase(
                                     searchResult = searchResult,
                                     searchRepository = searchRepository
                                 )
-                                .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
+                                .mapLeft { SearchUseCase.Error.SessionNotFound(additionalInfo = it.message) }
                                 .map {
                                     SearchUseCase.Result(
                                         searchSessionId = searchSession.id,
@@ -101,7 +114,7 @@ internal class RealSearchUseCase(
 
 private suspend fun SearchUseCase.Type.getSearchSession(
     searchRepository: SearchRepository
-): Either<SearchError, SearchSession> = when (this) {
+): Either<SearchUseCase.Error, SearchSession> = when (this) {
     is SearchUseCase.Type.NewSession -> Either.Right(
         SearchSession(
             id = uuid4().toString(),
@@ -116,7 +129,7 @@ private suspend fun SearchUseCase.Type.getSearchSession(
 
     is SearchUseCase.Type.WithSessionId -> searchRepository
         .getSearchSession(this.sessionId)
-        .mapLeft { SearchError.SessionNotFound(additionalInfo = it.message) }
+        .mapLeft { SearchUseCase.Error.SessionNotFound(additionalInfo = it.message) }
 }
 
 private suspend fun SearchSession.insertCurrentPost(

@@ -2,13 +2,14 @@ package com.gchristov.thecodinglove.search.domain.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.search.domain.model.SearchError
+import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.search.domain.model.SearchSession
 import com.gchristov.thecodinglove.search.testfixtures.*
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class RealPreloadSearchResultUseCaseTest {
     @Test
@@ -17,10 +18,7 @@ class RealPreloadSearchResultUseCaseTest {
             val actualResult = useCase.invoke(PreloadSearchResultUseCase.Dto(searchSessionId = TestSearchSessionId))
             searchRepository.assertSessionFetched()
             searchWithHistoryUseCase.assertNotInvoked()
-            assertEquals(
-                expected = Either.Left(SearchError.SessionNotFound(additionalInfo = "Session not found")),
-                actual = actualResult
-            )
+            assertTrue { actualResult.isLeft { it.message == "Search session not found: searchSessionId=$TestSearchSessionId" } }
         }
     }
 
@@ -46,7 +44,7 @@ class RealPreloadSearchResultUseCaseTest {
 
     @Test
     fun preloadWithEmptyResultReturnsEmpty(): TestResult {
-        val searchWithHistoryResult = Either.Left(SearchError.Empty(additionalInfo = "test"))
+        val searchWithHistoryResult = Either.Left(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "test"))
         val searchSession = SearchSessionCreator.searchSession(
             id = TestSearchSessionId,
             query = TestSearchQuery
@@ -59,15 +57,12 @@ class RealPreloadSearchResultUseCaseTest {
             val actualResult = useCase.invoke(PreloadSearchResultUseCase.Dto(searchSessionId = TestSearchSessionId))
             searchRepository.assertSessionFetched()
             searchWithHistoryUseCase.assertInvokedOnce()
-            assertEquals(
-                expected = Either.Left(SearchError.Empty(additionalInfo = "test")),
-                actual = actualResult,
-            )
+            assertTrue { actualResult.isLeft { it.message == "No results found: test" } }
         }
     }
 
     @Test
-    fun preloadWithExhaustedResultClearsPreloadedPostAndReturnsExhausted(): TestResult {
+    fun preloadWithExhaustedResultClearsPreloadedPostAndReturns(): TestResult {
         val searchSession = SearchSessionCreator.searchSession(
             id = TestSearchSessionId,
             query = TestSearchQuery,
@@ -76,7 +71,9 @@ class RealPreloadSearchResultUseCaseTest {
         )
 
         return runBlockingTest(
-            singleSearchWithHistoryInvocationResult = Either.Left(SearchError.Exhausted(additionalInfo = "test")),
+            singleSearchWithHistoryInvocationResult = Either.Left(
+                SearchWithHistoryUseCase.Error.Exhausted(additionalInfo = "test")
+            ),
             searchSession = searchSession,
         ) { useCase, searchRepository, searchWithHistoryUseCase ->
             val actualResult = useCase.invoke(PreloadSearchResultUseCase.Dto(searchSessionId = TestSearchSessionId))
@@ -93,7 +90,7 @@ class RealPreloadSearchResultUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(SearchError.Exhausted(additionalInfo = "test")),
+                expected = Either.Right(Unit),
                 actual = actualResult,
             )
         }
@@ -133,7 +130,7 @@ class RealPreloadSearchResultUseCaseTest {
     }
 
     private fun runBlockingTest(
-        singleSearchWithHistoryInvocationResult: Either<SearchError, SearchWithHistoryUseCase.Result>? = null,
+        singleSearchWithHistoryInvocationResult: Either<SearchWithHistoryUseCase.Error, SearchWithHistoryUseCase.Result>? = null,
         searchSession: SearchSession?,
         testBlock: suspend (PreloadSearchResultUseCase, FakeSearchRepository, FakeSearchWithHistoryUseCase) -> Unit
     ): TestResult = runTest {
@@ -146,7 +143,8 @@ class RealPreloadSearchResultUseCaseTest {
         val useCase = RealPreloadSearchResultUseCase(
             dispatcher = FakeCoroutineDispatcher,
             searchRepository = searchRepository,
-            searchWithHistoryUseCase = searchWithHistoryUseCase
+            searchWithHistoryUseCase = searchWithHistoryUseCase,
+            log = FakeLogger,
         )
         testBlock(useCase, searchRepository, searchWithHistoryUseCase)
     }

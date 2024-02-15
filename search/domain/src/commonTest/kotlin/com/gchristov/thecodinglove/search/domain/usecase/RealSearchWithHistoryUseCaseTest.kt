@@ -2,7 +2,10 @@ package com.gchristov.thecodinglove.search.domain.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.search.domain.model.*
+import com.gchristov.thecodinglove.search.domain.model.SearchConfig
+import com.gchristov.thecodinglove.search.domain.model.SearchPost
+import com.gchristov.thecodinglove.search.domain.model.contains
+import com.gchristov.thecodinglove.search.domain.model.insert
 import com.gchristov.thecodinglove.search.testfixtures.FakeSearchRepository
 import com.gchristov.thecodinglove.search.testfixtures.SearchPostCreator
 import kotlinx.coroutines.test.TestResult
@@ -29,7 +32,7 @@ class RealSearchWithHistoryUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(SearchError.Empty(additionalInfo = "query=$TestSearchQuery")),
+                expected = Either.Left(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "query=$TestSearchQuery")),
                 actual = actualResult
             )
         }
@@ -51,7 +54,7 @@ class RealSearchWithHistoryUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(SearchError.Empty(additionalInfo = "query=$TestSearchQuery")),
+                expected = Either.Left(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "query=$TestSearchQuery")),
                 actual = actualResult,
             )
         }
@@ -170,7 +173,7 @@ class RealSearchWithHistoryUseCaseTest {
                     searchHistory = searchHistory,
                 )
             )
-            assertTrue { actualResult == Either.Left(SearchError.Exhausted(additionalInfo = "query=$TestSearchQuery")) }
+            assertTrue { actualResult == Either.Left(SearchWithHistoryUseCase.Error.Exhausted(additionalInfo = "query=$TestSearchQuery")) }
         }
     }
 
