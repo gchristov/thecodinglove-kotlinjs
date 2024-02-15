@@ -11,7 +11,6 @@ import com.gchristov.thecodinglove.common.kotlin.di.registerModules
 import com.gchristov.thecodinglove.common.kotlin.process
 import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
 import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
-import com.gchristov.thecodinglove.common.monitoring.domain.MonitoringEnvironment
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.statistics.adapter.StatisticsAdapterModule
@@ -22,13 +21,9 @@ import com.gchristov.thecodinglove.statistics.domain.model.Environment
 suspend fun main() {
     // Ignore default Node arguments
     val environment = Environment.of(process.argv.slice(2) as Array<String>)
-    val monitoringEnvironment = MonitoringEnvironment.of(process.argv.slice(2) as Array<String>)
     val tag = "StatisticsService"
 
-    setupDi(
-        environment = environment,
-        monitoringEnvironment = monitoringEnvironment,
-    )
+    setupDi(environment = environment)
         .flatMap { setupMonitoring() }
         .flatMap { setupService(environment.port) }
         .flatMap { startService(it) }
@@ -42,15 +37,12 @@ suspend fun main() {
         })
 }
 
-private fun setupDi(
-    environment: Environment,
-    monitoringEnvironment: MonitoringEnvironment,
-): Either<Throwable, Unit> {
+private fun setupDi(environment: Environment): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
-            CommonMonitoringModule(monitoringEnvironment).module,
+            CommonMonitoringModule(environment.apiUrl).module,
             StatisticsDomainModule.module,
             StatisticsAdapterModule.module,
             StatisticsServiceModule(environment).module,

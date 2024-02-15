@@ -12,7 +12,6 @@ import com.gchristov.thecodinglove.common.kotlin.di.registerModules
 import com.gchristov.thecodinglove.common.kotlin.process
 import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
 import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
-import com.gchristov.thecodinglove.common.monitoring.domain.MonitoringEnvironment
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
@@ -26,13 +25,9 @@ import com.gchristov.thecodinglove.slack.domain.model.Environment
 suspend fun main() {
     // Ignore default Node arguments
     val environment = Environment.of(process.argv.slice(2) as Array<String>)
-    val monitoringEnvironment = MonitoringEnvironment.of(process.argv.slice(2) as Array<String>)
     val tag = "SlackService"
 
-    setupDi(
-        environment = environment,
-        monitoringEnvironment = monitoringEnvironment,
-    )
+    setupDi(environment = environment)
         .flatMap { setupMonitoring() }
         .flatMap { setupService(environment.port) }
         .flatMap { startService(it) }
@@ -46,19 +41,16 @@ suspend fun main() {
         })
 }
 
-private fun setupDi(
-    environment: Environment,
-    monitoringEnvironment: MonitoringEnvironment
-): Either<Throwable, Unit> {
+private fun setupDi(environment: Environment): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonPubSubModule.module,
-            CommonMonitoringModule(monitoringEnvironment).module,
+            CommonMonitoringModule(environment.apiUrl).module,
             CommonFirebaseModule.module,
             SlackDomainModule.module,
-            SlackAdapterModule.module,
+            SlackAdapterModule(environment).module,
             SlackServiceModule(environment).module,
         )
     )

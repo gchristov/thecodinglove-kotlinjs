@@ -60,6 +60,6 @@ node_modules/
 firebase-debug.log*
 firebase-debug.*.log*
 
-env.properties
+secrets.properties
 credentials-gcp-app.json
 credentials-gcp-infra.json

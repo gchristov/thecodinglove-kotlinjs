@@ -59,8 +59,8 @@ fun Project.binaryDestination(): Provider<Directory> {
     return rootProject.layout.buildDirectory.dir("services/$name")
 }
 
-fun Project.envVar(key: String): String {
-    val propFile = file("./env.properties")
+fun Project.envSecret(key: String): String {
+    val propFile = file("./secrets.properties")
     val properties = Properties()
     properties.load(FileInputStream(propFile))
     return properties.getProperty(key)

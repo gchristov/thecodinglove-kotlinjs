@@ -27,7 +27,7 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-object SlackAdapterModule : DiModule() {
+class SlackAdapterModule(private val environment: Environment) : DiModule() {
     override fun name() = "slack-adapter"
 
     override fun bindDependencies(builder: DI.Builder) {
@@ -140,11 +140,11 @@ object SlackAdapterModule : DiModule() {
     private fun provideSlackConfig(): SlackConfig = SlackConfig(
         signingSecret = BuildConfig.SLACK_SIGNING_SECRET,
         timestampValidityMinutes = 5,
-        requestVerificationEnabled = BuildConfig.SLACK_REQUEST_VERIFICATION_ENABLED,
+        requestVerificationEnabled = environment.slackRequestVerification,
         clientId = BuildConfig.SLACK_CLIENT_ID,
         clientSecret = BuildConfig.SLACK_CLIENT_SECRET,
-        interactivityPubSubTopic = BuildConfig.SLACK_INTERACTIVITY_PUBSUB_TOPIC,
-        slashCommandPubSubTopic = BuildConfig.SLACK_SLASH_COMMAND_PUBSUB_TOPIC,
+        interactivityPubSubTopic = environment.slackInteractivityPubSubTopic,
+        slashCommandPubSubTopic = environment.slackSlashCommandPubSubTopic,
         monitoringUrl = BuildConfig.SLACK_MONITORING_URL,
     )
 
