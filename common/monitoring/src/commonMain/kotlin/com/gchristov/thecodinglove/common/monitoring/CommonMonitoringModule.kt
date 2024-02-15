@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove.common.monitoring
 
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
-import com.gchristov.thecodinglove.common.monitoring.domain.MonitoringEnvironment
 import com.gchristov.thecodinglove.common.monitoring.slack.RealSlackReportExceptionRepository
 import com.gchristov.thecodinglove.common.monitoring.slack.SlackReportExceptionApi
 import com.gchristov.thecodinglove.common.monitoring.slack.SlackReportExceptionRepository
@@ -11,7 +10,7 @@ import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-data class CommonMonitoringModule(val environment: MonitoringEnvironment) : DiModule() {
+data class CommonMonitoringModule(val apiUrl: String) : DiModule() {
     override fun name() = "common-monitoring"
 
     override fun bindDependencies(builder: DI.Builder) {
@@ -19,7 +18,7 @@ data class CommonMonitoringModule(val environment: MonitoringEnvironment) : DiMo
             bindSingleton {
                 provideSlackReportExceptionApi(
                     networkClient = instance(),
-                    environment = environment,
+                    apiUrl = apiUrl,
                 )
             }
             bindSingleton {
@@ -37,10 +36,10 @@ data class CommonMonitoringModule(val environment: MonitoringEnvironment) : DiMo
 
     private fun provideSlackReportExceptionApi(
         networkClient: NetworkClient.Json,
-        environment: MonitoringEnvironment,
+        apiUrl: String,
     ): SlackReportExceptionApi = SlackReportExceptionApi(
         client = networkClient,
-        environment = environment,
+        apiUrl = apiUrl,
     )
 
     private fun provideSlackReportExceptionRepository(
