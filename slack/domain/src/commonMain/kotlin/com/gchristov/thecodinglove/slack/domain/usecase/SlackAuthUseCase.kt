@@ -13,9 +13,14 @@ interface SlackAuthUseCase {
     suspend operator fun invoke(dto: Dto): Either<Error, Unit>
 
     sealed class Error(override val message: String? = null) : Throwable(message) {
-        object Cancelled : Error()
+        abstract val additionalInfo: String?
+
+        data class Cancelled(
+            override val additionalInfo: String? = null
+        ) : Error("Auth cancelled${additionalInfo?.let { ": $it" } ?: ""}")
+
         data class Other(
-            val additionalInfo: String? = null
+            override val additionalInfo: String? = null
         ) : Error("Auth error${additionalInfo?.let { ": $it" } ?: ""}")
     }
 
@@ -35,7 +40,7 @@ internal class RealSlackAuthUseCase(
             log.debug(tag, "Processing user auth request: code=${dto.code}")
             if (dto.code.isNullOrEmpty()) {
                 log.debug(tag, "Auth cancelled")
-                Either.Left(SlackAuthUseCase.Error.Cancelled)
+                Either.Left(SlackAuthUseCase.Error.Cancelled())
             } else {
                 slackRepository.authUser(
                     code = dto.code,

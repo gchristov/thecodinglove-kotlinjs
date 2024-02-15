@@ -18,10 +18,18 @@ interface SlackVerifyRequestUseCase {
     suspend operator fun invoke(dto: Dto): Either<Error, Unit>
 
     sealed class Error(override val message: String? = null) : Throwable(message) {
-        object TooOld : Error()
-        object SignatureMismatch : Error()
+        abstract val additionalInfo: String?
+
+        data class TooOld(
+            override val additionalInfo: String? = null
+        ) : Error("Request too old${additionalInfo?.let { ": $it" } ?: ""}")
+
+        data class SignatureMismatch(
+            override val additionalInfo: String? = null
+        ) : Error("Request signature mismatch${additionalInfo?.let { ": $it" } ?: ""}")
+
         data class Other(
-            val additionalInfo: String?
+            override val additionalInfo: String? = null
         ) : Error("Request verification error${additionalInfo?.let { ": $it" } ?: ""}")
     }
 
@@ -70,7 +78,7 @@ internal class RealSlackVerifyRequestUseCase(
             unit = DateTimeUnit.MINUTE
         )
         if (timestampInstant < clock.now()) {
-            Either.Left(SlackVerifyRequestUseCase.Error.TooOld)
+            Either.Left(SlackVerifyRequestUseCase.Error.TooOld())
         } else {
             Either.Right(Unit)
         }
@@ -100,7 +108,7 @@ internal class RealSlackVerifyRequestUseCase(
         ) {
             Either.Right(Unit)
         } else {
-            Either.Left(SlackVerifyRequestUseCase.Error.SignatureMismatch)
+            Either.Left(SlackVerifyRequestUseCase.Error.SignatureMismatch())
         }
     } catch (error: Throwable) {
         Either.Left(SlackVerifyRequestUseCase.Error.Other(additionalInfo = error.message))
