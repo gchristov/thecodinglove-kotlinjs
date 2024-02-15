@@ -50,7 +50,7 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
             CommonPubSubModule.module,
             CommonMonitoringModule(environment.apiUrl).module,
             CommonFirebaseModule.module,
-            SearchAdapterModule.module,
+            SearchAdapterModule(environment).module,
             SearchDomainModule.module,
         )
     )

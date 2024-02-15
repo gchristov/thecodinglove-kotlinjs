@@ -40,7 +40,7 @@ jobs:
       - name: Build project
         run: |
           set -o pipefail && 
-          bash ./env.sh && 
+          bash ./secrets.sh && 
           ./gradlew --no-daemon assemble
       - name: Deploy infrastructure
         uses: pulumi/actions@v5
@@ -57,7 +57,7 @@ jobs:
           name: Build
           path: |
             build/services
-            **/env.properties
+            **/secrets.properties
             pulumi/
 
   jsTest:
@@ -78,7 +78,7 @@ jobs:
       - name: Test
         run: |
           set -o pipefail && 
-          bash ./env.sh && 
+          bash ./secrets.sh && 
           ./gradlew --no-daemon --continue jsNodeTest
       - name: Generate test report
         uses: mikepenz/action-junit-report@v4

@@ -152,6 +152,7 @@ resources:
         args:
           PORT: "8081"
           API_URL: https://${domain}/api
+          PRELOAD_SEARCH_PUBSUB_TOPIC: preload_search
         platform: linux/amd64
         context: ../build/services/search-service
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/search-service:latest
@@ -391,6 +392,9 @@ resources:
         args:
           PORT: "8084"
           API_URL: https://${domain}/api
+          SLACK_REQUEST_VERIFICATION: "true"
+          SLACK_SLASH_COMMAND_PUBSUB_TOPIC: slack_slash_command
+          SLACK_INTERACTIVITY_PUBSUB_TOPIC: slack_interactivity
         platform: linux/amd64
         context: ../build/services/slack-service
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/slack-service:latest

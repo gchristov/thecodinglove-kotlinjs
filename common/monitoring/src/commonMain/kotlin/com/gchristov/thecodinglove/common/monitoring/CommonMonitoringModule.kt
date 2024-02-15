@@ -10,7 +10,7 @@ import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-data class CommonMonitoringModule(val apiUrl: String) : DiModule() {
+class CommonMonitoringModule(val apiUrl: String) : DiModule() {
     override fun name() = "common-monitoring"
 
     override fun bindDependencies(builder: DI.Builder) {

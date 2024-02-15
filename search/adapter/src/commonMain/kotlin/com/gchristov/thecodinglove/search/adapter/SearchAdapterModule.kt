@@ -10,6 +10,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.http.*
+import com.gchristov.thecodinglove.search.domain.model.Environment
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
 import com.gchristov.thecodinglove.search.domain.usecase.PreloadSearchResultUseCase
@@ -21,7 +22,7 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-object SearchAdapterModule : DiModule() {
+class SearchAdapterModule(private val environment: Environment) : DiModule() {
     override fun name() = "search-adapter"
 
     override fun bindDependencies(builder: DI.Builder) {
@@ -105,7 +106,7 @@ object SearchAdapterModule : DiModule() {
 
     private fun provideSearchConfig(): SearchConfig = SearchConfig(
         postsPerPage = 4,
-        preloadPubSubTopic = BuildConfig.SEARCH_PRELOAD_PUBSUB_TOPIC,
+        preloadPubSubTopic = environment.preloadSearchPubSubTopic,
     )
 
     private fun provideSearchHttpHandler(
