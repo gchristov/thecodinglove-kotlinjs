@@ -7,7 +7,7 @@ import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
-import com.gchristov.thecodinglove.search.proto.http.SearchApiRepository
+import com.gchristov.thecodinglove.search.proto.http.SearchServiceRepository
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
@@ -43,7 +43,7 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
                 provideSlackAuthStateSerializer(jsonSerializer = instance())
             }
             bindSingleton {
-                provideSlackSearchRepository(searchApiRepository = instance())
+                provideSlackSearchRepository(searchServiceRepository = instance())
             }
             bindSingleton {
                 provideSlackEventHttpHandler(
@@ -150,8 +150,8 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
     private fun provideSlackAuthStateSerializer(jsonSerializer: JsonSerializer.Default): SlackAuthStateSerializer =
         RealSlackAuthStateSerializer(jsonSerializer = jsonSerializer)
 
-    private fun provideSlackSearchRepository(searchApiRepository: SearchApiRepository): SlackSearchRepository =
-        RealSlackSearchRepository(searchApiRepository = searchApiRepository)
+    private fun provideSlackSearchRepository(searchServiceRepository: SearchServiceRepository): SlackSearchRepository =
+        RealSlackSearchRepository(searchServiceRepository = searchServiceRepository)
 
     private fun provideSlackEventHttpHandler(
         jsonSerializer: JsonSerializer.Default,

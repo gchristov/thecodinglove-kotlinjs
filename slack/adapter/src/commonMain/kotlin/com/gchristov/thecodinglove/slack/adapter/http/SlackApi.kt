@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.slack.adapter.http
 
 import com.gchristov.thecodinglove.common.network.NetworkClient
-import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackDeleteMessage
-import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackMessage
+import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackDeleteMessage
+import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackMessage
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

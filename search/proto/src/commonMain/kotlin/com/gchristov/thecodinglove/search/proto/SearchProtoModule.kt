@@ -2,9 +2,9 @@ package com.gchristov.thecodinglove.search.proto
 
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
-import com.gchristov.thecodinglove.search.proto.http.RealSearchApiRepository
-import com.gchristov.thecodinglove.search.proto.http.SearchApi
-import com.gchristov.thecodinglove.search.proto.http.SearchApiRepository
+import com.gchristov.thecodinglove.search.proto.http.RealSearchServiceRepository
+import com.gchristov.thecodinglove.search.proto.http.SearchServiceApi
+import com.gchristov.thecodinglove.search.proto.http.SearchServiceRepository
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
@@ -15,25 +15,25 @@ class SearchProtoModule(private val apiUrl: String) : DiModule() {
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindSingleton {
-                provideSearchApi(
+                provideSearchServiceApi(
                     networkClient = instance(),
                     apiUrl = apiUrl,
                 )
             }
             bindSingleton {
-                provideSearchApiRepository(searchApi = instance())
+                provideSearchServiceRepository(searchServiceApi = instance())
             }
         }
     }
 
-    private fun provideSearchApi(
+    private fun provideSearchServiceApi(
         networkClient: NetworkClient.Json,
         apiUrl: String,
-    ): SearchApi = SearchApi(
+    ): SearchServiceApi = SearchServiceApi(
         client = networkClient,
         apiUrl = apiUrl,
     )
 
-    private fun provideSearchApiRepository(searchApi: SearchApi): SearchApiRepository =
-        RealSearchApiRepository(searchApi = searchApi)
+    private fun provideSearchServiceRepository(searchServiceApi: SearchServiceApi): SearchServiceRepository =
+        RealSearchServiceRepository(searchServiceApi = searchServiceApi)
 }

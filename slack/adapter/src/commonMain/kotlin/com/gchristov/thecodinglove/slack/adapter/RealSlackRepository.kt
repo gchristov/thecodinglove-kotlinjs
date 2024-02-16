@@ -12,11 +12,11 @@ import com.gchristov.thecodinglove.slack.adapter.db.mapper.toSelfDestructMessage
 import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toAuthToken
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackMessage
-import com.gchristov.thecodinglove.slack.adapter.http.model.*
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthToken
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
+import com.gchristov.thecodinglove.slack.proto.http.model.*
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

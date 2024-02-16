@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.slack.adapter.http.model
+package com.gchristov.thecodinglove.slack.proto.http.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal sealed class ApiSlackEvent {
+sealed class ApiSlackEvent {
     @Serializable
     @SerialName("url_verification")
     data class ApiUrlVerification(

@@ -11,10 +11,10 @@ import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSlashCommandPubSubMessage
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
+import com.gchristov.thecodinglove.slack.proto.pubsub.PubSubSlackSlashCommandMessage
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -43,12 +43,12 @@ class SlackSlashCommandPubSubHandler(
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =
         request.decodeBodyFromJson(
             jsonSerializer = jsonSerializer,
-            strategy = SlackSlashCommandPubSubMessage.serializer(),
+            strategy = PubSubSlackSlashCommandMessage.serializer(),
         )
             .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
             .flatMap { it.handle() }
 
-    private suspend fun SlackSlashCommandPubSubMessage.handle() = slackRepository.postMessageToUrl(
+    private suspend fun PubSubSlackSlashCommandMessage.handle() = slackRepository.postMessageToUrl(
         url = responseUrl,
         message = slackMessageFactory.message("🔎 Hang tight, we're finding your GIF...")
     )

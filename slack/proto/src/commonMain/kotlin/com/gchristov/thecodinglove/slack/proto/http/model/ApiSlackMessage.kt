@@ -1,23 +1,23 @@
-package com.gchristov.thecodinglove.slack.adapter.http.model
+package com.gchristov.thecodinglove.slack.proto.http.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class ApiSlackPostMessageResponse(
+data class ApiSlackPostMessageResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("error") val error: String?,
     @SerialName("ts") val messageTs: String,
 )
 
 @Serializable
-internal data class ApiSlackReplyWithMessageResponse(
+data class ApiSlackReplyWithMessageResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("error") val error: String?,
 )
 
 @Serializable
-internal data class ApiSlackMessage(
+data class ApiSlackMessage(
     @SerialName("text") val text: String?,
     @SerialName("user_id") val userId: String?,
     @SerialName("channel") val channelId: String?,

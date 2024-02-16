@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slack.adapter.http.model
+package com.gchristov.thecodinglove.slack.proto.http.model
 
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
@@ -14,7 +14,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Serializable
-internal data class ApiSlackInteractivity(
+data class ApiSlackInteractivity(
     @SerialName("payload") @Serializable(with = PayloadSerializer::class) val payload: ApiSlackInteractivityPayload,
 ) {
     @Serializable

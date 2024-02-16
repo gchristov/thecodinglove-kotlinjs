@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.http.mapper
 
-import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
+import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackMessage
 
 internal fun SlackMessage.toSlackMessage() = ApiSlackMessage(
     text = text,

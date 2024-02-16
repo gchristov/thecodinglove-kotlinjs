@@ -3,13 +3,11 @@ package com.gchristov.thecodinglove.statistics.adapter
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
-import com.gchristov.thecodinglove.common.network.NetworkClient
-import com.gchristov.thecodinglove.search.proto.http.SearchApiRepository
+import com.gchristov.thecodinglove.search.proto.http.SearchServiceRepository
+import com.gchristov.thecodinglove.slack.proto.http.SlackServiceRepository
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
 import com.gchristov.thecodinglove.statistics.adapter.search.RealStatisticsSearchRepository
 import com.gchristov.thecodinglove.statistics.adapter.slack.RealStatisticsSlackRepository
-import com.gchristov.thecodinglove.statistics.adapter.slack.SlackStatisticsApi
-import com.gchristov.thecodinglove.statistics.domain.model.Environment
 import com.gchristov.thecodinglove.statistics.domain.port.StatisticsSearchRepository
 import com.gchristov.thecodinglove.statistics.domain.port.StatisticsSlackRepository
 import com.gchristov.thecodinglove.statistics.domain.usecase.StatisticsReportUseCase
@@ -31,19 +29,13 @@ object StatisticsAdapterModule : DiModule() {
                 )
             }
             bindSingleton {
-                provideSlackStatisticsApi(
-                    networkClient = instance(),
-                    environment = instance(),
-                )
-            }
-            bindSingleton {
                 provideStatisticsSearchRepository(
-                    searchApiRepository = instance(),
+                    searchServiceRepository = instance(),
                 )
             }
             bindSingleton {
                 provideStatisticsSlackRepository(
-                    slackStatisticsApi = instance(),
+                    slackServiceRepository = instance(),
                 )
             }
         }
@@ -61,22 +53,14 @@ object StatisticsAdapterModule : DiModule() {
     )
 
     private fun provideStatisticsSearchRepository(
-        searchApiRepository: SearchApiRepository,
+        searchServiceRepository: SearchServiceRepository,
     ): StatisticsSearchRepository = RealStatisticsSearchRepository(
-        searchApiRepository = searchApiRepository,
+        searchServiceRepository = searchServiceRepository,
     )
 
     private fun provideStatisticsSlackRepository(
-        slackStatisticsApi: SlackStatisticsApi,
+        slackServiceRepository: SlackServiceRepository,
     ): StatisticsSlackRepository = RealStatisticsSlackRepository(
-        slackStatisticsApi = slackStatisticsApi,
-    )
-
-    private fun provideSlackStatisticsApi(
-        networkClient: NetworkClient.Json,
-        environment: Environment,
-    ): SlackStatisticsApi = SlackStatisticsApi(
-        client = networkClient,
-        environment = environment,
+        slackServiceRepository = slackServiceRepository,
     )
 }

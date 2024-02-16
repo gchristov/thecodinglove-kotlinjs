@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.slack.adapter.pubsub.model
+package com.gchristov.thecodinglove.slack.proto.pubsub
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class SlackInteractivityPubSubMessage(
+data class PubSubSlackInteractivityMessage(
     val payload: InteractivityPayload
 ) {
     @Serializable

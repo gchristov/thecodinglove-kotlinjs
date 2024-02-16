@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.slack.adapter.http.mapper
 
-import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackAuthResponse
-import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthToken
+import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackAuthResponse
+import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackAuthState
 
 internal fun SlackAuthState.toAuthState() = ApiSlackAuthState(
     searchSessionId = searchSessionId,
@@ -18,20 +18,20 @@ internal fun SlackAuthState.toAuthState() = ApiSlackAuthState(
 internal fun ApiSlackAuthResponse.toAuthToken() = if (authedUser?.accessToken != null) {
     // User token
     SlackAuthToken(
-        id = requireNotNull(authedUser.id),
-        scope = requireNotNull(authedUser.scope),
-        token = authedUser.accessToken,
-        teamId = requireNotNull(team).id,
-        teamName = team.name,
+        id = authedUser!!.id,
+        scope = authedUser!!.scope!!,
+        token = authedUser!!.accessToken!!,
+        teamId = team!!.id,
+        teamName = team!!.name,
     )
 } else {
     // Bot token
     SlackAuthToken(
-        id = requireNotNull(botUserId),
-        scope = requireNotNull(scope),
-        token = requireNotNull(accessToken),
-        teamId = requireNotNull(team).id,
-        teamName = team.name,
+        id = botUserId!!,
+        scope = scope!!,
+        token = accessToken!!,
+        teamId = team!!.id,
+        teamName = team!!.name,
     )
 }
 

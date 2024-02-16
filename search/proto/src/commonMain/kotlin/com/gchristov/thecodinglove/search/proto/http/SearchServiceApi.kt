@@ -6,7 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 
-internal class SearchApi(
+internal class SearchServiceApi(
     private val client: NetworkClient.Json,
     private val apiUrl: String,
 ) {

@@ -10,9 +10,9 @@ import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.network.http.HttpRequest
 import com.gchristov.thecodinglove.common.network.http.HttpResponse
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toAuthState
-import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackAuthState
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackAuthUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
+import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackAuthState
 import io.ktor.http.*
 import io.ktor.util.*
 import kotlinx.coroutines.CoroutineDispatcher
