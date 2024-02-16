@@ -12,4 +12,8 @@ internal class SlackServiceApi(
     suspend fun slackStatistics(): HttpResponse = client.http.get("$apiUrl/slack/statistics") {
         contentType(ContentType.Application.Json)
     }
+
+    suspend fun selfDestruct(): HttpResponse = client.http.get("$apiUrl/slack/self-destruct") {
+        contentType(ContentType.Application.Json)
+    }
 }
