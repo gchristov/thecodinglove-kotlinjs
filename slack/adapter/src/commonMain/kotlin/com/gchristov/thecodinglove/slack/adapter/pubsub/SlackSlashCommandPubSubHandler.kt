@@ -13,8 +13,8 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSlashCommandPubSubMessage
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
-import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
+import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -24,7 +24,7 @@ class SlackSlashCommandPubSubHandler(
     private val log: Logger,
     private val slackRepository: SlackRepository,
     private val slackMessageFactory: SlackMessageFactory,
-    private val searchEngine: SearchEngine,
+    private val slackSearchRepository: SlackSearchRepository,
     pubSubDecoder: PubSubDecoder,
 ) : BasePubSubHandler(
     dispatcher = dispatcher,
@@ -52,7 +52,7 @@ class SlackSlashCommandPubSubHandler(
         url = responseUrl,
         message = slackMessageFactory.message("🔎 Hang tight, we're finding your GIF...")
     )
-        .flatMap { searchEngine.search(text) }
+        .flatMap { slackSearchRepository.search(text) }
         .flatMap { searchResult ->
             slackRepository.postMessageToUrl(
                 url = responseUrl,

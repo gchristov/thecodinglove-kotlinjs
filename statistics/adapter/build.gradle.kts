@@ -8,6 +8,7 @@ kotlin {
             dependencies {
                 implementation(projects.common.network)
                 implementation(projects.statistics.domain)
+                implementation(projects.search.proto)
             }
         }
     }

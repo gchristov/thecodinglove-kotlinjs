@@ -11,8 +11,8 @@ import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
-import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubMessage
 import com.gchristov.thecodinglove.search.domain.usecase.PreloadSearchResultUseCase
+import com.gchristov.thecodinglove.search.proto.pubsub.PubSubPreloadSearchMessage
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -39,7 +39,7 @@ class PreloadSearchPubSubHandler(
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =
         request.decodeBodyFromJson(
             jsonSerializer = jsonSerializer,
-            strategy = PreloadSearchPubSubMessage.serializer(),
+            strategy = PubSubPreloadSearchMessage.serializer(),
         )
             .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
             .flatMap { preloadSearchResultUseCase(PreloadSearchResultUseCase.Dto(searchSessionId = it.searchSessionId)) }

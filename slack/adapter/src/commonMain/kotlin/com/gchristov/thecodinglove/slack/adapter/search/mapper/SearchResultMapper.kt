@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.slack.adapter.search.mapper
 
-import com.gchristov.thecodinglove.slack.adapter.search.model.ApiSearchResult
-import com.gchristov.thecodinglove.slack.domain.port.SearchEngineDto
+import com.gchristov.thecodinglove.search.proto.http.model.ApiSearchResult
+import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 
-internal fun ApiSearchResult.toSearchResult() = SearchEngineDto(
+internal fun ApiSearchResult.toSearchResult() = SlackSearchRepository.SearchResultDto(
     searchSessionId = searchSessionId,
     searchQuery = query,
     searchResults = totalPosts,

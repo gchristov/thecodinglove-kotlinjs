@@ -9,6 +9,7 @@ kotlin {
                 implementation(projects.common.firebase)
                 implementation(projects.slack.domain)
                 implementation(projects.slack.adapter)
+                implementation(projects.search.proto)
             }
         }
     }

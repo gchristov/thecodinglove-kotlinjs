@@ -5,7 +5,7 @@ import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
-import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStorage
+import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -22,7 +22,7 @@ interface SlackCancelSearchUseCase {
 internal class RealSlackCancelSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
-    private val searchSessionStorage: SearchSessionStorage,
+    private val slackSearchRepository: SlackSearchRepository,
     private val slackMessageFactory: SlackMessageFactory,
     private val slackRepository: SlackRepository,
 ) : SlackCancelSearchUseCase {
@@ -36,7 +36,7 @@ internal class RealSlackCancelSearchUseCase(
                 message = slackMessageFactory.cancelMessage(),
             ).flatMap {
                 log.debug(tag, "Deleting search session: searchSessionId=${dto.searchSessionId}")
-                searchSessionStorage.deleteSearchSession(dto.searchSessionId)
+                slackSearchRepository.deleteSearchSession(dto.searchSessionId)
             }
         }
 }

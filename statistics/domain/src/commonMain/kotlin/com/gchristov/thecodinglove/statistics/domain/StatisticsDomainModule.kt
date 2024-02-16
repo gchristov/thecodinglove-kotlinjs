@@ -2,8 +2,8 @@ package com.gchristov.thecodinglove.statistics.domain
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
-import com.gchristov.thecodinglove.statistics.domain.port.SearchStatisticsRepository
-import com.gchristov.thecodinglove.statistics.domain.port.SlackStatisticsRepository
+import com.gchristov.thecodinglove.statistics.domain.port.StatisticsSearchRepository
+import com.gchristov.thecodinglove.statistics.domain.port.StatisticsSlackRepository
 import com.gchristov.thecodinglove.statistics.domain.usecase.RealStatisticsReportUseCase
 import com.gchristov.thecodinglove.statistics.domain.usecase.StatisticsReportUseCase
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +19,8 @@ object StatisticsDomainModule : DiModule() {
             bindProvider {
                 provideStatisticsReportUseCase(
                     log = instance(),
-                    searchStatisticsRepository = instance(),
-                    slackStatisticsRepository = instance(),
+                    statisticsSearchRepository = instance(),
+                    statisticsSlackRepository = instance(),
                 )
             }
         }
@@ -28,12 +28,12 @@ object StatisticsDomainModule : DiModule() {
 
     private fun provideStatisticsReportUseCase(
         log: Logger,
-        searchStatisticsRepository: SearchStatisticsRepository,
-        slackStatisticsRepository: SlackStatisticsRepository,
+        statisticsSearchRepository: StatisticsSearchRepository,
+        statisticsSlackRepository: StatisticsSlackRepository,
     ): StatisticsReportUseCase = RealStatisticsReportUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
-        searchStatisticsRepository = searchStatisticsRepository,
-        slackStatisticsRepository = slackStatisticsRepository,
+        statisticsSearchRepository = statisticsSearchRepository,
+        statisticsSlackRepository = statisticsSlackRepository,
     )
 }

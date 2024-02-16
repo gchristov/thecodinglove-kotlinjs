@@ -6,7 +6,7 @@ import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubDecoder
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
-import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubMessage
+import com.gchristov.thecodinglove.search.proto.pubsub.PubSubPreloadSearchMessage
 import com.gchristov.thecodinglove.search.testfixtures.FakePreloadSearchResultUseCase
 import com.gchristov.thecodinglove.search.testfixtures.PreloadSearchPubSubCreator
 import io.ktor.http.*
@@ -61,16 +61,16 @@ class PreloadSearchPubSubHttpHandlerTest {
     }
 
     private fun runBlockingTest(
-        preloadSearchPubSubMessage: PreloadSearchPubSubMessage?,
+        preloadSearchPubSubMessage: PubSubPreloadSearchMessage?,
         preloadSearchResultInvocationResult: Either<Throwable, Unit>,
-        testBlock: suspend (PreloadSearchPubSubHandler, FakePreloadSearchResultUseCase, FakePubSubRequest<PreloadSearchPubSubMessage>) -> Unit
+        testBlock: suspend (PreloadSearchPubSubHandler, FakePreloadSearchResultUseCase, FakePubSubRequest<PubSubPreloadSearchMessage>) -> Unit
     ): TestResult = runTest {
         val preloadSearchResultUseCase = FakePreloadSearchResultUseCase(
             invocationResult = preloadSearchResultInvocationResult
         )
         val request = FakePubSubRequest(
             message = preloadSearchPubSubMessage,
-            messageSerializer = PreloadSearchPubSubMessage.serializer(),
+            messageSerializer = PubSubPreloadSearchMessage.serializer(),
         )
         val handler = PreloadSearchPubSubHandler(
             dispatcher = FakeCoroutineDispatcher,

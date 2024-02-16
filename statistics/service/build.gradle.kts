@@ -8,6 +8,7 @@ kotlin {
             dependencies {
                 implementation(projects.statistics.domain)
                 implementation(projects.statistics.adapter)
+                implementation(projects.search.proto)
             }
         }
     }

@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.search.testfixtures
 
-import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubMessage
+import com.gchristov.thecodinglove.search.proto.pubsub.PubSubPreloadSearchMessage
 
 object PreloadSearchPubSubCreator {
-    fun defaultMessage() = PreloadSearchPubSubMessage(
+    fun defaultMessage() = PubSubPreloadSearchMessage(
         searchSessionId = "session_123"
     )
 }
