@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.search
 
 import com.gchristov.thecodinglove.common.network.NetworkClient
-import com.gchristov.thecodinglove.slack.adapter.search.model.ApiUpdateSearchSessionState
+import com.gchristov.thecodinglove.search.proto.http.ApiUpdateSearchSessionState
 import com.gchristov.thecodinglove.slack.domain.model.Environment
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

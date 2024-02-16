@@ -8,8 +8,8 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
 import com.gchristov.thecodinglove.search.adapter.http.mapper.toState
-import com.gchristov.thecodinglove.search.adapter.http.model.ApiUpdateSearchSessionState
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
+import com.gchristov.thecodinglove.search.proto.http.ApiUpdateSearchSessionState
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 

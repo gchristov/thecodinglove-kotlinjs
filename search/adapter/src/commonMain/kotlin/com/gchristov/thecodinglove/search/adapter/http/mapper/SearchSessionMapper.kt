@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.http.mapper
 
-import com.gchristov.thecodinglove.search.adapter.http.model.ApiSearchSessionPost
 import com.gchristov.thecodinglove.search.domain.model.SearchSession
+import com.gchristov.thecodinglove.search.proto.http.ApiSearchSessionPost
 
 internal fun SearchSession.toSearchSessionPost() = ApiSearchSessionPost(
     searchQuery = query,

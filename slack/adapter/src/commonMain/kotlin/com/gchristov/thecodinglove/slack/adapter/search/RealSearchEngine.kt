@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.slack.adapter.search
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.search.proto.http.ApiSearchResult
 import com.gchristov.thecodinglove.slack.adapter.search.mapper.toSearchResult
-import com.gchristov.thecodinglove.slack.adapter.search.model.ApiSearchResult
 import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
 import io.ktor.client.call.*
 

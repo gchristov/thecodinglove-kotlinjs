@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.slack.adapter.search.mapper
 
-import com.gchristov.thecodinglove.slack.adapter.search.model.ApiSearchSessionPost
+import com.gchristov.thecodinglove.search.proto.http.ApiSearchSessionPost
 import com.gchristov.thecodinglove.slack.domain.port.SearchSessionPostDto
 
 internal fun ApiSearchSessionPost.toSearchSessionPost() = SearchSessionPostDto(

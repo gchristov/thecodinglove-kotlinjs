@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.search.adapter.http.model
+package com.gchristov.thecodinglove.search.proto.http
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class ApiSearchStatistics(
+data class ApiSearchStatistics(
     @SerialName("messages_sent") val messagesSent: Int,
     @SerialName("active_search_sessions") val activeSearchSessions: Int,
     @SerialName("messages_self_destruct") val messagesSelfDestruct: Int,

@@ -6,9 +6,9 @@ import com.gchristov.thecodinglove.common.networktestfixtures.FakeHttpResponse
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubPublisher
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
-import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubMessage
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.usecase.SearchUseCase
+import com.gchristov.thecodinglove.search.proto.pubsub.PubSubPreloadSearchMessage
 import com.gchristov.thecodinglove.search.testfixtures.FakeSearchHttpRequest
 import com.gchristov.thecodinglove.search.testfixtures.FakeSearchUseCase
 import com.gchristov.thecodinglove.search.testfixtures.SearchResultCreator
@@ -68,7 +68,7 @@ class SearchHttpHandlerTest {
             )
             pubSub.assertEquals(
                 topic = TestPreloadSearchPubSubTopic,
-                message = PreloadSearchPubSubMessage(TestSearchSessionId),
+                message = PubSubPreloadSearchMessage(TestSearchSessionId),
             )
         }
     }

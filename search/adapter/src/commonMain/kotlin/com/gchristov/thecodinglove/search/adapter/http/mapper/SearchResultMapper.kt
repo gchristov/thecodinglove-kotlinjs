@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.search.adapter.http.mapper
 
-import com.gchristov.thecodinglove.search.adapter.http.model.ApiSearchResult
 import com.gchristov.thecodinglove.search.domain.model.SearchPost
 import com.gchristov.thecodinglove.search.domain.usecase.SearchUseCase
+import com.gchristov.thecodinglove.search.proto.http.ApiSearchResult
 
 internal fun SearchUseCase.Result.toSearchResult() = ApiSearchResult(
     searchSessionId = searchSessionId,

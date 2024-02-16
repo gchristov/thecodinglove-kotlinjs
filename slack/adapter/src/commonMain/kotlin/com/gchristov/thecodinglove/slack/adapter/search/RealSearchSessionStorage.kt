@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.slack.adapter.search
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.search.proto.http.ApiSearchSessionPost
+import com.gchristov.thecodinglove.search.proto.http.ApiUpdateSearchSessionState
 import com.gchristov.thecodinglove.slack.adapter.search.mapper.toSearchSessionPost
-import com.gchristov.thecodinglove.slack.adapter.search.model.ApiSearchSessionPost
-import com.gchristov.thecodinglove.slack.adapter.search.model.ApiUpdateSearchSessionState
 import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStateDto
 import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStorage
 import io.ktor.client.call.*
