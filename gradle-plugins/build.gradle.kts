@@ -15,6 +15,10 @@ gradlePlugin {
         id = "module-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.ModulePlugin"
     }
+    plugins.register("proto-plugin") {
+        id = "proto-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.ProtoPlugin"
+    }
     plugins.register("build-config-plugin") {
         id = "build-config-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.BuildConfigPlugin"

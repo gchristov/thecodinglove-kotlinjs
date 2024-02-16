@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.statistics.adapter.http.model
+package com.gchristov.thecodinglove.statistics.proto.http.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class ApiStatisticsReport(
+data class ApiStatisticsReport(
     @SerialName("search_statistics") val searchStatistics: ApiSearchReport,
     @SerialName("slack_statistics") val slackStatistics: ApiSlackReport,
 ) {
