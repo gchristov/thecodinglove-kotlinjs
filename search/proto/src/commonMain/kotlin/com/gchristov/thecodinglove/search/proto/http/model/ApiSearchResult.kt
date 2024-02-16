@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.search.proto.http
+package com.gchristov.thecodinglove.search.proto.http.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -7,17 +7,15 @@ import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
+import com.gchristov.thecodinglove.search.proto.http.SearchApiRepository
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
-import com.gchristov.thecodinglove.slack.adapter.search.RealSearchEngine
-import com.gchristov.thecodinglove.slack.adapter.search.RealSearchSessionStorage
-import com.gchristov.thecodinglove.slack.adapter.search.SearchApi
+import com.gchristov.thecodinglove.slack.adapter.search.RealSearchRepository
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.Environment
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
-import com.gchristov.thecodinglove.slack.domain.port.SearchEngine
-import com.gchristov.thecodinglove.slack.domain.port.SearchSessionStorage
+import com.gchristov.thecodinglove.slack.domain.port.SearchRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import com.gchristov.thecodinglove.slack.domain.usecase.*
@@ -41,20 +39,11 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
                     jsonSerializer = instance(),
                 )
             }
-            bindSingleton {
-                provideSearchApi(
-                    networkClient = instance(),
-                    environment = instance(),
-                )
-            }
             bindProvider {
                 provideSlackAuthStateSerializer(jsonSerializer = instance())
             }
             bindSingleton {
-                provideSearchSessionStorage(searchApi = instance())
-            }
-            bindProvider {
-                provideSearchSessionShuffle(searchApi = instance())
+                provideSearchRepository(searchApiRepository = instance())
             }
             bindSingleton {
                 provideSlackEventHttpHandler(
@@ -88,7 +77,7 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
                     log = instance(),
                     slackRepository = instance(),
                     slackMessageFactory = instance(),
-                    searchEngine = instance(),
+                    searchRepository = instance(),
                     pubSubDecoder = instance(),
                 )
             }
@@ -161,11 +150,8 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
     private fun provideSlackAuthStateSerializer(jsonSerializer: JsonSerializer.Default): SlackAuthStateSerializer =
         RealSlackAuthStateSerializer(jsonSerializer = jsonSerializer)
 
-    private fun provideSearchSessionStorage(searchApi: SearchApi): SearchSessionStorage =
-        RealSearchSessionStorage(searchApi = searchApi)
-
-    private fun provideSearchSessionShuffle(searchApi: SearchApi): SearchEngine =
-        RealSearchEngine(searchApi = searchApi)
+    private fun provideSearchRepository(searchApiRepository: SearchApiRepository): SearchRepository =
+        RealSearchRepository(searchApiRepository = searchApiRepository)
 
     private fun provideSlackEventHttpHandler(
         jsonSerializer: JsonSerializer.Default,
@@ -215,7 +201,7 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
         log: Logger,
         slackRepository: SlackRepository,
         slackMessageFactory: SlackMessageFactory,
-        searchEngine: SearchEngine,
+        searchRepository: SearchRepository,
         pubSubDecoder: PubSubDecoder,
     ): SlackSlashCommandPubSubHandler = SlackSlashCommandPubSubHandler(
         dispatcher = Dispatchers.Default,
@@ -223,7 +209,7 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
         log = log,
         slackRepository = slackRepository,
         slackMessageFactory = slackMessageFactory,
-        searchEngine = searchEngine,
+        searchRepository = searchRepository,
         pubSubDecoder = pubSubDecoder,
     )
 
@@ -290,13 +276,5 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
         jsonSerializer = jsonSerializer,
         log = log,
         reportExceptionUseCase = reportExceptionUseCase,
-    )
-
-    private fun provideSearchApi(
-        networkClient: NetworkClient.Json,
-        environment: Environment,
-    ): SearchApi = SearchApi(
-        client = networkClient,
-        environment = environment,
     )
 }
