@@ -58,7 +58,7 @@ internal class RealSearchServiceRepository(private val searchServiceApi: SearchS
     override suspend fun updateSearchSessionState(
         searchSessionId: String,
         state: ApiUpdateSearchSessionState,
-    ): Either<Throwable, Unit> = try {
+    ) = try {
         searchServiceApi.updateSearchSessionState(state)
         Either.Right(Unit)
     } catch (error: Throwable) {
@@ -78,7 +78,7 @@ internal class RealSearchServiceRepository(private val searchServiceApi: SearchS
         ))
     }
 
-    override suspend fun searchStatistics(): Either<Throwable, ApiSearchStatistics> = try {
+    override suspend fun searchStatistics() = try {
         val response: ApiSearchStatistics = searchServiceApi.searchStatistics().body()
         Either.Right(response)
     } catch (error: Throwable) {
