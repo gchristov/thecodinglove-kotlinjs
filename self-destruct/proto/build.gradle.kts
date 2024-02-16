@@ -7,9 +7,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.common.network)
-                implementation(projects.slack.proto)
-                implementation(projects.selfDestruct.domain)
-                implementation(projects.selfDestruct.proto)
             }
         }
     }
