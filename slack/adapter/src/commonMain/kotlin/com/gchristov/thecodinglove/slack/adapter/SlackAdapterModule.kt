@@ -11,13 +11,13 @@ import com.gchristov.thecodinglove.search.proto.http.SearchApiRepository
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
-import com.gchristov.thecodinglove.slack.adapter.search.RealSearchRepository
+import com.gchristov.thecodinglove.slack.adapter.search.RealSlackSearchRepository
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.Environment
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
-import com.gchristov.thecodinglove.slack.domain.port.SearchRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
+import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import com.gchristov.thecodinglove.slack.domain.usecase.*
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
@@ -43,7 +43,7 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
                 provideSlackAuthStateSerializer(jsonSerializer = instance())
             }
             bindSingleton {
-                provideSearchRepository(searchApiRepository = instance())
+                provideSlackSearchRepository(searchApiRepository = instance())
             }
             bindSingleton {
                 provideSlackEventHttpHandler(
@@ -150,8 +150,8 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
     private fun provideSlackAuthStateSerializer(jsonSerializer: JsonSerializer.Default): SlackAuthStateSerializer =
         RealSlackAuthStateSerializer(jsonSerializer = jsonSerializer)
 
-    private fun provideSearchRepository(searchApiRepository: SearchApiRepository): SearchRepository =
-        RealSearchRepository(searchApiRepository = searchApiRepository)
+    private fun provideSlackSearchRepository(searchApiRepository: SearchApiRepository): SlackSearchRepository =
+        RealSlackSearchRepository(searchApiRepository = searchApiRepository)
 
     private fun provideSlackEventHttpHandler(
         jsonSerializer: JsonSerializer.Default,
@@ -201,7 +201,7 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
         log: Logger,
         slackRepository: SlackRepository,
         slackMessageFactory: SlackMessageFactory,
-        searchRepository: SearchRepository,
+        searchRepository: SlackSearchRepository,
         pubSubDecoder: PubSubDecoder,
     ): SlackSlashCommandPubSubHandler = SlackSlashCommandPubSubHandler(
         dispatcher = Dispatchers.Default,
@@ -209,7 +209,7 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
         log = log,
         slackRepository = slackRepository,
         slackMessageFactory = slackMessageFactory,
-        searchRepository = searchRepository,
+        slackSearchRepository = searchRepository,
         pubSubDecoder = pubSubDecoder,
     )
 

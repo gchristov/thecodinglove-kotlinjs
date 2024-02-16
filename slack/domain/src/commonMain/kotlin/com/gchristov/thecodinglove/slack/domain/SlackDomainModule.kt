@@ -3,9 +3,9 @@ package com.gchristov.thecodinglove.slack.domain
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
-import com.gchristov.thecodinglove.slack.domain.port.SearchRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
+import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import com.gchristov.thecodinglove.slack.domain.usecase.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
@@ -49,7 +49,7 @@ object SlackDomainModule : DiModule() {
             bindProvider {
                 provideSlackCancelSearchUseCase(
                     log = instance(),
-                    searchRepository = instance(),
+                    slackSearchRepository = instance(),
                     slackRepository = instance(),
                     slackMessageFactory = instance(),
                 )
@@ -57,7 +57,7 @@ object SlackDomainModule : DiModule() {
             bindProvider {
                 provideSlackSendSearchUseCase(
                     log = instance(),
-                    searchRepository = instance(),
+                    slackSearchRepository = instance(),
                     slackRepository = instance(),
                     slackConfig = instance(),
                     slackMessageFactory = instance(),
@@ -66,7 +66,7 @@ object SlackDomainModule : DiModule() {
             bindProvider {
                 provideSlackShuffleSearchUseCase(
                     log = instance(),
-                    searchRepository = instance(),
+                    slackSearchRepository = instance(),
                     slackRepository = instance(),
                     slackMessageFactory = instance(),
                 )
@@ -132,27 +132,27 @@ object SlackDomainModule : DiModule() {
 
     private fun provideSlackCancelSearchUseCase(
         log: Logger,
-        searchRepository: SearchRepository,
+        slackSearchRepository: SlackSearchRepository,
         slackRepository: SlackRepository,
         slackMessageFactory: SlackMessageFactory,
     ): SlackCancelSearchUseCase = RealSlackCancelSearchUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
-        searchRepository = searchRepository,
+        slackSearchRepository = slackSearchRepository,
         slackRepository = slackRepository,
         slackMessageFactory = slackMessageFactory,
     )
 
     private fun provideSlackSendSearchUseCase(
         log: Logger,
-        searchRepository: SearchRepository,
+        slackSearchRepository: SlackSearchRepository,
         slackRepository: SlackRepository,
         slackConfig: SlackConfig,
         slackMessageFactory: SlackMessageFactory,
     ): SlackSendSearchUseCase = RealSlackSendSearchUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
-        searchRepository = searchRepository,
+        slackSearchRepository = slackSearchRepository,
         slackRepository = slackRepository,
         slackConfig = slackConfig,
         slackMessageFactory = slackMessageFactory,
@@ -161,13 +161,13 @@ object SlackDomainModule : DiModule() {
 
     private fun provideSlackShuffleSearchUseCase(
         log: Logger,
-        searchRepository: SearchRepository,
+        slackSearchRepository: SlackSearchRepository,
         slackRepository: SlackRepository,
         slackMessageFactory: SlackMessageFactory,
     ): SlackShuffleSearchUseCase = RealSlackShuffleSearchUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
-        searchRepository = searchRepository,
+        slackSearchRepository = slackSearchRepository,
         slackRepository = slackRepository,
         slackMessageFactory = slackMessageFactory,
     )

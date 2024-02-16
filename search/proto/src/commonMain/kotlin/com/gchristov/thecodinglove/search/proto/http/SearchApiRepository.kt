@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.search.proto.http
 import arrow.core.Either
 import com.gchristov.thecodinglove.search.proto.http.model.ApiSearchResult
 import com.gchristov.thecodinglove.search.proto.http.model.ApiSearchSessionPost
+import com.gchristov.thecodinglove.search.proto.http.model.ApiSearchStatistics
 import com.gchristov.thecodinglove.search.proto.http.model.ApiUpdateSearchSessionState
 import io.ktor.client.call.*
 
@@ -19,6 +20,8 @@ interface SearchApiRepository {
     ): Either<Throwable, Unit>
 
     suspend fun getSearchSessionPost(searchSessionId: String): Either<Throwable, ApiSearchSessionPost>
+
+    suspend fun searchStatistics(): Either<Throwable, ApiSearchStatistics>
 }
 
 internal class RealSearchApiRepository(private val searchApi: SearchApi) : SearchApiRepository {
@@ -71,6 +74,16 @@ internal class RealSearchApiRepository(private val searchApi: SearchApi) : Searc
     } catch (error: Throwable) {
         Either.Left(Throwable(
             message = "Error during search session post${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
+    }
+
+    override suspend fun searchStatistics(): Either<Throwable, ApiSearchStatistics> = try {
+        val response: ApiSearchStatistics = searchApi.searchStatistics().body()
+        Either.Right(response)
+    } catch (error: Throwable) {
+        Either.Left(Throwable(
+            message = "Error during search statistics${error.message?.let { ": $it" } ?: ""}",
             cause = error,
         ))
     }

@@ -52,4 +52,8 @@ internal class SearchApi(
             parameters.append("searchSessionId", searchSessionId)
         }
     }
+
+    suspend fun searchStatistics(): HttpResponse = client.http.get("$apiUrl/search/statistics") {
+        contentType(ContentType.Application.Json)
+    }
 }

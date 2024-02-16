@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.slack.domain.port
 
 import arrow.core.Either
 
-interface SearchRepository {
+interface SlackSearchRepository {
     suspend fun search(query: String): Either<Throwable, SearchResultDto>
 
     suspend fun shuffle(searchSessionId: String): Either<Throwable, SearchResultDto>

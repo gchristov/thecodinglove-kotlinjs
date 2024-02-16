@@ -8,7 +8,7 @@ import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
-import com.gchristov.thecodinglove.slack.domain.port.SearchRepository
+import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -32,7 +32,7 @@ interface SlackSendSearchUseCase {
 internal class RealSlackSendSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,
-    private val searchRepository: SearchRepository,
+    private val slackSearchRepository: SlackSearchRepository,
     private val slackRepository: SlackRepository,
     private val slackMessageFactory: SlackMessageFactory,
     private val slackConfig: SlackConfig,
@@ -93,7 +93,7 @@ internal class RealSlackSendSearchUseCase(
         authToken: String,
     ): Either<Throwable, Unit> {
         log.debug(tag, "Obtaining search session: searchSessionId=${authState.searchSessionId}")
-        return searchRepository.getSearchSessionPost(authState.searchSessionId)
+        return slackSearchRepository.getSearchSessionPost(authState.searchSessionId)
             .flatMap { searchSessionPost ->
                 log.debug(tag, "Cancelling previous search: responseUrl=${authState.responseUrl}")
                 slackRepository.postMessageToUrl(
@@ -114,13 +114,13 @@ internal class RealSlackSendSearchUseCase(
                     ).flatMap { messageTs ->
                         val logPlaceholder = authState.selfDestructMinutes?.let { "self-destruct" } ?: "sent"
                         val state = authState.selfDestructMinutes?.let {
-                            SearchRepository.SearchSessionStateDto.SelfDestruct
-                        } ?: SearchRepository.SearchSessionStateDto.Sent
+                            SlackSearchRepository.SearchSessionStateDto.SelfDestruct
+                        } ?: SlackSearchRepository.SearchSessionStateDto.Sent
                         log.debug(
                             tag,
                             "Marking search session as $logPlaceholder: searchSessionId=${authState.searchSessionId}"
                         )
-                        searchRepository
+                        slackSearchRepository
                             .updateSearchSessionState(
                                 searchSessionId = authState.searchSessionId,
                                 state = state,
