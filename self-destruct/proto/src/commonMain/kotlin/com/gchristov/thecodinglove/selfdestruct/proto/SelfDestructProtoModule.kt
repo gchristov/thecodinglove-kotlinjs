@@ -21,7 +21,7 @@ class SelfDestructProtoModule(private val apiUrl: String) : DiModule() {
                 )
             }
             bindSingleton {
-                provideSelgDestructServiceRepository(selfDestructServiceApi = instance())
+                provideSelfDestructServiceRepository(selfDestructServiceApi = instance())
             }
         }
     }
@@ -34,6 +34,6 @@ class SelfDestructProtoModule(private val apiUrl: String) : DiModule() {
         apiUrl = apiUrl,
     )
 
-    private fun provideSelgDestructServiceRepository(selfDestructServiceApi: SelfDestructServiceApi): SelfDestructServiceRepository =
+    private fun provideSelfDestructServiceRepository(selfDestructServiceApi: SelfDestructServiceApi): SelfDestructServiceRepository =
         RealSelfDestructServiceRepository(selfDestructServiceApi = selfDestructServiceApi)
 }
