@@ -2,7 +2,7 @@ package com.gchristov.thecodinglove.selfdestruct.domain
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
-import com.gchristov.thecodinglove.selfdestruct.domain.port.SlackSelfDestructRepository
+import com.gchristov.thecodinglove.selfdestruct.domain.port.SelfDestructSlackRepository
 import com.gchristov.thecodinglove.selfdestruct.domain.usecase.RealSelfDestructUseCase
 import com.gchristov.thecodinglove.selfdestruct.domain.usecase.SelfDestructUseCase
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +18,7 @@ object SelfDestructDomainModule : DiModule() {
             bindProvider {
                 provideSelfDestructUseCase(
                     log = instance(),
-                    slackSelfDestructRepository = instance(),
+                    selfDestructSlackRepository = instance(),
                 )
             }
         }
@@ -26,10 +26,10 @@ object SelfDestructDomainModule : DiModule() {
 
     private fun provideSelfDestructUseCase(
         log: Logger,
-        slackSelfDestructRepository: SlackSelfDestructRepository,
+        selfDestructSlackRepository: SelfDestructSlackRepository,
     ): SelfDestructUseCase = RealSelfDestructUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
-        slackSelfDestructRepository = slackSelfDestructRepository,
+        selfDestructSlackRepository = selfDestructSlackRepository,
     )
 }

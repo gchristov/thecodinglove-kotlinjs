@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.slack.adapter.http.model
+package com.gchristov.thecodinglove.slack.proto.http.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class ApiSlackSlashCommand(
+data class ApiSlackSlashCommand(
     @SerialName("team_id") val teamId: String,
     @SerialName("team_domain") val teamDomain: String,
     @SerialName("channel_id") val channelId: String,

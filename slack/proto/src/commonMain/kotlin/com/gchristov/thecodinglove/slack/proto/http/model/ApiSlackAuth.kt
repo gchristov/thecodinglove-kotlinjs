@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.slack.adapter.http.model
+package com.gchristov.thecodinglove.slack.proto.http.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class ApiSlackAuthResponse(
+data class ApiSlackAuthResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("error") val error: String?,
     @SerialName("authed_user") val authedUser: ApiAuthedUser?,
@@ -28,7 +28,7 @@ internal data class ApiSlackAuthResponse(
 }
 
 @Serializable
-internal data class ApiSlackAuthState(
+data class ApiSlackAuthState(
     @SerialName("search_session_id") val searchSessionId: String,
     @SerialName("channel_id") val channelId: String,
     @SerialName("team_id") val teamId: String,

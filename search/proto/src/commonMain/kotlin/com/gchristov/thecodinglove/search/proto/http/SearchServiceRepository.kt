@@ -7,7 +7,7 @@ import com.gchristov.thecodinglove.search.proto.http.model.ApiSearchStatistics
 import com.gchristov.thecodinglove.search.proto.http.model.ApiUpdateSearchSessionState
 import io.ktor.client.call.*
 
-interface SearchApiRepository {
+interface SearchServiceRepository {
     suspend fun search(query: String): Either<Throwable, ApiSearchResult>
 
     suspend fun shuffle(searchSessionId: String): Either<Throwable, ApiSearchResult>
@@ -24,9 +24,9 @@ interface SearchApiRepository {
     suspend fun searchStatistics(): Either<Throwable, ApiSearchStatistics>
 }
 
-internal class RealSearchApiRepository(private val searchApi: SearchApi) : SearchApiRepository {
+internal class RealSearchServiceRepository(private val searchServiceApi: SearchServiceApi) : SearchServiceRepository {
     override suspend fun search(query: String) = try {
-        val response: ApiSearchResult = searchApi.search(query).body()
+        val response: ApiSearchResult = searchServiceApi.search(query).body()
         Either.Right(response)
     } catch (error: Throwable) {
         Either.Left(Throwable(
@@ -36,7 +36,7 @@ internal class RealSearchApiRepository(private val searchApi: SearchApi) : Searc
     }
 
     override suspend fun shuffle(searchSessionId: String) = try {
-        val response: ApiSearchResult = searchApi.shuffle(searchSessionId).body()
+        val response: ApiSearchResult = searchServiceApi.shuffle(searchSessionId).body()
         Either.Right(response)
     } catch (error: Throwable) {
         Either.Left(Throwable(
@@ -46,7 +46,7 @@ internal class RealSearchApiRepository(private val searchApi: SearchApi) : Searc
     }
 
     override suspend fun deleteSearchSession(searchSessionId: String) = try {
-        searchApi.deleteSearchSession(searchSessionId)
+        searchServiceApi.deleteSearchSession(searchSessionId)
         Either.Right(Unit)
     } catch (error: Throwable) {
         Either.Left(Throwable(
@@ -58,8 +58,8 @@ internal class RealSearchApiRepository(private val searchApi: SearchApi) : Searc
     override suspend fun updateSearchSessionState(
         searchSessionId: String,
         state: ApiUpdateSearchSessionState,
-    ): Either<Throwable, Unit> = try {
-        searchApi.updateSearchSessionState(state)
+    ) = try {
+        searchServiceApi.updateSearchSessionState(state)
         Either.Right(Unit)
     } catch (error: Throwable) {
         Either.Left(Throwable(
@@ -69,7 +69,7 @@ internal class RealSearchApiRepository(private val searchApi: SearchApi) : Searc
     }
 
     override suspend fun getSearchSessionPost(searchSessionId: String) = try {
-        val response: ApiSearchSessionPost = searchApi.getSearchSessionPost(searchSessionId).body()
+        val response: ApiSearchSessionPost = searchServiceApi.getSearchSessionPost(searchSessionId).body()
         Either.Right(response)
     } catch (error: Throwable) {
         Either.Left(Throwable(
@@ -78,8 +78,8 @@ internal class RealSearchApiRepository(private val searchApi: SearchApi) : Searc
         ))
     }
 
-    override suspend fun searchStatistics(): Either<Throwable, ApiSearchStatistics> = try {
-        val response: ApiSearchStatistics = searchApi.searchStatistics().body()
+    override suspend fun searchStatistics() = try {
+        val response: ApiSearchStatistics = searchServiceApi.searchStatistics().body()
         Either.Right(response)
     } catch (error: Throwable) {
         Either.Left(Throwable(

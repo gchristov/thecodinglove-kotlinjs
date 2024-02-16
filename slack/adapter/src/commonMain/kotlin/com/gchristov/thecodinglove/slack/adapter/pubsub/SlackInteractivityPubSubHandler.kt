@@ -11,11 +11,11 @@ import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityPubSubMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackCancelSearchUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackShuffleSearchUseCase
+import com.gchristov.thecodinglove.slack.proto.pubsub.PubSubSlackInteractivityMessage
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -44,12 +44,13 @@ class SlackInteractivityPubSubHandler(
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =
         request.decodeBodyFromJson(
             jsonSerializer = jsonSerializer,
-            strategy = SlackInteractivityPubSubMessage.serializer(),
+            strategy = PubSubSlackInteractivityMessage.serializer(),
         )
             .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
             .flatMap {
                 when (it.payload) {
-                    is SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage -> it.payload.handle()
+                    is PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage ->
+                        (it.payload as PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage).handle()
                 }
             }
             .fold(
@@ -61,7 +62,7 @@ class SlackInteractivityPubSubHandler(
                 }, ifRight = { Either.Right(Unit) }
             )
 
-    private suspend fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.handle(): Either<Throwable, Unit> {
+    private suspend fun PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.handle(): Either<Throwable, Unit> {
         val sendAction = sendAction()
         val selfDestruct5MinAction = selfDestruct5MinAction()
         val shuffleAction = shuffleAction()
@@ -107,14 +108,14 @@ class SlackInteractivityPubSubHandler(
     }
 }
 
-private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.sendAction() =
+private fun PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.sendAction() =
     actions.find { it.name == SlackActionName.SEND.apiValue }
 
-private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.selfDestruct5MinAction() =
+private fun PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.selfDestruct5MinAction() =
     actions.find { it.name == SlackActionName.SELF_DESTRUCT_5_MIN.apiValue }
 
-private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.shuffleAction() =
+private fun PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.shuffleAction() =
     actions.find { it.name == SlackActionName.SHUFFLE.apiValue }
 
-private fun SlackInteractivityPubSubMessage.InteractivityPayload.InteractiveMessage.cancelAction() =
+private fun PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.cancelAction() =
     actions.find { it.name == SlackActionName.CANCEL.apiValue }

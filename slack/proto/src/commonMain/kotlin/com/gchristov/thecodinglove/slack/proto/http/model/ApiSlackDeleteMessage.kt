@@ -1,16 +1,16 @@
-package com.gchristov.thecodinglove.slack.adapter.http.model
+package com.gchristov.thecodinglove.slack.proto.http.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class ApiSlackDeleteMessageResponse(
+data class ApiSlackDeleteMessageResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("error") val error: String?,
 )
 
 @Serializable
-internal data class ApiSlackDeleteMessage(
+data class ApiSlackDeleteMessage(
     @SerialName("channel") val channelId: String,
     @SerialName("ts") val messageTs: String,
 )
