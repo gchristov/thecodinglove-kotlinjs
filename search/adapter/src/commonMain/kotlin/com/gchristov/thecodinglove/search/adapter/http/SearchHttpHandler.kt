@@ -31,6 +31,24 @@ class SearchHttpHandler(
         contentType = ContentType.Application.Json,
     )
 
+    override fun handleError(
+        error: Throwable,
+        response: HttpResponse,
+    ): Either<Throwable, Unit> {
+        return if (error is SearchUseCase.Error) {
+            when (error) {
+                // Empty search results are expected so we respond with 200 and relevant error type.
+                is SearchUseCase.Error.Empty -> response.sendJson(
+                    data = error.toSearchResult(),
+                    jsonSerializer = jsonSerializer,
+                )
+                is SearchUseCase.Error.SessionNotFound -> super.handleError(error, response)
+            }
+        } else {
+            super.handleError(error, response)
+        }
+    }
+
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
