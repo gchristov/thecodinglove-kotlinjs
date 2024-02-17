@@ -61,7 +61,7 @@ class SlackSlashCommandPubSubHandler(
             ifLeft = {
                 slackRepository.postMessageToUrl(
                     url = responseUrl,
-                    message = slackMessageFactory.message(text = GenericError)
+                    message = slackMessageFactory.searchGenericErrorMessage()
                 )
             },
             ifRight = { searchResult ->
@@ -79,20 +79,20 @@ class SlackSlashCommandPubSubHandler(
                         )
                     )
 
-                    else -> {
-                        val text = when (searchResult.error) {
-                            is SlackSearchRepository.SearchResultDto.Error.NoResults -> "No results found for '$text'. Please try a different search query, for example `release`."
-                            null -> GenericError
+                    else -> when (searchResult.error) {
+                        is SlackSearchRepository.SearchResultDto.Error.NoResults -> {
+                            slackRepository.postMessageToUrl(
+                                url = responseUrl,
+                                message = slackMessageFactory.noSearchResultsMessage(text)
+                            )
                         }
-                        slackRepository.postMessageToUrl(
+
+                        null -> slackRepository.postMessageToUrl(
                             url = responseUrl,
-                            message = slackMessageFactory.message(text = text)
+                            message = slackMessageFactory.searchGenericErrorMessage()
                         )
                     }
                 }
             }
         )
 }
-
-private const val GenericError =
-    "⚠️ Something has gone wrong. We have been notified, so please try again while we investigate."

@@ -42,6 +42,10 @@ interface SlackMessageFactory {
         selfDestructMinutes: Int?,
     ): SlackMessage
 
+    fun searchGenericErrorMessage(): SlackMessage
+
+    fun noSearchResultsMessage(query: String): SlackMessage
+
     fun attachment(
         title: String? = null,
         text: String? = null,
@@ -186,6 +190,14 @@ internal class RealSlackMessageFactory(
                     ?: PostedUsingFooter,
             )
         ),
+    )
+
+    override fun searchGenericErrorMessage() = message(
+        text = "⚠️ Something has gone wrong. We have been notified, so please try again while we investigate."
+    )
+
+    override fun noSearchResultsMessage(query: String) = message(
+        text = "No results found for \"$query\". However, here are some popular suggestions for you to try again: \"release\", \"production\", \"test\""
     )
 
     override fun attachment(

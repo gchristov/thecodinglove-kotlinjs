@@ -2,7 +2,9 @@ package com.gchristov.thecodinglove.search.domain.usecase
 
 import arrow.core.Either
 import arrow.core.flatMap
+import co.touchlab.kermit.Logger
 import com.benasher44.uuid.uuid4
+import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.search.domain.model.SearchPost
 import com.gchristov.thecodinglove.search.domain.model.SearchSession
 import com.gchristov.thecodinglove.search.domain.model.insert
@@ -44,7 +46,10 @@ internal class RealSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val searchRepository: SearchRepository,
     private val searchWithHistoryUseCase: SearchWithHistoryUseCase,
+    private val log: Logger,
 ) : SearchUseCase {
+    private val tag = this::class.simpleName
+
     override suspend operator fun invoke(
         dto: SearchUseCase.Dto
     ): Either<SearchUseCase.Error, SearchUseCase.Result> = withContext(dispatcher) {
@@ -53,6 +58,7 @@ internal class RealSearchUseCase(
             .flatMap { searchSession ->
                 val preloadedPost = searchSession.preloadedPost
                 if (preloadedPost != null) {
+                    log.debug(tag, "Using preloaded post")
                     // If a post is preloaded, use it right away
                     searchSession.usePreloadedPost(
                         preloadedPost = preloadedPost,
@@ -68,6 +74,7 @@ internal class RealSearchUseCase(
                             )
                         }
                 } else {
+                    log.debug(tag, "No preloaded post, running normal search")
                     // Else, run normal search
                     searchWithHistoryUseCase(
                         SearchWithHistoryUseCase.Dto(
