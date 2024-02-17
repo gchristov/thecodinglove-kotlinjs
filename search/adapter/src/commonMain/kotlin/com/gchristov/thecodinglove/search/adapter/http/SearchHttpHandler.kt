@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.kotlin.error
 import com.gchristov.thecodinglove.common.network.http.*
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.http.mapper.toSearchResult
@@ -16,7 +17,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 class SearchHttpHandler(
     dispatcher: CoroutineDispatcher,
     private val jsonSerializer: JsonSerializer,
-    log: Logger,
+    private val log: Logger,
     private val searchUseCase: SearchUseCase,
     private val pubSubPublisher: PubSubPublisher,
     private val searchConfig: SearchConfig,
@@ -25,6 +26,8 @@ class SearchHttpHandler(
     jsonSerializer = jsonSerializer,
     log = log
 ) {
+    private val tag = this::class.simpleName
+
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Get,
         path = "/api/search",
@@ -35,20 +38,32 @@ class SearchHttpHandler(
         request: HttpRequest,
         response: HttpResponse,
     ): Either<Throwable, Unit> = searchUseCase(SearchUseCase.Dto(request.toSearchType()))
-        .flatMap { searchResult ->
-            publishSearchPreloadMessage(
-                searchSessionId = searchResult.searchSessionId,
-                searchConfig = searchConfig,
-            )
-                // Trigger preload before we send the response and propagate the search result.
-                .flatMap { Either.Right(searchResult) }
-        }
-        .flatMap { searchResult ->
-            response.sendJson(
-                data = searchResult.toSearchResult(),
-                jsonSerializer = jsonSerializer,
-            )
-        }
+        .fold(
+            ifLeft = {
+                when (it) {
+                    is SearchUseCase.Error.Empty -> {
+                        // Empty search results are expected so we respond with 200 and the relevant error type.
+                        log.error(tag, it) { "Error handling request" }
+                        response.sendJson(
+                            data = it.toSearchResult(),
+                            jsonSerializer = jsonSerializer,
+                        )
+                    }
+                    is SearchUseCase.Error.SessionNotFound -> Either.Left(it)
+                }
+            },
+            ifRight = { searchResult ->
+                publishSearchPreloadMessage(
+                    searchSessionId = searchResult.searchSessionId,
+                    searchConfig = searchConfig,
+                ).flatMap {
+                    response.sendJson(
+                        data = searchResult.toSearchResult(),
+                        jsonSerializer = jsonSerializer,
+                    )
+                }
+            }
+        )
 
     private suspend fun publishSearchPreloadMessage(
         searchSessionId: String,

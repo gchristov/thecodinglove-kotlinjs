@@ -17,13 +17,20 @@ interface SlackSearchRepository {
     suspend fun getSearchSessionPost(searchSessionId: String): Either<Throwable, SearchSessionPostDto>
 
     data class SearchResultDto(
-        val searchSessionId: String,
-        val searchQuery: String,
-        val searchResults: Int,
-        val attachmentTitle: String,
-        val attachmentUrl: String,
-        val attachmentImageUrl: String,
-    )
+        val ok: Boolean,
+        val error: Error?,
+        val searchSession: SearchSession?,
+    ) {
+        sealed class Error {
+            data object NoResults : Error()
+        }
+
+        data class SearchSession(
+            val searchSessionId: String,
+            val searchResults: Int,
+            val post: SearchSessionPostDto,
+        )
+    }
 
     sealed class SearchSessionStateDto {
         data object Sent : SearchSessionStateDto()

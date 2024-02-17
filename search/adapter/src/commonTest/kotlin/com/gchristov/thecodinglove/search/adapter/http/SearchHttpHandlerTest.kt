@@ -91,7 +91,7 @@ class SearchHttpHandlerTest {
                 header = "Content-Type",
                 headerValue = ContentType.Application.Json.toString(),
                 data = """
-                        {"search_session_id":"session_123","query":"test","post":{"title":"post","url":"url","image_url":"imageUrl"},"total_posts":1}
+                        {"ok":true,"search_session":{"search_session_id":"session_123","query":"test","total_posts":1,"post":{"title":"post","url":"url","image_url":"imageUrl"}}}
                        """.trimIndent(),
                 status = 200,
                 filePath = null,
@@ -160,8 +160,10 @@ class SearchHttpHandlerTest {
         response.assertEquals(
             header = "Content-Type",
             headerValue = ContentType.Application.Json.toString(),
-            data = "{\"errorMessage\":\"No results found: test\"}",
-            status = 400,
+            data = """
+                {"ok":false,"error":{"type":"no-results"}}
+            """.trimIndent(),
+            status = 200,
             filePath = null,
         )
     }
@@ -179,7 +181,9 @@ class SearchHttpHandlerTest {
         response.assertEquals(
             header = "Content-Type",
             headerValue = ContentType.Application.Json.toString(),
-            data = "{\"errorMessage\":\"Session not found: test\"}",
+            data = """
+                {"errorMessage":"Session not found: test"}
+            """.trimIndent(),
             status = 400,
             filePath = null,
         )

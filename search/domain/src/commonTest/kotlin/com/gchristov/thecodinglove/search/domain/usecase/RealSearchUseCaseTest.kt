@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.search.domain.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
+import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.search.domain.model.SearchSession
 import com.gchristov.thecodinglove.search.testfixtures.*
 import kotlinx.coroutines.test.TestResult
@@ -202,6 +203,7 @@ class RealSearchUseCaseTest {
             dispatcher = FakeCoroutineDispatcher,
             searchRepository = searchRepository,
             searchWithHistoryUseCase = searchWithHistoryUseCase,
+            log = FakeLogger,
         )
         testBlock(useCase, searchRepository, searchWithHistoryUseCase)
     }

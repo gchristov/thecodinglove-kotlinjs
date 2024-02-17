@@ -5,11 +5,25 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ApiSearchResult(
-    @SerialName("search_session_id") val searchSessionId: String,
-    @SerialName("query") val query: String,
-    @SerialName("post") val post: ApiPost,
-    @SerialName("total_posts") val totalPosts: Int
+    @SerialName("ok") val ok: Boolean,
+    @SerialName("error") val error: ApiError?,
+    @SerialName("search_session") val searchSession: ApiSearchSession?,
 ) {
+    @Serializable
+    sealed class ApiError {
+        @Serializable
+        @SerialName("no-results")
+        data object NoResults : ApiError()
+    }
+
+    @Serializable
+    data class ApiSearchSession(
+        @SerialName("search_session_id") val searchSessionId: String,
+        @SerialName("query") val query: String,
+        @SerialName("total_posts") val totalPosts: Int,
+        @SerialName("post") val post: ApiPost,
+    )
+
     @Serializable
     data class ApiPost(
         @SerialName("title") val title: String,

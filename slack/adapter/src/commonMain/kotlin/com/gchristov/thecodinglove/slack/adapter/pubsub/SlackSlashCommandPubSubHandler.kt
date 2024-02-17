@@ -6,7 +6,6 @@ import arrow.core.left
 import arrow.core.right
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
-import com.gchristov.thecodinglove.common.kotlin.error
 import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
@@ -48,38 +47,52 @@ class SlackSlashCommandPubSubHandler(
             .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
             .flatMap { it.handle() }
 
+    /*
+     * This method handles errors as success without PubSub retries, but tries to notify the user of the error. If
+     * sending the Slack reply back fails, the entire PubSub chain will be retried automatically. This is to avoid
+     * unnecessary PubSub retries which would most likely result in additional errors if the problem is on our end.
+     */
     private suspend fun PubSubSlackSlashCommandMessage.handle() = slackRepository.postMessageToUrl(
         url = responseUrl,
         message = slackMessageFactory.message("🔎 Hang tight, we're finding your GIF...")
     )
         .flatMap { slackSearchRepository.search(text) }
-        .flatMap { searchResult ->
-            slackRepository.postMessageToUrl(
-                url = responseUrl,
-                message = slackMessageFactory.searchResultMessage(
-                    searchQuery = searchResult.searchQuery,
-                    searchResults = searchResult.searchResults,
-                    searchSessionId = searchResult.searchSessionId,
-                    attachmentTitle = searchResult.attachmentTitle,
-                    attachmentUrl = searchResult.attachmentUrl,
-                    attachmentImageUrl = searchResult.attachmentImageUrl,
-                )
-            )
-        }
         .fold(
             ifLeft = {
-                // Handle errors as success without PubSub retries, but try to notify the user of the error. If sending
-                // the reply back fails, the entire PubSub chain will be retried automatically.
-                log.error(tag, it) { "Error handling request" }
-                val userErrorMessage = when {
-//                    it is SearchError.Empty -> "No results found for '$text'. Please try a different search query."
-                    else -> "⚠️ Something has gone wrong. Please try again while we investigate."
-                }
                 slackRepository.postMessageToUrl(
                     url = responseUrl,
-                    message = slackMessageFactory.message(text = userErrorMessage)
+                    message = slackMessageFactory.searchGenericErrorMessage()
                 )
             },
-            ifRight = { Either.Right(Unit) }
+            ifRight = { searchResult ->
+                val searchSession = searchResult.searchSession
+                when {
+                    searchResult.ok && searchSession != null -> slackRepository.postMessageToUrl(
+                        url = responseUrl,
+                        message = slackMessageFactory.searchResultMessage(
+                            searchQuery = searchSession.post.searchQuery,
+                            searchResults = searchSession.searchResults,
+                            searchSessionId = searchSession.searchSessionId,
+                            attachmentTitle = searchSession.post.attachmentTitle,
+                            attachmentUrl = searchSession.post.attachmentUrl,
+                            attachmentImageUrl = searchSession.post.attachmentImageUrl,
+                        )
+                    )
+
+                    else -> when (searchResult.error) {
+                        is SlackSearchRepository.SearchResultDto.Error.NoResults -> {
+                            slackRepository.postMessageToUrl(
+                                url = responseUrl,
+                                message = slackMessageFactory.noSearchResultsMessage(text)
+                            )
+                        }
+
+                        null -> slackRepository.postMessageToUrl(
+                            url = responseUrl,
+                            message = slackMessageFactory.searchGenericErrorMessage()
+                        )
+                    }
+                }
+            }
         )
 }
