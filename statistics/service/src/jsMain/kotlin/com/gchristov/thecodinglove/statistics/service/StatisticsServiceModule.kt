@@ -5,7 +5,7 @@ import com.gchristov.thecodinglove.statistics.domain.model.Environment
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 
-class StatisticsServiceModule(private val environment: Environment) : DiModule() {
+internal class StatisticsServiceModule(private val environment: Environment) : DiModule() {
     override fun name() = "statistics-service"
 
     override fun bindDependencies(builder: DI.Builder) {

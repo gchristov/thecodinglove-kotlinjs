@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DbSearchSession(
+internal data class DbSearchSession(
     @SerialName("id") val id: String,
     @SerialName("query") val query: String,
     @SerialName("total_posts") val totalPosts: Int?,

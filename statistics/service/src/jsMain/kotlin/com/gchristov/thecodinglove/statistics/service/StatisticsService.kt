@@ -44,7 +44,7 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
-            CommonMonitoringModule(environment.apiUrl).module,
+            CommonMonitoringModule.module,
             SearchProtoModule(environment.apiUrl).module,
             SlackProtoModule(environment.apiUrl).module,
             StatisticsDomainModule.module,

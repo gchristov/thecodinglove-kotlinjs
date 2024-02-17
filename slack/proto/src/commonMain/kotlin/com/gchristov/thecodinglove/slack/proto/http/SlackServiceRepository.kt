@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slack.proto.http
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackReportException
 import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackStatistics
 import io.ktor.client.call.*
 
@@ -8,6 +9,8 @@ interface SlackServiceRepository {
     suspend fun slackStatistics(): Either<Throwable, ApiSlackStatistics>
 
     suspend fun selfDestruct(): Either<Throwable, Unit>
+
+    suspend fun reportException(exception: ApiSlackReportException): Either<Throwable, Unit>
 }
 
 internal class RealSlackServiceRepository(
@@ -29,6 +32,16 @@ internal class RealSlackServiceRepository(
     } catch (error: Throwable) {
         Either.Left(Throwable(
             message = "Error during self-destruct${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
+    }
+
+    override suspend fun reportException(exception: ApiSlackReportException) = try {
+        slackServiceApi.reportException(exception)
+        Either.Right(Unit)
+    } catch (error: Throwable) {
+        Either.Left(Throwable(
+            message = "Error during report exception${error.message?.let { ": $it" } ?: ""}",
             cause = error,
         ))
     }

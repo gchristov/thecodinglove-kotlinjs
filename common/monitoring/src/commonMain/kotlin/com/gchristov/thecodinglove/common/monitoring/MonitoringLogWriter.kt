@@ -3,13 +3,14 @@ package com.gchristov.thecodinglove.common.monitoring
 import arrow.core.raise.either
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
-import com.gchristov.thecodinglove.common.monitoring.slack.SlackReportExceptionRepository
+import com.gchristov.thecodinglove.slack.proto.http.SlackServiceRepository
+import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackReportException
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 class MonitoringLogWriter(
     private val dispatcher: CoroutineDispatcher,
-    private val slackReportExceptionRepository: SlackReportExceptionRepository,
+    private val slackServiceRepository: SlackServiceRepository,
 ) : LogWriter(), CoroutineScope {
     private val job = Job()
 
@@ -60,8 +61,10 @@ class MonitoringLogWriter(
     private suspend fun reportToSlack(
         message: String,
         stacktrace: String,
-    ) = slackReportExceptionRepository.reportException(
-        message = message,
-        stacktrace = stacktrace,
+    ) = slackServiceRepository.reportException(
+        ApiSlackReportException(
+            message = message,
+            stacktrace = stacktrace,
+        )
     )
 }
