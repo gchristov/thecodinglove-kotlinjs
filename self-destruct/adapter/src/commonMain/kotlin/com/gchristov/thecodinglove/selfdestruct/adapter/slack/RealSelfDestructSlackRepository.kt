@@ -1,10 +1,18 @@
 package com.gchristov.thecodinglove.selfdestruct.adapter.slack
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.selfdestruct.domain.port.SelfDestructSlackRepository
-import com.gchristov.thecodinglove.slack.proto.http.SlackServiceRepository
 
 internal class RealSelfDestructSlackRepository(
-    private val slackServiceRepository: SlackServiceRepository,
+    private val selfDestructSlackServiceApi: SelfDestructSlackServiceApi,
 ) : SelfDestructSlackRepository {
-    override suspend fun selfDestruct() = slackServiceRepository.selfDestruct()
+    override suspend fun selfDestruct() = try {
+        selfDestructSlackServiceApi.selfDestruct()
+        Either.Right(Unit)
+    } catch (error: Throwable) {
+        Either.Left(Throwable(
+            message = "Error during self-destruct${error.message?.let { ": $it" } ?: ""}",
+            cause = error,
+        ))
+    }
 }

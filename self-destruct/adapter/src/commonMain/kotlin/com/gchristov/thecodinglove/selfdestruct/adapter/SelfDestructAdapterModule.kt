@@ -3,11 +3,13 @@ package com.gchristov.thecodinglove.selfdestruct.adapter
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
+import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.selfdestruct.adapter.http.SelfDestructHttpHandler
 import com.gchristov.thecodinglove.selfdestruct.adapter.slack.RealSelfDestructSlackRepository
+import com.gchristov.thecodinglove.selfdestruct.adapter.slack.SelfDestructSlackServiceApi
+import com.gchristov.thecodinglove.selfdestruct.domain.model.Environment
 import com.gchristov.thecodinglove.selfdestruct.domain.port.SelfDestructSlackRepository
 import com.gchristov.thecodinglove.selfdestruct.domain.usecase.SelfDestructUseCase
-import com.gchristov.thecodinglove.slack.proto.http.SlackServiceRepository
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
@@ -26,8 +28,14 @@ object SelfDestructAdapterModule : DiModule() {
                 )
             }
             bindSingleton {
+                provideSelfDestructSlackServiceApi(
+                    networkClient = instance(),
+                    environment = instance(),
+                )
+            }
+            bindSingleton {
                 provideSelfDestructSlackRepository(
-                    slackServiceRepository = instance(),
+                    selfDestructSlackServiceApi = instance(),
                 )
             }
         }
@@ -44,9 +52,17 @@ object SelfDestructAdapterModule : DiModule() {
         selfDestructUseCase = selfDestructUseCase,
     )
 
+    private fun provideSelfDestructSlackServiceApi(
+        networkClient: NetworkClient.Json,
+        environment: Environment,
+    ): SelfDestructSlackServiceApi = SelfDestructSlackServiceApi(
+        client = networkClient,
+        environment = environment,
+    )
+
     private fun provideSelfDestructSlackRepository(
-        slackServiceRepository: SlackServiceRepository,
+        selfDestructSlackServiceApi: SelfDestructSlackServiceApi,
     ): SelfDestructSlackRepository = RealSelfDestructSlackRepository(
-        slackServiceRepository = slackServiceRepository,
+        selfDestructSlackServiceApi = selfDestructSlackServiceApi,
     )
 }
