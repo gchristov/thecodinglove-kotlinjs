@@ -17,6 +17,8 @@ interface SlackMessageFactory {
         attachments: List<SlackMessage.Attachment>? = null,
     ): SlackMessage
 
+    fun searchingMessage(): SlackMessage
+
     fun cancelMessage(): SlackMessage
 
     fun searchResultMessage(
@@ -77,6 +79,8 @@ internal class RealSlackMessageFactory(
         deleteOriginal = deleteOriginal,
         attachments = attachments,
     )
+
+    override fun searchingMessage() = message(randomSearchingMessage())
 
     override fun cancelMessage() = message(deleteOriginal = true)
 
@@ -224,5 +228,13 @@ internal class RealSlackMessageFactory(
         private const val ActionStylePrimary = "primary"
 
         private const val PostedUsingFooter = "Posted using /codinglove"
+
+        private fun randomSearchingMessage() = listOf(
+            "\uD83D\uDD75\uFE0F\u200D♀\uFE0F Hang tight, we're finding your GIF...",
+            "\uD83E\uDDD0 Keep calm, we're on the hunt for your GIF...",
+            "\uD83D\uDD0D Hold on, we're in pursuit of your GIF...",
+            "\uD83D\uDD75\uFE0F\u200D♂\uFE0F Don't fret, we're locating your GIF...",
+            "\uD83D\uDE80 Stay patient, we're rocketing to find your GIF...",
+        ).random()
     }
 }

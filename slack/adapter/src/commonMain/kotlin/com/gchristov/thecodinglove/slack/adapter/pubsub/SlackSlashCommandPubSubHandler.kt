@@ -54,7 +54,7 @@ class SlackSlashCommandPubSubHandler(
      */
     private suspend fun PubSubSlackSlashCommandMessage.handle() = slackRepository.postMessageToUrl(
         url = responseUrl,
-        message = slackMessageFactory.message("🔎 Hang tight, we're finding your GIF...")
+        message = slackMessageFactory.searchingMessage(),
     )
         .flatMap { slackSearchRepository.search(text) }
         .fold(
