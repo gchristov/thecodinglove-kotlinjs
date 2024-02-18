@@ -49,7 +49,7 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonPubSubModule.module,
-            CommonMonitoringModule.module,
+            CommonMonitoringModule(environment.apiUrl).module,
             CommonFirebaseModule.module,
             SlackProtoModule(environment.apiUrl).module,
             SearchAdapterModule(environment).module,
