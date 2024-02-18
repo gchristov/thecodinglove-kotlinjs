@@ -16,7 +16,6 @@ kotlin {
                 implementation(projects.common.firebase)
                 implementation(projects.search.proto)
                 implementation(projects.slack.domain)
-                implementation(projects.slack.proto)
             }
         }
     }

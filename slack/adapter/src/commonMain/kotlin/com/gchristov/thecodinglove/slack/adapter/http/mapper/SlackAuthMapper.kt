@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.slack.adapter.http.mapper
 
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackAuthResponse
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthToken
-import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackAuthResponse
-import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackAuthState
 
 internal fun SlackAuthState.toAuthState() = ApiSlackAuthState(
     searchSessionId = searchSessionId,
@@ -18,11 +18,11 @@ internal fun SlackAuthState.toAuthState() = ApiSlackAuthState(
 internal fun ApiSlackAuthResponse.toAuthToken() = if (authedUser?.accessToken != null) {
     // User token
     SlackAuthToken(
-        id = authedUser!!.id,
-        scope = authedUser!!.scope!!,
-        token = authedUser!!.accessToken!!,
+        id = authedUser.id,
+        scope = authedUser.scope!!,
+        token = authedUser.accessToken,
         teamId = team!!.id,
-        teamName = team!!.name,
+        teamName = team.name,
     )
 } else {
     // Bot token
@@ -31,7 +31,7 @@ internal fun ApiSlackAuthResponse.toAuthToken() = if (authedUser?.accessToken !=
         scope = scope!!,
         token = accessToken!!,
         teamId = team!!.id,
-        teamName = team!!.name,
+        teamName = team.name,
     )
 }
 

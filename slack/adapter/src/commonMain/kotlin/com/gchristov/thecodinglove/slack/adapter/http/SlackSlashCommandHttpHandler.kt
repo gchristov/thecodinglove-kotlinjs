@@ -10,10 +10,10 @@ import com.gchristov.thecodinglove.common.network.http.*
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toPubSubMessage
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackRequestVerificationDto
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackSlashCommand
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackSlashCommandMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackVerifyRequestUseCase
-import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackSlashCommand
-import com.gchristov.thecodinglove.slack.proto.pubsub.PubSubSlackSlashCommandMessage
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 

@@ -22,7 +22,6 @@ import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSub
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slack.domain.SlackDomainModule
 import com.gchristov.thecodinglove.slack.domain.model.Environment
-import com.gchristov.thecodinglove.slack.proto.SlackProtoModule
 
 suspend fun main() {
     // Ignore default Node arguments
@@ -55,8 +54,6 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
             SlackDomainModule.module,
             SlackAdapterModule(environment).module,
             SlackServiceModule(environment).module,
-            // The Slack service also uses the monitoring module so we need to link the protos specifically here.
-            SlackProtoModule(environment.apiUrl).module,
         )
     )
     return Either.Right(Unit)

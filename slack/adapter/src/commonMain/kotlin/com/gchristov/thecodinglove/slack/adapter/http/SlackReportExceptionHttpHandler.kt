@@ -7,8 +7,8 @@ import arrow.core.right
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackReportException
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackReportExceptionUseCase
-import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackReportException
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 

@@ -10,17 +10,17 @@ import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackSlashCommandMessage
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
-import com.gchristov.thecodinglove.slack.proto.pubsub.PubSubSlackSlashCommandMessage
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 class SlackSlashCommandPubSubHandler(
     dispatcher: CoroutineDispatcher,
     private val jsonSerializer: JsonSerializer,
-    private val log: Logger,
+    log: Logger,
     private val slackRepository: SlackRepository,
     private val slackMessageFactory: SlackMessageFactory,
     private val slackSearchRepository: SlackSearchRepository,
@@ -31,8 +31,6 @@ class SlackSlashCommandPubSubHandler(
     log = log,
     pubSubDecoder = pubSubDecoder,
 ) {
-    private val tag = this::class.simpleName
-
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
         path = "/api/pubsub/slack/slash",

@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.http.mapper
 
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackEvent
-import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackEvent
 
 internal fun ApiSlackEvent.toEvent(): SlackEvent = when (this) {
     is ApiSlackEvent.ApiUrlVerification -> SlackEvent.UrlVerification(challenge)
@@ -13,8 +13,8 @@ private fun ApiSlackEvent.ApiCallback.toCallback(): SlackEvent = when (event) {
         teamId = teamId,
         event = SlackEvent.Callback.Event.TokensRevoked(
             tokens = SlackEvent.Callback.Event.TokensRevoked.Tokens(
-                oAuth = (event as ApiSlackEvent.ApiCallback.ApiEvent.ApiTokensRevoked).tokens.oAuth,
-                bot = (event as ApiSlackEvent.ApiCallback.ApiEvent.ApiTokensRevoked).tokens.bot,
+                oAuth = event.tokens.oAuth,
+                bot = event.tokens.bot,
             )
         )
     )
