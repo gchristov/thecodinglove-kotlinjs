@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.statistics.adapter.slack.mapper
 
-import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackStatistics
+import com.gchristov.thecodinglove.statistics.adapter.slack.model.ApiStatisticsSlack
 import com.gchristov.thecodinglove.statistics.domain.model.StatisticsReport
 
-internal fun ApiSlackStatistics.toStatistics() = StatisticsReport.SlackStatistics(
+internal fun ApiStatisticsSlack.toStatistics() = StatisticsReport.SlackStatistics(
     activeSelfDestructMessages = activeSelfDestructMessages,
     users = users,
     teams = teams,

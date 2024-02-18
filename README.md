@@ -7,7 +7,7 @@
 <details>
   <summary>🛠 Tech stack</summary>
 
-- [Hexagon architecture](https://en.m.wikipedia.org/wiki/Hexagonal_architecture_(software)) - implemented as domain, adapter, service and proto sub-projects for each mocroservice
+- [Hexagon architecture](https://en.m.wikipedia.org/wiki/Hexagonal_architecture_(software)) - implemented as domain, adapter and service sub-projects for each microservice
 - [KotlinJS](https://kotlinlang.org/docs/js-overview.html) - NodeJS transpiling
 - [PubSub](https://cloud.google.com/pubsub) - event-driven messaging
 - [Firestore](https://firebase.google.com/docs/firestore) - NoSQL database

@@ -3,11 +3,13 @@ package com.gchristov.thecodinglove.statistics.adapter
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
+import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.search.proto.http.SearchServiceRepository
-import com.gchristov.thecodinglove.slack.proto.http.SlackServiceRepository
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
 import com.gchristov.thecodinglove.statistics.adapter.search.RealStatisticsSearchRepository
 import com.gchristov.thecodinglove.statistics.adapter.slack.RealStatisticsSlackRepository
+import com.gchristov.thecodinglove.statistics.adapter.slack.StatisticsSlackServiceApi
+import com.gchristov.thecodinglove.statistics.domain.model.Environment
 import com.gchristov.thecodinglove.statistics.domain.port.StatisticsSearchRepository
 import com.gchristov.thecodinglove.statistics.domain.port.StatisticsSlackRepository
 import com.gchristov.thecodinglove.statistics.domain.usecase.StatisticsReportUseCase
@@ -34,8 +36,14 @@ object StatisticsAdapterModule : DiModule() {
                 )
             }
             bindSingleton {
+                provideStatisticsSlackServiceApi(
+                    networkClient = instance(),
+                    environment = instance(),
+                )
+            }
+            bindSingleton {
                 provideStatisticsSlackRepository(
-                    slackServiceRepository = instance(),
+                    statisticsSlackServiceApi = instance(),
                 )
             }
         }
@@ -58,9 +66,17 @@ object StatisticsAdapterModule : DiModule() {
         searchServiceRepository = searchServiceRepository,
     )
 
+    private fun provideStatisticsSlackServiceApi(
+        networkClient: NetworkClient.Json,
+        environment: Environment,
+    ): StatisticsSlackServiceApi = StatisticsSlackServiceApi(
+        client = networkClient,
+        environment = environment,
+    )
+
     private fun provideStatisticsSlackRepository(
-        slackServiceRepository: SlackServiceRepository,
+        statisticsSlackServiceApi: StatisticsSlackServiceApi,
     ): StatisticsSlackRepository = RealStatisticsSlackRepository(
-        slackServiceRepository = slackServiceRepository,
+        statisticsSlackServiceApi = statisticsSlackServiceApi,
     )
 }
