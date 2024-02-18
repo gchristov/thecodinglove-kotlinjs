@@ -22,7 +22,7 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-class SearchAdapterModule(private val environment: Environment) : DiModule() {
+object SearchAdapterModule : DiModule() {
     override fun name() = "search-adapter"
 
     override fun bindDependencies(builder: DI.Builder) {
@@ -37,7 +37,11 @@ class SearchAdapterModule(private val environment: Environment) : DiModule() {
                     jsonSerializer = instance(),
                 )
             }
-            bindSingleton { provideSearchConfig() }
+            bindSingleton {
+                provideSearchConfig(
+                    environment = instance(),
+                )
+            }
             bindProvider { provideParseHtmlTotalPostsUseCase() }
             bindProvider { provideParseHtmlPostsUseCase() }
             bindSingleton {
@@ -104,7 +108,7 @@ class SearchAdapterModule(private val environment: Environment) : DiModule() {
         jsonSerializer = jsonSerializer,
     )
 
-    private fun provideSearchConfig(): SearchConfig = SearchConfig(
+    private fun provideSearchConfig(environment: Environment): SearchConfig = SearchConfig(
         postsPerPage = 4,
         preloadPubSubTopic = environment.preloadSearchPubSubTopic,
     )

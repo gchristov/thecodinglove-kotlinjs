@@ -21,7 +21,6 @@ import com.gchristov.thecodinglove.search.adapter.SearchAdapterModule
 import com.gchristov.thecodinglove.search.adapter.http.*
 import com.gchristov.thecodinglove.search.domain.SearchDomainModule
 import com.gchristov.thecodinglove.search.domain.model.Environment
-import com.gchristov.thecodinglove.slack.proto.SlackProtoModule
 
 suspend fun main() {
     // Ignore default Node arguments
@@ -51,9 +50,9 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
             CommonPubSubModule.module,
             CommonMonitoringModule(environment.apiUrl).module,
             CommonFirebaseModule.module,
-            SlackProtoModule(environment.apiUrl).module,
-            SearchAdapterModule(environment).module,
+            SearchAdapterModule.module,
             SearchDomainModule.module,
+            SearchServiceModule(environment).module,
         )
     )
     return Either.Right(Unit)
