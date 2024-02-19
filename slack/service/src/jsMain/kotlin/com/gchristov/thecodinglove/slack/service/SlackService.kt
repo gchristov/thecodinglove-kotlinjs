@@ -15,7 +15,6 @@ import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
-import com.gchristov.thecodinglove.search.proto.SearchProtoModule
 import com.gchristov.thecodinglove.slack.adapter.SlackAdapterModule
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
@@ -50,7 +49,6 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
             CommonPubSubModule.module,
             CommonMonitoringModule(environment.apiUrl).module,
             CommonFirebaseModule.module,
-            SearchProtoModule(environment.apiUrl).module,
             SlackDomainModule.module,
             SlackAdapterModule(environment).module,
             SlackServiceModule(environment).module,

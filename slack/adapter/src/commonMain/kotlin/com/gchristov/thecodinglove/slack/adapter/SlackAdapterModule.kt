@@ -7,11 +7,11 @@ import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
-import com.gchristov.thecodinglove.search.proto.http.SearchServiceRepository
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.search.RealSlackSearchRepository
+import com.gchristov.thecodinglove.slack.adapter.search.SlackSearchServiceApi
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.Environment
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
@@ -43,7 +43,13 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
                 provideSlackAuthStateSerializer(jsonSerializer = instance())
             }
             bindSingleton {
-                provideSlackSearchRepository(searchServiceRepository = instance())
+                provideSlackSearchServiceApi(
+                    networkClient = instance(),
+                    environment = instance(),
+                )
+            }
+            bindSingleton {
+                provideSlackSearchRepository(slackSearchServiceApi = instance())
             }
             bindSingleton {
                 provideSlackEventHttpHandler(
@@ -150,8 +156,16 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
     private fun provideSlackAuthStateSerializer(jsonSerializer: JsonSerializer.Default): SlackAuthStateSerializer =
         RealSlackAuthStateSerializer(jsonSerializer = jsonSerializer)
 
-    private fun provideSlackSearchRepository(searchServiceRepository: SearchServiceRepository): SlackSearchRepository =
-        RealSlackSearchRepository(searchServiceRepository = searchServiceRepository)
+    private fun provideSlackSearchServiceApi(
+        networkClient: NetworkClient.Json,
+        environment: Environment,
+    ): SlackSearchServiceApi = SlackSearchServiceApi(
+        client = networkClient,
+        environment = environment,
+    )
+
+    private fun provideSlackSearchRepository(slackSearchServiceApi: SlackSearchServiceApi): SlackSearchRepository =
+        RealSlackSearchRepository(slackSearchServiceApi = slackSearchServiceApi)
 
     private fun provideSlackEventHttpHandler(
         jsonSerializer: JsonSerializer.Default,
