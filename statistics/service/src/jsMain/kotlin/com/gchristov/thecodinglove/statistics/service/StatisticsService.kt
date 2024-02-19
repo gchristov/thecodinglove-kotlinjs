@@ -13,7 +13,6 @@ import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
 import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
-import com.gchristov.thecodinglove.search.proto.SearchProtoModule
 import com.gchristov.thecodinglove.statistics.adapter.StatisticsAdapterModule
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
 import com.gchristov.thecodinglove.statistics.domain.StatisticsDomainModule
@@ -44,7 +43,6 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonMonitoringModule(environment.apiUrl).module,
-            SearchProtoModule(environment.apiUrl).module,
             StatisticsDomainModule.module,
             StatisticsAdapterModule.module,
             StatisticsServiceModule(environment).module,

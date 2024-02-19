@@ -4,9 +4,9 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
-import com.gchristov.thecodinglove.search.proto.http.SearchServiceRepository
 import com.gchristov.thecodinglove.statistics.adapter.http.StatisticsHttpHandler
 import com.gchristov.thecodinglove.statistics.adapter.search.RealStatisticsSearchRepository
+import com.gchristov.thecodinglove.statistics.adapter.search.StatisticsSearchServiceApi
 import com.gchristov.thecodinglove.statistics.adapter.slack.RealStatisticsSlackRepository
 import com.gchristov.thecodinglove.statistics.adapter.slack.StatisticsSlackServiceApi
 import com.gchristov.thecodinglove.statistics.domain.model.Environment
@@ -31,8 +31,14 @@ object StatisticsAdapterModule : DiModule() {
                 )
             }
             bindSingleton {
+                provideStatisticsSearchServiceApi(
+                    networkClient = instance(),
+                    environment = instance(),
+                )
+            }
+            bindSingleton {
                 provideStatisticsSearchRepository(
-                    searchServiceRepository = instance(),
+                    statisticsSearchServiceApi = instance(),
                 )
             }
             bindSingleton {
@@ -60,10 +66,18 @@ object StatisticsAdapterModule : DiModule() {
         statisticsReportUseCase = statisticsReportUseCase,
     )
 
+    private fun provideStatisticsSearchServiceApi(
+        networkClient: NetworkClient.Json,
+        environment: Environment,
+    ): StatisticsSearchServiceApi = StatisticsSearchServiceApi(
+        client = networkClient,
+        environment = environment,
+    )
+
     private fun provideStatisticsSearchRepository(
-        searchServiceRepository: SearchServiceRepository,
+        statisticsSearchServiceApi: StatisticsSearchServiceApi,
     ): StatisticsSearchRepository = RealStatisticsSearchRepository(
-        searchServiceRepository = searchServiceRepository,
+        statisticsSearchServiceApi = statisticsSearchServiceApi,
     )
 
     private fun provideStatisticsSlackServiceApi(
