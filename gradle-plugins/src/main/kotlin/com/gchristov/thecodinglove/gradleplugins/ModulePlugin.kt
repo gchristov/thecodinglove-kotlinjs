@@ -4,7 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
-class ModulePlugin : Plugin<Project> {
+class NodeModulePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
             plugins.apply("base-node-plugin")

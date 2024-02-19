@@ -1,7 +1,7 @@
 import com.gchristov.thecodinglove.gradleplugins.Deps
 
 plugins {
-    id("module-plugin")
+    id("node-module-plugin")
 }
 
 kotlin {
