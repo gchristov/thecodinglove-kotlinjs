@@ -1,6 +1,5 @@
 server {  
   listen 80;
-  server_name TheCodingLove;
 
   location /${STATISTICS_SERVICE_PATH} {
     proxy_pass ${STATISTICS_SERVICE_HOST}/${STATISTICS_SERVICE_PATH};
