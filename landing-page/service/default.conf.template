@@ -1,34 +1,7 @@
 server {  
-  listen 80;
-  server_name landing-page-service;
+  listen 8085;
+  server_name TheCodingLove;
 
-  # Reverse proxy setup. All individual microservices should be registered here in a similar way.
-  location /${STATISTICS_SERVICE_PATH} {
-    proxy_pass ${STATISTICS_SERVICE_HOST}/${STATISTICS_SERVICE_PATH};
-    proxy_ssl_server_name on;
-  }
-  location /${SELF_DESTRUCT_SERVICE_PATH} {
-      proxy_pass ${SELF_DESTRUCT_SERVICE_HOST}/${SELF_DESTRUCT_SERVICE_PATH};
-      proxy_ssl_server_name on;
-  }
-  location /${SLACK_SERVICE_PATH} {
-      proxy_pass ${SLACK_SERVICE_HOST}/${SLACK_SERVICE_PATH};
-      proxy_ssl_server_name on;
-  }
-  location /${SLACK_SERVICE_PUBSUB_PATH} {
-      proxy_pass ${SLACK_SERVICE_HOST}/${SLACK_SERVICE_PUBSUB_PATH};
-      proxy_ssl_server_name on;
-  }
-  location /${SEARCH_SERVICE_PATH} {
-    proxy_pass ${SEARCH_SERVICE_HOST}/${SEARCH_SERVICE_PATH};
-    proxy_ssl_server_name on;
-  }
-  location /${SEARCH_SERVICE_PUBSUB_PATH} {
-    proxy_pass ${SEARCH_SERVICE_HOST}/${SEARCH_SERVICE_PUBSUB_PATH};
-    proxy_ssl_server_name on;
-  }
-
-  # Static website setup. Keep at the bottom to allow API service paths above.
   location / {
       root /usr/share/nginx/html;
   }

@@ -1,4 +1,20 @@
 services:
+  web-proxy-service:
+    build: ../web-proxy/service/build/dist/js
+    ports:
+      - "8080:80" # host:container
+    environment:
+      - SEARCH_SERVICE_HOST=http://search-service:8081
+      - SEARCH_SERVICE_PATH=api/search
+      - SEARCH_SERVICE_PUBSUB_PATH=api/pubsub/search
+      - STATISTICS_SERVICE_HOST=http://statistics-service:8082
+      - STATISTICS_SERVICE_PATH=api/statistics
+      - SELF_DESTRUCT_SERVICE_HOST=http://self-destruct-service:8083
+      - SELF_DESTRUCT_SERVICE_PATH=api/self-destruct
+      - SLACK_SERVICE_HOST=http://slack-service:8084
+      - SLACK_SERVICE_PATH=api/slack
+      - SLACK_SERVICE_PUBSUB_PATH=api/pubsub/slack
+      - LANDING_PAGE_SERVICE_HOST=http://landing-page-service:8085
   search-service:
     build: ../search/service/build/dist/js
     ports:
@@ -34,15 +50,4 @@ services:
   landing-page-service:
     build: ../landing-page/service/build/dist/js
     ports:
-      - "8080:80"
-    environment:
-      - SEARCH_SERVICE_HOST=http://search-service:8081
-      - SEARCH_SERVICE_PATH=api/search
-      - SEARCH_SERVICE_PUBSUB_PATH=api/pubsub/search
-      - STATISTICS_SERVICE_HOST=http://statistics-service:8082
-      - STATISTICS_SERVICE_PATH=api/statistics
-      - SELF_DESTRUCT_SERVICE_HOST=http://self-destruct-service:8083
-      - SELF_DESTRUCT_SERVICE_PATH=api/self-destruct
-      - SLACK_SERVICE_HOST=http://slack-service:8084
-      - SLACK_SERVICE_PATH=api/slack
-      - SLACK_SERVICE_PUBSUB_PATH=api/pubsub/slack
+      - "8085:8085"
