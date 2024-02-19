@@ -1,7 +1,7 @@
 import com.gchristov.thecodinglove.gradleplugins.Deps
 
 plugins {
-    id("backend-binary-plugin")
+    id("node-binary-plugin")
 }
 
 kotlin {

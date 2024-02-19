@@ -3,7 +3,7 @@ import com.gchristov.thecodinglove.gradleplugins.envSecret
 val packageId = "com.gchristov.thecodinglove.slack.adapter"
 
 plugins {
-    id("module-plugin")
+    id("node-module-plugin")
     id("build-config-plugin")
 }
 

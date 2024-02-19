@@ -1,7 +1,7 @@
 import com.gchristov.thecodinglove.gradleplugins.binaryRootDirectory
 
 plugins {
-    id("frontend-binary-plugin")
+    id("browser-binary-plugin")
 }
 
 // Bundle resources specific to this binary

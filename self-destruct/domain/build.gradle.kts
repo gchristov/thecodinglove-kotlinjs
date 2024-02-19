@@ -1,3 +1,3 @@
 plugins {
-    id("module-plugin")
+    id("node-module-plugin")
 }

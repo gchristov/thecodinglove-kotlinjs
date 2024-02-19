@@ -11,21 +11,21 @@ gradlePlugin {
         id = "base-browser-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.BaseBrowserPlugin"
     }
-    plugins.register("module-plugin") {
-        id = "module-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.ModulePlugin"
+    plugins.register("node-module-plugin") {
+        id = "node-module-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.NodeModulePlugin"
     }
     plugins.register("build-config-plugin") {
         id = "build-config-plugin"
         implementationClass = "com.gchristov.thecodinglove.gradleplugins.BuildConfigPlugin"
     }
-    plugins.register("frontend-binary-plugin") {
-        id = "frontend-binary-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.FrontendBinaryPlugin"
+    plugins.register("browser-binary-plugin") {
+        id = "browser-binary-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.BrowserBinaryPlugin"
     }
-    plugins.register("backend-binary-plugin") {
-        id = "backend-binary-plugin"
-        implementationClass = "com.gchristov.thecodinglove.gradleplugins.BackendBinaryPlugin"
+    plugins.register("node-binary-plugin") {
+        id = "node-binary-plugin"
+        implementationClass = "com.gchristov.thecodinglove.gradleplugins.NodeBinaryPlugin"
     }
 }
 

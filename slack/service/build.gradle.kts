@@ -1,5 +1,5 @@
 plugins {
-    id("backend-binary-plugin")
+    id("node-binary-plugin")
 }
 
 kotlin {
