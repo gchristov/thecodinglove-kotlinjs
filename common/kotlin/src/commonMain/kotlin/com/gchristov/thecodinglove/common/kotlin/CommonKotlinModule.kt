@@ -7,7 +7,7 @@ import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 
 object CommonKotlinModule : DiModule() {
-    override fun name() = "common-kotlinn"
+    override fun name() = "common-kotlin"
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
