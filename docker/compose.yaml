@@ -1,6 +1,6 @@
 services:
-  web-proxy-service:
-    build: ../web-proxy/service/build/dist/js
+  proxy-web-service:
+    build: ../proxy-web/service/build/dist/js
     ports:
       - "8080:80" # host:container
     environment:
@@ -14,7 +14,7 @@ services:
       - SLACK_SERVICE_HOST=http://slack-service:8084
       - SLACK_SERVICE_PATH=api/slack
       - SLACK_SERVICE_PUBSUB_PATH=api/pubsub/slack
-      - LANDING_PAGE_SERVICE_HOST=http://landing-page-service:8085
+      - LANDING_PAGE_WEB_SERVICE_HOST=http://landing-page-web-service:8085
   search-service:
     build: ../search/service/build/dist/js
     ports:
@@ -47,7 +47,7 @@ services:
       - SLACK_REQUEST_VERIFICATION=true
       - SLACK_SLASH_COMMAND_PUBSUB_TOPIC=slack_slash_command_dev
       - SLACK_INTERACTIVITY_PUBSUB_TOPIC=slack_interactivity_dev
-  landing-page-service:
-    build: ../landing-page/service/build/dist/js
+  landing-page-web-service:
+    build: ../landing-page-web/service/build/dist/js
     ports:
       - "8085:8085"

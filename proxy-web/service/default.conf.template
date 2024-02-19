@@ -27,7 +27,7 @@ server {
     proxy_ssl_server_name on;
   }
   location / {
-      proxy_pass ${LANDING_PAGE_SERVICE_HOST};
+      proxy_pass ${LANDING_PAGE_WEB_SERVICE_HOST};
       proxy_ssl_server_name on;
   }
 }

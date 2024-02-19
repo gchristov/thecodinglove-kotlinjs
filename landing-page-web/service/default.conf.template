@@ -1,6 +1,5 @@
 server {  
   listen 8085;
-  server_name TheCodingLove;
 
   location / {
       root /usr/share/nginx/html;
