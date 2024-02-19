@@ -1,6 +1,6 @@
 services:
   search-service:
-    build: ../build/services/search-service/.
+    build: ../search/service/build/dist/js
     ports:
       - "8081:8081"
     environment:
@@ -8,21 +8,21 @@ services:
       - API_URL=http://host.docker.internal:8080/api
       - PRELOAD_SEARCH_PUBSUB_TOPIC=preload_search_dev
   statistics-service:
-    build: ../build/services/statistics-service/.
+    build: ../statistics/service/build/dist/js
     ports:
       - "8082:8082"
     environment:
       - PORT=8082
       - API_URL=http://host.docker.internal:8080/api
   self-destruct-service:
-    build: ../build/services/self-destruct-service/.
+    build: ../self-destruct/service/build/dist/js
     ports:
       - "8083:8083"
     environment:
       - PORT=8083
       - API_URL=http://host.docker.internal:8080/api
   slack-service:
-    build: ../build/services/slack-service/.
+    build: ../slack/service/build/dist/js
     ports:
       - "8084:8084"
     environment:
@@ -32,7 +32,7 @@ services:
       - SLACK_SLASH_COMMAND_PUBSUB_TOPIC=slack_slash_command_dev
       - SLACK_INTERACTIVITY_PUBSUB_TOPIC=slack_interactivity_dev
   landing-page-service:
-    build: ../build/services/landing-page-service/.
+    build: ../landing-page/service/build/dist/js
     ports:
       - "8080:80"
     environment:

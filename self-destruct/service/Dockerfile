@@ -9,11 +9,11 @@ ENV API_URL=${API_URL}
 WORKDIR /app
 
 # Step 1: Install Node.js dependencies
-COPY /bin/package.json .
+COPY /productionExecutable/package.json .
 RUN npm install --only=production
 
 # Step 2: Copy app files
-COPY /bin/. .
+COPY /productionExecutable .
 
 # Step 3: Run binaries
 FROM npm AS run

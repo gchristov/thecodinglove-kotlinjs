@@ -3,9 +3,9 @@ package com.gchristov.thecodinglove.gradleplugins
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
-import org.gradle.api.provider.Provider
+import org.gradle.kotlin.dsl.assign
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.util.prefixIfNot
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalDistributionDsl
 import java.io.FileInputStream
 import java.util.*
 
@@ -18,12 +18,17 @@ abstract class BaseMultiplatformPlugin : Plugin<Project> {
 }
 
 class BaseNodePlugin : BaseMultiplatformPlugin() {
+    @OptIn(ExperimentalDistributionDsl::class)
     override fun apply(target: Project) {
         super.apply(target)
         target.run {
             extensions.configure(KotlinMultiplatformExtension::class.java) {
                 js(IR) {
-                    nodejs()
+                    nodejs {
+                        distribution {
+                            outputDirectory = file("${binaryRootDirectory()}/productionExecutable")
+                        }
+                    }
                 }
             }
         }
@@ -31,6 +36,7 @@ class BaseNodePlugin : BaseMultiplatformPlugin() {
 }
 
 class BaseBrowserPlugin : BaseMultiplatformPlugin() {
+    @OptIn(ExperimentalDistributionDsl::class)
     override fun apply(target: Project) {
         super.apply(target)
         target.run {
@@ -42,6 +48,9 @@ class BaseBrowserPlugin : BaseMultiplatformPlugin() {
                                 enabled.set(true)
                             }
                         }
+                        distribution {
+                            outputDirectory = file("${binaryRootDirectory()}/productionExecutable")
+                        }
                     }
                 }
             }
@@ -49,15 +58,7 @@ class BaseBrowserPlugin : BaseMultiplatformPlugin() {
     }
 }
 
-fun Project.binaryDestination(): Provider<Directory> {
-    var currentProject = project.parent
-    var name = project.name
-    while (currentProject != null && currentProject != rootProject) {
-        name = name.prefixIfNot("${currentProject.name}-")
-        currentProject = currentProject.parent
-    }
-    return rootProject.layout.buildDirectory.dir("services/$name")
-}
+fun Project.binaryRootDirectory(): Directory = layout.buildDirectory.dir("dist/js").get()
 
 fun Project.envSecret(key: String): String {
     val propFile = file("./secrets.properties")

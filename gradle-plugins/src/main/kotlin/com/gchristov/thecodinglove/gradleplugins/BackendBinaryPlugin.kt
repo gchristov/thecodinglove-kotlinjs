@@ -8,7 +8,6 @@ class BackendBinaryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
             plugins.apply("module-plugin")
-            plugins.apply("dev.petuska.npm.publish")
             extensions.configure(KotlinMultiplatformExtension::class.java) {
                 js(IR) {
                     binaries.library()
@@ -38,15 +37,11 @@ class BackendBinaryPlugin : Plugin<Project> {
                 doLast {
                     copy {
                         from(file(rootProject.layout.projectDirectory.file("credentials-gcp-app.json")))
-                        into(binaryDestination().get().dir("bin").asFile)
-                    }
-                    copy {
-                        from(layout.buildDirectory.dir("packages/js").get().asFile)
-                        into(binaryDestination().get().dir("bin").asFile)
+                        into("${binaryRootDirectory()}/productionExecutable")
                     }
                     copy {
                         from(file(layout.projectDirectory.file("Dockerfile")))
-                        into(binaryDestination().get())
+                        into(binaryRootDirectory())
                     }
                 }
             }

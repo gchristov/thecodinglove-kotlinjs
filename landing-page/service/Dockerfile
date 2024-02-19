@@ -23,4 +23,4 @@ ENV SLACK_SERVICE_PATH=${SLACK_SERVICE_PATH}
 ENV SLACK_SERVICE_PUBSUB_PATH=${SLACK_SERVICE_PUBSUB_PATH}
 
 COPY ./default.conf.template /etc/nginx/templates/default.conf.template
-COPY ./bin/ /usr/share/nginx/html
+COPY ./productionExecutable /usr/share/nginx/html
