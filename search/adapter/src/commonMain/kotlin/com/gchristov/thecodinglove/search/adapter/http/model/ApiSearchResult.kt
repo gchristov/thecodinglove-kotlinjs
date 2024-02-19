@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.search.proto.http.model
+package com.gchristov.thecodinglove.search.adapter.http.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiSearchResult(
+internal data class ApiSearchResult(
     @SerialName("ok") val ok: Boolean,
     @SerialName("error") val error: ApiError?,
     @SerialName("search_session") val searchSession: ApiSearchSession?,

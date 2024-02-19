@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.search.proto.pubsub
+package com.gchristov.thecodinglove.search.adapter.pubsub.model
 
 import kotlinx.serialization.Serializable
 

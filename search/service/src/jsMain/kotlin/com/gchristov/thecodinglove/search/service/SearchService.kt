@@ -19,6 +19,7 @@ import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
 import com.gchristov.thecodinglove.search.adapter.SearchAdapterModule
 import com.gchristov.thecodinglove.search.adapter.http.*
+import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.domain.SearchDomainModule
 import com.gchristov.thecodinglove.search.domain.model.Environment
 

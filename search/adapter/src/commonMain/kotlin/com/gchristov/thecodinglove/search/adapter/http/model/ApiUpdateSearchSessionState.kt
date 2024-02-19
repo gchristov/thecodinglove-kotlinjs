@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.search.proto.http.model
+package com.gchristov.thecodinglove.search.adapter.http.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiUpdateSearchSessionState(
+internal data class ApiUpdateSearchSessionState(
     @SerialName("search_session_id") val searchSessionId: String,
     @SerialName("state") val state: ApiState,
 ) {

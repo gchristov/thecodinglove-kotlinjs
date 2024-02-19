@@ -1,10 +1,10 @@
-package com.gchristov.thecodinglove.search.proto.http.model
+package com.gchristov.thecodinglove.search.adapter.http.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiSearchSessionPost(
+internal data class ApiSearchSessionPost(
     @SerialName("search_query") val searchQuery: String,
     @SerialName("attachment_title") val attachmentTitle: String,
     @SerialName("attachment_url") val attachmentUrl: String,

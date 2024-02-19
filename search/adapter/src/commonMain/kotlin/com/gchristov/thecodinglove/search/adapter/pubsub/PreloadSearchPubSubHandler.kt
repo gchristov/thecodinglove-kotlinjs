@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.search.adapter.http
+package com.gchristov.thecodinglove.search.adapter.pubsub
 
 import arrow.core.Either
 import arrow.core.flatMap
@@ -12,7 +12,7 @@ import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.search.domain.usecase.PreloadSearchResultUseCase
-import com.gchristov.thecodinglove.search.proto.pubsub.PubSubPreloadSearchMessage
+import com.gchristov.thecodinglove.search.adapter.pubsub.model.PubSubPreloadSearchMessage
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 

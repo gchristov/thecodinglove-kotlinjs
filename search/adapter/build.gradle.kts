@@ -10,7 +10,6 @@ kotlin {
                 implementation(projects.common.pubsub)
                 implementation(projects.common.firebase)
                 implementation(projects.search.domain)
-                implementation(projects.search.proto)
             }
         }
         val commonTest by getting {

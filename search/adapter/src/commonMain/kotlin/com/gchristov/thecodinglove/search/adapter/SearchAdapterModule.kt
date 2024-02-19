@@ -10,6 +10,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.http.*
+import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.domain.model.Environment
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository

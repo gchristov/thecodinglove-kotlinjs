@@ -6,7 +6,8 @@ import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubDecoder
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
-import com.gchristov.thecodinglove.search.proto.pubsub.PubSubPreloadSearchMessage
+import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubHandler
+import com.gchristov.thecodinglove.search.adapter.pubsub.model.PubSubPreloadSearchMessage
 import com.gchristov.thecodinglove.search.testfixtures.FakePreloadSearchResultUseCase
 import com.gchristov.thecodinglove.search.testfixtures.PreloadSearchPubSubCreator
 import io.ktor.http.*
