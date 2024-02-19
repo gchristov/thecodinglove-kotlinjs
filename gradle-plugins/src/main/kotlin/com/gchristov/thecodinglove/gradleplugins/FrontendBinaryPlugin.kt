@@ -17,12 +17,8 @@ class FrontendBinaryPlugin : Plugin<Project> {
             tasks.named("assemble") {
                 doLast {
                     copy {
-                        from(layout.buildDirectory.dir("dist/js/productionExecutable").get().asFile)
-                        into(binaryDestination().get().dir("bin").asFile)
-                    }
-                    copy {
                         from(file(layout.projectDirectory.file("Dockerfile")))
-                        into(binaryDestination().get())
+                        into(binaryRootDirectory())
                     }
                 }
             }

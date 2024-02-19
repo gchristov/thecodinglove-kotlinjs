@@ -154,7 +154,7 @@ resources:
           API_URL: https://${domain}/api
           PRELOAD_SEARCH_PUBSUB_TOPIC: preload_search
         platform: linux/amd64
-        context: ../build/services/search-service
+        context: ../search/service/build/dist/js
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/search-service:latest
       registry:
         server: ${artifact-registry.location}-docker.pkg.dev
@@ -235,7 +235,7 @@ resources:
           PORT: "8082"
           API_URL: https://${domain}/api
         platform: linux/amd64
-        context: ../build/services/statistics-service
+        context: ../statistics/service/build/dist/js
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/statistics-service:latest
       registry:
         server: ${artifact-registry.location}-docker.pkg.dev
@@ -314,7 +314,7 @@ resources:
           PORT: "8083"
           API_URL: https://${domain}/api
         platform: linux/amd64
-        context: ../build/services/self-destruct-service
+        context: ../self-destruct/service/build/dist/js
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/self-destruct-service:latest
       registry:
         server: ${artifact-registry.location}-docker.pkg.dev
@@ -396,7 +396,7 @@ resources:
           SLACK_SLASH_COMMAND_PUBSUB_TOPIC: slack_slash_command
           SLACK_INTERACTIVITY_PUBSUB_TOPIC: slack_interactivity
         platform: linux/amd64
-        context: ../build/services/slack-service
+        context: ../slack/service/build/dist/js
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/slack-service:latest
       registry:
         server: ${artifact-registry.location}-docker.pkg.dev
@@ -483,7 +483,7 @@ resources:
           SLACK_SERVICE_PATH: api/slack
           SLACK_SERVICE_PUBSUB_PATH: api/pubsub/slack
         platform: linux/amd64
-        context: ../build/services/landing-page-service
+        context: ../landing-page/service/build/dist/js
       imageName: ${artifact-registry.location}-docker.pkg.dev/${artifact-registry.project}/${artifact-registry.repositoryId}/landing-page-service:latest
       registry:
         server: ${artifact-registry.location}-docker.pkg.dev
