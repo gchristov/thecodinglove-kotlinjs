@@ -9,7 +9,6 @@ kotlin {
                 implementation(projects.common.network)
                 implementation(projects.search.adapter)
                 implementation(projects.search.domain)
-                implementation(projects.search.proto)
             }
         }
     }

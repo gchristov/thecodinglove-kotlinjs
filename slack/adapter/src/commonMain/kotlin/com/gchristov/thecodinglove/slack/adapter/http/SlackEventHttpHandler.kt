@@ -12,11 +12,11 @@ import com.gchristov.thecodinglove.common.network.http.*
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toEvent
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackRequestVerificationDto
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackRevokeTokensDto
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.model.SlackEvent
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackRevokeTokensUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackVerifyRequestUseCase
-import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackEvent
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 

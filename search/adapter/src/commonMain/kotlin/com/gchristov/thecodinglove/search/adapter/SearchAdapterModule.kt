@@ -10,6 +10,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.http.*
+import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubHandler
 import com.gchristov.thecodinglove.search.domain.model.Environment
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
@@ -22,7 +23,7 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-class SearchAdapterModule(private val environment: Environment) : DiModule() {
+object SearchAdapterModule : DiModule() {
     override fun name() = "search-adapter"
 
     override fun bindDependencies(builder: DI.Builder) {
@@ -37,7 +38,11 @@ class SearchAdapterModule(private val environment: Environment) : DiModule() {
                     jsonSerializer = instance(),
                 )
             }
-            bindSingleton { provideSearchConfig() }
+            bindSingleton {
+                provideSearchConfig(
+                    environment = instance(),
+                )
+            }
             bindProvider { provideParseHtmlTotalPostsUseCase() }
             bindProvider { provideParseHtmlPostsUseCase() }
             bindSingleton {
@@ -104,7 +109,7 @@ class SearchAdapterModule(private val environment: Environment) : DiModule() {
         jsonSerializer = jsonSerializer,
     )
 
-    private fun provideSearchConfig(): SearchConfig = SearchConfig(
+    private fun provideSearchConfig(environment: Environment): SearchConfig = SearchConfig(
         postsPerPage = 4,
         preloadPubSubTopic = environment.preloadSearchPubSubTopic,
     )

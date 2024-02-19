@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.statistics.adapter.http.mapper
 
+import com.gchristov.thecodinglove.statistics.adapter.http.model.ApiStatisticsReport
 import com.gchristov.thecodinglove.statistics.domain.model.StatisticsReport
-import com.gchristov.thecodinglove.statistics.proto.http.model.ApiStatisticsReport
 
 internal fun StatisticsReport.toStatisticsReport() = ApiStatisticsReport(
     searchStatistics = ApiStatisticsReport.ApiSearchReport(

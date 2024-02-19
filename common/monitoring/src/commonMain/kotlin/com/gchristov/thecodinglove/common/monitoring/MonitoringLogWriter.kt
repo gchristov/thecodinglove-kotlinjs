@@ -3,15 +3,17 @@ package com.gchristov.thecodinglove.common.monitoring
 import arrow.core.raise.either
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
-import com.gchristov.thecodinglove.slack.proto.http.SlackServiceRepository
-import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackReportException
+import com.gchristov.thecodinglove.common.monitoring.slack.MonitoringSlackRepository
+import com.gchristov.thecodinglove.common.monitoring.slack.model.ApiMonitoringReportExceptionSlack
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-class MonitoringLogWriter(
+abstract class MonitoringLogWriter : LogWriter()
+
+internal class RealMonitoringLogWriter(
     private val dispatcher: CoroutineDispatcher,
-    private val slackServiceRepository: SlackServiceRepository,
-) : LogWriter(), CoroutineScope {
+    private val monitoringSlackRepository: MonitoringSlackRepository,
+) : MonitoringLogWriter(), CoroutineScope {
     private val job = Job()
 
     override val coroutineContext: CoroutineContext
@@ -61,8 +63,8 @@ class MonitoringLogWriter(
     private suspend fun reportToSlack(
         message: String,
         stacktrace: String,
-    ) = slackServiceRepository.reportException(
-        ApiSlackReportException(
+    ) = monitoringSlackRepository.reportException(
+        ApiMonitoringReportExceptionSlack(
             message = message,
             stacktrace = stacktrace,
         )

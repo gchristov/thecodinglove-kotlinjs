@@ -17,7 +17,6 @@ import com.gchristov.thecodinglove.selfdestruct.adapter.SelfDestructAdapterModul
 import com.gchristov.thecodinglove.selfdestruct.adapter.http.SelfDestructHttpHandler
 import com.gchristov.thecodinglove.selfdestruct.domain.SelfDestructDomainModule
 import com.gchristov.thecodinglove.selfdestruct.domain.model.Environment
-import com.gchristov.thecodinglove.slack.proto.SlackProtoModule
 
 suspend fun main() {
     // Ignore default Node arguments
@@ -43,8 +42,7 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
-            CommonMonitoringModule.module,
-            SlackProtoModule(environment.apiUrl).module,
+            CommonMonitoringModule(environment.apiUrl).module,
             SelfDestructAdapterModule.module,
             SelfDestructDomainModule.module,
             SelfDestructServiceModule(environment).module,

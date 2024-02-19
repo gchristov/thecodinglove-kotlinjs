@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.slack.adapter.http
 
 import com.gchristov.thecodinglove.common.network.NetworkClient
-import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackDeleteMessage
-import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackMessage
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackDeleteMessage
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackMessage
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -17,7 +17,7 @@ internal class SlackApi(private val client: NetworkClient.Json) {
 
     suspend fun postMessageToUrl(
         url: String,
-        message: ApiSlackMessage
+        message: ApiSlackMessage,
     ): HttpResponse = client.http.post(url) {
         contentType(ContentType.Application.Json)
         setBody(message)
@@ -25,7 +25,7 @@ internal class SlackApi(private val client: NetworkClient.Json) {
 
     suspend fun postMessage(
         authToken: String,
-        message: ApiSlackMessage
+        message: ApiSlackMessage,
     ): HttpResponse = client.http.post("https://slack.com/api/chat.postMessage") {
         bearerAuth(authToken)
         contentType(ContentType.Application.Json)

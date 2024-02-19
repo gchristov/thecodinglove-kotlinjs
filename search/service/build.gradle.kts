@@ -9,7 +9,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.common.firebase)
-                implementation(projects.slack.proto)
                 implementation(projects.search.domain)
                 implementation(projects.search.adapter)
             }

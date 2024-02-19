@@ -11,11 +11,11 @@ import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackInteractivityMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackCancelSearchUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackShuffleSearchUseCase
-import com.gchristov.thecodinglove.slack.proto.pubsub.PubSubSlackInteractivityMessage
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -50,7 +50,7 @@ class SlackInteractivityPubSubHandler(
             .flatMap {
                 when (it.payload) {
                     is PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage ->
-                        (it.payload as PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage).handle()
+                        it.payload.handle()
                 }
             }
             .fold(

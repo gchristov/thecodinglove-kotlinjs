@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.http.mapper
 
-import com.gchristov.thecodinglove.slack.proto.http.model.ApiSlackInteractivity
-import com.gchristov.thecodinglove.slack.proto.pubsub.PubSubSlackInteractivityMessage
+import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackInteractivity
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackInteractivityMessage
 
 internal fun ApiSlackInteractivity.toPubSubMessage() = PubSubSlackInteractivityMessage(
     payload = payload.toPayload()
