@@ -14,7 +14,7 @@ services:
       - SLACK_SERVICE_HOST=http://slack-service:8084
       - SLACK_SERVICE_PATH=api/slack
       - SLACK_SERVICE_PUBSUB_PATH=api/pubsub/slack
-      - LANDING_PAGE_WEB_SERVICE_HOST=http://landing-page-web-service:8085
+      - LANDING_PAGE_WEB_SERVICE_HOST=http://landing-page-web-service:80
   search-service:
     build: ../search/service/build/dist/js
     ports:
@@ -50,4 +50,4 @@ services:
   landing-page-web-service:
     build: ../landing-page-web/service/build/dist/js
     ports:
-      - "8085:8085"
+      - "8085:80"

@@ -1,7 +1,8 @@
 server {  
-  listen 8085;
-
-  location / {
-      root /usr/share/nginx/html;
-  }
+  listen 80;
+  rewrite ^(.+)/+$ $1 permanent;
+  rewrite ^(.+)/index.html$ $1 permanent;
+  root /usr/share/nginx/html;
+  index index.html;
+  try_files $uri $uri/index.html =404;
 }
