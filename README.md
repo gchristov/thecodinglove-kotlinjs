@@ -76,16 +76,16 @@ The project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN), so
 2. [Install IntelliJ](https://www.jetbrains.com/help/idea/installation-guide.html). This project has been tested with `IntelliJ IDEA 2023.2.5`.
 3. Clone the repository and open the project with IntelliJ.
 4. Create a Slack channel to receive server error messages and monitoring updates. The project is configured to post all unhandled `Throwable`s to that channel. We use the [Incoming Webhooks](https://slack.com/apps/A0F7XDUAZ-incoming-webhooks) app.
-5. Create a `env.properties` file at the root of the project with the following contents:
+5. Create the following `secrets.properties` files:
 ```
+# Under /slack/adapter/secrets.properties
 SLACK_SIGNING_SECRET=YOUR_SLACK_SIGNING_SECRET
-SLACK_REQUEST_VERIFICATION_ENABLED=true|false
 SLACK_CLIENT_ID=YOUR_SLACK_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_SLACK_CLIENT_SECRET
-SLACK_INTERACTIVITY_PUBSUB_TOPIC=TOPIC_NAME
-SLACK_SLASH_COMMAND_PUBSUB_TOPIC=TOPIC_NAME
-SLACK_MONITORING_URL=YOUR_SLACK_MONITORING_URL
-SEARCH_PRELOAD_PUBSUB_TOPIC=TOPIC_NAME
+```
+```
+# Under /common/monitoring/secrets.properties
+MONITORING_SLACK_URL=YOUR_MONITORING_SLACK_URL
 ```
 6. Copy the `credentials-gcp-app.json` Service Account JSON API key to the root project folder.
 </details>
@@ -104,7 +104,7 @@ This is really up to you! However, we've provided our setup below.
 The project is configured to build with [GitHub Actions](https://github.com/features/actions). Checkout the `.github` folder for the workflows. Follow these steps to configure the CI environment:
 
 1. Add your Pulumi access token as a [GitHub encrypted secret](https://docs.github.com/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets) with the name `PULUMI_ACCESS_TOKEN`.
-2. Each of the variables defined in `env.properties` above should be exposed as GitHub encrypted secrets under the same names.
+2. Each of the variables defined in the `secrets.properties` files you created above should be exposed as GitHub encrypted secrets, using the same names as keys.
 3. Add an additional `GCP_SA_KEY_INFRA` GitHub encrypted secret, containing the raw JSON API key for the above infrastructure as code Service Account.
 4. Add an additional `GCP_SA_KEY_APP` GitHub encrypted secret, containing the raw JSON API key for the `firebase-adminsdk` Service Account.
 5. (Optional) Install the [Pulumi GitHub app](https://www.pulumi.com/docs/using-pulumi/continuous-delivery/github-app/) to get automated summaries of your infrastructure as code changes directly on your PR.
