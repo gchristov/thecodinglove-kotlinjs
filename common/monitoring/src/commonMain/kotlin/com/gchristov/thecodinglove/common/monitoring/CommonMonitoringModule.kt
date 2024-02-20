@@ -22,7 +22,7 @@ object CommonMonitoringModule : DiModule() {
             }
             bindSingleton {
                 provideMonitoringSlackRepository(
-                    monitoringSlackServiceApi = instance(),
+                    monitoringSlackApi = instance(),
                 )
             }
             bindSingleton {
@@ -41,9 +41,9 @@ object CommonMonitoringModule : DiModule() {
     )
 
     private fun provideMonitoringSlackRepository(
-        monitoringSlackServiceApi: MonitoringSlackApi,
+        monitoringSlackApi: MonitoringSlackApi,
     ): MonitoringSlackRepository = RealMonitoringSlackRepository(
-        monitoringSlackApi = monitoringSlackServiceApi,
+        monitoringSlackApi = monitoringSlackApi,
     )
 
     private fun provideMonitoringLogWriter(
