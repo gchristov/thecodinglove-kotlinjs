@@ -64,5 +64,9 @@ fun Project.envSecret(key: String): String {
     val propFile = file("./secrets.properties")
     val properties = Properties()
     properties.load(FileInputStream(propFile))
-    return properties.getProperty(key)
+    val property = properties.getProperty(key)
+    if (property.isNullOrBlank()) {
+        throw IllegalStateException("Required property is missing: property=$key")
+    }
+    return property
 }
