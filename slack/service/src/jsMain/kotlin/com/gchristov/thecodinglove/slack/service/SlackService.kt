@@ -47,7 +47,7 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonPubSubModule.module,
-            CommonMonitoringModule(environment.apiUrl).module,
+            CommonMonitoringModule.module,
             CommonFirebaseModule.module,
             SlackDomainModule.module,
             SlackAdapterModule(environment).module,
@@ -74,7 +74,6 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
         DiGraph.inject<SlackEventHttpHandler>(),
         DiGraph.inject<SlackSelfDestructHttpHandler>(),
         DiGraph.inject<SlackStatisticsHttpHandler>(),
-        DiGraph.inject<SlackReportExceptionHttpHandler>(),
     )
     val service = DiGraph.inject<HttpService>()
     return service.initialise(

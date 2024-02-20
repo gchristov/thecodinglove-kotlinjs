@@ -120,13 +120,6 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
                     statisticsUseCase = instance(),
                 )
             }
-            bindSingleton {
-                provideSlackReportExceptionHttpHandler(
-                    jsonSerializer = instance(),
-                    log = instance(),
-                    reportExceptionUseCase = instance(),
-                )
-            }
         }
     }
 
@@ -140,7 +133,6 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
         clientSecret = BuildConfig.SLACK_CLIENT_SECRET,
         interactivityPubSubTopic = environment.slackInteractivityPubSubTopic,
         slashCommandPubSubTopic = environment.slackSlashCommandPubSubTopic,
-        monitoringUrl = BuildConfig.SLACK_MONITORING_URL,
     )
 
     private fun provideSlackRepository(
@@ -279,16 +271,5 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
         jsonSerializer = jsonSerializer,
         log = log,
         statisticsUseCase = statisticsUseCase,
-    )
-
-    private fun provideSlackReportExceptionHttpHandler(
-        jsonSerializer: JsonSerializer.Default,
-        log: Logger,
-        reportExceptionUseCase: SlackReportExceptionUseCase,
-    ): SlackReportExceptionHttpHandler = SlackReportExceptionHttpHandler(
-        dispatcher = Dispatchers.Default,
-        jsonSerializer = jsonSerializer,
-        log = log,
-        reportExceptionUseCase = reportExceptionUseCase,
     )
 }

@@ -77,13 +77,6 @@ object SlackDomainModule : DiModule() {
                     slackRepository = instance(),
                 )
             }
-            bindProvider {
-                provideReportExceptionUseCase(
-                    slackRepository = instance(),
-                    slackMessageFactory = instance(),
-                    slackConfig = instance(),
-                )
-            }
         }
     }
 
@@ -179,15 +172,5 @@ object SlackDomainModule : DiModule() {
         dispatcher = Dispatchers.Default,
         log = log,
         slackRepository = slackRepository,
-    )
-
-    private fun provideReportExceptionUseCase(
-        slackRepository: SlackRepository,
-        slackMessageFactory: SlackMessageFactory,
-        slackConfig: SlackConfig,
-    ): SlackReportExceptionUseCase = RealSlackReportExceptionUseCase(
-        slackRepository = slackRepository,
-        slackMessageFactory = slackMessageFactory,
-        slackConfig = slackConfig,
     )
 }

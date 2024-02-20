@@ -4,7 +4,6 @@ import arrow.core.raise.either
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
 import com.gchristov.thecodinglove.common.monitoring.slack.MonitoringSlackRepository
-import com.gchristov.thecodinglove.common.monitoring.slack.model.ApiMonitoringReportExceptionSlack
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -64,9 +63,7 @@ internal class RealMonitoringLogWriter(
         message: String,
         stacktrace: String,
     ) = monitoringSlackRepository.reportException(
-        ApiMonitoringReportExceptionSlack(
-            message = message,
-            stacktrace = stacktrace,
-        )
+        message = message,
+        stacktrace = stacktrace,
     )
 }

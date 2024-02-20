@@ -7,4 +7,5 @@ echo "$GCP_SA_KEY_INFRA" >> ./pulumi/credentials-gcp-infra.json
 echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/adapter/secrets.properties
 echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/adapter/secrets.properties
 echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack/adapter/secrets.properties
-echo SLACK_MONITORING_URL="$SLACK_MONITORING_URL" >> ./slack/adapter/secrets.properties
+# Monitoring
+echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
