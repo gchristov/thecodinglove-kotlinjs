@@ -39,10 +39,5 @@ buildkonfig {
             name = "SLACK_CLIENT_SECRET",
             value = project.envSecret("SLACK_CLIENT_SECRET")
         )
-        buildConfigField(
-            type = com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            name = "SLACK_MONITORING_URL",
-            value = project.envSecret("SLACK_MONITORING_URL")
-        )
     }
 }
