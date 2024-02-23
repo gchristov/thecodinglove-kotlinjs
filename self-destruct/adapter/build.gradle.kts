@@ -6,8 +6,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.common.network)
-                implementation(projects.selfDestruct.domain)
+                implementation("com.gchristov.thecodinglove.common:network")
+                implementation(projects.domain)
             }
         }
     }

@@ -6,17 +6,17 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.common.network)
-                implementation(projects.common.pubsub)
-                implementation(projects.common.firebase)
-                implementation(projects.search.domain)
+                implementation("com.gchristov.thecodinglove.common:network")
+                implementation("com.gchristov.thecodinglove.common:pubsub")
+                implementation("com.gchristov.thecodinglove.common:firebase")
+                implementation(projects.domain)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation(projects.common.networkTestfixtures)
-                implementation(projects.common.pubsubTestfixtures)
-                implementation(projects.search.testFixtures)
+                implementation("com.gchristov.thecodinglove.common:network-testfixtures")
+                implementation("com.gchristov.thecodinglove.common:pubsub-testfixtures")
+                implementation(projects.testFixtures)
             }
         }
     }

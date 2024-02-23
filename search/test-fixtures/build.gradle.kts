@@ -6,9 +6,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.common.network)
-                implementation(projects.search.adapter)
-                implementation(projects.search.domain)
+                implementation("com.gchristov.thecodinglove.common:network")
+                implementation(projects.adapter)
+                implementation(projects.domain)
             }
         }
     }

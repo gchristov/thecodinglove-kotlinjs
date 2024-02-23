@@ -15,9 +15,9 @@ class NodeBinaryPlugin : Plugin<Project> {
             }
             extensions.configure(KotlinMultiplatformExtension::class.java) {
                 sourceSets.maybeCreate("commonMain").dependencies {
-                    implementation(project(":common:network"))
-                    implementation(project(":common:pubsub"))
-                    implementation(project(":common:monitoring"))
+                    implementation("com.gchristov.thecodinglove.common:network")
+                    implementation("com.gchristov.thecodinglove.common:pubsub")
+                    implementation("com.gchristov.thecodinglove.common:monitoring")
                 }
                 sourceSets.maybeCreate("jsMain").dependencies {
                     // Ideally these would be linked from corresponding submodules but that is currently not supported out
@@ -28,15 +28,15 @@ class NodeBinaryPlugin : Plugin<Project> {
                     implementation(npm(Deps.Google.firebaseAdmin.name, Deps.Google.firebaseAdmin.version))
                 }
                 sourceSets.maybeCreate("jsTest").dependencies {
-                    implementation(project(":common:network-testfixtures"))
-                    implementation(project(":common:pubsub-testfixtures"))
+                    implementation("com.gchristov.thecodinglove.common:network-testfixtures")
+                    implementation("com.gchristov.thecodinglove.common:pubsub-testfixtures")
                 }
             }
             // Copy the output binaries to their final destination
             tasks.named("assemble") {
                 doLast {
                     copy {
-                        from(file(rootProject.layout.projectDirectory.file("credentials-gcp-app.json")))
+                        from(file(rootProject.layout.projectDirectory.file("../credentials-gcp-app.json")))
                         into("${binaryRootDirectory()}/productionExecutable")
                     }
                     copy {

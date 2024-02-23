@@ -6,8 +6,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.selfDestruct.adapter)
-                implementation(projects.selfDestruct.domain)
+                implementation(projects.adapter)
+                implementation(projects.domain)
             }
         }
     }

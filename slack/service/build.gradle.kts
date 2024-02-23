@@ -6,9 +6,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.common.firebase)
-                implementation(projects.slack.domain)
-                implementation(projects.slack.adapter)
+                implementation("com.gchristov.thecodinglove.common:firebase")
+                implementation(projects.domain)
+                implementation(projects.adapter)
             }
         }
     }

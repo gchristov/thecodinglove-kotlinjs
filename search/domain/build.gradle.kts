@@ -6,7 +6,7 @@ kotlin {
     sourceSets {
         val commonTest by getting {
             dependencies {
-                implementation(projects.search.testFixtures)
+                implementation(projects.testFixtures)
             }
         }
     }

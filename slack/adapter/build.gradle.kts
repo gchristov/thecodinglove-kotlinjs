@@ -11,10 +11,10 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.common.network)
-                implementation(projects.common.pubsub)
-                implementation(projects.common.firebase)
-                implementation(projects.slack.domain)
+                implementation("com.gchristov.thecodinglove.common:network")
+                implementation("com.gchristov.thecodinglove.common:pubsub")
+                implementation("com.gchristov.thecodinglove.common:firebase")
+                implementation(projects.domain)
             }
         }
     }
