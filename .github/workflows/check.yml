@@ -18,7 +18,7 @@ env:
   MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
 
 jobs:
-  jsBuild:
+  buildService:
     runs-on: ubuntu-20.04
     concurrency:
       group: ${{ github.ref }}_jsBuild
@@ -60,7 +60,7 @@ jobs:
             **/secrets.properties
             pulumi/
 
-  jsTest:
+  testService:
     runs-on: ubuntu-20.04
     concurrency:
       group: ${{ github.ref }}_jsTest
