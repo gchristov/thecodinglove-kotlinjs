@@ -35,10 +35,6 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
-      - name: Test Brew
-        run: |
-          set -o pipefail && 
-          bash ./pulumi/run.sh
       - name: Build project
         run: |
           set -o pipefail && 
