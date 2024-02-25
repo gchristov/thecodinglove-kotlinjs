@@ -4,13 +4,11 @@ allprojects {
     }
 }
 
-val taskNames = listOf("clean", "assemble")
+val taskNames = listOf("clean", "assemble", "jsTest")
 taskNames.forEach {  taskName ->
     tasks.register("${taskName}All") {
-        dependsOn(
-            tasks.named(taskName),
-            gradle.includedBuilds.map { it.task(":${taskName}All") },
-            subprojects.map { it.tasks.named(taskName) },
-        )
+        tasks.findByName(taskName)?.let { dependsOn(it) }
+        dependsOn(gradle.includedBuilds.map { it.task(":${taskName}All") })
+        subprojects.map { it.tasks.findByName(taskName)?.let { dependsOn(it) } }
     }
 }
