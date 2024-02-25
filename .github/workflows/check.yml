@@ -59,6 +59,7 @@ jobs:
             build/services
             **/secrets.properties
             pulumi/
+            **/yarn.lock
 
   jsTest:
     runs-on: ubuntu-20.04
@@ -91,4 +92,6 @@ jobs:
         if: always() # Ensure all artifacts are collected, even after errors
         with:
           name: Tests
-          path: '**/build/test-results/**/TEST-*.xml'
+          path: |
+            '**/build/test-results/**/TEST-*.xml'
+            **/yarn.lock
