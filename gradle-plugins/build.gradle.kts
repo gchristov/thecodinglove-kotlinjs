@@ -39,7 +39,7 @@ dependencies {
     implementation("com.codingfeline.buildkonfig:buildkonfig-gradle-plugin:0.15.0")
 }
 
-val taskNames = listOf("clean")
+val taskNames = listOf("clean", "assemble")
 taskNames.forEach {  taskName ->
     tasks.register("${taskName}All") {
         tasks.findByName(taskName)?.let { dependsOn(it) }
