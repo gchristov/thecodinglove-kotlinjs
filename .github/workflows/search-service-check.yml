@@ -45,6 +45,10 @@ jobs:
         run: |
           set -o pipefail &&
           docker compose -f docker/search-service-compose.yaml build
+      - name: Test Brew
+        run: |
+          set -o pipefail && 
+          bash ./pulumi/run.sh
 #      - name: Preview infrastructure
 #        uses: pulumi/actions@v5
 #        with:
