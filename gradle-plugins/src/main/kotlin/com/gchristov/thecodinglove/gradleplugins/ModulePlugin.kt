@@ -10,10 +10,10 @@ class NodeModulePlugin : Plugin<Project> {
             plugins.apply("base-node-plugin")
             plugins.apply("org.jetbrains.kotlin.plugin.serialization")
             extensions.configure(KotlinMultiplatformExtension::class.java) {
-                sourceSets.maybeCreate("commonMain").dependencies {
-                    api("com.gchristov.thecodinglove.common:kotlin")
-                    api("com.gchristov.thecodinglove.common:test")
-                }
+//                sourceSets.maybeCreate("commonMain").dependencies {
+//                    api("com.gchristov.thecodinglove.common:kotlin")
+//                    api("com.gchristov.thecodinglove.common:test")
+//                }
                 sourceSets.maybeCreate("commonTest").dependencies {
                     api(Deps.Kotlin.coroutinesTest)
                 }

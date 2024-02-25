@@ -9,6 +9,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(projects.test)
                 implementation(projects.network)
             }
         }
