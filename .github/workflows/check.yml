@@ -41,7 +41,7 @@ jobs:
       - name: Build container images
         run: |
           set -o pipefail &&
-          docker compose -f docker/compose.yaml build
+          docker compose -f docker/search_compose.yaml build
       - name: Preview infrastructure
         uses: pulumi/actions@v5
         with:

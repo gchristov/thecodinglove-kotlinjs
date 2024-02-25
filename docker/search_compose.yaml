@@ -1,0 +1,9 @@
+services:
+  search-service:
+    build: ../search/service/build/dist/js
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+      - API_URL=http://host.docker.internal:8080/api
+      - PRELOAD_SEARCH_PUBSUB_TOPIC=preload_search_dev
