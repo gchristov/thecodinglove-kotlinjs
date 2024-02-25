@@ -3,6 +3,8 @@ name: PR Checks
 on:
   pull_request:
     branches: [ master ]
+    paths:
+      - 'search/**'
 
 env:
   # Required for CI
@@ -18,7 +20,7 @@ env:
   MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
 
 jobs:
-  jsBuild:
+  searchServiceBuild:
     runs-on: ubuntu-20.04
     concurrency:
       group: ${{ github.ref }}_jsBuild
@@ -60,9 +62,8 @@ jobs:
             build/services
             **/secrets.properties
             pulumi/
-            **/yarn.lock
 
-  jsTest:
+  searchServiceTest:
     runs-on: ubuntu-20.04
     concurrency:
       group: ${{ github.ref }}_jsTest
@@ -94,6 +95,4 @@ jobs:
         if: always() # Ensure all artifacts are collected, even after errors
         with:
           name: Tests
-          path: |
-            '**/build/test-results/**/TEST-*.xml'
-            **/yarn.lock
+          path: '**/build/test-results/**/TEST-*.xml'
