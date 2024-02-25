@@ -45,14 +45,14 @@ jobs:
         run: |
           set -o pipefail &&
           docker compose -f docker/search-service-compose.yaml build
-#      - name: Preview infrastructure
-#        uses: pulumi/actions@v5
-#        with:
-#          command: preview
-#          stack-name: prod
-#          work-dir: pulumi/search
-#        env:
-#          PULUMI_ACCESS_TOKEN: ${{ env.PULUMI_ACCESS_TOKEN }}
+      - name: Preview infrastructure
+        uses: pulumi/actions@v5
+        with:
+          command: preview
+          stack-name: prod
+          work-dir: pulumi
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ env.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
