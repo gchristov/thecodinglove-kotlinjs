@@ -50,7 +50,7 @@ jobs:
         with:
           command: preview
           stack-name: prod
-          work-dir: pulumi
+          work-dir: search/infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ env.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts

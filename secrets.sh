@@ -2,7 +2,13 @@
 set -e
 # Credentials
 echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
-echo "$GCP_SA_KEY_INFRA" >> ./pulumi/credentials-gcp-infra.json
+echo "$GCP_SA_KEY_INFRA" >> ./common/infra/credentials-gcp-infra.json
+echo "$GCP_SA_KEY_INFRA" >> ./landing-page-web/infra/credentials-gcp-infra.json
+echo "$GCP_SA_KEY_INFRA" >> ./proxy-web/infra/credentials-gcp-infra.json
+echo "$GCP_SA_KEY_INFRA" >> ./search/infra/credentials-gcp-infra.json
+echo "$GCP_SA_KEY_INFRA" >> ./self-destruct/infra/credentials-gcp-infra.json
+echo "$GCP_SA_KEY_INFRA" >> ./slack/infra/credentials-gcp-infra.json
+echo "$GCP_SA_KEY_INFRA" >> ./statistics/infra/credentials-gcp-infra.json
 # Slack
 echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/adapter/secrets.properties
 echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/adapter/secrets.properties
