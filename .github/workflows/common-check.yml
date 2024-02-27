@@ -9,6 +9,9 @@ on:
 env:
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
+  GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
+  GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
+  MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
 
 jobs:
   common-build:
@@ -28,9 +31,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "${{ secrets.GCP_SA_KEY_APP }}" >> ./credentials-gcp-app.json
-          echo "${{ secrets.GCP_SA_KEY_INFRA }}" >> ./common/infra/credentials-gcp-infra.json
-          echo MONITORING_SLACK_URL="${{ secrets.MONITORING_SLACK_URL }}" >> ./common/monitoring/secrets.properties
+          echo "$GCP_SA_KEY_INFRA" >> ./common/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
+          echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
       - name: Build project
         run: |
           set -o pipefail && 
@@ -53,7 +56,7 @@ jobs:
           path: |
             **/build
             **/secrets.properties
-            **/infra
+            common/infra
             credentials-gcp-app.json
 
   common-test:
