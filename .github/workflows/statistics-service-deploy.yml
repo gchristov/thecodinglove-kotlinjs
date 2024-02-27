@@ -14,10 +14,10 @@ env:
   MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
 
 jobs:
-  statistics-service-deploy:
+  statistics-service-deploy-build:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-statistics-service-build
+      group: ${{ github.ref }}-statistics-service-deploy-build
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -58,10 +58,10 @@ jobs:
             **/secrets.properties
             statistics/infra
 
-  statistics-service-test:
+  statistics-service-deploy-test:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-statistics-service-test
+      group: ${{ github.ref }}-statistics-service-deploy-test
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -89,7 +89,7 @@ jobs:
         if: always() # Ensure all test reports are collected, even after errors
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
-          check_name: 'statistics-service-test-results'
+          check_name: 'statistics-service-deploy-test-results'
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors

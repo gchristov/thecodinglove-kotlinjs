@@ -12,10 +12,10 @@ env:
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
 
 jobs:
-  landing-page-web-service-build:
+  landing-page-web-service-check-build:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-landing-page-web-service-build
+      group: ${{ github.ref }}-landing-page-web-service-check-build
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -58,10 +58,10 @@ jobs:
             **/secrets.properties
             landing-page-web/infra
 
-  landing-page-web-service-test:
+  landing-page-web-service-check-test:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-landing-page-web-service-test
+      group: ${{ github.ref }}-landing-page-web-service-check-test
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -87,7 +87,7 @@ jobs:
         if: always() # Ensure all test reports are collected, even after errors
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
-          check_name: 'landing-page-web-service-test-results'
+          check_name: 'landing-page-web-service-check-test-results'
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
