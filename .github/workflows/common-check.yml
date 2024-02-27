@@ -57,7 +57,6 @@ jobs:
             **/build
             **/secrets.properties
             common/infra
-            credentials-gcp-app.json
 
   common-test:
     runs-on: ubuntu-20.04

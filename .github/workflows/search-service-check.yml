@@ -61,7 +61,6 @@ jobs:
             **/build
             **/secrets.properties
             search/infra
-            credentials-gcp-app.json
 
   search-service-test:
     runs-on: ubuntu-20.04
