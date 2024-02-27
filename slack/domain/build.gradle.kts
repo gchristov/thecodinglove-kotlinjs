@@ -1,3 +1,5 @@
+import com.gchristov.thecodinglove.gradleplugins.Deps
+
 plugins {
     id("node-module-plugin")
 }
@@ -6,12 +8,12 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("com.gchristov.thecodinglove.common:kotlin")
+                implementation(Deps.Common.kotlin)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation("com.gchristov.thecodinglove.common:test")
+                implementation(Deps.Common.test)
             }
         }
     }

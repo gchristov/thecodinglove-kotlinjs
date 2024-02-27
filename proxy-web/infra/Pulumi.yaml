@@ -44,7 +44,6 @@ resources:
     properties:
       build:
         args:
-          # TODO: Connect to other stacks
           SEARCH_SERVICE_HOST: ${search-service-reference.outputs["searchServiceHost"]}
           SEARCH_SERVICE_PATH: ${search-service-reference.outputs["searchServicePath"]}
           SEARCH_SERVICE_PUBSUB_PATH: ${search-service-reference.outputs["searchServicePubSubPath"]}

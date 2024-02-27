@@ -9,7 +9,6 @@ resources:
   ########################################
 
   # Enables Cloud Resource Manager API. Needed for some the resources.
-  # pulumi import gcp:projects/service:Service cloud-resource-manager-api PROJECT_ID/cloudresourcemanager.googleapis.com
   cloud-resource-manager-api:
     type: gcp:projects:Service
     properties:
@@ -65,7 +64,6 @@ resources:
   ########################################
 
   # Manages a Docker image repository.
-  # Example: pulumi import gcp:artifactregistry/repository:Repository artifact-registry PROJECT_ID/REGION/REPOSITORY_NAME
   artifact-registry:
     type: gcp:artifactregistry:Repository
     properties:
@@ -82,7 +80,6 @@ resources:
   ########################################
 
   # Enables Firebase.
-  # Example: pulumi import gcp:firebase/project:Project firebase PROJECT_ID
   firebase:
     type: gcp:firebase:Project
     options:

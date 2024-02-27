@@ -1,5 +1,6 @@
 rootProject.name = "thecodinglove-kotlinjs"
 
+// Add or remove projects here from the common build. Alternatively, each project can be opened in isolation.
 includeBuild("common")
 includeBuild("gradle-plugins")
 includeBuild("landing-page-web")
