@@ -201,7 +201,7 @@ internal class RealSlackMessageFactory(
     )
 
     override fun noSearchResultsMessage(query: String) = message(
-        text = "No results found for \"$query\". However, here are some popular suggestions for you to try again: \"release\", \"production\", \"test\""
+        text = "No results found for \"$query\". However, here are some popular suggestions for you to try instead: \"release\", \"production\", \"test\""
     )
 
     override fun attachment(
