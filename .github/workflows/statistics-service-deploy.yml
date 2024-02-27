@@ -1,7 +1,7 @@
 name: statistics-service-deploy
 
 on:
-  push:
+  pull_request:
     branches: [ master ]
     paths:
       - 'statistics/**'
