@@ -7,17 +7,8 @@ on:
       - 'common/**'
 
 env:
-  # Required for CI
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
-  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-  GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
-  # Required for app
-  GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
-  SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
-  SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
-  SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
-  MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
 
 jobs:
   common-build:
@@ -35,12 +26,17 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
+      - name: Set up secrets
+        run: |
+          echo "${{ secrets.GCP_SA_KEY_APP }}" >> ./credentials-gcp-app.json
+          echo "${{ secrets.GCP_SA_KEY_INFRA }}" >> ./common/infra/credentials-gcp-infra.json
+          echo MONITORING_SLACK_URL="${{ secrets.MONITORING_SLACK_URL }}" >> ./common/monitoring/secrets.properties
       - name: Build project
         run: |
           set -o pipefail && 
-          bash ./secrets.sh && 
           cd common &&
-          ./gradlew --no-daemon assemble
+          ./gradlew --no-daemon assemble &&
+          cd ..
       - name: Preview infrastructure
         uses: pulumi/actions@v5
         with:
@@ -48,7 +44,7 @@ jobs:
           stack-name: prod
           work-dir: common/infra
         env:
-          PULUMI_ACCESS_TOKEN: ${{ env.PULUMI_ACCESS_TOKEN }}
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
@@ -57,7 +53,8 @@ jobs:
           path: |
             **/build
             **/secrets.properties
-            pulumi/
+            **/infra
+            credentials-gcp-app.json
 
   common-test:
     runs-on: ubuntu-20.04
@@ -74,12 +71,17 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
+      - name: Set up secrets
+        run: |
+          echo "${{ secrets.GCP_SA_KEY_APP }}" >> ./credentials-gcp-app.json
+          echo "${{ secrets.GCP_SA_KEY_INFRA }}" >> ./common/infra/credentials-gcp-infra.json
+          echo MONITORING_SLACK_URL="${{ secrets.MONITORING_SLACK_URL }}" >> ./common/monitoring/secrets.properties
       - name: Test
         run: |
           set -o pipefail && 
-          bash ./secrets.sh && 
           cd common &&
-          ./gradlew --no-daemon --continue jsTest
+          ./gradlew --no-daemon --continue jsTest &&
+          cd ..
       - name: Generate test report
         uses: mikepenz/action-junit-report@v4
         if: always() # Ensure all test reports are collected, even after errors
