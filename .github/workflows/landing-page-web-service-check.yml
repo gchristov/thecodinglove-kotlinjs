@@ -10,7 +10,6 @@ env:
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
-  GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
 
 jobs:
   landing-page-web-service-build:
@@ -31,7 +30,6 @@ jobs:
       - name: Set up secrets
         run: |
           echo "$GCP_SA_KEY_INFRA" >> ./landing-page-web/infra/credentials-gcp-infra.json
-          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
       - name: Build project
         run: |
           set -o pipefail && 
