@@ -76,9 +76,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "${{ secrets.GCP_SA_KEY_APP }}" >> ./credentials-gcp-app.json
-          echo "${{ secrets.GCP_SA_KEY_INFRA }}" >> ./common/infra/credentials-gcp-infra.json
-          echo MONITORING_SLACK_URL="${{ secrets.MONITORING_SLACK_URL }}" >> ./common/monitoring/secrets.properties
+          echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
       - name: Test
         run: |
           set -o pipefail && 
