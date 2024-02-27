@@ -20,4 +20,4 @@ COPY /productionExecutable .
 # Step 3: Run binaries
 FROM npm AS run
 WORKDIR /app
-CMD exec node --enable-source-maps thecodinglove-kotlinjs-search-service.js -port ${PORT} -apiUrl ${API_URL} -preloadSearchPubSubTopic ${PRELOAD_SEARCH_PUBSUB_TOPIC}
+CMD exec node --enable-source-maps search-service.js -port ${PORT} -apiUrl ${API_URL} -preloadSearchPubSubTopic ${PRELOAD_SEARCH_PUBSUB_TOPIC}

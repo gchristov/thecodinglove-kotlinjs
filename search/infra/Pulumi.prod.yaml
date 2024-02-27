@@ -1,0 +1,3 @@
+config:
+  gcp:credentials: credentials-gcp-infra.json
+  gcp:project: thecodinglove-prod

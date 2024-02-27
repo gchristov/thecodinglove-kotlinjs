@@ -1,0 +1,135 @@
+name: common
+runtime: yaml
+description: Deploys the common infrastructure APIs for TheCodingLove
+
+resources:
+
+  ########################################
+  # APIs
+  ########################################
+
+  # Enables Cloud Resource Manager API. Needed for some the resources.
+  cloud-resource-manager-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: cloudresourcemanager.googleapis.com
+    options:
+      protect: true
+  # Enables the Artifact Registry API. Needed for Docker.
+  artifact-registry-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: artifactregistry.googleapis.com
+    options:
+      protect: true
+  # Enables Firebase API. Needed for Firestore.
+  firebase-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: firebase.googleapis.com
+    options:
+      protect: true
+  # Enables the Firestore API.
+  firestore-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: firestore.googleapis.com
+    options:
+      protect: true
+      dependsOn:
+        - ${cloud-resource-manager-api}
+  # Enables the Cloud Run Admin API.
+  cloud-run-admin-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: run.googleapis.com
+    options:
+      protect: true
+  # Enables the PubSub API.
+  pubsub-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: pubsub.googleapis.com
+    options:
+      protect: true
+
+  ########################################
+  # Artifact Registry
+  ########################################
+
+  # Manages a Docker image repository.
+  artifact-registry:
+    type: gcp:artifactregistry:Repository
+    properties:
+      format: DOCKER
+      location: europe-west1
+      repositoryId: thecodinglove
+    options:
+      protect: true
+      dependsOn:
+        - ${artifact-registry-api}
+
+  ########################################
+  # Firebase
+  ########################################
+
+  # Enables Firebase.
+  firebase:
+    type: gcp:firebase:Project
+    options:
+      protect: true
+      dependsOn:
+        - ${firebase-api}
+  # Manages a Firestore database.
+  # Example: pulumi import gcp:firestore/database:Database firestore "projects/PROJECT_ID/databases/(default)"
+  firestore:
+    type: gcp:firestore:Database
+    properties:
+      appEngineIntegrationMode: DISABLED
+      concurrencyMode: PESSIMISTIC
+      deleteProtectionState: DELETE_PROTECTION_DISABLED
+      locationId: eur3
+      name: (default)
+      type: FIRESTORE_NATIVE
+    options:
+      protect: true
+      dependsOn:
+        - ${firestore-api}
+  # Manages Firestore security rules.
+  # Example: pulumi import gcp:firebaserules/ruleset:Ruleset firestore-rules projects/PROJECT_ID/rulesets/RULESET_ID. You
+  # can obtain the ruleset id by inspecting the network calls in GCP.
+  firestore-rules:
+    type: gcp:firebaserules:Ruleset
+    properties:
+      source:
+        files:
+          - content: |-
+              rules_version = '2';
+              service cloud.firestore {
+                match /databases/{database}/documents {
+                  match /{document=**} {
+                    // Disable public access as we're using Firebase Admin SDK
+                    allow read, write: if false;
+                  }
+                }
+              }
+            name: firestore.rules
+    options:
+      protect: true
+      dependsOn:
+        - ${firestore}
+  # Manages Firestore security rules updates.
+  # Example: pulumi import gcp:firebaserules/release:Release firestore-rules-publish projects/PROJECT_ID/releases/cloud.firestore
+  firestore-rules-publish:
+    type: gcp:firebaserules:Release
+    properties:
+      name: cloud.firestore
+      rulesetName: projects/${firestore-rules.project}/rulesets/${firestore-rules.name}
+    options:
+      protect: true

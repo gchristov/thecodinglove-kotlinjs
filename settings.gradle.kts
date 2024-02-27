@@ -1,19 +1,11 @@
-plugins {
-    id("com.gradle.enterprise") version("3.15.1")
-}
-
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
 rootProject.name = "thecodinglove-kotlinjs"
 
-apply {
-    from("modules.gradle.kts")
-}
-
-gradleEnterprise {
-    buildScan {
-        termsOfServiceUrl = "https://gradle.com/terms-of-service"
-        termsOfServiceAgree = "yes"
-        publishAlways()
-    }
-}
+// Add or remove projects here from the common build. Alternatively, each project can be opened in isolation.
+includeBuild("common")
+includeBuild("gradle-plugins")
+includeBuild("landing-page-web")
+includeBuild("proxy-web")
+includeBuild("search")
+includeBuild("self-destruct")
+includeBuild("slack")
+includeBuild("statistics")

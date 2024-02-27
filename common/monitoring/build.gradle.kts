@@ -7,11 +7,15 @@ plugins {
     id("build-config-plugin")
 }
 
+group = "com.gchristov.thecodinglove.common"
+version = "0.0.1"
+
 kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.common.network)
+                implementation(projects.kotlin)
+                implementation(projects.network)
             }
         }
     }

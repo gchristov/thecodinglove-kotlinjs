@@ -24,4 +24,4 @@ COPY /productionExecutable .
 # Step 3: Run binaries
 FROM npm AS run
 WORKDIR /app
-CMD exec node --enable-source-maps thecodinglove-kotlinjs-slack-service.js -port ${PORT} -apiUrl ${API_URL} -slackRequestVerification ${SLACK_REQUEST_VERIFICATION} -slackSlashCommandPubSubTopic ${SLACK_SLASH_COMMAND_PUBSUB_TOPIC} -slackInteractivityPubSubTopic ${SLACK_INTERACTIVITY_PUBSUB_TOPIC}
+CMD exec node --enable-source-maps slack-service.js -port ${PORT} -apiUrl ${API_URL} -slackRequestVerification ${SLACK_REQUEST_VERIFICATION} -slackSlashCommandPubSubTopic ${SLACK_SLASH_COMMAND_PUBSUB_TOPIC} -slackInteractivityPubSubTopic ${SLACK_INTERACTIVITY_PUBSUB_TOPIC}

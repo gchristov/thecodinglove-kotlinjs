@@ -14,11 +14,6 @@ class NodeBinaryPlugin : Plugin<Project> {
                 }
             }
             extensions.configure(KotlinMultiplatformExtension::class.java) {
-                sourceSets.maybeCreate("commonMain").dependencies {
-                    implementation(project(":common:network"))
-                    implementation(project(":common:pubsub"))
-                    implementation(project(":common:monitoring"))
-                }
                 sourceSets.maybeCreate("jsMain").dependencies {
                     // Ideally these would be linked from corresponding submodules but that is currently not supported out
                     // of the box or through the npm-publish plugin and causes "module not found" errors. As a workaround,
@@ -27,16 +22,12 @@ class NodeBinaryPlugin : Plugin<Project> {
                     implementation(npm(Deps.Node.express.name, Deps.Node.express.version))
                     implementation(npm(Deps.Google.firebaseAdmin.name, Deps.Google.firebaseAdmin.version))
                 }
-                sourceSets.maybeCreate("jsTest").dependencies {
-                    implementation(project(":common:network-testfixtures"))
-                    implementation(project(":common:pubsub-testfixtures"))
-                }
             }
             // Copy the output binaries to their final destination
             tasks.named("assemble") {
                 doLast {
                     copy {
-                        from(file(rootProject.layout.projectDirectory.file("credentials-gcp-app.json")))
+                        from(file(rootProject.layout.projectDirectory.file("../credentials-gcp-app.json")))
                         into("${binaryRootDirectory()}/productionExecutable")
                     }
                     copy {

@@ -1,3 +1,5 @@
+import com.gchristov.thecodinglove.gradleplugins.Deps
+
 plugins {
     id("node-module-plugin")
 }
@@ -6,17 +8,19 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.common.network)
-                implementation(projects.common.pubsub)
-                implementation(projects.common.firebase)
-                implementation(projects.search.domain)
+                implementation(Deps.Common.kotlin)
+                implementation(Deps.Common.network)
+                implementation(Deps.Common.pubsub)
+                implementation(Deps.Common.firebase)
+                implementation(projects.domain)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation(projects.common.networkTestfixtures)
-                implementation(projects.common.pubsubTestfixtures)
-                implementation(projects.search.testFixtures)
+                implementation(Deps.Common.test)
+                implementation(Deps.Common.networkTestFixtures)
+                implementation(Deps.Common.pubsubTestFixtures)
+                implementation(projects.testFixtures)
             }
         }
     }

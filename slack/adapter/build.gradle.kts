@@ -1,3 +1,4 @@
+import com.gchristov.thecodinglove.gradleplugins.Deps
 import com.gchristov.thecodinglove.gradleplugins.envSecret
 
 val packageId = "com.gchristov.thecodinglove.slack.adapter"
@@ -11,10 +12,11 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.common.network)
-                implementation(projects.common.pubsub)
-                implementation(projects.common.firebase)
-                implementation(projects.slack.domain)
+                implementation(Deps.Common.kotlin)
+                implementation(Deps.Common.network)
+                implementation(Deps.Common.pubsub)
+                implementation(Deps.Common.firebase)
+                implementation(projects.domain)
             }
         }
     }

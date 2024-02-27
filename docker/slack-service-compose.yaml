@@ -1,0 +1,11 @@
+services:
+  slack-service:
+    build: ../slack/service/build/dist/js
+    ports:
+      - "8084:8084" # host:container
+    environment:
+      - PORT=8084
+      - API_URL=http://host.docker.internal:8080/api
+      - SLACK_REQUEST_VERIFICATION=true
+      - SLACK_SLASH_COMMAND_PUBSUB_TOPIC=slack_slash_command_dev
+      - SLACK_INTERACTIVITY_PUBSUB_TOPIC=slack_interactivity_dev

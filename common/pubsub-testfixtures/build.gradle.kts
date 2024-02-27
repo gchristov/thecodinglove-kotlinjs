@@ -2,12 +2,17 @@ plugins {
     id("node-module-plugin")
 }
 
+group = "com.gchristov.thecodinglove.common"
+version = "0.0.1"
+
 kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.common.network)
-                implementation(projects.common.pubsub)
+                implementation(projects.kotlin)
+                implementation(projects.test)
+                implementation(projects.network)
+                implementation(projects.pubsub)
             }
         }
     }

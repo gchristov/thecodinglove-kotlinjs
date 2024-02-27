@@ -1,0 +1,91 @@
+name: statistics-service
+runtime: yaml
+description: Deploys the statistics service for TheCodingLove
+
+variables:
+  domain: thecodinglove.crowdstandout.com
+  location: europe-west1
+  repositoryId: thecodinglove
+
+resources:
+
+  ########################################
+  # statistics-service
+  ########################################
+
+  # Manages the binary.
+  statistics-service-binary:
+    type: docker:Image
+    properties:
+      build:
+        args:
+          PORT: "8082"
+          API_URL: https://${domain}/api
+        platform: linux/amd64
+        context: ../service/build/dist/js
+      imageName: ${location}-docker.pkg.dev/${gcp:project}/${repositoryId}/statistics-service:latest
+      registry:
+        server: ${location}-docker.pkg.dev
+        username: _json_key
+        password:
+          fn::secret:
+            fn::readFile: ${gcp:credentials}
+    options:
+      protect: true
+  # Manages the Cloud Run service.
+  statistics-service:
+    type: gcp:cloudrunv2:Service
+    properties:
+      ingress: INGRESS_TRAFFIC_ALL
+      location: ${location}
+      name: statistics-service
+      template:
+        containers:
+          - image: ${statistics-service-binary.repoDigest}
+            ports:
+              - containerPort: 8082
+                name: http1
+            resources:
+              cpuIdle: true
+              limits:
+                cpu: 1000m
+                memory: 512Mi
+            startupProbe:
+              failureThreshold: 1
+              periodSeconds: 240
+              tcpSocket:
+                port: 8082
+              timeoutSeconds: 240
+        maxInstanceRequestConcurrency: 80
+        scaling:
+          maxInstanceCount: 100
+          minInstanceCount: 0
+        timeout: 300s
+      traffics:
+        - percent: 100
+          type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
+    options:
+      protect: true
+  # Manages the Cloud Run service policy.
+  statistics-service-policy:
+    type: gcp:cloudrunv2:ServiceIamPolicy
+    properties:
+      name: ${statistics-service.name}
+      location: ${location}
+      policyData: |
+        {
+          "bindings": [
+            {
+              "role": "roles/run.invoker",
+              "members": [
+                "allUsers"
+              ]
+            }
+          ]
+        }
+    options:
+      protect: true
+
+outputs:
+  statisticsServiceHost: ${statistics-service.uri}
+  statisticsServicePath: api/statistics
