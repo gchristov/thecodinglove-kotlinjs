@@ -1,7 +1,7 @@
 name: search-service-check
 
 on:
-  push:
+  pull_request:
     branches: [ master ]
     paths:
       - 'search/**'

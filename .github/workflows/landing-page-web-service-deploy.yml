@@ -1,7 +1,7 @@
 name: landing-page-web-service-deploy
 
 on:
-  pull_request:
+  push:
     branches: [ master ]
     paths:
       - 'landing-page-web/**'

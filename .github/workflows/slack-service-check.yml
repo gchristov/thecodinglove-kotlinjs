@@ -1,7 +1,7 @@
 name: slack-service-check
 
 on:
-  push:
+  pull_request:
     branches: [ master ]
     paths:
       - 'slack/**'
