@@ -57,7 +57,6 @@ jobs:
             **/build
             **/secrets.properties
             landing-page-web/infra
-            credentials-gcp-app.json
 
   landing-page-web-service-test:
     runs-on: ubuntu-20.04
