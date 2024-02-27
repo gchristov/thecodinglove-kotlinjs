@@ -1,4 +1,4 @@
-name: PR Checks
+name: search-service-check
 
 on:
   pull_request:

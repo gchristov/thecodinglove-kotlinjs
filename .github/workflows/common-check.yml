@@ -1,4 +1,4 @@
-name: PR Checks
+name: common-check
 
 on:
   pull_request:

@@ -1,4 +1,4 @@
-name: PR Checks
+name: self-destruct-service-check
 
 on:
   pull_request:

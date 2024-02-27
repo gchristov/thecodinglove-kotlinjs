@@ -1,4 +1,4 @@
-name: PR Checks
+name: slack-service-check
 
 on:
   pull_request:

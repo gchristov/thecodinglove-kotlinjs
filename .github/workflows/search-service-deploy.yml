@@ -1,21 +1,23 @@
-name: proxy-web-service-check
+name: search-service-deploy
 
 on:
-  pull_request:
+  push:
     branches: [ master ]
     paths:
-      - 'proxy-web/**'
+      - 'search/**'
 
 env:
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
+  GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
+  MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
 
 jobs:
-  proxy-web-service-build:
+  search-service-deploy:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-proxy-web-service-build
+      group: ${{ github.ref }}-search-service-build
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -29,23 +31,21 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./proxy-web/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./search/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
+          echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
       - name: Build project
         run: |
           set -o pipefail && 
-          cd proxy-web &&
+          cd search &&
           ./gradlew --no-daemon assemble &&
           cd ..
-      - name: Build container images
-        run: |
-          set -o pipefail &&
-          docker compose -f docker/proxy-web-service-compose.yaml build
-      - name: Preview infrastructure
+      - name: Deploy infrastructure
         uses: pulumi/actions@v5
         with:
-          command: preview
+          command: up
           stack-name: prod
-          work-dir: proxy-web/infra
+          work-dir: search/infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
@@ -56,12 +56,12 @@ jobs:
           path: |
             **/build
             **/secrets.properties
-            proxy-web/infra
+            search/infra
 
-  proxy-web-service-test:
+  search-service-test:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-proxy-web-service-test
+      group: ${{ github.ref }}-search-service-test
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -75,11 +75,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./proxy-web/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./search/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
+          echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
       - name: Test
         run: |
           set -o pipefail && 
-          cd proxy-web &&
+          cd search &&
           ./gradlew --no-daemon --continue jsTest &&
           cd ..
       - name: Generate test report
@@ -87,7 +89,7 @@ jobs:
         if: always() # Ensure all test reports are collected, even after errors
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
-          check_name: 'proxy-web-service-test-results'
+          check_name: 'search-service-test-results'
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
