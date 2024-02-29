@@ -50,7 +50,7 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
             CommonMonitoringModule.module,
             CommonFirebaseModule.module,
             SlackDomainModule.module,
-            SlackAdapterModule(environment).module,
+            SlackAdapterModule.module,
             SlackServiceModule(environment).module,
         )
     )

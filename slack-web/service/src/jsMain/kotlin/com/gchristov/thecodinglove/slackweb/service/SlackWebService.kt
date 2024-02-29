@@ -14,6 +14,8 @@ import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.common.network.http.StaticFileHttpHandler
+import com.gchristov.thecodinglove.slackweb.adapter.SlackWebAdapterModule
+import com.gchristov.thecodinglove.slackweb.adapter.http.SlackAuthRedirectHttpHandler
 import com.gchristov.thecodinglove.slackweb.domain.SlackWebDomainModule
 import com.gchristov.thecodinglove.slackweb.domain.model.Environment
 
@@ -42,6 +44,7 @@ private fun setupDi(): Either<Throwable, Unit> {
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonMonitoringModule.module,
+            SlackWebAdapterModule.module,
             SlackWebDomainModule.module,
         )
     )
@@ -58,6 +61,7 @@ private fun setupMonitoring(): Either<Throwable, Unit> {
 private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
     val staticWebsiteRoot = ""
     val handlers = listOf(
+        DiGraph.inject<SlackAuthRedirectHttpHandler>(),
         // Link this last so that bespoke handlers are correctly registered
         StaticFileHttpHandler("$staticWebsiteRoot/index.html"),
     )

@@ -25,7 +25,7 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-class SlackAdapterModule(private val environment: Environment) : DiModule() {
+object SlackAdapterModule : DiModule() {
     override fun name() = "slack-adapter"
 
     override fun bindDependencies(builder: DI.Builder) {
