@@ -29,6 +29,10 @@ resources:
     type: pulumi:pulumi:StackReference
     properties:
       name: gchristov/slack-service/prod
+  slack-web-service-reference:
+    type: pulumi:pulumi:StackReference
+    properties:
+      name: gchristov/slack-web-service/prod
   landing-page-web-service-reference:
     type: pulumi:pulumi:StackReference
     properties:
@@ -54,6 +58,8 @@ resources:
           SLACK_SERVICE_HOST: ${slack-service-reference.outputs["slackServiceHost"]}
           SLACK_SERVICE_PATH: ${slack-service-reference.outputs["slackServicePath"]}
           SLACK_SERVICE_PUBSUB_PATH: ${slack-service-reference.outputs["slackServicePubSubPath"]}
+          SLACK_WEB_SERVICE_HOST: ${slack-web-service-reference.outputs["slackWebServiceHost"]}
+          SLACK_WEB_SERVICE_PATH: ${slack-web-service-reference.outputs["slackWebServicePath"]}
           LANDING_PAGE_WEB_SERVICE_HOST: ${landing-page-web-service-reference.outputs["landingPageWebServiceHost"]}
         platform: linux/amd64
         context: ../service/build/dist/js

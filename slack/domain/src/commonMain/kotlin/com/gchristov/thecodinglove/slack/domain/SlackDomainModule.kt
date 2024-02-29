@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.slack.domain
 
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
+import com.gchristov.thecodinglove.slack.domain.model.Environment
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
@@ -11,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
+import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
 object SlackDomainModule : DiModule() {
@@ -18,6 +20,7 @@ object SlackDomainModule : DiModule() {
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
+            bindSingleton { provideSlackConfig(environment = instance()) }
             bindProvider {
                 provideSlackMessageFactory(slackAuthStateSerializer = instance())
             }
@@ -79,6 +82,16 @@ object SlackDomainModule : DiModule() {
             }
         }
     }
+
+    private fun provideSlackConfig(environment: Environment): SlackConfig = SlackConfig(
+        signingSecret = BuildConfig.SLACK_SIGNING_SECRET,
+        timestampValidityMinutes = 5,
+        requestVerificationEnabled = environment.slackRequestVerification,
+        clientId = BuildConfig.SLACK_CLIENT_ID,
+        clientSecret = BuildConfig.SLACK_CLIENT_SECRET,
+        interactivityPubSubTopic = environment.slackInteractivityPubSubTopic,
+        slashCommandPubSubTopic = environment.slackSlashCommandPubSubTopic,
+    )
 
     private fun provideSlackMessageFactory(slackAuthStateSerializer: SlackAuthStateSerializer): SlackMessageFactory =
         RealSlackMessageFactory(slackAuthStateSerializer = slackAuthStateSerializer)

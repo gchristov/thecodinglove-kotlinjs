@@ -13,6 +13,9 @@ server {
   location /${SLACK_SERVICE_PUBSUB_PATH} {
     proxy_pass ${SLACK_SERVICE_HOST}/${SLACK_SERVICE_PUBSUB_PATH};
   }
+  location /${SLACK_WEB_SERVICE_PATH} {
+      proxy_pass ${SLACK_WEB_SERVICE_HOST}/${SLACK_WEB_SERVICE_PATH};
+    }
   location /${SEARCH_SERVICE_PATH} {
     proxy_pass ${SEARCH_SERVICE_HOST}/${SEARCH_SERVICE_PATH};
   }

@@ -1,8 +1,7 @@
 import com.gchristov.thecodinglove.gradleplugins.Deps
-import com.gchristov.thecodinglove.gradleplugins.envSecret
 
 plugins {
-    id("node-module-plugin")
+    id("node-binary-plugin")
 }
 
 kotlin {
@@ -11,9 +10,9 @@ kotlin {
             dependencies {
                 implementation(Deps.Common.kotlin)
                 implementation(Deps.Common.network)
-                implementation(Deps.Common.pubsub)
-                implementation(Deps.Common.firebase)
+                implementation(Deps.Common.monitoring)
                 implementation(projects.domain)
+                implementation(projects.adapter)
             }
         }
     }

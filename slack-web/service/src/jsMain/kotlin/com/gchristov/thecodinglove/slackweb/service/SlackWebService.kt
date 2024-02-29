@@ -1,9 +1,8 @@
-package com.gchristov.thecodinglove.slack.service
+package com.gchristov.thecodinglove.slackweb.service
 
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
@@ -14,20 +13,18 @@ import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
 import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
-import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
-import com.gchristov.thecodinglove.slack.adapter.SlackAdapterModule
-import com.gchristov.thecodinglove.slack.adapter.http.*
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
-import com.gchristov.thecodinglove.slack.domain.SlackDomainModule
-import com.gchristov.thecodinglove.slack.domain.model.Environment
+import com.gchristov.thecodinglove.common.network.http.StaticFileHttpHandler
+import com.gchristov.thecodinglove.slackweb.adapter.SlackWebAdapterModule
+import com.gchristov.thecodinglove.slackweb.adapter.http.SlackAuthRedirectHttpHandler
+import com.gchristov.thecodinglove.slackweb.domain.SlackWebDomainModule
+import com.gchristov.thecodinglove.slackweb.domain.model.Environment
 
 suspend fun main() {
     // Ignore default Node arguments
     val environment = Environment.of(process.argv.slice(2) as Array<String>)
-    val tag = "SlackService"
+    val tag = "SlackWebService"
 
-    setupDi(environment = environment)
+    setupDi()
         .flatMap { setupMonitoring() }
         .flatMap { setupService(environment.port) }
         .flatMap { startService(it) }
@@ -41,17 +38,14 @@ suspend fun main() {
         })
 }
 
-private fun setupDi(environment: Environment): Either<Throwable, Unit> {
+private fun setupDi(): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
-            CommonPubSubModule.module,
             CommonMonitoringModule.module,
-            CommonFirebaseModule.module,
-            SlackDomainModule.module,
-            SlackAdapterModule.module,
-            SlackServiceModule(environment).module,
+            SlackWebAdapterModule.module,
+            SlackWebDomainModule.module,
         )
     )
     return Either.Right(Unit)
@@ -65,20 +59,17 @@ private fun setupMonitoring(): Either<Throwable, Unit> {
 }
 
 private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
+    val staticWebsiteRoot = ""
     val handlers = listOf(
-        DiGraph.inject<SlackSlashCommandHttpHandler>(),
-        DiGraph.inject<SlackSlashCommandPubSubHandler>(),
-        DiGraph.inject<SlackInteractivityHttpHandler>(),
-        DiGraph.inject<SlackInteractivityPubSubHandler>(),
-        DiGraph.inject<SlackAuthHttpHandler>(),
-        DiGraph.inject<SlackEventHttpHandler>(),
-        DiGraph.inject<SlackSelfDestructHttpHandler>(),
-        DiGraph.inject<SlackStatisticsHttpHandler>(),
+        DiGraph.inject<SlackAuthRedirectHttpHandler>(),
+        // Link this last so that bespoke handlers are correctly registered
+        StaticFileHttpHandler("$staticWebsiteRoot/index.html"),
     )
     val service = DiGraph.inject<HttpService>()
     return service.initialise(
         handlers = handlers,
         port = port,
+        staticWebsiteRoot = staticWebsiteRoot,
     ).flatMap { Either.Right(service) }
 }
 

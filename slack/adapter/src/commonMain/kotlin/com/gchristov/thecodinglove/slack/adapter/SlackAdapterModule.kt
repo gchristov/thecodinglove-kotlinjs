@@ -25,13 +25,12 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-class SlackAdapterModule(private val environment: Environment) : DiModule() {
+object SlackAdapterModule : DiModule() {
     override fun name() = "slack-adapter"
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindSingleton { provideSlackApi(client = instance()) }
-            bindSingleton { provideSlackConfig() }
             bindSingleton {
                 provideSlackRepository(
                     slackApi = instance(),
@@ -124,16 +123,6 @@ class SlackAdapterModule(private val environment: Environment) : DiModule() {
     }
 
     private fun provideSlackApi(client: NetworkClient.Json) = SlackApi(client)
-
-    private fun provideSlackConfig(): SlackConfig = SlackConfig(
-        signingSecret = BuildConfig.SLACK_SIGNING_SECRET,
-        timestampValidityMinutes = 5,
-        requestVerificationEnabled = environment.slackRequestVerification,
-        clientId = BuildConfig.SLACK_CLIENT_ID,
-        clientSecret = BuildConfig.SLACK_CLIENT_SECRET,
-        interactivityPubSubTopic = environment.slackInteractivityPubSubTopic,
-        slashCommandPubSubTopic = environment.slackSlashCommandPubSubTopic,
-    )
 
     private fun provideSlackRepository(
         slackApi: SlackApi,

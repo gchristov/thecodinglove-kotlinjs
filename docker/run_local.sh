@@ -10,5 +10,6 @@ echo "🏁 Start app" && echo "" && docker compose \
 -f docker/search-service-compose.yaml \
 -f docker/self-destruct-service-compose.yaml \
 -f docker/slack-service-compose.yaml \
+-f docker/slack-web-service-compose.yaml \
 -f docker/statistics-service-compose.yaml \
 up --build --remove-orphans

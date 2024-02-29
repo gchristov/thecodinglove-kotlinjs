@@ -1,4 +1,5 @@
 import com.gchristov.thecodinglove.gradleplugins.Deps
+import com.gchristov.thecodinglove.gradleplugins.Deps.Common.kotlin
 import com.gchristov.thecodinglove.gradleplugins.envSecret
 
 plugins {
@@ -11,8 +12,6 @@ kotlin {
             dependencies {
                 implementation(Deps.Common.kotlin)
                 implementation(Deps.Common.network)
-                implementation(Deps.Common.pubsub)
-                implementation(Deps.Common.firebase)
                 implementation(projects.domain)
             }
         }

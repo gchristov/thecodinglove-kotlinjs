@@ -1,26 +1,24 @@
-name: slack-service-check
+name: slack-web-service-check
 
 on:
   pull_request:
     branches: [ master ]
     paths:
-      - 'slack/**'
+      - 'slack-web/**'
 
 env:
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
   GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
-  SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
   SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
-  SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
   MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
 
 jobs:
-  slack-service-check-build:
+  slack-web-service-check-build:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-slack-service-check-build
+      group: ${{ github.ref }}-slack-web-service-check-build
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -34,28 +32,26 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./slack/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./slack-web/infra/credentials-gcp-infra.json
           echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
           echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
-          echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/domain/secrets.properties
-          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/domain/secrets.properties
-          echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack/domain/secrets.properties
+          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack-web/domain/secrets.properties
       - name: Build project
         run: |
           set -o pipefail && 
-          cd slack &&
+          cd slack-web &&
           ./gradlew --no-daemon assemble &&
           cd ..
       - name: Build container images
         run: |
           set -o pipefail &&
-          docker compose -f docker/slack-service-compose.yaml build
+          docker compose -f docker/slack-web-service-compose.yaml build
       - name: Preview infrastructure
         uses: pulumi/actions@v5
         with:
           command: preview
           stack-name: prod
-          work-dir: slack/infra
+          work-dir: slack-web/infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
@@ -66,12 +62,12 @@ jobs:
           path: |
             **/build
             **/secrets.properties
-            slack/infra
+            slack-web/infra
 
-  slack-service-check-test:
+  slack-web-service-check-test:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-slack-service-check-test
+      group: ${{ github.ref }}-slack-web-service-check-test
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -85,16 +81,14 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./slack/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./slack-web/infra/credentials-gcp-infra.json
           echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
           echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
-          echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/domain/secrets.properties
-          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/domain/secrets.properties
-          echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack/domain/secrets.properties
+          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack-web/domain/secrets.properties
       - name: Test
         run: |
           set -o pipefail && 
-          cd slack &&
+          cd slack-web &&
           ./gradlew --no-daemon --continue jsTest &&
           cd ..
       - name: Generate test report
@@ -102,7 +96,7 @@ jobs:
         if: always() # Ensure all test reports are collected, even after errors
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
-          check_name: 'slack-service-check-test-results'
+          check_name: 'slack-web-service-check-test-results'
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
