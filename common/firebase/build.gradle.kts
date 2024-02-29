@@ -1,3 +1,5 @@
+import com.gchristov.thecodinglove.gradleplugins.Deps
+
 plugins {
     id("node-module-plugin")
 }
@@ -10,6 +12,11 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.kotlin)
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation(npm(Deps.Google.firebaseAdmin.name, Deps.Google.firebaseAdmin.version))
             }
         }
     }

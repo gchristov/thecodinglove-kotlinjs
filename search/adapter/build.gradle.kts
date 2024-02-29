@@ -23,5 +23,10 @@ kotlin {
                 implementation(projects.testFixtures)
             }
         }
+        val jsMain by getting {
+            dependencies {
+                implementation(npm(Deps.Node.htmlParser.name, Deps.Node.htmlParser.version))
+            }
+        }
     }
 }

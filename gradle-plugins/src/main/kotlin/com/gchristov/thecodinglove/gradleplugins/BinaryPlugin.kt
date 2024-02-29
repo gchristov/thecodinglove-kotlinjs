@@ -13,16 +13,6 @@ class NodeBinaryPlugin : Plugin<Project> {
                     binaries.library()
                 }
             }
-            extensions.configure(KotlinMultiplatformExtension::class.java) {
-                sourceSets.maybeCreate("jsMain").dependencies {
-                    // Ideally these would be linked from corresponding submodules but that is currently not supported out
-                    // of the box or through the npm-publish plugin and causes "module not found" errors. As a workaround,
-                    // all NPM dependencies will be listed at the top level here.
-                    implementation(npm(Deps.Google.pubSub.name, Deps.Google.pubSub.version))
-                    implementation(npm(Deps.Node.express.name, Deps.Node.express.version))
-                    implementation(npm(Deps.Google.firebaseAdmin.name, Deps.Google.firebaseAdmin.version))
-                }
-            }
             // Copy the output binaries to their final destination
             tasks.named("assemble") {
                 doLast {

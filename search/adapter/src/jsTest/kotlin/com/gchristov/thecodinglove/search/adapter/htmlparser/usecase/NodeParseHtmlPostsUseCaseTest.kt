@@ -2,7 +2,6 @@ package com.gchristov.thecodinglove.search.adapter.htmlparser.usecase
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
-import com.gchristov.thecodinglove.htmlparsedata.usecase.NodeParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.htmlparser.model.HtmlPost
 import com.gchristov.thecodinglove.search.testfixtures.HtmlCreator
 import kotlinx.coroutines.test.runTest
