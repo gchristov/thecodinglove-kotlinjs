@@ -1,7 +1,9 @@
 import com.gchristov.thecodinglove.gradleplugins.Deps
+import com.gchristov.thecodinglove.gradleplugins.Deps.Common.kotlin
+import com.gchristov.thecodinglove.gradleplugins.envSecret
 
 plugins {
-    id("node-binary-plugin")
+    id("node-module-plugin")
 }
 
 kotlin {
@@ -10,9 +12,7 @@ kotlin {
             dependencies {
                 implementation(Deps.Common.kotlin)
                 implementation(Deps.Common.network)
-                implementation(Deps.Common.monitoring)
                 implementation(projects.domain)
-                implementation(projects.adapter)
             }
         }
     }

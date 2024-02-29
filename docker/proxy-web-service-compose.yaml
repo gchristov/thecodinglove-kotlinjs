@@ -14,6 +14,13 @@ services:
       - SLACK_SERVICE_HOST=http://slack-service:8084
       - SLACK_SERVICE_PATH=api/slack
       - SLACK_SERVICE_PUBSUB_PATH=api/pubsub/slack
-      - SLACK_WEB_SERVICE_HOST=http://slack-web-service:80
+      - SLACK_WEB_SERVICE_HOST=http://slack-web-service:8086
       - SLACK_WEB_SERVICE_PATH=slack
       - LANDING_PAGE_WEB_SERVICE_HOST=http://landing-page-web-service:80
+    depends_on:
+      - search-service
+      - statistics-service
+      - self-destruct-service
+      - slack-service
+      - slack-web-service
+      - landing-page-web-service

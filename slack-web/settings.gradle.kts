@@ -6,4 +6,7 @@ pluginManagement {
 
 rootProject.name = "slack-web"
 
+includeBuild("../common")
+include("adapter")
+include("domain")
 include("service")
