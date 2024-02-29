@@ -89,6 +89,10 @@ SLACK_CLIENT_ID=YOUR_SLACK_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_SLACK_CLIENT_SECRET
 ```
 ```
+# Under /slack-web/domain/secrets.properties
+SLACK_CLIENT_ID=YOUR_SLACK_CLIENT_ID
+```
+```
 # Under /common/monitoring/secrets.properties
 MONITORING_SLACK_URL=YOUR_MONITORING_SLACK_URL
 ```

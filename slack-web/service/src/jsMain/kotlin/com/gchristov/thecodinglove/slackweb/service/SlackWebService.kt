@@ -14,6 +14,7 @@ import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.common.network.http.StaticFileHttpHandler
+import com.gchristov.thecodinglove.slackweb.domain.SlackWebDomainModule
 import com.gchristov.thecodinglove.slackweb.domain.model.Environment
 
 suspend fun main() {
@@ -41,6 +42,7 @@ private fun setupDi(): Either<Throwable, Unit> {
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonMonitoringModule.module,
+            SlackWebDomainModule.module,
         )
     )
     return Either.Right(Unit)
