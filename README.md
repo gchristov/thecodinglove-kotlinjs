@@ -83,7 +83,7 @@ The project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN), so
 4. Create a Slack channel to receive server error messages and monitoring updates. The project is configured to post all unhandled `Throwable`s to that channel. We use the [Incoming Webhooks](https://slack.com/apps/A0F7XDUAZ-incoming-webhooks) app to obtain a channel URL webhook.
 5. Create the following `secrets.properties` files:
 ```
-# Under /slack/adapter/secrets.properties
+# Under /slack/domain/secrets.properties
 SLACK_SIGNING_SECRET=YOUR_SLACK_SIGNING_SECRET
 SLACK_CLIENT_ID=YOUR_SLACK_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_SLACK_CLIENT_SECRET
