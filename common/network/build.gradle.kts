@@ -19,5 +19,10 @@ kotlin {
                 implementation(Deps.Ktor.logback)
             }
         }
+        val jsMain by getting {
+            dependencies {
+                implementation(npm(Deps.Node.express.name, Deps.Node.express.version))
+            }
+        }
     }
 }

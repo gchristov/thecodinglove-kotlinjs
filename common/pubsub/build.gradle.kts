@@ -1,3 +1,5 @@
+import com.gchristov.thecodinglove.gradleplugins.Deps
+
 plugins {
     id("node-module-plugin")
 }
@@ -11,6 +13,11 @@ kotlin {
             dependencies {
                 implementation(projects.kotlin)
                 implementation(projects.network)
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation(npm(Deps.Google.pubSub.name, Deps.Google.pubSub.version))
             }
         }
     }
