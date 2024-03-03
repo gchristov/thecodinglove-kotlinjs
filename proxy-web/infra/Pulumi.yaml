@@ -1,6 +1,6 @@
-name: proxy-web-service
+name: thecodinglove-proxy-web
 runtime: yaml
-description: Deploys the proxy web service for TheCodingLove
+description: Deploys the proxy web infra
 
 variables:
   domain: thecodinglove.crowdstandout.com

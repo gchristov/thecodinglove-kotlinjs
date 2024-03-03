@@ -1,6 +1,6 @@
-name: self-destruct-service
+name: thecodinglove-self-destruct
 runtime: yaml
-description: Deploys the self-destruct service for TheCodingLove
+description: Deploys the self-destruct infra
 
 variables:
   domain: thecodinglove.crowdstandout.com

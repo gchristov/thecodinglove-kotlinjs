@@ -1,6 +1,6 @@
-name: search-service
+name: thecodinglove-search
 runtime: yaml
-description: Deploys the search service for TheCodingLove
+description: Deploys the search infra
 
 variables:
   domain: thecodinglove.crowdstandout.com

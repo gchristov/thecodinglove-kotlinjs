@@ -1,6 +1,6 @@
-name: slack-service
+name: thecodinglove-slack
 runtime: yaml
-description: Deploys the Slack service for TheCodingLove
+description: Deploys the Slack infra
 
 variables:
   domain: thecodinglove.crowdstandout.com
