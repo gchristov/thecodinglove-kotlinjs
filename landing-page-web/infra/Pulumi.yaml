@@ -1,6 +1,6 @@
-name: landing-page-web-service
+name: thecodinglove-landing-page-web
 runtime: yaml
-description: Deploys the landing page web service for TheCodingLove
+description: Deploys the landing page web infra for TheCodingLove
 
 variables:
   location: europe-west1

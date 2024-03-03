@@ -1,6 +1,6 @@
-name: common
+name: thecodinglove-common
 runtime: yaml
-description: Deploys the common infrastructure APIs for TheCodingLove
+description: Deploys the common infra APIs for TheCodingLove
 
 resources:
 
