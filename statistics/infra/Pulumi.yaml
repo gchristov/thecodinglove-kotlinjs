@@ -1,6 +1,6 @@
 name: thecodinglove-statistics
 runtime: yaml
-description: Deploys the statistics infra for TheCodingLove
+description: Deploys the statistics infra
 
 variables:
   domain: thecodinglove.crowdstandout.com

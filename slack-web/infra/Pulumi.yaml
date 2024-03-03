@@ -1,6 +1,6 @@
 name: thecodinglove-slack-web
 runtime: yaml
-description: Deploys the Slack web infra for TheCodingLove
+description: Deploys the Slack web infra
 
 variables:
   location: europe-west1
