@@ -13,30 +13,30 @@ resources:
   # Stack references
   ########################################
 
-  search-service-reference:
+  search-reference:
     type: pulumi:pulumi:StackReference
     properties:
-      name: gchristov/search-service/prod
-  statistics-service-reference:
+      name: gchristov/thecodinglove-search/prod
+  statistics-reference:
     type: pulumi:pulumi:StackReference
     properties:
-      name: gchristov/statistics-service/prod
-  self-destruct-service-reference:
+      name: gchristov/thecodinglove-statistics/prod
+  self-destruct-reference:
     type: pulumi:pulumi:StackReference
     properties:
-      name: gchristov/self-destruct-service/prod
-  slack-service-reference:
+      name: gchristov/thecodinglove-self-destruct/prod
+  slack-reference:
     type: pulumi:pulumi:StackReference
     properties:
-      name: gchristov/slack-service/prod
-  slack-web-service-reference:
+      name: gchristov/thecodinglove-slack/prod
+  slack-web-reference:
     type: pulumi:pulumi:StackReference
     properties:
-      name: gchristov/slack-web-service/prod
-  landing-page-web-service-reference:
+      name: gchristov/thecodinglove-slack-web/prod
+  landing-page-web-reference:
     type: pulumi:pulumi:StackReference
     properties:
-      name: gchristov/landing-page-web-service/prod
+      name: gchristov/thecodinglove-landing-page-web/prod
 
   ########################################
   # proxy-web-service
@@ -48,19 +48,19 @@ resources:
     properties:
       build:
         args:
-          SEARCH_SERVICE_HOST: ${search-service-reference.outputs["searchServiceHost"]}
-          SEARCH_SERVICE_PATH: ${search-service-reference.outputs["searchServicePath"]}
-          SEARCH_SERVICE_PUBSUB_PATH: ${search-service-reference.outputs["searchServicePubSubPath"]}
-          STATISTICS_SERVICE_HOST: ${statistics-service-reference.outputs["statisticsServiceHost"]}
-          STATISTICS_SERVICE_PATH: ${statistics-service-reference.outputs["statisticsServicePath"]}
-          SELF_DESTRUCT_SERVICE_HOST: ${self-destruct-service-reference.outputs["selfDestructServiceHost"]}
-          SELF_DESTRUCT_SERVICE_PATH: ${self-destruct-service-reference.outputs["selfDestructServicePath"]}
-          SLACK_SERVICE_HOST: ${slack-service-reference.outputs["slackServiceHost"]}
-          SLACK_SERVICE_PATH: ${slack-service-reference.outputs["slackServicePath"]}
-          SLACK_SERVICE_PUBSUB_PATH: ${slack-service-reference.outputs["slackServicePubSubPath"]}
-          SLACK_WEB_SERVICE_HOST: ${slack-web-service-reference.outputs["slackWebServiceHost"]}
-          SLACK_WEB_SERVICE_PATH: ${slack-web-service-reference.outputs["slackWebServicePath"]}
-          LANDING_PAGE_WEB_SERVICE_HOST: ${landing-page-web-service-reference.outputs["landingPageWebServiceHost"]}
+          SEARCH_SERVICE_HOST: ${search-reference.outputs["searchServiceHost"]}
+          SEARCH_SERVICE_PATH: ${search-reference.outputs["searchServicePath"]}
+          SEARCH_SERVICE_PUBSUB_PATH: ${search-reference.outputs["searchServicePubSubPath"]}
+          STATISTICS_SERVICE_HOST: ${statistics-reference.outputs["statisticsServiceHost"]}
+          STATISTICS_SERVICE_PATH: ${statistics-reference.outputs["statisticsServicePath"]}
+          SELF_DESTRUCT_SERVICE_HOST: ${self-destruct-reference.outputs["selfDestructServiceHost"]}
+          SELF_DESTRUCT_SERVICE_PATH: ${self-destruct-reference.outputs["selfDestructServicePath"]}
+          SLACK_SERVICE_HOST: ${slack-reference.outputs["slackServiceHost"]}
+          SLACK_SERVICE_PATH: ${slack-reference.outputs["slackServicePath"]}
+          SLACK_SERVICE_PUBSUB_PATH: ${slack-reference.outputs["slackServicePubSubPath"]}
+          SLACK_WEB_SERVICE_HOST: ${slack-web-reference.outputs["slackWebServiceHost"]}
+          SLACK_WEB_SERVICE_PATH: ${slack-web-reference.outputs["slackWebServicePath"]}
+          LANDING_PAGE_WEB_SERVICE_HOST: ${landing-page-web-reference.outputs["landingPageWebServiceHost"]}
         platform: linux/amd64
         context: ../service/build/dist/js
       imageName: ${location}-docker.pkg.dev/${gcp:project}/${repositoryId}/proxy-web-service:latest
@@ -129,7 +129,7 @@ resources:
   proxy-web-service-domain-mapping:
     type: gcp:cloudrun:DomainMapping
     properties:
-      location: ${location}
+      location: ${proxy-web-service.location}
       metadata:
         namespace: ${gcp:project}
       name: ${domain}

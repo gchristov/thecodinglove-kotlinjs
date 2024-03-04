@@ -1,21 +1,23 @@
-name: proxy-web-service-deploy
+name: statistics-deploy
 
 on:
   push:
     branches: [ master ]
     paths:
-      - 'proxy-web/**'
+      - 'statistics/**'
 
 env:
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
+  GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
+  MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
 
 jobs:
-  proxy-web-service-deploy-build:
+  statistics-deploy-build:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-proxy-web-service-deploy-build
+      group: ${{ github.ref }}-statistics-deploy-build
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -29,11 +31,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./proxy-web/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./statistics/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
+          echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
       - name: Build project
         run: |
           set -o pipefail && 
-          cd proxy-web &&
+          cd statistics &&
           ./gradlew --no-daemon assemble &&
           cd ..
       - name: Deploy infrastructure
@@ -41,7 +45,7 @@ jobs:
         with:
           command: up
           stack-name: prod
-          work-dir: proxy-web/infra
+          work-dir: statistics/infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
@@ -52,12 +56,12 @@ jobs:
           path: |
             **/build
             **/secrets.properties
-            proxy-web/infra
+            statistics/infra
 
-  proxy-web-service-deploy-test:
+  statistics-deploy-test:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-proxy-web-service-deploy-test
+      group: ${{ github.ref }}-statistics-deploy-test
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -71,11 +75,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./proxy-web/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./statistics/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
+          echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
       - name: Test
         run: |
           set -o pipefail && 
-          cd proxy-web &&
+          cd statistics &&
           ./gradlew --no-daemon --continue jsTest &&
           cd ..
       - name: Generate test report
@@ -83,7 +89,7 @@ jobs:
         if: always() # Ensure all test reports are collected, even after errors
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
-          check_name: 'proxy-web-service-test-deploy-results'
+          check_name: 'statistics-deploy-test-results'
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors

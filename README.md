@@ -36,6 +36,7 @@ The below setup assumes you've already cloned the project locally.
    - `Service Usage Admin`
    - `Pub/Sub Admin`
    - `Cloud Scheduler Admin`
+   - `Cloud Run Admin`
    - (Optional) If you're specifying a custom domain mapping, as we are, [verify domain ownership and add your service account as owner](https://search.google.com/search-console).
 3. Export a JSON API key for your Service Account and call it `credentials-gcp-infra.json`.
 4. [Signup and Install Pulumi](https://www.pulumi.com/docs/clouds/gcp/get-started/begin/#install-pulumi) locally.
