@@ -1,10 +1,10 @@
-name: search-service-deploy
+name: statistics-check
 
 on:
-  push:
+  pull_request:
     branches: [ master ]
     paths:
-      - 'search/**'
+      - 'statistics/**'
 
 env:
   JAVA_VERSION: "15"
@@ -14,10 +14,10 @@ env:
   MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
 
 jobs:
-  search-service-deploy-build:
+  statistics-check-build:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-search-service-deploy-build
+      group: ${{ github.ref }}-statistics-check-build
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -31,21 +31,25 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./search/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./statistics/infra/credentials-gcp-infra.json
           echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
           echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
       - name: Build project
         run: |
           set -o pipefail && 
-          cd search &&
+          cd statistics &&
           ./gradlew --no-daemon assemble &&
           cd ..
-      - name: Deploy infrastructure
+      - name: Build container images
+        run: |
+          set -o pipefail &&
+          docker compose -f docker/statistics-compose.yaml build
+      - name: Preview infrastructure
         uses: pulumi/actions@v5
         with:
-          command: up
+          command: preview
           stack-name: prod
-          work-dir: search/infra
+          work-dir: statistics/infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
@@ -56,12 +60,12 @@ jobs:
           path: |
             **/build
             **/secrets.properties
-            search/infra
+            statistics/infra
 
-  search-service-deploy-test:
+  statistics-check-test:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-search-service-deploy-test
+      group: ${{ github.ref }}-statistics-check-test
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -75,13 +79,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./search/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./statistics/infra/credentials-gcp-infra.json
           echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
           echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
       - name: Test
         run: |
           set -o pipefail && 
-          cd search &&
+          cd statistics &&
           ./gradlew --no-daemon --continue jsTest &&
           cd ..
       - name: Generate test report
@@ -89,7 +93,7 @@ jobs:
         if: always() # Ensure all test reports are collected, even after errors
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
-          check_name: 'search-service-deploy-test-results'
+          check_name: 'statistics-check-test-results'
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors

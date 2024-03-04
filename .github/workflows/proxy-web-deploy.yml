@@ -1,10 +1,10 @@
-name: landing-page-web-service-check
+name: proxy-web-deploy
 
 on:
-  pull_request:
+  push:
     branches: [ master ]
     paths:
-      - 'landing-page-web/**'
+      - 'proxy-web/**'
 
 env:
   JAVA_VERSION: "15"
@@ -12,10 +12,10 @@ env:
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
 
 jobs:
-  landing-page-web-service-check-build:
+  proxy-web-deploy-build:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-landing-page-web-service-check-build
+      group: ${{ github.ref }}-proxy-web-deploy-build
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -29,23 +29,19 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./landing-page-web/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./proxy-web/infra/credentials-gcp-infra.json
       - name: Build project
         run: |
           set -o pipefail && 
-          cd landing-page-web &&
+          cd proxy-web &&
           ./gradlew --no-daemon assemble &&
           cd ..
-      - name: Build container images
-        run: |
-          set -o pipefail &&
-          docker compose -f docker/landing-page-web-service-compose.yaml build
-      - name: Preview infrastructure
+      - name: Deploy infrastructure
         uses: pulumi/actions@v5
         with:
-          command: preview
+          command: up
           stack-name: prod
-          work-dir: landing-page-web/infra
+          work-dir: proxy-web/infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
@@ -56,12 +52,12 @@ jobs:
           path: |
             **/build
             **/secrets.properties
-            landing-page-web/infra
+            proxy-web/infra
 
-  landing-page-web-service-check-test:
+  proxy-web-deploy-test:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.ref }}-landing-page-web-service-check-test
+      group: ${{ github.ref }}-proxy-web-deploy-test
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -75,11 +71,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./landing-page-web/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./proxy-web/infra/credentials-gcp-infra.json
       - name: Test
         run: |
           set -o pipefail && 
-          cd landing-page-web &&
+          cd proxy-web &&
           ./gradlew --no-daemon --continue jsTest &&
           cd ..
       - name: Generate test report
@@ -87,7 +83,7 @@ jobs:
         if: always() # Ensure all test reports are collected, even after errors
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
-          check_name: 'landing-page-web-service-check-test-results'
+          check_name: 'proxy-web-deploy-test-results'
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
