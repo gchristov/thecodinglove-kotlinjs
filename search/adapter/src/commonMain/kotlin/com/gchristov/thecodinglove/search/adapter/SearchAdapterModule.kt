@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter
 
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
@@ -52,6 +53,7 @@ object SearchAdapterModule : DiModule() {
                     searchUseCase = instance(),
                     pubSubPublisher = instance(),
                     searchConfig = instance(),
+                    analytics = instance(),
                 )
             }
             bindSingleton {
@@ -120,6 +122,7 @@ object SearchAdapterModule : DiModule() {
         searchUseCase: SearchUseCase,
         pubSubPublisher: PubSubPublisher,
         searchConfig: SearchConfig,
+        analytics: Analytics,
     ): SearchHttpHandler = SearchHttpHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
@@ -127,6 +130,7 @@ object SearchAdapterModule : DiModule() {
         searchUseCase = searchUseCase,
         pubSubPublisher = pubSubPublisher,
         searchConfig = searchConfig,
+        analytics = analytics,
     )
 
     private fun providePreloadSearchPubSubHttpHandler(

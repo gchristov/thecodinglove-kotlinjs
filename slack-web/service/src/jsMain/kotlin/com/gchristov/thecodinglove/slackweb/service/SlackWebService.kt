@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slackweb.service
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.common.analytics.CommonAnalyticsModule
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
@@ -41,6 +42,7 @@ suspend fun main() {
 private fun setupDi(): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
+            CommonAnalyticsModule.module,
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonMonitoringModule.module,

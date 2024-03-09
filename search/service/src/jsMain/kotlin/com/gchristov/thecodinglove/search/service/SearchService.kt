@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.common.analytics.CommonAnalyticsModule
 import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
 import com.gchristov.thecodinglove.common.firebase.firestore.FirestoreMigration
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
@@ -46,6 +47,7 @@ suspend fun main() {
 private fun setupDi(environment: Environment): Either<Throwable, Unit> {
     DiGraph.registerModules(
         listOf(
+            CommonAnalyticsModule.module,
             CommonKotlinModule.module,
             CommonNetworkModule.module,
             CommonPubSubModule.module,

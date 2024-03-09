@@ -3,6 +3,8 @@ package com.gchristov.thecodinglove.slack.adapter.http
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
+import com.benasher44.uuid.uuid4
+import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.network.http.BaseHttpHandler
@@ -23,10 +25,11 @@ class SlackAuthHttpHandler(
     private val log: Logger,
     private val slackAuthUseCase: SlackAuthUseCase,
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
+    private val analytics: Analytics,
 ) : BaseHttpHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
-    log = log
+    log = log,
 ) {
     private val tag = this::class.simpleName
 
@@ -45,6 +48,10 @@ class SlackAuthHttpHandler(
         return slackAuthUseCase(SlackAuthUseCase.Dto(code)).flatMap {
             val stateResult = state?.let { handleAuthState(it) } ?: Either.Right(Unit)
             stateResult.flatMap {
+                analytics.sendEvent(
+                    clientId = uuid4().toString(),
+                    name = "slack_auth_success",
+                )
                 response.redirect("/slack/auth/success")
                 Either.Right(Unit)
             }
@@ -56,11 +63,20 @@ class SlackAuthHttpHandler(
         response: HttpResponse,
     ): Either<Throwable, Unit> = when (error) {
         is SlackAuthUseCase.Error.Cancelled -> {
+            analytics.sendEvent(
+                clientId = uuid4().toString(),
+                name = "slack_auth_cancel",
+            )
             response.redirect("/")
             Either.Right(Unit)
         }
 
         is SlackAuthUseCase.Error.Other -> {
+            analytics.sendEvent(
+                clientId = uuid4().toString(),
+                name = "slack_auth_error",
+                params = error.message?.let { mapOf("info" to it) }
+            )
             response.redirect("/slack/auth/error")
             Either.Right(Unit)
         }

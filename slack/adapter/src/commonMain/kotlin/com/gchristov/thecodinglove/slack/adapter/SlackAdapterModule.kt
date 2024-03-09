@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter
 
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
@@ -57,6 +58,7 @@ object SlackAdapterModule : DiModule() {
                     slackVerifyRequestUseCase = instance(),
                     slackConfig = instance(),
                     slackRevokeTokensUseCase = instance(),
+                    analytics = instance(),
                 )
             }
             bindSingleton {
@@ -65,6 +67,7 @@ object SlackAdapterModule : DiModule() {
                     log = instance(),
                     slackAuthUseCase = instance(),
                     slackSendSearchUseCase = instance(),
+                    analytics = instance(),
                 )
             }
             bindSingleton {
@@ -84,6 +87,7 @@ object SlackAdapterModule : DiModule() {
                     slackMessageFactory = instance(),
                     searchRepository = instance(),
                     pubSubDecoder = instance(),
+                    analytics = instance(),
                 )
             }
             bindSingleton {
@@ -103,6 +107,7 @@ object SlackAdapterModule : DiModule() {
                     slackShuffleSearchUseCase = instance(),
                     slackCancelSearchUseCase = instance(),
                     pubSubDecoder = instance(),
+                    analytics = instance(),
                 )
             }
             bindSingleton {
@@ -154,6 +159,7 @@ object SlackAdapterModule : DiModule() {
         slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
         slackConfig: SlackConfig,
         slackRevokeTokensUseCase: SlackRevokeTokensUseCase,
+        analytics: Analytics,
     ): SlackEventHttpHandler = SlackEventHttpHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
@@ -161,6 +167,7 @@ object SlackAdapterModule : DiModule() {
         slackVerifyRequestUseCase = slackVerifyRequestUseCase,
         slackConfig = slackConfig,
         slackRevokeTokensUseCase = slackRevokeTokensUseCase,
+        analytics = analytics,
     )
 
     private fun provideSlackAuthHttpHandler(
@@ -168,12 +175,14 @@ object SlackAdapterModule : DiModule() {
         log: Logger,
         slackAuthUseCase: SlackAuthUseCase,
         slackSendSearchUseCase: SlackSendSearchUseCase,
+        analytics: Analytics,
     ): SlackAuthHttpHandler = SlackAuthHttpHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         slackAuthUseCase = slackAuthUseCase,
         slackSendSearchUseCase = slackSendSearchUseCase,
+        analytics = analytics,
     )
 
     private fun provideSlackSlashCommandHttpHandler(
@@ -198,6 +207,7 @@ object SlackAdapterModule : DiModule() {
         slackMessageFactory: SlackMessageFactory,
         searchRepository: SlackSearchRepository,
         pubSubDecoder: PubSubDecoder,
+        analytics: Analytics,
     ): SlackSlashCommandPubSubHandler = SlackSlashCommandPubSubHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
@@ -206,6 +216,7 @@ object SlackAdapterModule : DiModule() {
         slackMessageFactory = slackMessageFactory,
         slackSearchRepository = searchRepository,
         pubSubDecoder = pubSubDecoder,
+        analytics = analytics,
     )
 
     private fun provideSlackInteractivityHttpHandler(
@@ -230,6 +241,7 @@ object SlackAdapterModule : DiModule() {
         slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
         slackCancelSearchUseCase: SlackCancelSearchUseCase,
         pubSubDecoder: PubSubDecoder,
+        analytics: Analytics,
     ): SlackInteractivityPubSubHandler = SlackInteractivityPubSubHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
@@ -238,6 +250,7 @@ object SlackAdapterModule : DiModule() {
         slackShuffleSearchUseCase = slackShuffleSearchUseCase,
         slackCancelSearchUseCase = slackCancelSearchUseCase,
         pubSubDecoder = pubSubDecoder,
+        analytics = analytics,
     )
 
     private fun provideSlackSelfDestructHttpHandler(
