@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.statistics.adapter
 
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
@@ -28,6 +29,7 @@ object StatisticsAdapterModule : DiModule() {
                     jsonSerializer = instance(),
                     log = instance(),
                     statisticsReportUseCase = instance(),
+                    analytics = instance(),
                 )
             }
             bindSingleton {
@@ -59,11 +61,13 @@ object StatisticsAdapterModule : DiModule() {
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         statisticsReportUseCase: StatisticsReportUseCase,
+        analytics: Analytics,
     ): StatisticsHttpHandler = StatisticsHttpHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         statisticsReportUseCase = statisticsReportUseCase,
+        analytics = analytics,
     )
 
     private fun provideStatisticsSearchServiceApi(

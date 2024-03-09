@@ -6,6 +6,7 @@ pluginManagement {
 
 rootProject.name = "common"
 
+include("analytics")
 include("firebase")
 include("kotlin")
 include("monitoring")
