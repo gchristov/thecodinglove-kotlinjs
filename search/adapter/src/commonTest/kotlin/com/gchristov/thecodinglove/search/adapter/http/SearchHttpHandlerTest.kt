@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.http
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.common.analyticstestfixtures.FakeAnalytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.networktestfixtures.FakeHttpResponse
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubPublisher
@@ -213,7 +214,8 @@ class SearchHttpHandlerTest {
             searchConfig = SearchConfig(
                 postsPerPage = TestSearchPostsPerPage,
                 preloadPubSubTopic = TestPreloadSearchPubSubTopic,
-            )
+            ),
+            analytics = FakeAnalytics(),
         )
         testBlock(handler, pubSubPublisher, searchUseCase, request, response)
     }

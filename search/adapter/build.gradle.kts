@@ -19,6 +19,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(Deps.Common.test)
+                implementation(Deps.Common.analyticsTestFixtures)
                 implementation(Deps.Common.networkTestFixtures)
                 implementation(Deps.Common.pubsubTestFixtures)
                 implementation(projects.testFixtures)
