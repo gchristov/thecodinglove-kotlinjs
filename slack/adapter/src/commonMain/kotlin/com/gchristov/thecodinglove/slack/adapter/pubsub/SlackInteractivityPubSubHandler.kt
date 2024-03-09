@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.error
 import com.gchristov.thecodinglove.common.network.http.HttpHandler
@@ -26,6 +27,7 @@ class SlackInteractivityPubSubHandler(
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
     private val slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
     private val slackCancelSearchUseCase: SlackCancelSearchUseCase,
+    private val analytics: Analytics,
     pubSubDecoder: PubSubDecoder,
 ) : BasePubSubHandler(
     dispatcher = dispatcher,
@@ -68,42 +70,90 @@ class SlackInteractivityPubSubHandler(
         val shuffleAction = shuffleAction()
         val cancelAction = cancelAction()
         return when {
-            sendAction != null -> slackSendSearchUseCase.invoke(
-                SlackSendSearchUseCase.Dto(
-                    userId = user.id,
-                    teamId = team.id,
-                    channelId = channel.id,
-                    responseUrl = responseUrl,
-                    searchSessionId = sendAction.value,
+            sendAction != null -> {
+                analytics.sendEvent(
+                    clientId = user.id,
+                    name = "slack_interactivity_send",
+                    params = mapOf(
+                        "user_id" to user.id,
+                        "team_id" to team.id,
+                    )
                 )
-            )
-
-            selfDestruct5MinAction != null -> slackSendSearchUseCase.invoke(
-                SlackSendSearchUseCase.Dto(
-                    userId = user.id,
-                    teamId = team.id,
-                    channelId = channel.id,
-                    responseUrl = responseUrl,
-                    searchSessionId = selfDestruct5MinAction.value,
-                    selfDestructMinutes = 5,
+                slackSendSearchUseCase.invoke(
+                    SlackSendSearchUseCase.Dto(
+                        userId = user.id,
+                        teamId = team.id,
+                        channelId = channel.id,
+                        responseUrl = responseUrl,
+                        searchSessionId = sendAction.value,
+                    )
                 )
-            )
+            }
 
-            shuffleAction != null -> slackShuffleSearchUseCase.invoke(
-                SlackShuffleSearchUseCase.Dto(
-                    responseUrl = responseUrl,
-                    searchSessionId = shuffleAction.value,
+            selfDestruct5MinAction != null -> {
+                analytics.sendEvent(
+                    clientId = user.id,
+                    name = "slack_interactivity_self_destruct",
+                    params = mapOf(
+                        "user_id" to user.id,
+                        "team_id" to team.id,
+                    )
                 )
-            )
-
-            cancelAction != null -> slackCancelSearchUseCase.invoke(
-                SlackCancelSearchUseCase.Dto(
-                    responseUrl = responseUrl,
-                    searchSessionId = cancelAction.value,
+                slackSendSearchUseCase.invoke(
+                    SlackSendSearchUseCase.Dto(
+                        userId = user.id,
+                        teamId = team.id,
+                        channelId = channel.id,
+                        responseUrl = responseUrl,
+                        searchSessionId = selfDestruct5MinAction.value,
+                        selfDestructMinutes = 5,
+                    )
                 )
-            )
+            }
 
-            else -> Either.Left(Throwable("Unsupported interactivity message action: $actions"))
+            shuffleAction != null -> {
+                analytics.sendEvent(
+                    clientId = user.id,
+                    name = "slack_interactivity_shuffle",
+                    params = mapOf(
+                        "user_id" to user.id,
+                        "team_id" to team.id,
+                    )
+                )
+                slackShuffleSearchUseCase.invoke(
+                    SlackShuffleSearchUseCase.Dto(
+                        responseUrl = responseUrl,
+                        searchSessionId = shuffleAction.value,
+                    )
+                )
+            }
+
+            cancelAction != null -> {
+                analytics.sendEvent(
+                    clientId = user.id,
+                    name = "slack_interactivity_cancel",
+                    params = mapOf(
+                        "user_id" to user.id,
+                        "team_id" to team.id,
+                    )
+                )
+                slackCancelSearchUseCase.invoke(
+                    SlackCancelSearchUseCase.Dto(
+                        responseUrl = responseUrl,
+                        searchSessionId = cancelAction.value,
+                    )
+                )
+            }
+
+            else -> {
+                val error = Throwable("Unsupported interactivity message action: $actions")
+                analytics.sendEvent(
+                    clientId = user.id,
+                    name = "slack_interactivity_error",
+                    params = error.message?.let { mapOf("info" to it) }
+                )
+                Either.Left(error)
+            }
         }
     }
 }

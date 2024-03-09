@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slackweb.adapter
 
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.slackweb.adapter.http.SlackAuthRedirectHttpHandler
@@ -20,6 +21,7 @@ object SlackWebAdapterModule : DiModule() {
                     jsonSerializer = instance(),
                     log = instance(),
                     slackConfig = instance(),
+                    analytics = instance(),
                 )
             }
         }
@@ -29,10 +31,12 @@ object SlackWebAdapterModule : DiModule() {
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackConfig: SlackConfig,
+        analytics: Analytics,
     ): SlackAuthRedirectHttpHandler = SlackAuthRedirectHttpHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
         slackConfig = slackConfig,
+        analytics = analytics,
     )
 }

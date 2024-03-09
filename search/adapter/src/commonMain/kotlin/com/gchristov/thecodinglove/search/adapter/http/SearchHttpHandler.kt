@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.search.adapter.http
 import arrow.core.Either
 import arrow.core.flatMap
 import co.touchlab.kermit.Logger
+import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.error
 import com.gchristov.thecodinglove.common.network.http.*
@@ -21,6 +22,7 @@ class SearchHttpHandler(
     private val searchUseCase: SearchUseCase,
     private val pubSubPublisher: PubSubPublisher,
     private val searchConfig: SearchConfig,
+    private val analytics: Analytics,
 ) : BaseHttpHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
@@ -49,10 +51,19 @@ class SearchHttpHandler(
                             jsonSerializer = jsonSerializer,
                         )
                     }
+
                     is SearchUseCase.Error.SessionNotFound -> Either.Left(it)
                 }
             },
             ifRight = { searchResult ->
+                analytics.sendEvent(
+                    clientId = searchResult.searchSessionId,
+                    name = "search",
+                    params = mapOf(
+                        "query" to searchResult.query,
+                        "total_posts" to searchResult.totalPosts.toString(),
+                    ),
+                )
                 publishSearchPreloadMessage(
                     searchSessionId = searchResult.searchSessionId,
                     searchConfig = searchConfig,

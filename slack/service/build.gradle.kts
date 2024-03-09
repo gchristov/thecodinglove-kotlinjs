@@ -8,6 +8,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(Deps.Common.analytics)
                 implementation(Deps.Common.kotlin)
                 implementation(Deps.Common.monitoring)
                 implementation(Deps.Common.network)

@@ -20,7 +20,7 @@ internal class RealMonitoringSlackRepository(
     override suspend fun reportException(
         message: String,
         stacktrace: String,
-    ): Either<Throwable, Unit> = try {
+    ) = try {
         val monitoringSlackMessage = ApiMonitoringSlackMessage(
             text = message,
             attachments = listOf(ApiMonitoringSlackMessage.ApiAttachment(

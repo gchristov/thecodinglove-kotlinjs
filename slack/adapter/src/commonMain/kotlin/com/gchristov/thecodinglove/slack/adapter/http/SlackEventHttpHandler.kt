@@ -6,6 +6,8 @@ import arrow.core.left
 import arrow.core.right
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Logger.Companion.tag
+import com.benasher44.uuid.uuid4
+import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.network.http.*
@@ -27,6 +29,7 @@ class SlackEventHttpHandler(
     private val slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
     private val slackConfig: SlackConfig,
     private val slackRevokeTokensUseCase: SlackRevokeTokensUseCase,
+    private val analytics: Analytics,
 ) : BaseHttpHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
@@ -66,12 +69,29 @@ class SlackEventHttpHandler(
 
     private suspend fun SlackEvent.Callback.handle(response: HttpResponse) =
         when (val typedEvent = event) {
-            is SlackEvent.Callback.Event.TokensRevoked -> slackRevokeTokensUseCase(typedEvent.toSlackRevokeTokensDto()).flatMap {
-                response.sendEmpty()
+            is SlackEvent.Callback.Event.TokensRevoked -> {
+                val revokeTokensDto = typedEvent.toSlackRevokeTokensDto()
+                slackRevokeTokensUseCase(revokeTokensDto).flatMap {
+                    val params = mutableMapOf<String, String>().apply {
+                        revokeTokensDto.bot?.forEach { put(it, true.toString()) }
+                        revokeTokensDto.oAuth?.forEach { put(it, true.toString()) }
+                    }
+                    analytics.sendEvent(
+                        clientId = uuid4().toString(),
+                        name = "app_revoke_tokens",
+                        params = params,
+                    )
+                    response.sendEmpty()
+                }
             }
 
             is SlackEvent.Callback.Event.AppUninstalled -> {
                 log.debug(tag, "App uninstalled: teamId=$teamId")
+                analytics.sendEvent(
+                    clientId = uuid4().toString(),
+                    name = "app_uninstall",
+                    params = mapOf("team_id" to teamId),
+                )
                 response.sendEmpty()
             }
         }
