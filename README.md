@@ -15,7 +15,7 @@
 - [GitHub Actions](https://github.com/features/actions) - CI automation
 - [Pulumi](https://www.pulumi.com/) - infrastructure as code, using [micro-stacks](https://www.pulumi.com/docs/using-pulumi/organizing-projects-stacks/#micro-stacks)
 - [nginx](https://nginx.org/) - web reverse proxy
-- [Google Analytics](https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference?client_type=gtag) - analytics and engagement measurement
+- [Google Analytics](https://developers.google.com/analytics/devguides/collection/protocol/ga4) - analytics and engagement measurement
 </details>
 
 🌍 [Live demo](https://thecodinglove.crowdstandout.com)
