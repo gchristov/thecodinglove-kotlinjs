@@ -15,6 +15,7 @@
 - [GitHub Actions](https://github.com/features/actions) - CI automation
 - [Pulumi](https://www.pulumi.com/) - infrastructure as code, using [micro-stacks](https://www.pulumi.com/docs/using-pulumi/organizing-projects-stacks/#micro-stacks)
 - [nginx](https://nginx.org/) - web reverse proxy
+- [Google Analytics](https://developers.google.com/analytics/devguides/collection/protocol/ga4) - analytics and engagement measurement
 </details>
 
 🌍 [Live demo](https://thecodinglove.crowdstandout.com)
@@ -82,7 +83,8 @@ The project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN), so
 2. [Install IntelliJ](https://www.jetbrains.com/help/idea/installation-guide.html). This project has been tested with `IntelliJ IDEA 2023.2.5`.
 3. Open the root project with IntelliJ and wait for it to initialise.
 4. Create a Slack channel to receive server error messages and monitoring updates. The project is configured to post all unhandled `Throwable`s to that channel. We use the [Incoming Webhooks](https://slack.com/apps/A0F7XDUAZ-incoming-webhooks) app to obtain a channel URL webhook.
-5. Create the following `secrets.properties` files:
+5. Create a [Google Analytics 4 property and an API secret](https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference?client_type=gtag).
+6. Create the following `secrets.properties` files:
 ```
 # Under /slack/domain/secrets.properties
 SLACK_SIGNING_SECRET=YOUR_SLACK_SIGNING_SECRET
@@ -97,7 +99,12 @@ SLACK_CLIENT_ID=YOUR_SLACK_CLIENT_ID
 # Under /common/monitoring/secrets.properties
 MONITORING_SLACK_URL=YOUR_MONITORING_SLACK_URL
 ```
-6. Copy the `credentials-gcp-app.json` Service Account JSON API key to the root project folder.
+```
+# Under /common/analytics/secrets.properties
+GOOGLE_ANALYTICS_MEASUREMENT_ID=YOUR_ANALYTICS_MEASUREMENT_ID
+GOOGLE_ANALYTICS_API_SECRET=YOUR_ANALYTICS_API_SECRET
+```
+7. Copy the `credentials-gcp-app.json` Service Account JSON API key to the root project folder.
 </details>
 
 ## Run locally
