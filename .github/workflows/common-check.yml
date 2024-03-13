@@ -14,6 +14,9 @@ env:
   MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
   GOOGLE_ANALYTICS_MEASUREMENT_ID: ${{ secrets.GOOGLE_ANALYTICS_MEASUREMENT_ID }}
   GOOGLE_ANALYTICS_API_SECRET: ${{ secrets.GOOGLE_ANALYTICS_API_SECRET }}
+  SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+  SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
+  SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
 
 jobs:
   common-check-build:
@@ -33,11 +36,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./common/infra/credentials-gcp-infra.json
-          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
-          echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
-          echo GOOGLE_ANALYTICS_MEASUREMENT_ID="$GOOGLE_ANALYTICS_MEASUREMENT_ID" >> ./common/analytics/secrets.properties
-          echo GOOGLE_ANALYTICS_API_SECRET="$GOOGLE_ANALYTICS_API_SECRET" >> ./common/analytics/secrets.properties
+          bash secrets.sh
       - name: Build project
         run: |
           set -o pipefail && 
@@ -50,6 +49,7 @@ jobs:
           command: preview
           stack-name: prod
           work-dir: common/infra
+          pulumi-version: "3.109.0"
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
@@ -79,11 +79,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./common/infra/credentials-gcp-infra.json
-          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
-          echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
-          echo GOOGLE_ANALYTICS_MEASUREMENT_ID="$GOOGLE_ANALYTICS_MEASUREMENT_ID" >> ./common/analytics/secrets.properties
-          echo GOOGLE_ANALYTICS_API_SECRET="$GOOGLE_ANALYTICS_API_SECRET" >> ./common/analytics/secrets.properties
+          bash secrets.sh
       - name: Test
         run: |
           set -o pipefail && 

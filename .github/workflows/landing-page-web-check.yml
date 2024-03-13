@@ -10,6 +10,13 @@ env:
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
+  GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
+  MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
+  GOOGLE_ANALYTICS_MEASUREMENT_ID: ${{ secrets.GOOGLE_ANALYTICS_MEASUREMENT_ID }}
+  GOOGLE_ANALYTICS_API_SECRET: ${{ secrets.GOOGLE_ANALYTICS_API_SECRET }}
+  SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+  SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
+  SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
 
 jobs:
   landing-page-web-check-build:
@@ -29,7 +36,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./landing-page-web/infra/credentials-gcp-infra.json
+          bash secrets.sh
       - name: Build project
         run: |
           set -o pipefail && 
@@ -46,6 +53,7 @@ jobs:
           command: preview
           stack-name: prod
           work-dir: landing-page-web/infra
+          pulumi-version: "3.109.0"
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
@@ -75,7 +83,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./landing-page-web/infra/credentials-gcp-infra.json
+          bash secrets.sh
       - name: Test
         run: |
           set -o pipefail && 
