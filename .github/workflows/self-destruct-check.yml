@@ -94,11 +94,13 @@ jobs:
         uses: mikepenz/action-junit-report@v4
         if: always() # Ensure all test reports are collected, even after errors
         with:
-          report_paths: '**/build/test-results/**/TEST-*.xml'
+          report_paths: |
+            **/TEST-*.xml
           check_name: 'self-destruct-check-test-results'
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
         with:
           name: Tests
-          path: '**/build/test-results/**/TEST-*.xml'
+          path: |
+            **/TEST-*.xml

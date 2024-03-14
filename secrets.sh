@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-# Exports required CI environment secrets to local secrets.properties files so that the project can use them
+# Exports required CI environment secrets to local secrets so that the project can use them
 
 # GCP credentials
 echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
