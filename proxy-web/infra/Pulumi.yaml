@@ -2,8 +2,10 @@ name: thecodinglove-proxy-web
 runtime: yaml
 description: Deploys the proxy web infra
 
-dependencies:
-  gcp: 7.11.2 # https://github.com/pulumi/pulumi-gcp/issues/1809
+configuration:
+  gcp:provider:
+    description: The GCP provider package version
+    default: 7.11.2 # https://github.com/pulumi/pulumi-gcp/issues/1809
 
 variables:
   domain: thecodinglove.crowdstandout.com
