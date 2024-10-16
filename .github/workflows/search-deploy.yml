@@ -41,7 +41,7 @@ jobs:
         run: |
           set -o pipefail && 
           cd search &&
-          ./gradlew --no-daemon assemble &&
+          ./gradlew --no-daemon assemble --scan &&
           cd ..
       - name: Deploy infrastructure
         uses: pulumi/actions@v5
@@ -84,7 +84,7 @@ jobs:
         run: |
           set -o pipefail && 
           cd search &&
-          ./gradlew --no-daemon --continue jsTest &&
+          ./gradlew --no-daemon --continue jsTest --scan &&
           cd ..
       - name: Generate test report
         uses: mikepenz/action-junit-report@v4
