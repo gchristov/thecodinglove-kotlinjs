@@ -17,7 +17,7 @@ env:
 
 jobs:
   common-check-build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     concurrency:
       group: ${{ github.ref }}-common-check-build
       cancel-in-progress: true
@@ -63,7 +63,7 @@ jobs:
             common/infra
 
   common-check-test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     concurrency:
       group: ${{ github.ref }}-common-check-test
       cancel-in-progress: true

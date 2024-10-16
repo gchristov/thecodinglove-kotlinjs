@@ -15,6 +15,7 @@ resources:
       disableDependentServices: true
       service: cloudresourcemanager.googleapis.com
     options:
+      version: 8.6.0
       protect: true
   # Enables the Artifact Registry API. Needed for Docker.
   artifact-registry-api:
@@ -23,6 +24,7 @@ resources:
       disableDependentServices: true
       service: artifactregistry.googleapis.com
     options:
+      version: 8.6.0
       protect: true
   # Enables Firebase API. Needed for Firestore.
   firebase-api:
@@ -31,6 +33,7 @@ resources:
       disableDependentServices: true
       service: firebase.googleapis.com
     options:
+      version: 8.6.0
       protect: true
   # Enables the Firestore API.
   firestore-api:
@@ -39,6 +42,7 @@ resources:
       disableDependentServices: true
       service: firestore.googleapis.com
     options:
+      version: 8.6.0
       protect: true
       dependsOn:
         - ${cloud-resource-manager-api}
@@ -49,6 +53,7 @@ resources:
       disableDependentServices: true
       service: run.googleapis.com
     options:
+      version: 8.6.0
       protect: true
   # Enables the PubSub API.
   pubsub-api:
@@ -57,6 +62,7 @@ resources:
       disableDependentServices: true
       service: pubsub.googleapis.com
     options:
+      version: 8.6.0
       protect: true
 
   ########################################
@@ -71,6 +77,7 @@ resources:
       location: europe-west1
       repositoryId: thecodinglove
     options:
+      version: 8.6.0
       protect: true
       dependsOn:
         - ${artifact-registry-api}
@@ -83,6 +90,7 @@ resources:
   firebase:
     type: gcp:firebase:Project
     options:
+      version: 8.6.0
       protect: true
       dependsOn:
         - ${firebase-api}
@@ -98,6 +106,7 @@ resources:
       name: (default)
       type: FIRESTORE_NATIVE
     options:
+      version: 8.6.0
       protect: true
       dependsOn:
         - ${firestore-api}
@@ -121,6 +130,7 @@ resources:
               }
             name: firestore.rules
     options:
+      version: 8.6.0
       protect: true
       dependsOn:
         - ${firestore}
@@ -132,4 +142,5 @@ resources:
       name: cloud.firestore
       rulesetName: projects/${firestore-rules.project}/rulesets/${firestore-rules.name}
     options:
+      version: 8.6.0
       protect: true

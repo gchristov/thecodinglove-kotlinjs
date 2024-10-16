@@ -18,7 +18,7 @@ env:
 
 jobs:
   slack-web-check-build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     concurrency:
       group: ${{ github.ref }}-slack-web-check-build
       cancel-in-progress: true
@@ -69,7 +69,7 @@ jobs:
             slack-web/infra
 
   slack-web-check-test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     concurrency:
       group: ${{ github.ref }}-slack-web-check-test
       cancel-in-progress: true

@@ -168,10 +168,12 @@ internal class RealSlackRepository(
                 messageTs = messageTs,
             ),
         ).body()
-        if (slackResponse.ok) {
-            Either.Right(Unit)
-        } else {
-            throw Exception(slackResponse.error)
+        when {
+            slackResponse.ok -> Either.Right(Unit)
+            // A message might have been deleted by the time self destruct attempts to delete it,
+            // so just assume it's already gone if Slack tells us it doesn't exist.
+            slackResponse.error == "message_not_found" -> Either.Right(Unit)
+            else -> throw Exception(slackResponse.error)
         }
     } catch (error: Throwable) {
         Either.Left(Throwable(
