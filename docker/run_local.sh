@@ -1,6 +1,8 @@
-# Builds and runs the project locally with Docker
+#!/bin/bash
 set -e
-echo "🛠 Build project" && ./gradlew assemble
+
+# Builds and runs the project locally with Docker
+echo "🛠 Build project" && ./gradlew assemble --scan
 echo "🧹 Clean up old Docker resources" && (docker image prune -af)
 echo "🏁 Start local tunnel" && (ssh -tt -R codinglove.serveo.net:80:localhost:8080 serveo.net &)
 sleep 1

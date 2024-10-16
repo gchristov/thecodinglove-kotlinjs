@@ -1,3 +1,15 @@
+plugins {
+    id("com.gradle.enterprise") version("3.16.2")
+}
+
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = "https://gradle.com/terms-of-service"
+        termsOfServiceAgree = "yes"
+        publishAlways()
+    }
+}
+
 rootProject.name = "thecodinglove-kotlinjs"
 
 // Add or remove projects here from the common build. Alternatively, each project can be opened in isolation.

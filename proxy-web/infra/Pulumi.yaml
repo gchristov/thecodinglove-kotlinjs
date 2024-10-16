@@ -137,3 +137,4 @@ resources:
         routeName: proxy-web-service
     options:
       protect: true
+      version: 7.11.2 # https://github.com/pulumi/pulumi-gcp/issues/1809

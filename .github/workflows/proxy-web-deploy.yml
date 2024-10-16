@@ -10,6 +10,13 @@ env:
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
+  GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
+  MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
+  GOOGLE_ANALYTICS_MEASUREMENT_ID: ${{ secrets.GOOGLE_ANALYTICS_MEASUREMENT_ID }}
+  GOOGLE_ANALYTICS_API_SECRET: ${{ secrets.GOOGLE_ANALYTICS_API_SECRET }}
+  SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+  SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
+  SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
 
 jobs:
   proxy-web-deploy-build:
@@ -29,12 +36,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./proxy-web/infra/credentials-gcp-infra.json
+          bash secrets.sh
       - name: Build project
         run: |
           set -o pipefail && 
           cd proxy-web &&
-          ./gradlew --no-daemon assemble &&
+          ./gradlew --no-daemon assemble --scan &&
           cd ..
       - name: Deploy infrastructure
         uses: pulumi/actions@v5
@@ -42,6 +49,7 @@ jobs:
           command: up
           stack-name: prod
           work-dir: proxy-web/infra
+          pulumi-version: "3.109.0"
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
@@ -71,22 +79,24 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./proxy-web/infra/credentials-gcp-infra.json
+          bash secrets.sh
       - name: Test
         run: |
           set -o pipefail && 
           cd proxy-web &&
-          ./gradlew --no-daemon --continue jsTest &&
+          ./gradlew --no-daemon --continue jsTest --scan &&
           cd ..
       - name: Generate test report
         uses: mikepenz/action-junit-report@v4
         if: always() # Ensure all test reports are collected, even after errors
         with:
-          report_paths: '**/build/test-results/**/TEST-*.xml'
+          report_paths: |
+            **/TEST-*.xml
           check_name: 'proxy-web-deploy-test-results'
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
         with:
           name: Tests
-          path: '**/build/test-results/**/TEST-*.xml'
+          path: |
+            **/TEST-*.xml
