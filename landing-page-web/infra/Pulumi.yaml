@@ -39,8 +39,8 @@ resources:
         containers:
           - image: ${landing-page-web-service-binary.repoDigest}
             ports:
-              - containerPort: 80
-                name: http1
+              containerPort: 80
+              name: http1
             resources:
               cpuIdle: true
               limits:
@@ -61,6 +61,7 @@ resources:
         - percent: 100
           type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
     options:
+      version: 8.6.0
       protect: true
   # Manages the Cloud Run service policy.
   landing-page-web-service-policy:
@@ -80,6 +81,7 @@ resources:
           ]
         }
     options:
+      version: 8.6.0
       protect: true
 
 outputs:

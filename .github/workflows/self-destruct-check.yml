@@ -15,7 +15,7 @@ env:
 
 jobs:
   self-destruct-check-build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     concurrency:
       group: ${{ github.ref }}-self-destruct-check-build
       cancel-in-progress: true
@@ -63,7 +63,7 @@ jobs:
             self-destruct/infra
 
   self-destruct-check-test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     concurrency:
       group: ${{ github.ref }}-self-destruct-check-test
       cancel-in-progress: true

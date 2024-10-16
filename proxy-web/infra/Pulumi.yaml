@@ -83,8 +83,8 @@ resources:
         containers:
           - image: ${proxy-web-service-binary.repoDigest}
             ports:
-              - containerPort: 80
-                name: http1
+              containerPort: 80
+              name: http1
             resources:
               cpuIdle: true
               limits:
@@ -105,6 +105,7 @@ resources:
         - percent: 100
           type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
     options:
+      version: 8.6.0
       protect: true
   # Manages the Cloud Run service policy.
   proxy-web-service-policy:
@@ -124,6 +125,7 @@ resources:
           ]
         }
     options:
+      version: 8.6.0
       protect: true
   # Manages the Cloud Run service domain mapping.
   proxy-web-service-domain-mapping:
@@ -136,4 +138,5 @@ resources:
       spec:
         routeName: proxy-web-service
     options:
+      version: 8.6.0
       protect: true

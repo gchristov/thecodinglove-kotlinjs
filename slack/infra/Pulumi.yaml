@@ -46,8 +46,8 @@ resources:
         containers:
           - image: ${slack-service-binary.repoDigest}
             ports:
-              - containerPort: 8084
-                name: http1
+              containerPort: 8084
+              name: http1
             resources:
               cpuIdle: true
               limits:
@@ -68,6 +68,7 @@ resources:
         - percent: 100
           type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
     options:
+      version: 8.6.0
       protect: true
   # Manages the Cloud Run service policy.
   slack-service-policy:
@@ -87,6 +88,7 @@ resources:
           ]
         }
     options:
+      version: 8.6.0
       protect: true
 
   ########################################
@@ -99,6 +101,7 @@ resources:
     properties:
       name: slack_interactivity
     options:
+      version: 8.6.0
       protect: true
   # Manages the Slack interactivity PubSub subscription.
   pubsub-subscription-slack-interactivity:
@@ -116,6 +119,7 @@ resources:
         minimumBackoff: 10s
       topic: ${pubsub-topic-slack-interactivity.name}
     options:
+      version: 8.6.0
       protect: true
   # Manages the dev Slack interactivity PubSub topic.
   pubsub-topic-slack-interactivity-dev:
@@ -123,6 +127,7 @@ resources:
     properties:
       name: slack_interactivity_dev
     options:
+      version: 8.6.0
       protect: true
   # Manages the dev Slack interactivity PubSub subscription.
   pubsub-subscription-slack-interactivity-dev:
@@ -141,6 +146,7 @@ resources:
         minimumBackoff: 10s
       topic: ${pubsub-topic-slack-interactivity-dev.name}
     options:
+      version: 8.6.0
       protect: true
   # Manages the Slack slash command PubSub topic.
   pubsub-topic-slack-slash-command:
@@ -148,6 +154,7 @@ resources:
     properties:
       name: slack_slash_command
     options:
+      version: 8.6.0
       protect: true
   # Manages the Slack slash command PubSub subscription.
   pubsub-subscription-slack-slash-command:
@@ -165,6 +172,7 @@ resources:
         minimumBackoff: 10s
       topic: ${pubsub-topic-slack-slash-command.name}
     options:
+      version: 8.6.0
       protect: true
   # Manages the dev Slack slash command PubSub topic.
   pubsub-topic-slack-slash-command-dev:
@@ -172,6 +180,7 @@ resources:
     properties:
       name: slack_slash_command_dev
     options:
+      version: 8.6.0
       protect: true
   # Manages the dev Slack slash command PubSub subscription.
   pubsub-subscription-slack-slash-command-dev:
@@ -190,6 +199,7 @@ resources:
         minimumBackoff: 10s
       topic: ${pubsub-topic-slack-slash-command-dev.name}
     options:
+      version: 8.6.0
       protect: true
 
 outputs:

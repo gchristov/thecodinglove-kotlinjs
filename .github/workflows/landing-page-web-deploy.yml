@@ -13,7 +13,7 @@ env:
 
 jobs:
   landing-page-web-deploy-build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     concurrency:
       group: ${{ github.ref }}-landing-page-web-deploy-build
       cancel-in-progress: true
@@ -55,7 +55,7 @@ jobs:
             landing-page-web/infra
 
   landing-page-web-deploy-test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     concurrency:
       group: ${{ github.ref }}-landing-page-web-deploy-test
       cancel-in-progress: true

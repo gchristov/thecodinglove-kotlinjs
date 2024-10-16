@@ -44,8 +44,8 @@ resources:
         containers:
           - image: ${search-service-binary.repoDigest}
             ports:
-              - containerPort: 8081
-                name: http1
+              containerPort: 8081
+              name: http1
             resources:
               cpuIdle: true
               limits:
@@ -66,6 +66,7 @@ resources:
         - percent: 100
           type: TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
     options:
+      version: 8.6.0
       protect: true
   # Manages the Cloud Run service policy.
   search-service-policy:
@@ -85,6 +86,7 @@ resources:
           ]
         }
     options:
+      version: 8.6.0
       protect: true
 
   ########################################
@@ -97,6 +99,7 @@ resources:
     properties:
       name: preload_search
     options:
+      version: 8.6.0
       protect: true
   # Manages the preload search PubSub subscription.
   pubsub-subscription-preload-search:
@@ -114,6 +117,7 @@ resources:
         minimumBackoff: 10s
       topic: ${pubsub-topic-preload-search.name}
     options:
+      version: 8.6.0
       protect: true
   # Manages the dev preload search PubSub topic.
   pubsub-topic-preload-search-dev:
@@ -121,6 +125,7 @@ resources:
     properties:
       name: preload_search_dev
     options:
+      version: 8.6.0
       protect: true
   # Manages the dev preload search PubSub subscription.
   pubsub-subscription-preload-search-dev:
@@ -139,6 +144,7 @@ resources:
         minimumBackoff: 10s
       topic: ${pubsub-topic-preload-search-dev.name}
     options:
+      version: 8.6.0
       protect: true
 
 outputs:
