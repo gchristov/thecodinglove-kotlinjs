@@ -22,4 +22,7 @@ jobs:
         run: |
           for file in ${ALL_CHANGED_FILES}; do
             echo "$file was changed"
+            if [ -e "$file/infra/Pulumi.yaml" ]; then
+              echo "It is within a service"
+            fi
           done
