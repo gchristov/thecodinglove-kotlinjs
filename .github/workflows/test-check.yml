@@ -11,4 +11,4 @@ jobs:
       - uses: actions/checkout@v4
       - name: Get Root Directories
         run: |
-          git diff --name-only origin/master -- | while IFS= read -r file; do [[ -d "${file%%/*}" ]] && echo "${file%%/*}"; done | sort | uniq
+          git diff --name-only origin/master
