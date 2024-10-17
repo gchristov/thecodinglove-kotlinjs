@@ -1,7 +1,7 @@
 name: self-destruct-check
 
 on:
-  pull_request:
+  push:
     branches: [ master ]
     paths:
       - 'self-destruct/**'
