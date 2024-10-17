@@ -10,21 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Get Root Directories
-        id: get_root_directories
         run: |
           git diff --name-only origin/main -- $(git rev-parse --abbrev-ref HEAD) | while IFS= read -r file; do
             dir=$(dirname "$file")
             root_dir=$(cd "$dir"; cd -; pwd)
-            echo "::set-output name=root_directories::$root_dir"
-          done
-
-  print-root-directories:
-    runs-on: ubuntu-latest
-    needs: get-root-directories
-    steps:
-      - name: Print Root Directories
-        run: |
-          echo "Root directories:"
-          for root_dir in ${{ jobs.get-root-directories.outputs.root_directories.split(',') }}; do
-            echo "  - $root_dir"
+            echo "$root_dir"
           done
