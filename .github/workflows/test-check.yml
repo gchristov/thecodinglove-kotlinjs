@@ -26,8 +26,8 @@ jobs:
               CHANGED_SERVICES+=("$file")
             fi
           done
-          echo 'changed_services=[${CHANGED_SERVICES[@]}]'
-          echo 'changed_services=[${CHANGED_SERVICES[@]}]' >> "$GITHUB_OUTPUT"
+          echo "changed_services=[${CHANGED_SERVICES[@]}]"
+          echo "changed_services=[${CHANGED_SERVICES[@]}]" >> "$GITHUB_OUTPUT"
     outputs:
       changed_services: ${{ steps.changed-services.outputs.changed_services }}
 
