@@ -86,7 +86,11 @@ jobs:
           ./gradlew --no-daemon assemble &&
           cd ..
       - name: Build container images
-        if: ${{ hashFiles('docker/"${{ matrix.service }}"-compose.yaml') != '' }}
         run: |
           set -o pipefail &&
-          docker compose -f docker/${{ matrix.service }}-compose.yaml build
+          
+          if [ -e "docker/${{ matrix.service }}-compose.yaml" ]; then
+            docker compose -f docker/${{ matrix.service }}-compose.yaml build
+          else
+            echo "Skipping step as docker file doesn't exist"
+          fi
