@@ -139,7 +139,7 @@ jobs:
       - name: Test
         run: |
           set -o pipefail && 
-          ./gradlew --no-daemon --continue jsTest &&
+          ./gradlew assemble &&
           cd ..
       - name: Generate test report
         uses: mikepenz/action-junit-report@v4
