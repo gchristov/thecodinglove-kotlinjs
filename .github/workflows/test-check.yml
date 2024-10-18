@@ -23,10 +23,10 @@ jobs:
           CHANGED_SERVICES=()
           for file in ${all_changed_files}; do
             if [ -e "$file/infra/Pulumi.yaml" ]; then
-              CHANGED_SERVICES+=("$file")
+              CHANGED_SERVICES+=("'$file'")
             fi
           done
-          printf "[%s]\n" "${CHANGED_FILES[@]}"
+          echo "[${CHANGED_SERVICES[@]}]"
           echo 'changed_services=["cat", "dog"]' >> "$GITHUB_OUTPUT"
 
     outputs:
