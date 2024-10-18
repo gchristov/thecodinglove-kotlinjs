@@ -86,7 +86,7 @@ jobs:
           ./gradlew --no-daemon assemble &&
           cd ..
       - name: Build container images
-        if: ${{ hashFiles('docker/${{ matrix.service }}-compose.yaml') != '' }}
+        if: ${{ hashFiles("docker/${{ matrix.service }}-compose.yaml") != '' }}
         run: |
           set -o pipefail &&
           docker compose -f docker/${{ matrix.service }}-compose.yaml build
