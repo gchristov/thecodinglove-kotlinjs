@@ -139,7 +139,6 @@ jobs:
       - name: Test
         run: |
           set -o pipefail && 
-          cd search &&
           ./gradlew --no-daemon --continue jsTest &&
           cd ..
       - name: Generate test report
