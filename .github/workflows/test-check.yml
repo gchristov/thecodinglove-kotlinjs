@@ -23,7 +23,7 @@ jobs:
           CHANGED_SERVICES=()
           for file in ${all_changed_files}; do
             if [ -e "$file/infra/Pulumi.yaml" ]; then
-              CHANGED_SERVICES+=("'$file'")
+              CHANGED_SERVICES+=("\"$file\"")
             fi
           done
           echo "[${CHANGED_SERVICES[@]}]"
