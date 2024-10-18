@@ -16,6 +16,7 @@ jobs:
           dir_names: true
           dir_names_max_depth: '1'
       - name: List all changed files
+        id: changed-services
         env:
           ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
@@ -27,6 +28,8 @@ jobs:
           done
           echo 'changed_services=["cat", "dog"]'
           echo 'changed_services=["cat", "dog"]' >> "$GITHUB_OUTPUT"
+    outputs:
+      changed_services: ${{ steps.changed-services.outputs.changed_services }}
 
   produce-artifacts:
     runs-on: ubuntu-latest
