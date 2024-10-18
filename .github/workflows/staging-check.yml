@@ -1,7 +1,7 @@
 name: staging-check
 
 on:
-  push:
+  pull_request:
     branches: [ master ]
 
 env:
@@ -70,7 +70,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./slack/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./${{ matrix.service }}/infra/credentials-gcp-infra.json
           echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
           echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
           echo GOOGLE_ANALYTICS_MEASUREMENT_ID="$GOOGLE_ANALYTICS_MEASUREMENT_ID" >> ./common/analytics/secrets.properties
@@ -94,7 +94,7 @@ jobs:
           else
             echo "Skipping step as docker file doesn't exist"
           fi
-      - name: Preview infrastructureee
+      - name: Preview infrastructure
         uses: pulumi/actions@v5
         with:
           command: preview
