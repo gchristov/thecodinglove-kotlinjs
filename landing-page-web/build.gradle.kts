@@ -4,7 +4,7 @@ allprojects {
     }
 }
 
-val taskNames = listOf("clean", "assemble", "jsTest", "kotlinUpgradeYarnLock")
+val taskNames = listOf("clean", "assemble", "jsTest")
 taskNames.forEach {  taskName ->
     tasks.register("${taskName}All") {
         tasks.findByName(taskName)?.let { dependsOn(it) }
