@@ -4,11 +4,27 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  JAVA_VERSION: "15"
+  JAVA_DISTRIBUTION: "zulu"
+  GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
+  GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
+  SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+  SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
+  SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
+  MONITORING_SLACK_URL: ${{ secrets.MONITORING_SLACK_URL }}
+  GOOGLE_ANALYTICS_MEASUREMENT_ID: ${{ secrets.GOOGLE_ANALYTICS_MEASUREMENT_ID }}
+  GOOGLE_ANALYTICS_API_SECRET: ${{ secrets.GOOGLE_ANALYTICS_API_SECRET }}
+
 jobs:
   detect-changed-services:
     runs-on: ubuntu-24.04
+    concurrency:
+      group: ${{ github.ref }}-detect-changed-services
+      cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Collect all changed root directories
         id: changed-root-directories
         uses: tj-actions/changed-files@v45
@@ -34,12 +50,34 @@ jobs:
       changed_services: ${{ steps.changed-services.outputs.changed_services }}
 
   service-check-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: ${{ github.ref }}-service-check-build
+      cancel-in-progress: true
     needs: detect-changed-services
     strategy:
       matrix:
         service: ${{ fromJSON(needs.detect-changed-services.outputs.changed_services) }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
+      - name: Set up secrets
+        run: |
+          echo "$GCP_SA_KEY_INFRA" >> ./slack/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
+          echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
+          echo GOOGLE_ANALYTICS_MEASUREMENT_ID="$GOOGLE_ANALYTICS_MEASUREMENT_ID" >> ./common/analytics/secrets.properties
+          echo GOOGLE_ANALYTICS_API_SECRET="$GOOGLE_ANALYTICS_API_SECRET" >> ./common/analytics/secrets.properties
+          echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/domain/secrets.properties
+          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/domain/secrets.properties
+          echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack/domain/secrets.properties
       - name: Print service
         env:
           service: ${{ matrix.service }}
