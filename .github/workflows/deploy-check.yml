@@ -135,7 +135,7 @@ jobs:
         run: |
           set -o pipefail && 
           cd ${{ matrix.service }} &&
-          ./gradlew --no-daemon --continue assemble &&
+          ./gradlew assemble &&
           cd ..
       - name: Generate test report
         uses: mikepenz/action-junit-report@v4
