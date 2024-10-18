@@ -94,3 +94,11 @@ jobs:
           else
             echo "Skipping step as docker file doesn't exist"
           fi
+      - name: Preview infrastructure
+        uses: pulumi/actions@v5
+        with:
+          command: preview
+          stack-name: prod
+          work-dir: ${{ matrix.service }}/infra
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
