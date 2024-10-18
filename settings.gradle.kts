@@ -1,4 +1,4 @@
-rootProject.name = "thecodinglovekotlinjs"
+rootProject.name = "thecodinglove-kotlinjs"
 
 // Add or remove projects here from the common build. Alternatively, each project can be opened in isolation.
 includeBuild("common")

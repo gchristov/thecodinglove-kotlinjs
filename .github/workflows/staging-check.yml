@@ -112,11 +112,15 @@ jobs:
             **/secrets.properties
             ${{ matrix.service }}/infra
 
-  check-test:
+  service-check-test:
     runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        service: ${{ fromJSON(needs.detect-changed-services.outputs.changed_services) }}
     concurrency:
-      group: ${{ github.ref }}-check-test
+      group: ${{ github.ref }}-${{ matrix.service }}-service-check-test
       cancel-in-progress: true
+    needs: detect-changed-services
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -139,6 +143,7 @@ jobs:
       - name: Test
         run: |
           set -o pipefail && 
+          cd ${{ matrix.service }} &&
           ./gradlew --no-daemon --continue jsTest &&
           cd ..
       - name: Generate test report
@@ -151,5 +156,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
         with:
-          name: Tests
+          name: Tests (${{ matrix.service }})
           path: '**/build/test-results/**/TEST-*.xml'
