@@ -51,13 +51,13 @@ jobs:
 
   service-check-build:
     runs-on: ubuntu-24.04
-    concurrency:
-      group: ${{ github.ref }}-service-check-build
-      cancel-in-progress: true
-    needs: detect-changed-services
     strategy:
       matrix:
         service: ${{ fromJSON(needs.detect-changed-services.outputs.changed_services) }}
+    concurrency:
+      group: ${{ github.ref }}-${{ matrix.service }}-service-check-build
+      cancel-in-progress: true
+    needs: detect-changed-services
     steps:
       - name: Checkout
         uses: actions/checkout@v4
