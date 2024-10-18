@@ -129,15 +129,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./${{ matrix.service }}/infra/credentials-gcp-infra.json
-          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
           echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
           echo GOOGLE_ANALYTICS_MEASUREMENT_ID="$GOOGLE_ANALYTICS_MEASUREMENT_ID" >> ./common/analytics/secrets.properties
           echo GOOGLE_ANALYTICS_API_SECRET="$GOOGLE_ANALYTICS_API_SECRET" >> ./common/analytics/secrets.properties
           echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/domain/secrets.properties
           echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/domain/secrets.properties
           echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack/domain/secrets.properties
-          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack-web/domain/secrets.properties
+          echo SLACK_CLIEN  T_ID="$SLACK_CLIENT_ID" >> ./slack-web/domain/secrets.properties
       - name: Test
         run: |
           set -o pipefail && 
