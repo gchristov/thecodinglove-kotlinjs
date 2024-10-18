@@ -26,7 +26,7 @@ jobs:
               CHANGED_SERVICES+=("$file")
             fi
           done
-          joined=$(printf ",\"%s\"" "${arr[@]}")
+          joined=$(printf ",\"%s\"" "${CHANGED_SERVICES[@]}")
           echo "[${joined}]"
           echo 'changed_services=["cat", "dog"]' >> "$GITHUB_OUTPUT"
 
