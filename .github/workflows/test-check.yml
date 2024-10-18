@@ -85,3 +85,7 @@ jobs:
           cd ${{ matrix.service }} &&
           ./gradlew --no-daemon assemble &&
           cd ..
+      - name: Build container images
+        run: |
+          set -o pipefail &&
+          docker compose -f docker/${{ matrix.service }}-compose.yaml build
