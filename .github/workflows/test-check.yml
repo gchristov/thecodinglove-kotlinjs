@@ -25,8 +25,8 @@ jobs:
               CHANGED_SERVICES+=("$file")
             fi
           done
-          echo "changed_services=[${CHANGED_SERVICES[@]}]"
-          echo "changed_services=[${CHANGED_SERVICES[@]}]" >> "$GITHUB_OUTPUT"
+          echo "changed_services=["cat", "dog"]"
+          echo "changed_services=["cat", "dog"]" >> "$GITHUB_OUTPUT"
 
   produce-artifacts:
     runs-on: ubuntu-latest
