@@ -42,14 +42,20 @@ jobs:
               CHANGED_SERVICES+=("$file")
             fi
           done
-          joined=$(printf ",\"%s\"" "${CHANGED_SERVICES[@]}")
-          echo "changed_services=[${joined:1}]"
-          echo "changed_services=[${joined:1}]" >> "$GITHUB_OUTPUT"
+          
+          if [ ${#CHANGED_SERVICES[@]} -eq 0 ]; then
+            echo "No services changed"
+          else
+            joined=$(printf ",\"%s\"" "${CHANGED_SERVICES[@]}")
+            echo "changed_services=[${joined:1}]"
+            echo "changed_services=[${joined:1}]" >> "$GITHUB_OUTPUT"
+          fi
 
     outputs:
       changed_services: ${{ steps.changed-services.outputs.changed_services }}
 
   service-check-build:
+    if: needs.detect-changed-services.outputs.changed_services != ''
     runs-on: ubuntu-24.04
     strategy:
       matrix:
