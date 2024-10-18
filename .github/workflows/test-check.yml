@@ -18,10 +18,10 @@ jobs:
       - name: Collect all changed services
         id: changed-services
         env:
-          ALL_CHANGED_FILES: ${{ steps.changed-root-directories.outputs.all_changed_files }}
+          all_changed_files: ${{ steps.changed-root-directories.outputs.all_changed_files }}
         run: |
           CHANGED_SERVICES=()
-          for file in ${ALL_CHANGED_FILES}; do
+          for file in ${all_changed_files}; do
             if [ -e "$file/infra/Pulumi.yaml" ]; then
               CHANGED_SERVICES+=("$file")
             fi
@@ -41,6 +41,6 @@ jobs:
     steps:
       - name: Print service
         env:
-          color: ${{ matrix.service }}
+          service: ${{ matrix.service }}
         run: |
           echo "$service"
