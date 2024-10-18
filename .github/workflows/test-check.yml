@@ -78,8 +78,9 @@ jobs:
           echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/domain/secrets.properties
           echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/domain/secrets.properties
           echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack/domain/secrets.properties
-      - name: Print service
-        env:
-          service: ${{ matrix.service }}
+      - name: Build service
         run: |
-          echo "$service"
+          set -o pipefail && 
+          cd ${{ matrix.service }} &&
+          ./gradlew --no-daemon assemble &&
+          cd ..
