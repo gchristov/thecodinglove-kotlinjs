@@ -55,7 +55,6 @@ jobs:
       changed_services: ${{ steps.changed-services.outputs.changed_services }}
 
   service-check-build:
-    if: needs.detect-changed-services.outputs.changed_services != ''
     runs-on: ubuntu-24.04
     strategy:
       matrix:
