@@ -106,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
         with:
-          name: Build
+          name: Build (${{ matrix.service }})
           path: |
             **/build
             **/secrets.properties
