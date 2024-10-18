@@ -28,7 +28,7 @@ jobs:
           done
           joined=$(printf ",\"%s\"" "${CHANGED_SERVICES[@]}")
           echo "changed_services=[${joined:1}]"
-          echo 'changed_services=["cat", "dog"]' >> "$GITHUB_OUTPUT"
+          echo "changed_services=[${joined:1}]" >> "$GITHUB_OUTPUT"
 
     outputs:
       changed_services: ${{ steps.changed-services.outputs.changed_services }}
