@@ -1,10 +1,8 @@
-name: slack-deploy
+name: staging-check
 
 on:
-  push:
+  pull_request:
     branches: [ master ]
-    paths:
-      - 'slack/**'
 
 env:
   JAVA_VERSION: "15"
@@ -19,11 +17,47 @@ env:
   GOOGLE_ANALYTICS_API_SECRET: ${{ secrets.GOOGLE_ANALYTICS_API_SECRET }}
 
 jobs:
-  slack-deploy-build:
+  detect-changed-services:
     runs-on: ubuntu-24.04
     concurrency:
-      group: ${{ github.ref }}-slack-deploy-build
+      group: ${{ github.ref }}-detect-changed-services
       cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Collect all changed root directories
+        id: changed-root-directories
+        uses: tj-actions/changed-files@v45
+        with:
+          dir_names: true
+          dir_names_max_depth: '1'
+      - name: Collect all changed services
+        id: changed-services
+        env:
+          all_changed_files: ${{ steps.changed-root-directories.outputs.all_changed_files }}
+        run: |
+          CHANGED_SERVICES=()
+          for file in ${all_changed_files}; do
+            if [ -e "$file/infra/Pulumi.yaml" ]; then
+              CHANGED_SERVICES+=("$file")
+            fi
+          done
+          joined=$(printf ",\"%s\"" "${CHANGED_SERVICES[@]}")
+          echo "changed_services=[${joined:1}]"
+          echo "changed_services=[${joined:1}]" >> "$GITHUB_OUTPUT"
+
+    outputs:
+      changed_services: ${{ steps.changed-services.outputs.changed_services }}
+
+  service-check-build:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        service: ${{ fromJSON(needs.detect-changed-services.outputs.changed_services) }}
+    concurrency:
+      group: ${{ github.ref }}-${{ matrix.service }}-service-check-build
+      cancel-in-progress: true
+    needs: detect-changed-services
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,7 +70,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./slack/infra/credentials-gcp-infra.json
+          echo "$GCP_SA_KEY_INFRA" >> ./${{ matrix.service }}/infra/credentials-gcp-infra.json
           echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
           echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
           echo GOOGLE_ANALYTICS_MEASUREMENT_ID="$GOOGLE_ANALYTICS_MEASUREMENT_ID" >> ./common/analytics/secrets.properties
@@ -44,35 +78,49 @@ jobs:
           echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/domain/secrets.properties
           echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/domain/secrets.properties
           echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack/domain/secrets.properties
-      - name: Build project
+          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack-web/domain/secrets.properties
+      - name: Build service
         run: |
           set -o pipefail && 
-          cd slack &&
+          cd ${{ matrix.service }} &&
           ./gradlew --no-daemon assemble &&
           cd ..
-      - name: Deploy infrastructure
+      - name: Build container images
+        run: |
+          set -o pipefail &&
+          
+          if [ -e "docker/${{ matrix.service }}-compose.yaml" ]; then
+            docker compose -f docker/${{ matrix.service }}-compose.yaml build
+          else
+            echo "Skipping step as docker file doesn't exist"
+          fi
+      - name: Preview infrastructure
         uses: pulumi/actions@v5
         with:
-          command: up
+          command: preview
           stack-name: prod
-          work-dir: slack/infra
+          work-dir: ${{ matrix.service }}/infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
         with:
-          name: Build
+          name: Build (${{ matrix.service }})
           path: |
             **/build
             **/secrets.properties
-            slack/infra
+            ${{ matrix.service }}/infra
 
-  slack-deploy-test:
+  service-check-test:
     runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        service: ${{ fromJSON(needs.detect-changed-services.outputs.changed_services) }}
     concurrency:
-      group: ${{ github.ref }}-slack-deploy-test
+      group: ${{ github.ref }}-${{ matrix.service }}-service-check-test
       cancel-in-progress: true
+    needs: detect-changed-services
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -85,18 +133,17 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./slack/infra/credentials-gcp-infra.json
-          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
           echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
           echo GOOGLE_ANALYTICS_MEASUREMENT_ID="$GOOGLE_ANALYTICS_MEASUREMENT_ID" >> ./common/analytics/secrets.properties
           echo GOOGLE_ANALYTICS_API_SECRET="$GOOGLE_ANALYTICS_API_SECRET" >> ./common/analytics/secrets.properties
           echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/domain/secrets.properties
           echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/domain/secrets.properties
           echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack/domain/secrets.properties
+          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack-web/domain/secrets.properties
       - name: Test
         run: |
           set -o pipefail && 
-          cd slack &&
+          cd ${{ matrix.service }} &&
           ./gradlew --no-daemon --continue jsTest &&
           cd ..
       - name: Generate test report
@@ -104,10 +151,10 @@ jobs:
         if: always() # Ensure all test reports are collected, even after errors
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
-          check_name: 'slack-deploy-test-results'
+          check_name: service-check-test-results (${{ matrix.service }})
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
         with:
-          name: Tests
+          name: Tests (${{ matrix.service }})
           path: '**/build/test-results/**/TEST-*.xml'
