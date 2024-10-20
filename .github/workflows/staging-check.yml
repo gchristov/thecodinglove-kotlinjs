@@ -101,6 +101,7 @@ jobs:
             echo "Skipping step as docker file doesn't exist"
           fi
       - name: Preview infrastructure
+        id: ${{ matrix.service }}-preview-infra
         uses: pulumi/actions@v5
         with:
           command: preview
