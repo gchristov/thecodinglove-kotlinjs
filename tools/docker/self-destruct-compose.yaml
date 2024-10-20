@@ -1,6 +1,6 @@
 services:
   self-destruct-service:
-    build: ../self-destruct/service/build/dist/js
+    build: ../../self-destruct/service/build/dist/js
     ports:
       - "8083:8083" # host:container
     environment:

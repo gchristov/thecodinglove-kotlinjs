@@ -95,8 +95,8 @@ jobs:
         run: |
           set -o pipefail &&
           
-          if [ -e "docker/${{ matrix.service }}-compose.yaml" ]; then
-            docker compose -f docker/${{ matrix.service }}-compose.yaml build
+          if [ -e "tools/docker/${{ matrix.service }}-compose.yaml" ]; then
+            docker compose -f tools/docker/${{ matrix.service }}-compose.yaml build
           else
             echo "Skipping step as docker file doesn't exist"
           fi
