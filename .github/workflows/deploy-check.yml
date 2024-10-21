@@ -76,21 +76,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo "$GCP_SA_KEY_INFRA" >> ./${{ matrix.service }}/infra/credentials-gcp-infra.json
-          echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
-          echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
-          echo GOOGLE_ANALYTICS_MEASUREMENT_ID="$GOOGLE_ANALYTICS_MEASUREMENT_ID" >> ./common/analytics/secrets.properties
-          echo GOOGLE_ANALYTICS_API_SECRET="$GOOGLE_ANALYTICS_API_SECRET" >> ./common/analytics/secrets.properties
-          echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/domain/secrets.properties
-          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/domain/secrets.properties
-          echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack/domain/secrets.properties
-          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack-web/domain/secrets.properties
+          set -o pipefail &&
+          bash tools/scripts/secrets.sh
       - name: Build service
         run: |
           set -o pipefail && 
-          cd ${{ matrix.service }} &&
-          ./gradlew --no-daemon assemble &&
-          cd ..
+          ${{ matrix.service }}/gradlew --no-daemon assemble &&
       - name: Deploy infrastructure
         uses: pulumi/actions@v5
         with:
@@ -98,6 +89,7 @@ jobs:
           stack-name: prod
           work-dir: ${{ matrix.service }}/infra
           edit-pr-comment: false
+          pulumi-version: "3.136.1"
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
@@ -132,19 +124,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          echo MONITORING_SLACK_URL="$MONITORING_SLACK_URL" >> ./common/monitoring/secrets.properties
-          echo GOOGLE_ANALYTICS_MEASUREMENT_ID="$GOOGLE_ANALYTICS_MEASUREMENT_ID" >> ./common/analytics/secrets.properties
-          echo GOOGLE_ANALYTICS_API_SECRET="$GOOGLE_ANALYTICS_API_SECRET" >> ./common/analytics/secrets.properties
-          echo SLACK_SIGNING_SECRET="$SLACK_SIGNING_SECRET" >> ./slack/domain/secrets.properties
-          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack/domain/secrets.properties
-          echo SLACK_CLIENT_SECRET="$SLACK_CLIENT_SECRET" >> ./slack/domain/secrets.properties
-          echo SLACK_CLIENT_ID="$SLACK_CLIENT_ID" >> ./slack-web/domain/secrets.properties
+          set -o pipefail && 
+          bash tools/scripts/secrets.sh
       - name: Test
         run: |
           set -o pipefail && 
-          cd ${{ matrix.service }} &&
-          ./gradlew --no-daemon --continue jsTest &&
-          cd ..
+          ${{ matrix.service }}/gradlew --no-daemon --continue jsTest &&
       - name: Generate test report
         uses: mikepenz/action-junit-report@v4
         if: always() # Ensure all test reports are collected, even after errors
