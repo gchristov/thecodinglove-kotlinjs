@@ -7,6 +7,7 @@ on:
 env:
   JAVA_VERSION: "15"
   JAVA_DISTRIBUTION: "zulu"
+  PULUMI_VERSION: "3.136.1"
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
   GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
   SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
@@ -92,7 +93,7 @@ jobs:
           stack-name: prod
           work-dir: ${{ matrix.service }}/infra
           edit-pr-comment: false
-          pulumi-version: "3.136.1"
+          pulumi-version: ${{ env.PULUMI_VERSION }}
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
