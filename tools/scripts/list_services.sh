@@ -2,12 +2,12 @@
 set -e
 # Lists all valid services from the project
 
-all_services=$(find . -maxdepth 2 -type d -name infra -exec test -f "{}/Pulumi.yaml" \; -print | awk -F'/' '{print $2}')
+all_services=($(find . -maxdepth 2 -type d -name infra -exec test -f "{}/Pulumi.yaml" \; -print | awk -F'/' '{print $2}' | xargs -I {} echo {}))
 
-if [[ -z "$all_services" ]]; then
+if [ ${#all_services[@]} -eq 0 ]; then
   echo "No services detected"
   exit 1
 else
-  echo "$all_services"
+  echo "${all_services[@]}"
   exit 0
 fi
