@@ -76,7 +76,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          bash tool/scripts/secrets.sh
+          bash tools/scripts/secrets.sh
       - name: Build service
         run: |
           set -o pipefail && 
@@ -134,7 +134,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          bash tool/scripts/secrets.sh
+          bash tools/scripts/secrets.sh
       - name: Test
         run: |
           set -o pipefail && 
