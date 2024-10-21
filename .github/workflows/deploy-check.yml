@@ -82,7 +82,7 @@ jobs:
         run: |
           # Need to explicitly cd into each service, otherwise we get yarn cache clashes
           set -o pipefail &&
-          cd ${{ matrix.service }}
+          cd ${{ matrix.service }} &&
           ./gradlew --no-daemon assemble &&
           cd ..
       - name: Deploy infrastructure
