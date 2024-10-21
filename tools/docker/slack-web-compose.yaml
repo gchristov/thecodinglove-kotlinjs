@@ -1,6 +1,6 @@
 services:
   slack-web-service:
-    build: ../slack-web/service/build/dist/js
+    build: ../../slack-web/service/build/dist/js
     ports:
       - "8086:8086" # host:container
     environment:

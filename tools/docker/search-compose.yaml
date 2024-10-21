@@ -1,6 +1,6 @@
 services:
   search-service:
-    build: ../search/service/build/dist/js
+    build: ../../search/service/build/dist/js
     ports:
       - "8081:8081" # host:container
     environment:

@@ -1,6 +1,6 @@
 services:
   proxy-web-service:
-    build: ../proxy-web/service/build/dist/js
+    build: ../../proxy-web/service/build/dist/js
     ports:
       - "8080:80" # host:container
     environment:

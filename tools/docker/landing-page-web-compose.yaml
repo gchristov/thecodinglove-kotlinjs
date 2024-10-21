@@ -1,5 +1,5 @@
 services:
   landing-page-web-service:
-    build: ../landing-page-web/service/build/dist/js
+    build: ../../landing-page-web/service/build/dist/js
     ports:
       - "8085:80" # host:container
