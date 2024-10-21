@@ -9,7 +9,7 @@ echo "$GCP_SA_KEY_APP" >> ./credentials-gcp-app.json
 # Per-service infra GCP credentials
 services=$(bash ./tools/scripts/list_services.sh)
 for service in "${services[@]}"; do
-  echo "$GCP_SA_KEY_INFRA" >> "$service/infra/credentials-gcp-infra.json"
+  echo "$GCP_SA_KEY_INFRA" >> "./$service/infra/credentials-gcp-infra.json"
 done
 
 ## common library credentials
