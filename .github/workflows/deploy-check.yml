@@ -81,7 +81,7 @@ jobs:
       - name: Build service
         run: |
           set -o pipefail && 
-          ${{ matrix.service }}/gradlew --no-daemon assemble &&
+          ${{ matrix.service }}/gradlew --no-daemon assemble
       - name: Deploy infrastructure
         uses: pulumi/actions@v5
         with:
@@ -129,7 +129,7 @@ jobs:
       - name: Test
         run: |
           set -o pipefail && 
-          ${{ matrix.service }}/gradlew --no-daemon --continue jsTest &&
+          ${{ matrix.service }}/gradlew --no-daemon --continue jsTest
       - name: Generate test report
         uses: mikepenz/action-junit-report@v4
         if: always() # Ensure all test reports are collected, even after errors
