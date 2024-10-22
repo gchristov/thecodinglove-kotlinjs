@@ -2,20 +2,19 @@ package com.gchristov.thecodinglove.gradleplugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.Directory
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalDistributionDsl
 import org.jetbrains.kotlin.gradle.targets.js.npm.tasks.KotlinNpmInstallTask
-import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnSetupTask
-import java.io.FileInputStream
-import java.util.*
 
 abstract class BaseMultiplatformPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
+            tasks.withType<KotlinNpmInstallTask> {
+                args += "--mutex file"
+            }
         }
     }
 }
@@ -33,9 +32,6 @@ class BaseNodePlugin : BaseMultiplatformPlugin() {
                         }
                     }
                 }
-            }
-            tasks.withType<KotlinNpmInstallTask>() {
-                args += "--mutex file"
             }
         }
     }
