@@ -193,7 +193,7 @@ jobs:
       - name: Test
         run: |
           set -Eeuo pipefail 
-          bash tools/scripts/run_all_tests.sh
+          ./gradlew --no-daemon --continue jsTest
       - name: Generate test report
         uses: mikepenz/action-junit-report@v4
         if: always() # Ensure all test reports are collected, even after errors
@@ -206,4 +206,5 @@ jobs:
         if: always() # Ensure all artifacts are collected, even after errors
         with:
           name: Tests
+          path: |
             **/TEST-*.xml
