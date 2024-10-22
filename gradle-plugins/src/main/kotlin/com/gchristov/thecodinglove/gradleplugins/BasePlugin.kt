@@ -13,7 +13,7 @@ abstract class BaseMultiplatformPlugin : Plugin<Project> {
         target.run {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             tasks.withType<KotlinNpmInstallTask> {
-                args += "--mutex network"
+                args += "--mutex networkd"
             }
         }
     }
