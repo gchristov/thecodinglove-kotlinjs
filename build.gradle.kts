@@ -1,7 +1,10 @@
-// This file is intentionally empty as each sub-project should be independent. These tasks allow us to build and run it
-// as one from the repository root.
-// TODO: Consider if this still makes sense at scale
-val taskNames = listOf("clean", "assemble")
+/*
+This file is intentionally empty as each sub-project should be independent. These tasks below allow us to execute
+common actions for all projects right from the project root.
+- clean, assemble and kotlinUpgradeYarnLock are used for local development
+- jsTest is used to run all unit tests in one go (eg within the CI)
+*/
+val taskNames = listOf("clean", "assemble", "jsTest", "kotlinUpgradeYarnLock")
 taskNames.forEach { taskName ->
     tasks.register(taskName) {
         dependsOn(

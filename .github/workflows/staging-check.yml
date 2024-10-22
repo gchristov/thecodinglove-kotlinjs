@@ -55,14 +55,14 @@ jobs:
     outputs:
       changed_services: ${{ steps.changed-services.outputs.changed_services }}
 
-  service-check-build:
+  check-service-build:
     if: needs.detect-changed-services.outputs.changed_services != ''
     runs-on: ubuntu-24.04
     strategy:
       matrix:
         service: ${{ fromJSON(needs.detect-changed-services.outputs.changed_services) }}
     concurrency:
-      group: ${{ github.ref }}-${{ matrix.service }}-service-check-build
+      group: ${{ github.ref }}-${{ matrix.service }}-check-service-build
       cancel-in-progress: true
     needs: detect-changed-services
     steps:
@@ -120,16 +120,11 @@ jobs:
             **/secrets.properties
             ${{ matrix.service }}/infra
 
-  service-check-test:
-    if: needs.detect-changed-services.outputs.changed_services != ''
+  check-test:
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        service: ${{ fromJSON(needs.detect-changed-services.outputs.changed_services) }}
     concurrency:
-      group: ${{ github.ref }}-${{ matrix.service }}-service-check-test
+      group: ${{ github.ref }}-check-test
       cancel-in-progress: true
-    needs: detect-changed-services
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -146,27 +141,19 @@ jobs:
           bash tools/scripts/secrets.sh
       - name: Test
         run: |
-          set -Eeuo pipefail
-          
-          if [ -e "${{ matrix.service }}/gradlew" ]; then
-            # Need to explicitly cd into each service, otherwise we get yarn cache clashes
-            cd ${{ matrix.service }}
-            ./gradlew --no-daemon --continue jsTest
-            cd ..
-          else
-            echo "Skipping step as required file doesn't exist"
-          fi
+          set -Eeuo pipefail 
+          ./gradlew --no-daemon --continue jsTest
       - name: Generate test report
         uses: mikepenz/action-junit-report@v4
         if: always() # Ensure all test reports are collected, even after errors
         with:
           report_paths: |
             **/TEST-*.xml
-          check_name: service-check-test-results (${{ matrix.service }})
+          check_name: check-test-results
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
         with:
-          name: Tests (${{ matrix.service }})
+          name: Tests
           path: |
             **/TEST-*.xml
