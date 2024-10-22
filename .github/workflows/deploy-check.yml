@@ -77,15 +77,20 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          set -o pipefail &&
+          set -Eeuo pipefail
           bash tools/scripts/secrets.sh
       - name: Build service
         run: |
-          # Need to explicitly cd into each service, otherwise we get yarn cache clashes
-          set -o pipefail &&
-          cd ${{ matrix.service }} &&
-          ./gradlew --no-daemon assemble &&
-          cd ..
+          set -Eeuo pipefail
+          
+          if [ -e "${{ matrix.service }}/gradlew" ]; then
+            # Need to explicitly cd into each service, otherwise we get yarn cache clashes
+            cd ${{ matrix.service }}
+            ./gradlew --no-daemon assemble
+            cd ..
+          else
+            echo "Skipping step as required file doesn't exist"
+          fi
       - name: Deploy infrastructure
         uses: pulumi/actions@v5
         with:
@@ -128,15 +133,20 @@ jobs:
         uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
       - name: Set up secrets
         run: |
-          set -o pipefail && 
+          set -Eeuo pipefail 
           bash tools/scripts/secrets.sh
       - name: Test
         run: |
-          # Need to explicitly cd into each service, otherwise we get yarn cache clashes
-          set -o pipefail && 
-          cd ${{ matrix.service }} &&
-          ./gradlew --no-daemon --continue jsTest &&
-          cd ..
+          set -Eeuo pipefail
+          
+          if [ -e "${{ matrix.service }}/gradlew" ]; then
+            # Need to explicitly cd into each service, otherwise we get yarn cache clashes
+            cd ${{ matrix.service }}
+            ./gradlew --no-daemon --continue jsTest
+            cd ..
+          else
+            echo "Skipping step as required file doesn't exist"
+          fi
       - name: Generate test report
         uses: mikepenz/action-junit-report@v4
         if: always() # Ensure all test reports are collected, even after errors
