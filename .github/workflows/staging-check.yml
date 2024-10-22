@@ -55,14 +55,14 @@ jobs:
     outputs:
       changed_services: ${{ steps.changed-services.outputs.changed_services }}
 
-  service-check-build:
+  check-service-build:
     if: needs.detect-changed-services.outputs.changed_services != ''
     runs-on: ubuntu-24.04
     strategy:
       matrix:
         service: ${{ fromJSON(needs.detect-changed-services.outputs.changed_services) }}
     concurrency:
-      group: ${{ github.ref }}-${{ matrix.service }}-service-check-build
+      group: ${{ github.ref }}-${{ matrix.service }}-check-service-build
       cancel-in-progress: true
     needs: detect-changed-services
     steps:
