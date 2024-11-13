@@ -57,7 +57,7 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "⚠️️ Nightly job <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ job.name }}> failed (cc @georgi)"
+              "text": "⚠️️ Nightly job ${{ job.name }} failed. <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Logs>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ env.MONITORING_SLACK_URL }}
@@ -107,7 +107,7 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "⚠️️ Nightly job <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ job.name }}> failed (cc @georgi)"
+              "text": "⚠️️ Nightly job ${{ job.name }} failed. <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Logs>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ env.MONITORING_SLACK_URL }}
