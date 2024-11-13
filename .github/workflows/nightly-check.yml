@@ -50,11 +50,10 @@ jobs:
             **/build
             **/secrets.properties
             **/infra
-      - name: Slack report
+      - name: Slack error report
         uses: slackapi/slack-github-action@v1.27.0
-        if: always() # Ensure report is always sent, even after errors
+        if: failure()
         with:
-          # For posting a rich message using Block Kit
           payload: |
             {
               "text": "⚠️️ Nightly job <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.job }}> failed"
@@ -100,11 +99,10 @@ jobs:
           name: Tests
           path: |
             **/TEST-*.xml
-      - name: Slack report
+      - name: Slack error report
         uses: slackapi/slack-github-action@v1.27.0
-        if: always() # Ensure report is always sent, even after errors
+        if: failure()
         with:
-          # For posting a rich message using Block Kit
           payload: |
             {
               "text": "⚠️️ Nightly job <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.job }}> failed"
