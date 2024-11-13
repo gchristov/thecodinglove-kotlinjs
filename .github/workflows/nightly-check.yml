@@ -50,6 +50,18 @@ jobs:
             **/build
             **/secrets.properties
             **/infra
+      - name: Slack report
+        uses: slackapi/slack-github-action@v1.27.0
+        if: always() # Ensure report is always sent, even after errors
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ env.MONITORING_SLACK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   check-test:
     runs-on: ubuntu-24.04
@@ -88,3 +100,15 @@ jobs:
           name: Tests
           path: |
             **/TEST-*.xml
+      - name: Slack report
+        uses: slackapi/slack-github-action@v1.27.0
+        if: always() # Ensure report is always sent, even after errors
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "GitHub Action test result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ env.MONITORING_SLACK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
