@@ -3,8 +3,6 @@ name: staging-check
 on:
   pull_request:
     branches: [ master ]
-  schedule:
-    - cron: '25 21 * * *'
 
 env:
   JAVA_VERSION: "15"
