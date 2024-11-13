@@ -1,8 +1,8 @@
 name: nightly-check
 
 on:
-  schedule:
-    - cron: '20 22 * * *'
+  pull_request:
+    branches: [ master ]
 
 env:
   JAVA_VERSION: "15"
@@ -18,53 +18,11 @@ env:
   GOOGLE_ANALYTICS_API_SECRET: ${{ secrets.GOOGLE_ANALYTICS_API_SECRET }}
 
 jobs:
-  detect-changed-services:
+  check-build:
     runs-on: ubuntu-24.04
     concurrency:
-      group: ${{ github.ref }}-detect-changed-services
+      group: ${{ github.ref }}-check-build
       cancel-in-progress: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Collect all changed root directories
-        id: changed-root-directories
-        uses: tj-actions/changed-files@v45
-        with:
-          dir_names: true
-          dir_names_max_depth: '1'
-      - name: Collect all changed services
-        id: changed-services
-        env:
-          all_changed_files: ${{ steps.changed-root-directories.outputs.all_changed_files }}
-        run: |
-          CHANGED_SERVICES=()
-          for file in ${all_changed_files}; do
-            if [ -e "$file/infra/Pulumi.yaml" ]; then
-              CHANGED_SERVICES+=("$file")
-            fi
-          done
-          
-          if [ ${#CHANGED_SERVICES[@]} -eq 0 ]; then
-            echo "No services changed"
-          else
-            joined=$(printf ",\"%s\"" "${CHANGED_SERVICES[@]}")
-            echo "changed_services=[${joined:1}]"
-            echo "changed_services=[${joined:1}]" >> "$GITHUB_OUTPUT"
-          fi
-
-    outputs:
-      changed_services: ${{ steps.changed-services.outputs.changed_services }}
-
-  check-service-build:
-    if: needs.detect-changed-services.outputs.changed_services != ''
-    runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        service: ${{ fromJSON(needs.detect-changed-services.outputs.changed_services) }}
-    concurrency:
-      group: ${{ github.ref }}-${{ matrix.service }}-check-service-build
-      cancel-in-progress: true
-    needs: detect-changed-services
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -79,46 +37,19 @@ jobs:
         run: |
           set -Eeuo pipefail
           bash tools/scripts/secrets.sh
-      - name: Build service
+      - name: Build services
         run: |
           set -Eeuo pipefail
-          
-          if [ -e "${{ matrix.service }}/gradlew" ]; then
-            # Need to explicitly cd into each service, otherwise we get yarn cache clashes
-            cd ${{ matrix.service }}
-            ./gradlew --no-daemon assemble
-            cd ..
-          else
-            echo "Skipping step as required file doesn't exist"
-          fi
-      - name: Build container images
-        run: |
-          set -Eeuo pipefail
-          
-          if [ -e "tools/docker/${{ matrix.service }}-compose.yaml" ]; then
-            docker compose -f tools/docker/${{ matrix.service }}-compose.yaml build
-          else
-            echo "Skipping step as required file doesn't exist"
-          fi
-      - name: Preview infrastructure
-        uses: pulumi/actions@v5
-        with:
-          command: preview
-          stack-name: prod
-          work-dir: ${{ matrix.service }}/infra
-          edit-pr-comment: false
-          pulumi-version: ${{ env.PULUMI_VERSION }}
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          ./gradlew --no-daemon assemble
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
         with:
-          name: Build (${{ matrix.service }})
+          name: Build
           path: |
             **/build
             **/secrets.properties
-            ${{ matrix.service }}/infra
+            **/infra
 
   check-test:
     runs-on: ubuntu-24.04

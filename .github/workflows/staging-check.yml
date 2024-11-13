@@ -2,7 +2,7 @@ name: staging-check
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ develop ]
 
 env:
   JAVA_VERSION: "15"
