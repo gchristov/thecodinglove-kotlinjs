@@ -2,7 +2,7 @@ name: staging-check
 
 on:
   schedule:
-    - cron: '10 22 * * *'
+    - cron: '15 22 * * *'
 
 env:
   JAVA_VERSION: "15"
