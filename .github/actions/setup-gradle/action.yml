@@ -1,5 +1,4 @@
-name: 'setup'
-description: 'Setup common steps'
+name: 'setup-gradle'
 inputs:
   java-distribution:
     required: true
