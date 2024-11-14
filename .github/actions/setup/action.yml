@@ -1,0 +1,21 @@
+name: 'setup'
+description: 'Setup common steps'
+inputs:
+  java-distribution:
+    required: true
+  java-version:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: ${{ inputs.java-distribution }}
+        java-version: ${{ inputs.java-version }}
+    - name: Set up Gradle
+      uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
+    - name: Set up secrets
+      run: |
+        set -Eeuo pipefail 
+        bash tools/scripts/secrets.sh
