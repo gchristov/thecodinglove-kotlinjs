@@ -1,8 +1,8 @@
 name: nightly-check
 
 on:
-  pull_request:
-    branches: [ master ]
+  schedule:
+    - cron: '0 0 * * *'
 
 env:
   JAVA_VERSION: "15"
@@ -26,7 +26,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Gradle
+      - name: Set up Gradle
         uses: ./.github/actions/setup-gradle
         with:
           java-distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -46,7 +46,7 @@ jobs:
             **/infra
       - name: Slack report
         uses: slackapi/slack-github-action@v1.27.0
-        if: always()
+        if: always() # Ensure report is sent, even after errors
         with:
           payload: |
             {
@@ -71,7 +71,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Slack report
         uses: slackapi/slack-github-action@v1.27.0
-        if: always()
+        if: always() # Ensure report is sent, even after errors
         with:
           payload: |
             {

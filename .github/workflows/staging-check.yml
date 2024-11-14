@@ -2,7 +2,7 @@ name: staging-check
 
 on:
   pull_request:
-    branches: [ de ]
+    branches: [ master ]
 
 env:
   JAVA_VERSION: "15"
@@ -55,30 +55,24 @@ jobs:
     outputs:
       changed_services: ${{ steps.changed-services.outputs.changed_services }}
 
-  check-service-build:
+  build-service:
     if: needs.detect-changed-services.outputs.changed_services != ''
     runs-on: ubuntu-24.04
     strategy:
       matrix:
         service: ${{ fromJSON(needs.detect-changed-services.outputs.changed_services) }}
     concurrency:
-      group: ${{ github.ref }}-${{ matrix.service }}-check-service-build
+      group: ${{ github.ref }}-${{ matrix.service }}-build-service
       cancel-in-progress: true
     needs: detect-changed-services
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-          java-version: ${{ env.JAVA_VERSION }}
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
-      - name: Set up secrets
-        run: |
-          set -Eeuo pipefail
-          bash tools/scripts/secrets.sh
+        uses: ./.github/actions/setup-gradle
+        with:
+          java-distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
       - name: Build service
         run: |
           set -Eeuo pipefail

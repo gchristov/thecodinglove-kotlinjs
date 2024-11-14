@@ -7,7 +7,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup Gradle
+    - name: Set up Gradle
       uses: ./.github/actions/setup-gradle
       with:
         java-distribution: ${{ inputs.java-distribution }}
