@@ -14,6 +14,7 @@ runs:
         java-distribution: ${{ inputs.java-distribution }}
         java-version: ${{ inputs.java-version }}
     - name: Test
+      shell: bash
       run: |
         set -Eeuo pipefail 
         ./gradlew --no-daemon --continue jsTest
