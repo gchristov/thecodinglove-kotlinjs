@@ -2,7 +2,7 @@ name: staging-check
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ de ]
 
 env:
   JAVA_VERSION: "15"
@@ -120,10 +120,10 @@ jobs:
             **/secrets.properties
             ${{ matrix.service }}/infra
 
-  check-test:
+  unit-test:
     runs-on: ubuntu-24.04
     concurrency:
-      group: ${{ github.ref }}-check-test
+      group: ${{ github.ref }}-unit-test
       cancel-in-progress: true
     steps:
       - name: Checkout
