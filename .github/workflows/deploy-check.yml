@@ -55,30 +55,24 @@ jobs:
     outputs:
       changed_services: ${{ steps.changed-services.outputs.changed_services }}
 
-  deploy-service-build:
+  deploy-service:
     if: needs.detect-changed-services.outputs.changed_services != ''
     runs-on: ubuntu-24.04
     strategy:
       matrix:
         service: ${{ fromJSON(needs.detect-changed-services.outputs.changed_services) }}
     concurrency:
-      group: ${{ github.ref }}-${{ matrix.service }}-deploy-service-build
+      group: ${{ github.ref }}-${{ matrix.service }}-deploy-service
       cancel-in-progress: true
     needs: detect-changed-services
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-          java-version: ${{ env.JAVA_VERSION }}
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
-      - name: Set up secrets
-        run: |
-          set -Eeuo pipefail
-          bash tools/scripts/secrets.sh
+        uses: ./.github/actions/setup-gradle
+        with:
+          java-distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
       - name: Build service
         run: |
           set -Eeuo pipefail
@@ -105,46 +99,22 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
         with:
-          name: Build (${{ matrix.service }})
+          name: Deploy (${{ matrix.service }})
           path: |
             **/build
             **/secrets.properties
             ${{ matrix.service }}/infra
 
-  deploy-test:
+  unit-test:
     runs-on: ubuntu-24.04
     concurrency:
-      group: ${{ github.ref }}-deploy-test
+      group: ${{ github.ref }}-unit-test
       cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-          java-version: ${{ env.JAVA_VERSION }}
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
-      - name: Set up secrets
-        run: |
-          set -Eeuo pipefail 
-          bash tools/scripts/secrets.sh
       - name: Test
-        run: |
-          set -Eeuo pipefail 
-          ./gradlew --no-daemon --continue jsTest
-      - name: Generate test report
-        uses: mikepenz/action-junit-report@v4
-        if: always() # Ensure all test reports are collected, even after errors
+        uses: ./.github/actions/unit-test
         with:
-          report_paths: |
-            **/TEST-*.xml
-          check_name: deploy-test-results
-      - name: Artifacts
-        uses: actions/upload-artifact@v4
-        if: always() # Ensure all artifacts are collected, even after errors
-        with:
-          name: Tests
-          path: |
-            **/TEST-*.xml
+          java-distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
