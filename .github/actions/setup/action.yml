@@ -16,6 +16,7 @@ runs:
     - name: Set up Gradle
       uses: gradle/actions/setup-gradle@v3 # By default, cache is only saved on the 'master' branch
     - name: Set up secrets
+      shell: bash
       run: |
         set -Eeuo pipefail 
         bash tools/scripts/secrets.sh
