@@ -5,7 +5,6 @@ on:
     branches: [ master ]
 
 env:
-  PULUMI_VERSION: "3.136.1"
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
   GCP_SA_KEY_APP: ${{ secrets.GCP_SA_KEY_APP }}
   SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
@@ -59,15 +58,10 @@ jobs:
             echo "Skipping step as required file doesn't exist"
           fi
       - name: Preview infrastructure
-        uses: pulumi/actions@v5
+        uses: ./.github/actions/infra
         with:
           command: preview
-          stack-name: prod
-          work-dir: ${{ matrix.service }}/infra
-          edit-pr-comment: false
-          pulumi-version: ${{ env.PULUMI_VERSION }}
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          service: ${{ matrix.service }}
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
