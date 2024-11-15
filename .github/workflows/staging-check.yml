@@ -62,6 +62,7 @@ jobs:
         with:
           command: preview
           service: ${{ matrix.service }}
+          access-token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors

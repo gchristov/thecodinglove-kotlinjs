@@ -51,8 +51,9 @@ jobs:
       - name: Deploy infrastructure
         uses: ./.github/actions/infra
         with:
-          command: preview
+          command: up
           service: ${{ matrix.service }}
+          access-token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
