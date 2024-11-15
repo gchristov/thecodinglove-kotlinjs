@@ -1,6 +1,7 @@
 name: 'detect-changed-services'
 outputs:
-  changed_services: ${{ steps.changed-services.outputs.changed_services }}
+  changed_services:
+    value: ${{ steps.changed-services.outputs.changed_services }}
 runs:
   using: "composite"
   steps:
