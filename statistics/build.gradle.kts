@@ -5,7 +5,7 @@ allprojects {
 }
 
 val taskNames = listOf("clean", "assemble", "jsTest", "kotlinUpgradeYarnLock")
-taskNames.forEach {  taskName ->
+taskNames.forEach { taskName ->
     tasks.register("${taskName}All") {
         tasks.findByName(taskName)?.let { dependsOn(it) }
         dependsOn(gradle.includedBuilds.map { it.task(":${taskName}All") })

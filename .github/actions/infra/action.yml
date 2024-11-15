@@ -1,0 +1,21 @@
+name: 'infra'
+inputs:
+  command:
+    required: true
+  service:
+    required: true
+  access-token:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Set up infrastructure
+      uses: pulumi/actions@v5
+      with:
+        command: ${{ inputs.command }}
+        stack-name: prod
+        work-dir: ${{ inputs.service }}/infra
+        edit-pr-comment: false
+        pulumi-version: "3.136.1"
+      env:
+        PULUMI_ACCESS_TOKEN: ${{ inputs.access-token }}

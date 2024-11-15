@@ -173,6 +173,9 @@ internal class RealSlackRepository(
             // A message might have been deleted by the time self destruct attempts to delete it,
             // so just assume it's already gone if Slack tells us it doesn't exist.
             slackResponse.error == "message_not_found" -> Either.Right(Unit)
+            // The app might not have permission to delete the message by the time self destruct 
+            // attempts to delete it, so just consume the error and leave the message there.
+            slackResponse.error == "cant_delete_message" -> Either.Right(Unit)
             else -> throw Exception(slackResponse.error)
         }
     } catch (error: Throwable) {

@@ -1,0 +1,35 @@
+name: 'detect-changed-services'
+outputs:
+  changed_services:
+    value: ${{ steps.changed-services.outputs.changed_services }}
+runs:
+  using: "composite"
+  steps:
+    - name: Collect all changed root directories
+      id: changed-root-directories
+      uses: tj-actions/changed-files@v45
+      with:
+        dir_names: true
+        dir_names_max_depth: '1'
+    - name: Collect all changed services
+      shell: bash
+      id: changed-services
+      env:
+        all_changed_files: ${{ steps.changed-root-directories.outputs.all_changed_files }}
+      run: |
+        set -Eeuo pipefail
+        
+        CHANGED_SERVICES=()
+        for file in ${all_changed_files}; do
+          if [ -e "$file/infra/Pulumi.yaml" ]; then
+            CHANGED_SERVICES+=("$file")
+          fi
+        done
+
+        if [ ${#CHANGED_SERVICES[@]} -eq 0 ]; then
+          echo "No services changed"
+        else
+          joined=$(printf ",\"%s\"" "${CHANGED_SERVICES[@]}")
+          echo "changed_services=[${joined:1}]"
+          echo "changed_services=[${joined:1}]" >> "$GITHUB_OUTPUT"
+        fi
