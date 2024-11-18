@@ -1,8 +1,8 @@
 name: nightly-check
 
 on:
-  pull_request:
-    branches: [ master ]
+  schedule:
+    - cron: '0 0 * * *'
 
 env:
   GCP_SA_KEY_INFRA: ${{ secrets.GCP_SA_KEY_INFRA }}
