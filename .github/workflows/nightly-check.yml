@@ -29,6 +29,12 @@ jobs:
         run: |
           set -Eeuo pipefail
           ./gradlew --no-daemon assemble
+      - name: Preview infrastructure
+        uses: ./.github/actions/infra
+        with:
+          command: preview
+          service: common
+          access-token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
         uses: actions/upload-artifact@v4
         if: always() # Ensure all artifacts are collected, even after errors
