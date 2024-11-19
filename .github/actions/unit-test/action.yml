@@ -8,7 +8,7 @@ runs:
       shell: bash
       run: |
         set -Eeuo pipefail 
-        ./gradlew --no-daemon --continue --no-parallel --max-workers=1 jsTest
+        ./gradlew --no-daemon --continue --max-workers=1 jsTest
     - name: Generate test report
       uses: mikepenz/action-junit-report@v4
       if: always() # Ensure all test reports are collected, even after errors
