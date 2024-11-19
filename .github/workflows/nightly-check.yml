@@ -28,7 +28,7 @@ jobs:
       - name: Build services
         run: |
           set -Eeuo pipefail
-          ./gradlew --no-daemon  assemble
+          ./gradlew --no-daemon assemble
       - name: Preview infrastructure
         uses: ./.github/actions/infra
         with:

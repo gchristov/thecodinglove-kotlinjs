@@ -8,6 +8,8 @@ runs:
       shell: bash
       run: |
         set -Eeuo pipefail 
+        # A single worker is a workaround for the concurrent yarn instances that multi-workers brings,
+        # where the cache directory is being updated in parallel, causing conflicting changes.
         ./gradlew --no-daemon --continue --max-workers=1 jsTest
     - name: Generate test report
       uses: mikepenz/action-junit-report@v4

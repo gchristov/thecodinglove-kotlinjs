@@ -11,7 +11,7 @@ runs:
         set -Eeuo pipefail
         
         if [ -e "${{ inputs.service }}/gradlew" ]; then
-          # Need to explicitly cd into each service, otherwise we get yarn cache clashes
+          # Need to explicitly cd into each service, otherwise we get concurrent yarn cache clashes
           cd ${{ inputs.service }}
           ./gradlew --no-daemon assemble
           cd ..
