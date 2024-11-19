@@ -28,7 +28,10 @@ jobs:
       - name: Build services
         run: |
           set -Eeuo pipefail
-          ./gradlew --no-daemon assemble
+          # This Gradle task runs across all compisite build projects and because it's invoked from 
+          # the root it'll try to use concurrent yarn instances that all try to write to the same output
+          # folder. A single Gradle worker avoids this at the cost of a slower build but this is okay for now.
+          ./gradlew --no-daemon --max-workers=1 assemble
       - name: Preview infrastructure
         uses: ./.github/actions/infra
         with:
