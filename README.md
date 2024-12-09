@@ -105,6 +105,7 @@ GOOGLE_ANALYTICS_MEASUREMENT_ID=YOUR_ANALYTICS_MEASUREMENT_ID
 GOOGLE_ANALYTICS_API_SECRET=YOUR_ANALYTICS_API_SECRET
 ```
 7. Copy the `credentials-gcp-app.json` Service Account JSON API key to the root project folder.
+8. Make sure you select the right Java version. If you don't have it installed locally, use latest Azul Zulu on Intellij
 </details>
 
 ## Run locally

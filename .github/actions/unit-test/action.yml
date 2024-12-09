@@ -8,8 +8,8 @@ runs:
       shell: bash
       run: |
         set -Eeuo pipefail 
-        # This Gradle task runs across all compisite build projects and because it's invoked from 
-        # the root it'll try to use concurrent yarn instances that all try to write to the same output
+        # This Gradle task runs across all composite build projects and because it's invoked from 
+        # the root it'll try to use concurrent yarn instances that all try to write to the same cache
         # folder. A single Gradle worker avoids this at the cost of a slower build but this is okay for now.
         ./gradlew --no-daemon --continue --max-workers=1 jsTest
     - name: Generate test report
