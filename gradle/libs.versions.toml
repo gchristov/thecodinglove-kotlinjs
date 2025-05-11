@@ -1,0 +1,21 @@
+[versions]
+buildKonfig = "0.15.0"
+kotlin = "1.9.21"
+
+[libraries]
+buildKonfig = { module = "com.codingfeline.buildkonfig:buildkonfig-gradle-plugin", version.ref = "buildKonfig" }
+kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+
+# Dependencies of the included gradle-plugins
+kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+
+[plugins]
+
+# Plugins defined by this project
+// TODO: Figure out how to do the below for multi-project setup
+thecodinglove-base-node = { id = "base-node-plugin", version = "unspecified" }
+thecodinglove-base-browser = { id = "base-browser-plugin", version = "unspecified" }
+thecodinglove-node-module = { id = "node-module-plugin", version = "unspecified" }
+thecodinglove-build-config = { id = "build-config-plugin", version = "unspecified" }
+thecodinglove-browser-binary = { id = "browser-binary-plugin", version = "unspecified" }
+thecodinglove-node-binary = { id = "node-binary-plugin", version = "unspecified" }

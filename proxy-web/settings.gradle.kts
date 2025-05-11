@@ -8,9 +8,11 @@ plugins {
     id("com.gradle.develocity") version("3.18.1")
 }
 
-rootProject.name = "proxy-web"
-
-include("service")
+dependencyResolutionManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
 
 develocity {
     buildScan {
@@ -19,3 +21,7 @@ develocity {
         publishing.onlyIf { true }
     }
 }
+
+rootProject.name = "proxy-web"
+
+include("service")
