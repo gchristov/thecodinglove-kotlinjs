@@ -17,6 +17,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(npm(Deps.Google.firebaseAdmin.name, Deps.Google.firebaseAdmin.version))
+                implementation(npm(Deps.Google.firestore.name, Deps.Google.firestore.version))
             }
         }
     }

@@ -26,6 +26,7 @@ class Deps {
 
     object Google {
         val firebaseAdmin = NpmDependency("firebase-admin", "11.11.1")
+        val firestore = NpmDependency("@google-cloud/firestore", "6.8.0")
         val pubSub = NpmDependency("@google-cloud/pubsub", "4.0.7")
     }
 

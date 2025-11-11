@@ -12,7 +12,7 @@ kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 [plugins]
 
 # Plugins defined by this project
-// TODO: Figure out how to do the below for multi-project setup
+# TODO: Figure out how to do the below for multi-project setup
 thecodinglove-base-node = { id = "base-node-plugin", version = "unspecified" }
 thecodinglove-base-browser = { id = "base-browser-plugin", version = "unspecified" }
 thecodinglove-node-module = { id = "node-module-plugin", version = "unspecified" }
