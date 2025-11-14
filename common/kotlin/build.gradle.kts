@@ -11,15 +11,15 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(Deps.Kodein.di)
-                api(Deps.Kermit.logger)
-                api(Deps.Kotlin.coroutinesCore)
-                api(Deps.Kotlin.dateTime)
-                api(Deps.Kotlin.serialization)
-                api(Deps.Uuid.uuid)
-                api(Deps.Arrow.core)
-                api(Deps.Crypto.mac)
-                api(Deps.Crypto.encoding)
+                api(libs.kodein)
+                api(libs.touchlab.kermit)
+                api(libs.kotlinx.coroutines.core)
+                api(libs.kotlinx.datetime)
+                api(libs.kotlinx.serialization.json)
+                api(libs.uuid)
+                api(libs.arrow.core)
+                api(libs.diglol.crypto)
+                api(libs.diglol.encoding)
             }
         }
     }

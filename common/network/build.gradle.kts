@@ -12,11 +12,11 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.kotlin)
-                api(Deps.Ktor.client)
-                implementation(Deps.Ktor.contentNegotiation)
-                implementation(Deps.Ktor.serialization)
-                implementation(Deps.Ktor.logging)
-                implementation(Deps.Ktor.logback)
+                api(libs.ktor.client.core)
+                implementation(libs.ktor.client.contentNegotiation)
+                implementation(libs.ktor.client.serializationJson)
+                implementation(libs.ktor.client.logging)
+                implementation(libs.logback)
             }
         }
         val jsMain by getting {

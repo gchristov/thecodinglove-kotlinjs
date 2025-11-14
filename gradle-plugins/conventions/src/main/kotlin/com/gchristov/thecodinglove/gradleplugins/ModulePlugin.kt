@@ -11,7 +11,7 @@ class NodeModulePlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.plugin.serialization")
             extensions.configure(KotlinMultiplatformExtension::class.java) {
                 sourceSets.maybeCreate("commonTest").dependencies {
-                    api(Deps.Kotlin.coroutinesTest)
+                    api(libs.findLibrary("kotlinx-coroutines-test").get())
                 }
             }
         }
