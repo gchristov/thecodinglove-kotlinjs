@@ -1,5 +1,5 @@
 plugins {
-    id("base-node-plugin")
+    alias(libs.plugins.thecodinglove.base.node)
 }
 
 group = "com.gchristov.thecodinglove.common"

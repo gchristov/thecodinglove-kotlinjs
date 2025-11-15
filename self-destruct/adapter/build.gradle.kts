@@ -1,5 +1,5 @@
 plugins {
-    id("node-module-plugin")
+    alias(libs.plugins.thecodinglove.node.module)
 }
 
 kotlin {

@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 class NodeBinaryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
-            plugins.apply("node-module-plugin")
+            plugins.apply(libs.findPlugin("thecodinglove-node-module").get().get().pluginId)
             extensions.configure(KotlinMultiplatformExtension::class.java) {
                 js(IR) {
                     binaries.library()
@@ -33,7 +33,7 @@ class NodeBinaryPlugin : Plugin<Project> {
 class BrowserBinaryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
-            plugins.apply("base-browser-plugin")
+            plugins.apply(libs.findPlugin("thecodinglove-base-browser").get().get().pluginId)
             extensions.configure(KotlinMultiplatformExtension::class.java) {
                 js(IR) {
                     binaries.executable()

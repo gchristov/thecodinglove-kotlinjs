@@ -1,5 +1,5 @@
 plugins {
-    id("node-binary-plugin")
+    alias(libs.plugins.thecodinglove.node.binary)
 }
 
 kotlin {
