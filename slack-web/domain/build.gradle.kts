@@ -1,4 +1,3 @@
-import com.gchristov.thecodinglove.gradleplugins.Deps
 import com.gchristov.thecodinglove.gradleplugins.envSecret
 
 val packageId = "com.gchristov.thecodinglove.slackweb.domain"
@@ -12,7 +11,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(Deps.Common.kotlin)
+                implementation(libs.common.kotlin)
             }
         }
     }

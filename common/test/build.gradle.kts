@@ -1,5 +1,3 @@
-import com.gchristov.thecodinglove.gradleplugins.Deps
-
 plugins {
     id("base-node-plugin")
 }

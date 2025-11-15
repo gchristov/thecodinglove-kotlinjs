@@ -47,6 +47,18 @@ npm-google-pubsub = { group = "npm", name = "@google-cloud/pubsub", version.ref 
 # Dependencies of the included gradle-plugins
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
+# Dependency notations for internal libraries
+common-analytics = { group = "com.gchristov.thecodinglove.common", name = "analytics" }
+common-analytics-testFixtures = { group = "com.gchristov.thecodinglove.common", name = "analytics-testfixtures" }
+common-firebase = { group = "com.gchristov.thecodinglove.common", name = "firebase" }
+common-kotlin = { group = "com.gchristov.thecodinglove.common", name = "kotlin" }
+common-monitoring = { group = "com.gchristov.thecodinglove.common", name = "monitoring" }
+common-network = { group = "com.gchristov.thecodinglove.common", name = "network" }
+common-network-testFixtures = { group = "com.gchristov.thecodinglove.common", name = "network-testfixtures" }
+common-pubsub = { group = "com.gchristov.thecodinglove.common", name = "pubsub" }
+common-pubsub-testFixtures = { group = "com.gchristov.thecodinglove.common", name = "pubsub-testfixtures" }
+common-test = { group = "com.gchristov.thecodinglove.common", name = "test" }
+
 [plugins]
 
 # Plugins defined by this project
