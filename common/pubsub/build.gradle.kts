@@ -17,7 +17,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation(npm(Deps.Google.pubSub.name, Deps.Google.pubSub.version))
+                implementation(npm(libs.npm.google.pubsub.get().name, libs.npm.google.pubsub.get().version!!))
             }
         }
     }

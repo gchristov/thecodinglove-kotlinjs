@@ -21,7 +21,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation(npm(Deps.Node.express.name, Deps.Node.express.version))
+                implementation(npm(libs.npm.express.get().name, libs.npm.express.get().version!!))
             }
         }
     }

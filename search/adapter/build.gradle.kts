@@ -27,7 +27,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation(npm(Deps.Node.htmlParser.name, Deps.Node.htmlParser.version))
+                implementation(npm(libs.npm.htmlParser.get().name, libs.npm.htmlParser.get().version!!))
             }
         }
     }
