@@ -19,8 +19,6 @@ npm-google-firestore = "6.8.0"
 npm-google-pubsub = "4.0.7"
 
 [libraries]
-buildKonfig = { module = "com.codingfeline.buildkonfig:buildkonfig-gradle-plugin", version.ref = "buildKonfig" }
-kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 #noinspection UnusedVersionCatalogEntry
@@ -44,8 +42,10 @@ npm-firebase-admin = { group = "npm", name = "firebase-admin", version.ref = "np
 npm-google-firestore = { group = "npm", name = "@google-cloud/firestore", version.ref = "npm-google-firestore" }
 npm-google-pubsub = { group = "npm", name = "@google-cloud/pubsub", version.ref = "npm-google-pubsub" }
 
-# Dependencies of the included gradle-plugins
+# Plugin dependencies included in the pre-compiled gradle-plugins/conventions project
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-serialization-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+buildKonfig-gradlePlugin = { module = "com.codingfeline.buildkonfig:buildkonfig-gradle-plugin", version.ref = "buildKonfig" }
 
 # Dependency notations for internal libraries
 common-analytics = { group = "com.gchristov.thecodinglove.common", name = "analytics" }

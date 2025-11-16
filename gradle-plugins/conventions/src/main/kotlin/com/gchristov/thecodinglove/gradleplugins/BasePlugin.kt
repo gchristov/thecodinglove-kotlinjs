@@ -2,12 +2,9 @@ package com.gchristov.thecodinglove.gradleplugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.Directory
 import org.gradle.kotlin.dsl.assign
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalDistributionDsl
-import java.io.FileInputStream
-import java.util.*
 
 abstract class BaseMultiplatformPlugin : Plugin<Project> {
     override fun apply(target: Project) {

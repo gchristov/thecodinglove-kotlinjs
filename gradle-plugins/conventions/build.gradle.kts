@@ -31,8 +31,7 @@ gradlePlugin {
 
 dependencies {
     compileOnly(libs.kotlin.gradlePlugin)
-    // TODO: Setup in a different way, figure out why it doesn't work
-    implementation(libs.kotlin.serialization)
-    // TODO: Setup in a different way, figure out why it doesn't work
-    implementation(libs.buildKonfig)
+    // Allows these to be available and applied in the pre-compiled conventions plugin
+    implementation(libs.kotlin.serialization.gradlePlugin)
+    implementation(libs.buildKonfig.gradlePlugin)
 }
