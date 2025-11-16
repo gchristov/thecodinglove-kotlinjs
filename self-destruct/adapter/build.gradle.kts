@@ -1,15 +1,13 @@
-import com.gchristov.thecodinglove.gradleplugins.Deps
-
 plugins {
-    id("node-module-plugin")
+    alias(libs.plugins.thecodinglove.node.module)
 }
 
 kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(Deps.Common.kotlin)
-                implementation(Deps.Common.network)
+                implementation(libs.common.kotlin)
+                implementation(libs.common.network)
                 implementation(projects.domain)
             }
         }

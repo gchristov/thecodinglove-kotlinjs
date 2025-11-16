@@ -1,33 +1,31 @@
-import com.gchristov.thecodinglove.gradleplugins.Deps
-
 plugins {
-    id("node-module-plugin")
+    alias(libs.plugins.thecodinglove.node.module)
 }
 
 kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(Deps.Common.analytics)
-                implementation(Deps.Common.kotlin)
-                implementation(Deps.Common.network)
-                implementation(Deps.Common.pubsub)
-                implementation(Deps.Common.firebase)
+                implementation(libs.common.analytics)
+                implementation(libs.common.kotlin)
+                implementation(libs.common.network)
+                implementation(libs.common.pubsub)
+                implementation(libs.common.firebase)
                 implementation(projects.domain)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation(Deps.Common.test)
-                implementation(Deps.Common.analyticsTestFixtures)
-                implementation(Deps.Common.networkTestFixtures)
-                implementation(Deps.Common.pubsubTestFixtures)
+                implementation(libs.common.test)
+                implementation(libs.common.analytics.testFixtures)
+                implementation(libs.common.network.testFixtures)
+                implementation(libs.common.pubsub.testFixtures)
                 implementation(projects.testFixtures)
             }
         }
         val jsMain by getting {
             dependencies {
-                implementation(npm(Deps.Node.htmlParser.name, Deps.Node.htmlParser.version))
+                implementation(npm(libs.npm.htmlParser.get().name, libs.npm.htmlParser.get().version!!))
             }
         }
     }

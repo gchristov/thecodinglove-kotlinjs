@@ -1,18 +1,17 @@
-import com.gchristov.thecodinglove.gradleplugins.Deps
 import com.gchristov.thecodinglove.gradleplugins.envSecret
 
 val packageId = "com.gchristov.thecodinglove.slackweb.domain"
 
 plugins {
-    id("node-module-plugin")
-    id("build-config-plugin")
+    alias(libs.plugins.thecodinglove.node.module)
+    alias(libs.plugins.thecodinglove.build.config)
 }
 
 kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(Deps.Common.kotlin)
+                implementation(libs.common.kotlin)
             }
         }
     }

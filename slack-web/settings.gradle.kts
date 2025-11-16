@@ -8,12 +8,16 @@ plugins {
     id("com.gradle.develocity") version("3.18.1")
 }
 
-rootProject.name = "slack-web"
-
-includeBuild("../common")
-include("adapter")
-include("domain")
-include("service")
+dependencyResolutionManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+    versionCatalogs {
+        create("libs") {
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
+}
 
 develocity {
     buildScan {
@@ -22,3 +26,10 @@ develocity {
         publishing.onlyIf { true }
     }
 }
+
+rootProject.name = "slack-web"
+
+includeBuild("../common")
+include("adapter")
+include("domain")
+include("service")

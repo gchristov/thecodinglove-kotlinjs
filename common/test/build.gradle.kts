@@ -1,7 +1,5 @@
-import com.gchristov.thecodinglove.gradleplugins.Deps
-
 plugins {
-    id("base-node-plugin")
+    alias(libs.plugins.thecodinglove.base.node)
 }
 
 group = "com.gchristov.thecodinglove.common"
@@ -11,9 +9,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(Deps.Kermit.logger)
-                implementation(Deps.Kotlin.coroutinesCore)
-                api(Deps.Kotlin.test)
+                implementation(libs.touchlab.kermit)
+                implementation(libs.kotlinx.coroutines.core)
+                api(libs.kotlin.test)
             }
         }
     }
