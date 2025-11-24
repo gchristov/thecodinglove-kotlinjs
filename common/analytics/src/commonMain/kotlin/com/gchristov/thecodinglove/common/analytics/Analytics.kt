@@ -28,15 +28,12 @@ internal class RealAnalytics(
         params: Map<String, String>?,
     ) {
         launch(dispatcher) {
-            val google = async {
+            either {
                 sendToGoogle(
                     clientId = clientId,
                     name = name,
                     params = params,
-                )
-            }
-            either {
-                google.await().bind()
+                ).bind()
             }.fold(
                 ifLeft = {
                     it.printStackTrace()

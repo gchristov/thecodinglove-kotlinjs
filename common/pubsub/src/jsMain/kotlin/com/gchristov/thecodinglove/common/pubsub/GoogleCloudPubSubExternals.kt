@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.gchristov.thecodinglove.common.pubsub
 
 import com.gchristov.thecodinglove.common.kotlin.Buffer

@@ -32,7 +32,7 @@ class RealSearchWithHistoryUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "query=$TestSearchQuery")),
+                expected = Either.Right(SearchWithHistoryUseCase.Result.Empty),
                 actual = actualResult
             )
         }
@@ -54,7 +54,7 @@ class RealSearchWithHistoryUseCaseTest {
                 )
             )
             assertEquals(
-                expected = Either.Left(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "query=$TestSearchQuery")),
+                expected = Either.Right(SearchWithHistoryUseCase.Result.Empty),
                 actual = actualResult,
             )
         }
@@ -77,7 +77,7 @@ class RealSearchWithHistoryUseCaseTest {
             )
             assertEquals(
                 expected = Either.Right(
-                    SearchWithHistoryUseCase.Result(
+                    SearchWithHistoryUseCase.Result.Data(
                         query = TestSearchQuery,
                         totalPosts = 1,
                         post = pages[1]!!.first(),
@@ -107,12 +107,12 @@ class RealSearchWithHistoryUseCaseTest {
             val maxPostIndexOnPage = 3
 
             for (i in 0 until totalPosts) {
-                val actualResult = (it.invoke(
+                val actualResult = it.invoke(
                     SearchWithHistoryUseCase.Dto(
                         query = TestSearchQuery,
                         searchHistory = searchHistory,
                     )
-                ) as Either.Right).value
+                ).getOrNull() as SearchWithHistoryUseCase.Result.Data
                 // Ensure post isn't already picked
                 assertFalse {
                     searchHistory.contains(
@@ -144,12 +144,12 @@ class RealSearchWithHistoryUseCaseTest {
             val searchHistory = mutableMapOf<Int, List<Int>>()
 
             for (i in 0 until totalPosts) {
-                val actualResult = (it.invoke(
+                val actualResult = it.invoke(
                     SearchWithHistoryUseCase.Dto(
                         query = TestSearchQuery,
                         searchHistory = searchHistory,
                     )
-                ) as Either.Right).value
+                ).getOrNull() as SearchWithHistoryUseCase.Result.Data
                 searchHistory.insert(
                     postPage = actualResult.postPage,
                     postIndexOnPage = actualResult.postIndexOnPage,
@@ -173,7 +173,7 @@ class RealSearchWithHistoryUseCaseTest {
                     searchHistory = searchHistory,
                 )
             )
-            assertTrue { actualResult == Either.Left(SearchWithHistoryUseCase.Error.Exhausted(additionalInfo = "query=$TestSearchQuery")) }
+            assertTrue { actualResult == Either.Right(SearchWithHistoryUseCase.Result.Exhausted) }
         }
     }
 

@@ -9,7 +9,7 @@ internal fun Random.nextRandomPage(
     totalResults: Int,
     resultsPerPage: Int,
     exclusions: List<Int>
-): Either<RangeError, Int> {
+): RandomResult {
     val min = 1
     val max = max(
         a = min,
@@ -25,14 +25,14 @@ internal fun Random.nextRandomPage(
 internal fun Random.nextRandomPostIndex(
     posts: List<SearchPost>,
     exclusions: List<Int>
-): Either<RangeError, Int> {
+): RandomResult {
     val min = 0
     val max = max(
         a = min,
         b = posts.size
     )
     if (max == 0) {
-        return Either.Left(RangeError.Empty)
+        return RandomResult.Empty
     }
     return nextRandomIntInRange(
         start = min,
@@ -51,24 +51,25 @@ private fun Random.nextRandomIntInRange(
     start: Int,
     end: Int,
     exclusions: List<Int>
-): Either<RangeError, Int> {
+): RandomResult {
     // Make sure the numbers are sorted
     val sorted = exclusions.sorted()
     val rangeLength = end - start - sorted.size
     if (rangeLength <= 0) {
-        return Either.Left(RangeError.Exhausted)
+        return RandomResult.Exhausted
     }
     var randomInt: Int = nextInt(rangeLength) + start
     for (item in sorted) {
         if (item > randomInt) {
-            return Either.Right(randomInt)
+            return RandomResult.Data(randomInt)
         }
         randomInt++
     }
-    return Either.Right(randomInt)
+    return RandomResult.Data(randomInt)
 }
 
-internal sealed class RangeError : Throwable() {
-    object Empty : RangeError()
-    object Exhausted : RangeError()
+internal sealed class RandomResult {
+    object Empty : RandomResult()
+    object Exhausted : RandomResult()
+    data class Data(val result: Int) : RandomResult()
 }

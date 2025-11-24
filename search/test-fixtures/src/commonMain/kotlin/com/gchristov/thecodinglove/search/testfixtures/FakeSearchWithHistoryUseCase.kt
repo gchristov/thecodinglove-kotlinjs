@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 
 class FakeSearchWithHistoryUseCase(
     // Each result is passed as a response to the relevant invocation attempt
-    var invocationResults: List<Either<SearchWithHistoryUseCase.Error, SearchWithHistoryUseCase.Result>>
+    var invocationResults: List<Either<Throwable, SearchWithHistoryUseCase.Result>>
 ) : SearchWithHistoryUseCase {
     private val searchResponse: FakeResponse = FakeResponse.CompletesNormally
 
@@ -16,7 +16,7 @@ class FakeSearchWithHistoryUseCase(
 
     override suspend fun invoke(
         dto: SearchWithHistoryUseCase.Dto
-    ): Either<SearchWithHistoryUseCase.Error, SearchWithHistoryUseCase.Result> =
+    ): Either<Throwable, SearchWithHistoryUseCase.Result> =
         searchResponse.execute(invocationResults[invocations++])
 
     fun assertNotInvoked() {

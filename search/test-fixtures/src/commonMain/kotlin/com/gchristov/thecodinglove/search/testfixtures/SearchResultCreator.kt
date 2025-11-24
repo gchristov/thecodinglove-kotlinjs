@@ -6,7 +6,7 @@ object SearchResultCreator {
     fun validResult(
         searchSessionId: String,
         query: String
-    ) = SearchUseCase.Result(
+    ) = SearchUseCase.Result.Data(
         searchSessionId = searchSessionId,
         query = query,
         post = SearchPostCreator.defaultPost(),

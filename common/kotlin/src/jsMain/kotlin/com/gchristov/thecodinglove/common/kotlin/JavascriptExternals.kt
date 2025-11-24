@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.gchristov.thecodinglove.common.kotlin
 
 fun requireModule(module: String) = require(module)

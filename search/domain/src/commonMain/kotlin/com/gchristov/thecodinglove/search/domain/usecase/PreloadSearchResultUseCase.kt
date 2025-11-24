@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.search.domain.usecase
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.error
 import com.gchristov.thecodinglove.search.domain.model.SearchSession
@@ -27,45 +27,37 @@ internal class RealPreloadSearchResultUseCase(
     override suspend operator fun invoke(
         dto: PreloadSearchResultUseCase.Dto
     ): Either<Throwable, Unit> = withContext(dispatcher) {
-        searchRepository
-            .getSearchSession(dto.searchSessionId)
-            .flatMap { searchSession ->
-                searchWithHistoryUseCase(
-                    SearchWithHistoryUseCase.Dto(
-                        query = searchSession.query,
-                        totalPosts = searchSession.totalPosts,
-                        searchHistory = searchSession.searchHistory,
-                    )
-                ).fold(
-                    ifLeft = { searchError ->
-                        when (searchError) {
-                            is SearchWithHistoryUseCase.Error.Exhausted -> {
-                                // Only clear the preloaded post and let session search deal with
-                                // updating the history
-                                searchSession
-                                    .clearPreloadedPost(searchRepository)
-                                    .flatMap {
-                                        log.error(tag, searchError) { "Search exhausted" }
-                                        Either.Right(Unit)
-                                    }
-                            }
+        either {
+            val searchSession = searchRepository.getSearchSession(dto.searchSessionId).bind()
 
-                            is SearchWithHistoryUseCase.Error.Empty -> Either.Left(searchError)
-                        }
-                    },
-                    ifRight = { searchResult ->
-                        searchSession.insertPreloadedPost(
-                            searchResult = searchResult,
-                            searchRepository = searchRepository
-                        )
-                    }
+            val searchRes = searchWithHistoryUseCase(
+                SearchWithHistoryUseCase.Dto(
+                    query = searchSession.query,
+                    totalPosts = searchSession.totalPosts,
+                    searchHistory = searchSession.searchHistory,
                 )
+            ).bind()
+
+            return@either when (searchRes) {
+                is SearchWithHistoryUseCase.Result.Empty -> Unit
+                is SearchWithHistoryUseCase.Result.Exhausted -> {
+                    // Only clear the preloaded post and let session search deal with updating the history
+                    searchSession.clearPreloadedPost(searchRepository).bind()
+                    // Temporary track the error
+                    log.error(tag, Throwable()) { "Search exhausted" }
+                }
+
+                is SearchWithHistoryUseCase.Result.Data -> searchSession.insertPreloadedPost(
+                    searchResult = searchRes,
+                    searchRepository = searchRepository
+                ).bind()
             }
+        }
     }
 }
 
 private suspend fun SearchSession.insertPreloadedPost(
-    searchResult: SearchWithHistoryUseCase.Result,
+    searchResult: SearchWithHistoryUseCase.Result.Data,
     searchRepository: SearchRepository
 ): Either<Throwable, Unit> {
     val updatedSearchSession = copy(

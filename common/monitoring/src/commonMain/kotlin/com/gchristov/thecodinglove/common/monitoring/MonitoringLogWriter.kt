@@ -39,15 +39,11 @@ internal class RealMonitoringLogWriter(
         message: String,
         throwable: Throwable?,
     ) = launch(dispatcher) {
-        val stacktrace = throwable?.stackTraceToString() ?: "Missing stacktrace"
-        val slack = async {
+        either {
             reportToSlack(
                 message = message,
-                stacktrace = stacktrace,
-            )
-        }
-        either {
-            slack.await().bind()
+                stacktrace = throwable?.stackTraceToString() ?: "Missing stacktrace",
+            ).bind()
         }.fold(
             ifLeft = {
                 // The logger has already attempted to post to Slack but has failed, so just log the error locally.
