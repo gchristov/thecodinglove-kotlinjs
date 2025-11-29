@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.http
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
@@ -29,12 +29,11 @@ class SearchSessionPostHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = searchRepository
-        .getSearchSession(requireNotNull(request.query["searchSessionId"]))
-        .flatMap { searchSession ->
-            response.sendJson(
-                data = searchSession.toSearchSessionPost(),
-                jsonSerializer = jsonSerializer,
-            )
-        }
+    ): Either<Throwable, Unit> = either {
+        val searchSession = searchRepository.getSearchSession(requireNotNull(request.query["searchSessionId"])).bind()
+        response.sendJson(
+            data = searchSession.toSearchSessionPost(),
+            jsonSerializer = jsonSerializer,
+        ).bind()
+    }
 }

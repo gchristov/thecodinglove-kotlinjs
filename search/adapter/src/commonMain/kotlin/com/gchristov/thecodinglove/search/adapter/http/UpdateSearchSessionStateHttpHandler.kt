@@ -1,15 +1,13 @@
 package com.gchristov.thecodinglove.search.adapter.http
 
 import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.left
-import arrow.core.right
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
 import com.gchristov.thecodinglove.search.adapter.http.mapper.toState
-import com.gchristov.thecodinglove.search.domain.port.SearchRepository
 import com.gchristov.thecodinglove.search.adapter.http.model.ApiUpdateSearchSessionState
+import com.gchristov.thecodinglove.search.domain.port.SearchRepository
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -32,17 +30,20 @@ class UpdateSearchSessionStateHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = request.decodeBodyFromJson(
-        jsonSerializer = jsonSerializer,
-        strategy = ApiUpdateSearchSessionState.serializer(),
-    )
-        .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
-        .flatMap { sessionUpdate ->
-            searchRepository
-                .getSearchSession(sessionUpdate.searchSessionId)
-                .flatMap {
-                    searchRepository.saveSearchSession(it.copy(state = sessionUpdate.state.toState()))
-                }
+    ): Either<Throwable, Unit> = either {
+        val body = request.decodeBodyFromJson(
+            jsonSerializer = jsonSerializer,
+            strategy = ApiUpdateSearchSessionState.serializer(),
+        ).bind()
+        if (body == null) {
+            raise(Exception("Request body is invalid"))
         }
-        .flatMap { response.sendEmpty() }
+
+        val searchSession = searchRepository.getSearchSession(body.searchSessionId).bind()
+
+        val updatedSearchSession = searchSession.copy(state = body.state.toState())
+        searchRepository.saveSearchSession(updatedSearchSession).bind()
+
+        response.sendEmpty().bind()
+    }
 }

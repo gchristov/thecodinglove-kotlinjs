@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.gchristov.thecodinglove.common.firebase
 
 import kotlin.js.Json

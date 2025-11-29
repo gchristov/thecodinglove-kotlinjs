@@ -24,7 +24,7 @@ class SearchHttpHandlerTest {
     fun httpConfig(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
-        searchInvocationResult = Either.Left(SearchUseCase.Error.Empty())
+        searchInvocationResult = Either.Right(SearchUseCase.Result.Empty)
     ) { handler, _, _, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Get, config.method)
@@ -126,7 +126,7 @@ class SearchHttpHandlerTest {
     fun handleRequestErrorSearches(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
-        searchInvocationResult = Either.Left(SearchUseCase.Error.Empty(additionalInfo = "test"))
+        searchInvocationResult = Either.Right(SearchUseCase.Result.Empty)
     ) { handler, _, searchUseCase, request, response ->
         handler.handleHttpRequest(
             request = request,
@@ -139,7 +139,7 @@ class SearchHttpHandlerTest {
     fun handleRequestErrorDoesNotPreload(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
-        searchInvocationResult = Either.Left(SearchUseCase.Error.Empty(additionalInfo = "test"))
+        searchInvocationResult = Either.Right(SearchUseCase.Result.Empty)
     ) { handler, pubSub, _, request, response ->
         handler.handleHttpRequest(
             request = request,
@@ -152,7 +152,7 @@ class SearchHttpHandlerTest {
     fun handleRequestEmptyErrorResponds(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
-        searchInvocationResult = Either.Left(SearchUseCase.Error.Empty(additionalInfo = "test"))
+        searchInvocationResult = Either.Right(SearchUseCase.Result.Empty)
     ) { handler, _, _, request, response ->
         handler.handleHttpRequest(
             request = request,
@@ -169,31 +169,10 @@ class SearchHttpHandlerTest {
         )
     }
 
-    @Test
-    fun handleRequestSessionNotFoundErrorResponds(): TestResult = runBlockingTest(
-        searchSessionId = TestSearchSessionId,
-        searchQuery = TestSearchQuery,
-        searchInvocationResult = Either.Left(SearchUseCase.Error.SessionNotFound(additionalInfo = "test"))
-    ) { handler, _, _, request, response ->
-        handler.handleHttpRequest(
-            request = request,
-            response = response
-        )
-        response.assertEquals(
-            header = "Content-Type",
-            headerValue = ContentType.Application.Json.toString(),
-            data = """
-                {"errorMessage":"Session not found: test"}
-            """.trimIndent(),
-            status = 400,
-            filePath = null,
-        )
-    }
-
     private fun runBlockingTest(
         searchSessionId: String? = TestSearchSessionId,
         searchQuery: String? = TestSearchQuery,
-        searchInvocationResult: Either<SearchUseCase.Error, SearchUseCase.Result>,
+        searchInvocationResult: Either<Throwable, SearchUseCase.Result>,
         testBlock: suspend (SearchHttpHandler, FakePubSubPublisher, FakeSearchUseCase, FakeSearchHttpRequest, FakeHttpResponse) -> Unit
     ): TestResult = runTest {
         val pubSubPublisher = FakePubSubPublisher()

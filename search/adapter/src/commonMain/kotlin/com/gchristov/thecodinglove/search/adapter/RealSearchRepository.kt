@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove.search.adapter
 
 import arrow.core.Either
-import arrow.core.flatMap
 import arrow.core.raise.either
 import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
@@ -31,7 +30,8 @@ internal class RealSearchRepository(
         ).bodyAsText()
         parseHtmlTotalPostsUseCase(ParseHtmlTotalPostsUseCase.Dto(responseHtml))
     } catch (error: Throwable) {
-        Either.Left(Throwable(
+        Either.Left(
+            Throwable(
             message = "Error during finding total posts${error.message?.let { ": $it" } ?: ""}",
             cause = error,
         ))
@@ -47,71 +47,70 @@ internal class RealSearchRepository(
         ).bodyAsText()
         parseHtmlPostsUseCase(ParseHtmlPostsUseCase.Dto(responseHtml)).map { posts -> posts.map { it.toPost() } }
     } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during search${error.message?.let { ": $it" } ?: ""}",
+        Either.Left(
+            Throwable(
+                message = "Error during search${error.message?.let { ": $it" } ?: ""}",
             cause = error,
         ))
     }
 
-    override suspend fun getSearchSession(id: String): Either<Throwable, SearchSession> = firebaseAdmin
-        .firestore()
-        .collection(SearchSessionCollection)
-        .document(id)
-        .get()
-        .flatMap { document ->
-            if (document.exists) {
-                document.decodeDataFromJson(
-                    jsonSerializer = jsonSerializer,
-                    strategy = DbSearchSession.serializer(),
-                ).flatMap { dbSearchSession ->
-                    dbSearchSession?.let {
-                        Either.Right(it.toSearchSession())
-                    } ?: Either.Left(Throwable("Search session not found: searchSessionId=$id"))
-                }
-            } else {
-                Either.Left(Throwable("Search session not found: searchSessionId=$id"))
-            }
+    override suspend fun getSearchSession(id: String): Either<Throwable, SearchSession> = either {
+        val document = firebaseAdmin.firestore()
+            .collection(SearchSessionCollection)
+            .document(id)
+            .get().bind()
+        if (!document.exists) {
+            raise(Throwable("Search session not found: searchSessionId=$id"))
         }
 
-    override suspend fun saveSearchSession(searchSession: SearchSession): Either<Throwable, Unit> = firebaseAdmin
-        .firestore()
-        .collection(SearchSessionCollection)
-        .document(searchSession.id)
-        .set(
+        val dbSearchSession = document.decodeDataFromJson(
             jsonSerializer = jsonSerializer,
             strategy = DbSearchSession.serializer(),
-            data = searchSession.toSearchSession(),
-            merge = true,
-        )
-        .mapLeft { Throwable("Search session not found: searchSessionId=${searchSession.id}") }
+        ).bind()
+        if (dbSearchSession == null) {
+            raise(Throwable("Could not parse session: searchSessionId=$id"))
+        }
 
-    override suspend fun deleteSearchSession(id: String): Either<Throwable, Unit> = firebaseAdmin
-        .firestore()
+        dbSearchSession.toSearchSession()
+    }
+
+    override suspend fun saveSearchSession(searchSession: SearchSession): Either<Throwable, Unit> =
+        firebaseAdmin.firestore()
+            .collection(SearchSessionCollection)
+            .document(searchSession.id)
+            .set(
+                jsonSerializer = jsonSerializer,
+                strategy = DbSearchSession.serializer(),
+                data = searchSession.toSearchSession(),
+                merge = true,
+            )
+            .mapLeft { Throwable("Could not save search session: searchSessionId=${searchSession.id}") }
+
+    override suspend fun deleteSearchSession(id: String): Either<Throwable, Unit> = firebaseAdmin.firestore()
         .collection(SearchSessionCollection)
         .document(id)
         .delete()
 
     override suspend fun findSearchSessions(
         state: SearchSession.State
-    ): Either<Throwable, List<SearchSession>> = firebaseAdmin
-        .firestore()
-        .collection(SearchSessionCollection)
-        .where("state.type", "==", state.type)
-        .get()
-        .flatMap {
-            it.docs
-                .map { document ->
-                    document.decodeDataFromJson(
-                        jsonSerializer = jsonSerializer,
-                        strategy = DbSearchSession.serializer(),
-                    ).flatMap { dbSearchSession ->
-                        dbSearchSession?.let {
-                            Either.Right(it.toSearchSession())
-                        } ?: Either.Left(Throwable("Could not decode search session"))
-                    }
-                }
-                .let { l -> either { l.bindAll() } }
+    ): Either<Throwable, List<SearchSession>> = either {
+        val searchRes = firebaseAdmin.firestore()
+            .collection(SearchSessionCollection)
+            .where("state.type", "==", state.type)
+            .get().bind()
+
+        searchRes.docs.map { document ->
+            val dbSearchSession = document.decodeDataFromJson(
+                jsonSerializer = jsonSerializer,
+                strategy = DbSearchSession.serializer(),
+            ).bind()
+            if (dbSearchSession == null) {
+                raise(Throwable("Could not decode search session result"))
+            }
+
+            dbSearchSession.toSearchSession()
         }
+    }
 }
 
 private const val SearchSessionCollection = "search_session"

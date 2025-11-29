@@ -44,7 +44,7 @@ class RealPreloadSearchResultUseCaseTest {
 
     @Test
     fun preloadWithEmptyResultReturnsEmpty(): TestResult {
-        val searchWithHistoryResult = Either.Left(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "test"))
+        val searchWithHistoryResult = Either.Right(SearchWithHistoryUseCase.Result.Empty)
         val searchSession = SearchSessionCreator.searchSession(
             id = TestSearchSessionId,
             query = TestSearchQuery
@@ -56,8 +56,9 @@ class RealPreloadSearchResultUseCaseTest {
         ) { useCase, searchRepository, searchWithHistoryUseCase ->
             val actualResult = useCase.invoke(PreloadSearchResultUseCase.Dto(searchSessionId = TestSearchSessionId))
             searchRepository.assertSessionFetched()
+            searchRepository.assertSessionNotSaved()
             searchWithHistoryUseCase.assertInvokedOnce()
-            assertTrue { actualResult.isLeft { it.message == "No results found: test" } }
+            assertTrue { actualResult.isRight() }
         }
     }
 
@@ -71,8 +72,8 @@ class RealPreloadSearchResultUseCaseTest {
         )
 
         return runBlockingTest(
-            singleSearchWithHistoryInvocationResult = Either.Left(
-                SearchWithHistoryUseCase.Error.Exhausted(additionalInfo = "test")
+            singleSearchWithHistoryInvocationResult = Either.Right(
+                SearchWithHistoryUseCase.Result.Exhausted
             ),
             searchSession = searchSession,
         ) { useCase, searchRepository, searchWithHistoryUseCase ->
@@ -130,7 +131,7 @@ class RealPreloadSearchResultUseCaseTest {
     }
 
     private fun runBlockingTest(
-        singleSearchWithHistoryInvocationResult: Either<SearchWithHistoryUseCase.Error, SearchWithHistoryUseCase.Result>? = null,
+        singleSearchWithHistoryInvocationResult: Either<Throwable, SearchWithHistoryUseCase.Result>? = null,
         searchSession: SearchSession?,
         testBlock: suspend (PreloadSearchResultUseCase, FakeSearchRepository, FakeSearchWithHistoryUseCase) -> Unit
     ): TestResult = runTest {

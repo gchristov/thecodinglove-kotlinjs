@@ -7,7 +7,7 @@ import com.gchristov.thecodinglove.search.domain.usecase.SearchUseCase
 import kotlin.test.assertEquals
 
 class FakeSearchUseCase(
-    var invocationResult: Either<SearchUseCase.Error, SearchUseCase.Result>
+    var invocationResult: Either<Throwable, SearchUseCase.Result>
 ) : SearchUseCase {
     private val searchResponse: FakeResponse = FakeResponse.CompletesNormally
     private var invocations = 0
@@ -15,7 +15,7 @@ class FakeSearchUseCase(
 
     override suspend fun invoke(
         dto: SearchUseCase.Dto
-    ): Either<SearchUseCase.Error, SearchUseCase.Result> {
+    ): Either<Throwable, SearchUseCase.Result> {
         lastType = dto.type
         invocations++
         return searchResponse.execute(invocationResult)

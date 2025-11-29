@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.http
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
@@ -28,7 +28,9 @@ class DeleteSearchSessionHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = searchRepository
-        .deleteSearchSession(requireNotNull(request.query["searchSessionId"]))
-        .flatMap { response.sendEmpty() }
+    ): Either<Throwable, Unit> = either {
+        val searchSessionId: String = requireNotNull(request.query["searchSessionId"])
+        searchRepository.deleteSearchSession(searchSessionId).bind()
+        response.sendEmpty().bind()
+    }
 }

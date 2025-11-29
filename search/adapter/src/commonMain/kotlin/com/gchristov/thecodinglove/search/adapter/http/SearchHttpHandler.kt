@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.http
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
@@ -9,9 +9,9 @@ import com.gchristov.thecodinglove.common.kotlin.error
 import com.gchristov.thecodinglove.common.network.http.*
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.http.mapper.toSearchResult
+import com.gchristov.thecodinglove.search.adapter.pubsub.model.PubSubPreloadSearchMessage
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.usecase.SearchUseCase
-import com.gchristov.thecodinglove.search.adapter.pubsub.model.PubSubPreloadSearchMessage
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -39,42 +39,36 @@ class SearchHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = searchUseCase(SearchUseCase.Dto(request.toSearchType()))
-        .fold(
-            ifLeft = {
-                when (it) {
-                    is SearchUseCase.Error.Empty -> {
-                        // Empty search results are expected so we respond with 200 and the relevant error type.
-                        log.error(tag, it) { "Error handling request" }
-                        response.sendJson(
-                            data = it.toSearchResult(),
-                            jsonSerializer = jsonSerializer,
-                        )
-                    }
+    ): Either<Throwable, Unit> = either {
+        val searchType = request.toSearchType()
+        val searchRes = searchUseCase(SearchUseCase.Dto(searchType)).bind()
 
-                    is SearchUseCase.Error.SessionNotFound -> Either.Left(it)
-                }
-            },
-            ifRight = { searchResult ->
-                analytics.sendEvent(
-                    clientId = searchResult.searchSessionId,
-                    name = "search",
-                    params = mapOf(
-                        "query" to searchResult.query,
-                        "total_posts" to searchResult.totalPosts.toString(),
-                    ),
-                )
-                publishSearchPreloadMessage(
-                    searchSessionId = searchResult.searchSessionId,
-                    searchConfig = searchConfig,
-                ).flatMap {
-                    response.sendJson(
-                        data = searchResult.toSearchResult(),
-                        jsonSerializer = jsonSerializer,
-                    )
-                }
-            }
-        )
+        if (searchRes is SearchUseCase.Result.Empty) {
+            // Temporary track the error to manually spot-check the logic works as expected.
+            log.error(tag, Throwable()) { "Error handling request" }
+        }
+
+        if (searchRes is SearchUseCase.Result.Data) {
+            analytics.sendEvent(
+                clientId = searchRes.searchSessionId,
+                name = "search",
+                params = mapOf(
+                    "query" to searchRes.query,
+                    "total_posts" to searchRes.totalPosts.toString(),
+                ),
+            )
+
+            publishSearchPreloadMessage(
+                searchSessionId = searchRes.searchSessionId,
+                searchConfig = searchConfig,
+            ).bind()
+        }
+
+        response.sendJson(
+            data = searchRes.toSearchResult(),
+            jsonSerializer = jsonSerializer,
+        ).bind()
+    }
 
     private suspend fun publishSearchPreloadMessage(
         searchSessionId: String,

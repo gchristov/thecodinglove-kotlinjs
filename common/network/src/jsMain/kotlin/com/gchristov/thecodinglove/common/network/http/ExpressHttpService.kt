@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove.common.network.http
 
 import arrow.core.Either
-import arrow.core.flatMap
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.__dirname
@@ -30,20 +29,14 @@ internal class ExpressHttpService(
             app.use(express.static(path.join(__dirname, it) as String))
         }
 
-        handlers
-            .map { handler ->
-                handler
-                    .initialise()
-                    .map {
-                        log.debug(handler::class.simpleName, "Attaching")
-                        handler.attach(app)
-                    }
+        either {
+            handlers.forEach { handler ->
+                handler.initialise().bind()
+                log.debug(handler::class.simpleName, "Attaching")
+                handler.attach(app)
             }
-            .let { l -> either { l.bindAll() } }
-            .flatMap {
-                log.debug(tag, "Initialised")
-                Either.Right(Unit)
-            }
+            log.debug(tag, "Initialised")
+        }
     } catch (error: Throwable) {
         Either.Left(Throwable(
             message = "Error initialising $tag${error.message?.let { ": $it" } ?: ""}",

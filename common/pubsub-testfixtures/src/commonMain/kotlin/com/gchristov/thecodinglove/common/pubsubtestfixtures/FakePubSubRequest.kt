@@ -16,5 +16,5 @@ class FakePubSubRequest<T>(
     override fun <T> decodeBodyFromJson(
         jsonSerializer: JsonSerializer,
         strategy: DeserializationStrategy<T>
-    ): Either<Throwable, T?> = Either.Right(message as T)
+    ): Either<Throwable, T?> = message?.let { Either.Right(message as T) } ?: Either.Left(Throwable())
 }
