@@ -40,16 +40,19 @@ class PreloadSearchPubSubHandler(
         val body = request.decodeBodyFromJson(
             jsonSerializer = jsonSerializer,
             strategy = PubSubPreloadSearchMessage.serializer(),
-        ).bind()
+        ).getOrNull()
         if (body == null) {
-            raise(Exception("Request body is invalid"))
+            // Swallow but report the error, so that we can investigate. Retrying is unlikely to help,
+            // if the request body cannot be parsed.
+            log.error(tag, Exception("Request body is invalid")) { "Error handling request" }
+            return@either
         }
 
         preloadSearchResultUseCase(PreloadSearchResultUseCase.Dto(searchSessionId = body.searchSessionId))
             .mapLeft {
                 // Swallow but report the error, so that we can investigate. Preload errors should not retry if the
                 // PubSub body cannot be parsed, or we get any of the search errors, which are currently Exhausted,
-                // Empty and NotFound, where retrying doesn't really make sense for any of them.
+                // and Empty, where retrying doesn't really make sense.
                 log.error(tag, it) { "Error handling request" }
                 Either.Right(Unit)
             }

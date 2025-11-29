@@ -8,6 +8,7 @@ import com.gchristov.thecodinglove.search.domain.model.SearchSession
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class FakeSearchRepository(
@@ -65,5 +66,9 @@ class FakeSearchRepository(
             expected = searchSession,
             actual = lastSavedSession
         )
+    }
+
+    fun assertSessionNotSaved() {
+        assertNull(lastSavedSession)
     }
 }

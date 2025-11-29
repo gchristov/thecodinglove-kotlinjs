@@ -74,7 +74,7 @@ internal class RealSearchUseCase(
                 )
             ).bind()
 
-            return@either when (searchRes) {
+            when (searchRes) {
                 is SearchWithHistoryUseCase.Result.Empty -> SearchUseCase.Result.Empty
                 is SearchWithHistoryUseCase.Result.Exhausted -> {
                     searchSession.clearExhaustedHistory(searchRepository).bind()

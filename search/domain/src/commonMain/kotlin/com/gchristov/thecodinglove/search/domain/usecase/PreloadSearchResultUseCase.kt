@@ -38,7 +38,7 @@ internal class RealPreloadSearchResultUseCase(
                 )
             ).bind()
 
-            return@either when (searchRes) {
+            when (searchRes) {
                 is SearchWithHistoryUseCase.Result.Empty -> Unit
                 is SearchWithHistoryUseCase.Result.Exhausted -> {
                     // Only clear the preloaded post and let session search deal with updating the history

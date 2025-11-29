@@ -56,8 +56,9 @@ class RealPreloadSearchResultUseCaseTest {
         ) { useCase, searchRepository, searchWithHistoryUseCase ->
             val actualResult = useCase.invoke(PreloadSearchResultUseCase.Dto(searchSessionId = TestSearchSessionId))
             searchRepository.assertSessionFetched()
+            searchRepository.assertSessionNotSaved()
             searchWithHistoryUseCase.assertInvokedOnce()
-            assertTrue { actualResult.isLeft { it.message == "No results found: test" } }
+            assertTrue { actualResult.isRight() }
         }
     }
 
