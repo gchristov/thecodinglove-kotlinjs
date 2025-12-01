@@ -15,7 +15,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 class PreloadSearchPubSubHandler(
     dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
+    jsonSerializer: JsonSerializer,
     private val log: Logger,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
     pubSubDecoder: PubSubDecoder,
