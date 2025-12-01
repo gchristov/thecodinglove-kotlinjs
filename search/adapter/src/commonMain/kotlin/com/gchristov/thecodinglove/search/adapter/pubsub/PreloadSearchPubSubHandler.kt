@@ -8,7 +8,6 @@ import com.gchristov.thecodinglove.common.kotlin.error
 import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
-import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.search.adapter.pubsub.model.PubSubPreloadSearchMessage
 import com.gchristov.thecodinglove.search.domain.usecase.PreloadSearchResultUseCase
 import io.ktor.http.*
@@ -20,7 +19,7 @@ class PreloadSearchPubSubHandler(
     private val log: Logger,
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
     pubSubDecoder: PubSubDecoder,
-) : BasePubSubHandler(
+) : BasePubSubHandler<PubSubPreloadSearchMessage>(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
     log = log,
@@ -34,25 +33,15 @@ class PreloadSearchPubSubHandler(
         contentType = ContentType.Application.Json,
     )
 
-    override suspend fun handlePubSubRequest(
-        request: PubSubRequest
-    ): Either<Throwable, Unit> = either {
-        val body = request.decodeBodyFromJson(
-            jsonSerializer = jsonSerializer,
-            strategy = PubSubPreloadSearchMessage.serializer(),
-        ).getOrNull()
-        if (body == null) {
-            // Swallow but report the error, so that we can investigate. Retrying is unlikely to help,
-            // if the request body cannot be parsed.
-            log.error(tag, Exception("Request body is invalid")) { "Error handling request" }
-            return@either
-        }
+    override fun deserialisationStrategy() = PubSubPreloadSearchMessage.serializer()
 
+    override suspend fun handlePubSubRequest(
+        body: PubSubPreloadSearchMessage
+    ): Either<Throwable, Unit> = either {
         preloadSearchResultUseCase(PreloadSearchResultUseCase.Dto(searchSessionId = body.searchSessionId))
             .mapLeft {
-                // Swallow but report the error, so that we can investigate. Preload errors should not retry if the
-                // PubSub body cannot be parsed, or we get any of the search errors, which are currently Exhausted,
-                // and Empty, where retrying doesn't really make sense.
+                // Preload errors should not retry if we get a search error (Exhausted|Empty), as retrying doesn't
+                // really make sense. In that case swallow but report the error, so that we can investigate.
                 log.error(tag, it) { "Error handling request" }
                 Either.Right(Unit)
             }

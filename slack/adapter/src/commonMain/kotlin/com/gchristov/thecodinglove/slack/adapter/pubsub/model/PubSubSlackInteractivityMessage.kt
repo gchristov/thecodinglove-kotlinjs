@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class PubSubSlackInteractivityMessage(
+data class PubSubSlackInteractivityMessage(
     val payload: InteractivityPayload
 ) {
     @Serializable
