@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.slack.domain
 
 import com.benasher44.uuid.uuid4
+import com.gchristov.thecodinglove.common.slack.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
-import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessageResponseType
 import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
 
