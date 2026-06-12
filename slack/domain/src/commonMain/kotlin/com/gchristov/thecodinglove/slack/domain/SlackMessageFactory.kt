@@ -71,10 +71,8 @@ internal class RealSlackMessageFactory(
         attachments: List<SlackMessage.Attachment>?,
     ) = SlackMessage(
         text = text,
-        userId = null,
         channelId = channelId,
         responseType = responseType.apiValue,
-        teamId = null,
         replaceOriginal = replaceOriginal,
         deleteOriginal = deleteOriginal,
         attachments = attachments,
@@ -105,7 +103,6 @@ internal class RealSlackMessageFactory(
                         text = SlackActionName.SEND.text,
                         type = ActionTypeButton,
                         value = searchSessionId,
-                        url = null,
                         style = ActionStylePrimary,
                     ),
                     SlackMessage.Attachment.Action(
@@ -113,7 +110,6 @@ internal class RealSlackMessageFactory(
                         text = SlackActionName.SELF_DESTRUCT_5_MIN.text,
                         type = ActionTypeButton,
                         value = searchSessionId,
-                        url = null,
                         style = ActionStylePrimary,
                     ),
                     SlackMessage.Attachment.Action(
@@ -121,16 +117,12 @@ internal class RealSlackMessageFactory(
                         text = SlackActionName.SHUFFLE.text,
                         type = ActionTypeButton,
                         value = searchSessionId,
-                        url = null,
-                        style = null,
                     ),
                     SlackMessage.Attachment.Action(
                         name = SlackActionName.CANCEL.apiValue,
                         text = SlackActionName.CANCEL.text,
                         type = ActionTypeButton,
                         value = searchSessionId,
-                        url = null,
-                        style = null,
                     )
                 ),
             )
@@ -154,7 +146,6 @@ internal class RealSlackMessageFactory(
                             name = SlackActionName.AUTH_SEND.apiValue,
                             text = SlackActionName.AUTH_SEND.text,
                             type = ActionTypeButton,
-                            value = null,
                             url = "https://slack.com/oauth/v2/authorize?client_id=$clientId&user_scope=chat:write&team=${authState.teamId}&state=$serializedAuthState",
                             style = ActionStylePrimary,
                         ),
@@ -163,8 +154,6 @@ internal class RealSlackMessageFactory(
                             text = SlackActionName.CANCEL.text,
                             type = ActionTypeButton,
                             value = authState.searchSessionId,
-                            url = null,
-                            style = null,
                         )
                     ),
                 )

@@ -68,22 +68,10 @@ internal class RealMonitoringLogWriter(
         url = monitoringSlackUrl,
         message = SlackMessage(
             text = message,
-            userId = null,
-            channelId = null,
-            responseType = "",
-            teamId = null,
-            replaceOriginal = false,
-            deleteOriginal = false,
             attachments = listOf(
                 SlackMessage.Attachment(
-                    title = null,
-                    titleLink = null,
                     text = stacktrace,
-                    imageUrl = null,
-                    footer = null,
-                    callbackId = "",
                     color = "#D00000",
-                    actions = emptyList(),
                 )
             ),
         ),
