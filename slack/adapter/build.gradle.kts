@@ -11,6 +11,7 @@ kotlin {
                 implementation(libs.common.network)
                 implementation(libs.common.pubsub)
                 implementation(libs.common.firebase)
+                implementation(libs.common.slack)
                 implementation(projects.domain)
             }
         }

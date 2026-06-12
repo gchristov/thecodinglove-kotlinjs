@@ -5,48 +5,30 @@ import arrow.core.flatMap
 import arrow.core.raise.either
 import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.slack.SlackSender
+import com.gchristov.thecodinglove.common.slack.model.SlackAuthToken
+import com.gchristov.thecodinglove.common.slack.model.SlackMessage
 import com.gchristov.thecodinglove.slack.adapter.db.DbSlackAuthToken
 import com.gchristov.thecodinglove.slack.adapter.db.DbSlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.adapter.db.mapper.toAuthToken
 import com.gchristov.thecodinglove.slack.adapter.db.mapper.toSelfDestructMessage
-import com.gchristov.thecodinglove.slack.adapter.http.SlackApi
-import com.gchristov.thecodinglove.slack.adapter.http.mapper.toAuthToken
-import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackMessage
-import com.gchristov.thecodinglove.slack.adapter.http.model.*
-import com.gchristov.thecodinglove.slack.domain.model.SlackAuthToken
-import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
-import io.ktor.client.call.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
 
 internal class RealSlackRepository(
-    private val slackApi: SlackApi,
+    private val slackSender: SlackSender,
     private val firebaseAdmin: FirebaseAdmin,
     private val jsonSerializer: JsonSerializer,
 ) : SlackRepository {
     override suspend fun authUser(
         code: String,
         clientId: String,
-        clientSecret: String
-    ) = try {
-        val slackResponse: ApiSlackAuthResponse = slackApi.authUser(
-            code = code,
-            clientId = clientId,
-            clientSecret = clientSecret
-        ).body()
-        if (slackResponse.ok) {
-            Either.Right(slackResponse.toAuthToken())
-        } else {
-            throw Exception(slackResponse.error)
-        }
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during user auth${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
-    }
+        clientSecret: String,
+    ) = slackSender.authUser(
+        code = code,
+        clientId = clientId,
+        clientSecret = clientSecret,
+    )
 
     override suspend fun getAuthToken(tokenId: String): Either<Throwable, SlackAuthToken> = firebaseAdmin
         .firestore()
@@ -107,83 +89,28 @@ internal class RealSlackRepository(
     override suspend fun postMessageToUrl(
         url: String,
         message: SlackMessage,
-    ) = try {
-        val slackResponse = slackApi.postMessageToUrl(
-            url = url,
-            message = message.toSlackMessage(),
-        )
-        // Sending requests to Slack response URLs currently has an issue where the content type
-        // does not honor the Accept header, so we get text/plain instead of application/json
-        if (slackResponse.contentType()?.match(ContentType.Application.Json) == true) {
-            val jsonResponse: ApiSlackReplyWithMessageResponse = slackResponse.body()
-            if (jsonResponse.ok) {
-                Either.Right(Unit)
-            } else {
-                throw Exception(jsonResponse.error)
-            }
-        } else {
-            val textResponse = slackResponse.bodyAsText()
-            if (textResponse.lowercase() == "ok") {
-                Either.Right(Unit)
-            } else {
-                throw Exception(textResponse)
-            }
-        }
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during message reply${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
-    }
+    ) = slackSender.postMessageToUrl(
+        url = url,
+        message = message,
+    )
 
     override suspend fun postMessage(
         authToken: String,
         message: SlackMessage,
-    ) = try {
-        val slackResponse: ApiSlackPostMessageResponse = slackApi.postMessage(
-            authToken = authToken,
-            message = message.toSlackMessage(),
-        ).body()
-        if (slackResponse.ok) {
-            Either.Right(slackResponse.messageTs)
-        } else {
-            throw Exception(slackResponse.error)
-        }
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during message post${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
-    }
+    ) = slackSender.postMessage(
+        authToken = authToken,
+        message = message,
+    )
 
     override suspend fun deleteMessage(
         authToken: String,
         channelId: String,
         messageTs: String,
-    ): Either<Throwable, Unit> = try {
-        val slackResponse: ApiSlackDeleteMessageResponse = slackApi.deleteMessage(
-            authToken = authToken,
-            deleteMessage = ApiSlackDeleteMessage(
-                channelId = channelId,
-                messageTs = messageTs,
-            ),
-        ).body()
-        when {
-            slackResponse.ok -> Either.Right(Unit)
-            // A message might have been deleted by the time self destruct attempts to delete it,
-            // so just assume it's already gone if Slack tells us it doesn't exist.
-            slackResponse.error == "message_not_found" -> Either.Right(Unit)
-            // The app might not have permission to delete the message by the time self destruct 
-            // attempts to delete it, so just consume the error and leave the message there.
-            slackResponse.error == "cant_delete_message" -> Either.Right(Unit)
-            else -> throw Exception(slackResponse.error)
-        }
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during message delete${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
-    }
+    ) = slackSender.deleteMessage(
+        authToken = authToken,
+        channelId = channelId,
+        messageTs = messageTs,
+    )
 
     override suspend fun saveSelfDestructMessage(message: SlackSelfDestructMessage): Either<Throwable, Unit> =
         firebaseAdmin

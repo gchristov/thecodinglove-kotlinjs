@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.db.mapper
 
 import com.gchristov.thecodinglove.slack.adapter.db.DbSlackAuthToken
-import com.gchristov.thecodinglove.slack.domain.model.SlackAuthToken
+import com.gchristov.thecodinglove.common.slack.model.SlackAuthToken
 
 internal fun SlackAuthToken.toAuthToken() = DbSlackAuthToken(
     id = id,
