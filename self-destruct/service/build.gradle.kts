@@ -8,6 +8,7 @@ kotlin {
             dependencies {
                 implementation(libs.common.kotlin)
                 implementation(libs.common.monitoring)
+                implementation(libs.common.slack)
                 implementation(libs.common.network)
                 implementation(projects.adapter)
                 implementation(projects.domain)

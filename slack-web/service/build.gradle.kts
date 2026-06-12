@@ -10,6 +10,7 @@ kotlin {
                 implementation(libs.common.kotlin)
                 implementation(libs.common.network)
                 implementation(libs.common.monitoring)
+                implementation(libs.common.slack)
                 implementation(projects.domain)
                 implementation(projects.adapter)
             }

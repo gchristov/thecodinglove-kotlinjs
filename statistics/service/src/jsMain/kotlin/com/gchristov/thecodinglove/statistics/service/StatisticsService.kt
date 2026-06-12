@@ -10,6 +10,7 @@ import com.gchristov.thecodinglove.common.kotlin.di.inject
 import com.gchristov.thecodinglove.common.kotlin.di.registerModules
 import com.gchristov.thecodinglove.common.kotlin.process
 import com.gchristov.thecodinglove.common.monitoring.CommonMonitoringModule
+import com.gchristov.thecodinglove.common.slack.CommonSlackModule
 import com.gchristov.thecodinglove.common.monitoring.MonitoringLogWriter
 import com.gchristov.thecodinglove.common.network.CommonNetworkModule
 import com.gchristov.thecodinglove.common.network.http.HttpService
@@ -42,6 +43,7 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
         listOf(
             CommonKotlinModule.module,
             CommonNetworkModule.module,
+            CommonSlackModule.module,
             CommonMonitoringModule.module,
             StatisticsDomainModule.module,
             StatisticsAdapterModule.module,
