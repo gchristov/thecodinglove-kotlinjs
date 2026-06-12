@@ -57,6 +57,7 @@ common-network = { group = "com.gchristov.thecodinglove.common", name = "network
 common-network-testFixtures = { group = "com.gchristov.thecodinglove.common", name = "network-testfixtures" }
 common-pubsub = { group = "com.gchristov.thecodinglove.common", name = "pubsub" }
 common-pubsub-testFixtures = { group = "com.gchristov.thecodinglove.common", name = "pubsub-testfixtures" }
+common-slack = { group = "com.gchristov.thecodinglove.common", name = "slack" }
 common-test = { group = "com.gchristov.thecodinglove.common", name = "test" }
 
 [plugins]
