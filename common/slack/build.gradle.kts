@@ -13,5 +13,10 @@ kotlin {
                 implementation(projects.network)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.common.test)
+            }
+        }
     }
 }
