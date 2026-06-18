@@ -1,0 +1,53 @@
+{
+    "display_information": {
+        "name": "The Coding Love GIFs - Dev",
+        "description": "The right GIFs for your coding break",
+        "background_color": "#1e1e1e",
+        "long_description": "The coding love brings a bit of developer humor to your break. Search from the world's largest library of coding-related GIFs and share them easily with your team.\r\n\r\nThis integration will enable the /codinglove slash command for your team. Example: typing \"/codinglove html\" will display an html GIF in your channel."
+    },
+    "features": {
+        "bot_user": {
+            "display_name": "The Coding Love GIFs - Dev",
+            "always_online": true
+        },
+        "slash_commands": [
+            {
+                "command": "/codinglove_dev",
+                "url": "https://codinglove.serveousercontent.com/api/slack/slash",
+                "description": "Post a random gif to channel",
+                "usage_hint": "text",
+                "should_escape": true
+            }
+        ]
+    },
+    "oauth_config": {
+        "redirect_urls": [
+            "https://codinglove.serveousercontent.com/api/slack/auth"
+        ],
+        "scopes": {
+            "user": [
+                "chat:write"
+            ],
+            "bot": [
+                "commands"
+            ]
+        },
+        "pkce_enabled": false
+    },
+    "settings": {
+        "event_subscriptions": {
+            "request_url": "https://codinglove.serveousercontent.com/api/slack/event",
+            "bot_events": [
+                "tokens_revoked"
+            ]
+        },
+        "interactivity": {
+            "is_enabled": true,
+            "request_url": "https://codinglove.serveousercontent.com/api/slack/interactivity"
+        },
+        "org_deploy_enabled": false,
+        "socket_mode_enabled": false,
+        "token_rotation_enabled": false,
+        "is_mcp_enabled": false
+    }
+}
