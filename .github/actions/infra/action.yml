@@ -6,6 +6,10 @@ inputs:
     required: true
   access-token:
     required: true
+  infra-dir:
+    required: true
+  stack-name:
+    required: true
 runs:
   using: "composite"
   steps:
@@ -13,8 +17,8 @@ runs:
       uses: pulumi/actions@v5
       with:
         command: ${{ inputs.command }}
-        stack-name: prod
-        work-dir: ${{ inputs.service }}/infra
+        stack-name: ${{ inputs.stack-name }}
+        work-dir: ${{ inputs.service }}/${{ inputs.infra-dir }}
         edit-pr-comment: false
         pulumi-version: "3.136.1"
       env:
