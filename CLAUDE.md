@@ -21,7 +21,11 @@ Kotlin Multiplatform project powering the TheCodingLove Slack app. KotlinJS/IR t
 ├── statistics/          ← Statistics microservice (tracks usage)
 ├── slack-web/           ← Slack OAuth web flow microservice
 ├── landing-page-web/    ← Landing page
-└── proxy-web/           ← nginx reverse proxy
+├── proxy-web/           ← nginx reverse proxy
+└── tools/               ← developer tooling
+    ├── docker/          ← Docker Compose files for local dev
+    ├── scripts/         ← helper scripts (run_local.sh)
+    └── slack/           ← Slack manifest + update_manifest.sh
 ```
 
 Each microservice follows hexagonal architecture:
@@ -106,6 +110,17 @@ These are read by the `BuildConfigPlugin` and exposed as `BuildConfig.*` constan
 
 `SlackMessage` has all fields defaulted — only specify what you need.
 
+## Infrastructure
+
+Each microservice has an `infra/` folder with a Pulumi YAML program (`Pulumi.yaml`) and a stack config (`Pulumi.prod.yaml`, stack name `prod`). Some services also have an `infra/dev/` folder with a separate program for dev-only resources (stack name `dev`, config in `Pulumi.dev.yaml`).
+
+- `infra/` — prod resources (Cloud Run service, Pub/Sub topics/subscriptions, IAM). Deployed on merge to `master`.
+- `infra/dev/` — dev-only resources (Pub/Sub topics/subscriptions with tunnel pushEndpoints for local development). Deployed on PRs.
+
+The `infra/dev/` push endpoints point to a local tunnel URL. If that URL changes, it must be updated in all `infra/dev/` Pulumi files and in `tools/scripts/run_local.sh`.
+
+GCP credentials (`credentials-gcp-infra.json`) sit alongside each `Pulumi.yaml`; `infra/dev/` programs reference the parent folder's credentials via `../credentials-gcp-infra.json`.
+
 ## CI
 
 GitHub Actions per microservice. Tests run with:
@@ -113,3 +128,6 @@ GitHub Actions per microservice. Tests run with:
 ./gradlew --no-daemon --continue --max-workers=1 jsTest
 ```
 Results collected from `**/TEST-*.xml`.
+
+On pull requests: build, test, preview `infra/` (stack `prod`), and deploy `infra/dev/` (stack `dev`) for any service that has that folder.
+On merge to `master`: build, test, deploy `infra/` (stack `prod`).
