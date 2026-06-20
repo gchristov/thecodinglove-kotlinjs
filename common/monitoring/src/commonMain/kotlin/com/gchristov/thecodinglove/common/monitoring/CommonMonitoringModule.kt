@@ -1,10 +1,7 @@
 package com.gchristov.thecodinglove.common.monitoring
 
 import com.gchristov.thecodinglove.common.kotlin.di.DiModule
-import com.gchristov.thecodinglove.common.monitoring.slack.MonitoringSlackApi
-import com.gchristov.thecodinglove.common.monitoring.slack.MonitoringSlackRepository
-import com.gchristov.thecodinglove.common.monitoring.slack.RealMonitoringSlackRepository
-import com.gchristov.thecodinglove.common.network.NetworkClient
+import com.gchristov.thecodinglove.common.slack.SlackSender
 import kotlinx.coroutines.Dispatchers
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
@@ -16,40 +13,18 @@ object CommonMonitoringModule : DiModule() {
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
             bindSingleton {
-                provideMonitoringSlackApi(
-                    networkClient = instance(),
-                )
-            }
-            bindSingleton {
-                provideMonitoringSlackRepository(
-                    monitoringSlackApi = instance(),
-                )
-            }
-            bindSingleton {
                 provideMonitoringLogWriter(
-                    monitoringSlackRepository = instance(),
+                    slackSender = instance(),
                 )
             }
         }
     }
 
-    private fun provideMonitoringSlackApi(
-        networkClient: NetworkClient.Json,
-    ): MonitoringSlackApi = MonitoringSlackApi(
-        client = networkClient,
-        monitoringSlackUrl = BuildConfig.MONITORING_SLACK_URL,
-    )
-
-    private fun provideMonitoringSlackRepository(
-        monitoringSlackApi: MonitoringSlackApi,
-    ): MonitoringSlackRepository = RealMonitoringSlackRepository(
-        monitoringSlackApi = monitoringSlackApi,
-    )
-
     private fun provideMonitoringLogWriter(
-        monitoringSlackRepository: MonitoringSlackRepository,
+        slackSender: SlackSender,
     ): MonitoringLogWriter = RealMonitoringLogWriter(
         dispatcher = Dispatchers.Default,
-        monitoringSlackRepository = monitoringSlackRepository,
+        slackSender = slackSender,
+        monitoringSlackUrl = BuildConfig.MONITORING_SLACK_URL,
     )
 }

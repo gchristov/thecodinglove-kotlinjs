@@ -5,7 +5,8 @@ set -e
 # folder. A single Gradle worker avoids this at the cost of a slower build but this is okay for now.
 echo "🛠 Build project" && ./gradlew --max-workers=1 assemble
 echo "🧹 Clean up old Docker resources" && (docker image prune -af)
-echo "🏁 Start local tunnel" && (ssh -R 80:localhost:8080 localhost.run &)
+# If the tunnel URL changes, update the pushEndpoint in all infra/dev Pulumi files too.
+echo "🏁 Start local tunnel" && pkill -f "ssh.*serveo.net" 2>/dev/null || true && (ssh -o StrictHostKeyChecking=accept-new -R codinglove:80:localhost:8080 serveo.net &)
 sleep 1
 echo "🏁 Start app" && echo "" && docker compose \
 -f tools/docker/landing-page-web-compose.yaml \

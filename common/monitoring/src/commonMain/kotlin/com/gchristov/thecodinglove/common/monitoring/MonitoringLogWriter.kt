@@ -3,7 +3,8 @@ package com.gchristov.thecodinglove.common.monitoring
 import arrow.core.raise.either
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
-import com.gchristov.thecodinglove.common.monitoring.slack.MonitoringSlackRepository
+import com.gchristov.thecodinglove.common.slack.SlackSender
+import com.gchristov.thecodinglove.common.slack.model.SlackMessage
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -11,7 +12,8 @@ abstract class MonitoringLogWriter : LogWriter()
 
 internal class RealMonitoringLogWriter(
     private val dispatcher: CoroutineDispatcher,
-    private val monitoringSlackRepository: MonitoringSlackRepository,
+    private val slackSender: SlackSender,
+    private val monitoringSlackUrl: String,
 ) : MonitoringLogWriter(), CoroutineScope {
     private val job = Job()
 
@@ -62,8 +64,16 @@ internal class RealMonitoringLogWriter(
     private suspend fun reportToSlack(
         message: String,
         stacktrace: String,
-    ) = monitoringSlackRepository.reportException(
-        message = message,
-        stacktrace = stacktrace,
+    ) = slackSender.postMessageToUrl(
+        url = monitoringSlackUrl,
+        message = SlackMessage(
+            text = message,
+            attachments = listOf(
+                SlackMessage.Attachment(
+                    text = stacktrace,
+                    color = "#D00000",
+                )
+            ),
+        ),
     )
 }

@@ -8,6 +8,7 @@ import com.gchristov.thecodinglove.common.kotlin.di.DiModule
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
+import com.gchristov.thecodinglove.common.slack.SlackSender
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
@@ -31,10 +32,9 @@ object SlackAdapterModule : DiModule() {
 
     override fun bindDependencies(builder: DI.Builder) {
         builder.apply {
-            bindSingleton { provideSlackApi(client = instance()) }
             bindSingleton {
                 provideSlackRepository(
-                    slackApi = instance(),
+                    slackSender = instance(),
                     firebaseAdmin = instance(),
                     jsonSerializer = instance(),
                 )
@@ -127,14 +127,12 @@ object SlackAdapterModule : DiModule() {
         }
     }
 
-    private fun provideSlackApi(client: NetworkClient.Json) = SlackApi(client)
-
     private fun provideSlackRepository(
-        slackApi: SlackApi,
+        slackSender: SlackSender,
         firebaseAdmin: FirebaseAdmin,
         jsonSerializer: JsonSerializer.ExplicitNulls,
     ): SlackRepository = RealSlackRepository(
-        slackApi = slackApi,
+        slackSender = slackSender,
         firebaseAdmin = firebaseAdmin,
         jsonSerializer = jsonSerializer,
     )

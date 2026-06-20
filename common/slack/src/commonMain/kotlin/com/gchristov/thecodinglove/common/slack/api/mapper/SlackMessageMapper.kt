@@ -1,9 +1,9 @@
-package com.gchristov.thecodinglove.slack.adapter.http.mapper
+package com.gchristov.thecodinglove.common.slack.api.mapper
 
-import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackMessage
-import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
+import com.gchristov.thecodinglove.common.slack.api.model.ApiSlackMessage
+import com.gchristov.thecodinglove.common.slack.model.SlackMessage
 
-internal fun SlackMessage.toSlackMessage() = ApiSlackMessage(
+internal fun SlackMessage.toApiSlackMessage() = ApiSlackMessage(
     text = text,
     userId = userId,
     channelId = channelId,

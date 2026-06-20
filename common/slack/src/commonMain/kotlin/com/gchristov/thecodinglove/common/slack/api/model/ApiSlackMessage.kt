@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slack.adapter.http.model
+package com.gchristov.thecodinglove.common.slack.api.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

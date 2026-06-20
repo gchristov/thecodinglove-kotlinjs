@@ -9,6 +9,7 @@ kotlin {
                 implementation(libs.common.analytics)
                 implementation(libs.common.kotlin)
                 implementation(libs.common.monitoring)
+                implementation(libs.common.slack)
                 implementation(libs.common.network)
                 implementation(libs.common.pubsub)
                 implementation(libs.common.firebase)

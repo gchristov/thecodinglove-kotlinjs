@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.slack.domain.port
 
 import arrow.core.Either
-import com.gchristov.thecodinglove.slack.domain.model.SlackAuthToken
-import com.gchristov.thecodinglove.slack.domain.model.SlackMessage
+import com.gchristov.thecodinglove.common.slack.model.SlackAuthToken
+import com.gchristov.thecodinglove.common.slack.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
 
 interface SlackRepository {

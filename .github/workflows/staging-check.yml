@@ -57,11 +57,30 @@ jobs:
           else
             echo "Skipping step as required file doesn't exist"
           fi
-      - name: Preview infrastructure
+      - name: Preview prod infrastructure
         uses: ./.github/actions/infra
         with:
           command: preview
           service: ${{ matrix.service }}
+          infra-dir: infra
+          stack-name: prod
+          access-token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      - name: Check for dev infrastructure
+        id: check-dev-infra
+        run: |
+          if [ -d "${{ matrix.service }}/infra/dev" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Deploy dev infrastructure
+        if: steps.check-dev-infra.outputs.exists == 'true'
+        uses: ./.github/actions/infra
+        with:
+          command: up
+          service: ${{ matrix.service }}
+          infra-dir: infra/dev
+          stack-name: dev
           access-token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Artifacts
         uses: actions/upload-artifact@v4
