@@ -42,7 +42,7 @@ The below setup assumes you've already cloned the project locally.
 3. Export a JSON API key for your Service Account and call it `credentials-gcp-infra.json`.
 4. [Signup and Install Pulumi](https://www.pulumi.com/docs/clouds/gcp/get-started/begin/#install-pulumi) locally.
 5. Create a Pulumi [access token](https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/) and login locally using `pulumi login`.
-6. The project uses Pulumi micro-stacks to deploy the microservices individually. Each microservice has a corresponding `infra` folder containing its `Pulumi.yaml` infrastructure program, eg `search/infra`. To get the project going, you will need to manually initialise each microservice on GCP using the Pulumi scripts. 
+6. The project uses Pulumi micro-stacks to deploy the microservices individually. Each microservice has a corresponding `infra` folder containing its `Pulumi.yaml` infrastructure program, eg `search/infra`. Some services also have an `infra/dev` folder with a separate Pulumi program managing dev-only resources (deployed on PRs). To get the project going, you will need to manually initialise each microservice on GCP using the Pulumi scripts. 
 ```
 The order to do this matters, so go with common/infra first, then all other microservices, then proxy-web/infra. The reason is that the resouces are created incrementally at each stage and we currently have no way synchronize them.
 ```
@@ -67,12 +67,11 @@ The order to do this matters, so go with common/infra first, then all other micr
 The project powers an [existing Slack app](https://slack.com/apps/AFNEWBNFN), so you'll need one in order to run it. 
 
 1. Create a new Slack app.
-2. You will need an SSH tunnel to your localhost for Slack's APIs. You can use [serveo.net](http://serveo.net) for free and configure it with this command `ssh -R YOUR_DOMAIN.serveo.net:80:localhost:3000 serveo.net`.
-3. Point the following Slack features to the relevant project API endpoints that know how to respond to them using the url you used for [serveo.net](http://serveo.net):
-   - [Slash commands](https://api.slack.com/slash-commands) -> `YOUR_DOMAIN.serveo.net/api/slack/slash`
-   - [OAuth](https://api.slack.com/authentication/oauth-v2) -> `YOUR_DOMAIN.serveo.net/api/slack/auth`
-   - [Events](http://api.slack.com/events-api) -> `YOUR_DOMAIN.serveo.net/api/slack/event`
-   - [Interactivity](https://api.slack.com/messaging/interactivity) -> `YOUR_DOMAIN.serveo.net/api/slack/interactivity`
+2. You will need an SSH tunnel to your localhost for Slack's APIs. You can use [serveo.net](http://serveo.net) for free — see `tools/scripts/run_local.sh` for an example command.
+3. The project uses a Slack manifest to configure all API endpoints, features, and scopes in one place. The manifest file is at `tools/slack/thecodinglove-slack-manifest.json`. To set it up:
+   - When creating your Slack app, choose "From a manifest" and paste the contents of the manifest file.
+   - Update the URLs in the manifest to point to your tunnel domain.
+   - To push manifest changes back to Slack after the initial setup, use `tools/slack/update_manifest.sh --app-id YOUR_APP_ID --token YOUR_USER_TOKEN`. The token must be a user token (`xoxp-...`) with the `apps:write` scope, obtainable from the [Your Apps](https://api.slack.com/apps).
 4. Make a note of your `Slack Client ID`, `Secret` and `Signing Secret`.
 </details>
 
@@ -128,6 +127,6 @@ The project is configured to build with [GitHub Actions](https://github.com/feat
 5. (Optional) Install the [Pulumi GitHub app](https://www.pulumi.com/docs/using-pulumi/continuous-delivery/github-app/) to get automated summaries of your infrastructure as code changes directly on your PR.
 
 Once this is done:
-   - opening pull requests against the repo will trigger build/test checks as well as infrastructure changes preview for the microservice that has been changed;
+   - opening pull requests against the repo will trigger build/test checks, an infrastructure changes preview for the `infra` program of the microservice that has been changed, and a live deployment of any `infra/dev` program for services that have one;
    - merging pull requests to the main branch deploys the changes to the corresponding microservice to Google Cloud;
 </details>
