@@ -14,7 +14,7 @@ runs:
   using: "composite"
   steps:
     - name: Set up infrastructure
-      uses: pulumi/actions@v5
+      uses: pulumi/actions@v7
       with:
         command: ${{ inputs.command }}
         stack-name: ${{ inputs.stack-name }}
