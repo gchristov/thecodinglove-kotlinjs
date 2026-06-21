@@ -2,6 +2,14 @@
 
 Kotlin Multiplatform project powering the TheCodingLove Slack app. KotlinJS/IR transpiles to Node.js; microservices run as Docker containers on Google Cloud Run.
 
+## Relationship to child project
+
+This project has a child: [personal-website-kotlinjs](../personal-website-kotlinjs) (`/Users/georgi/Documents/Workspace/personal-website-kotlinjs`). The two projects share the same foundational architecture and should be kept in sync at the infrastructure and tooling level. The only intentional differences are the features each project actually delivers.
+
+**The rule:** this project is the authoritative source for foundational patterns — Gradle plugin conventions, `common/` module structure, CI workflows, Pulumi templates, Docker/nginx setup, test patterns, DI wiring. Changes here should be evaluated and ported to the child, tailored to its scope. The diff between the two should read as "different features, same foundations."
+
+**Cross-project sync prompt:** whenever you make a change that touches foundational or shared code — CI workflows, Gradle plugins, `common/` modules, infra templates, test patterns, tooling scripts — ask the user: *"Should this change also be applied to the child project (personal-website-kotlinjs)?"* Do the same in reverse when working in the child: ask if the change should come back here.
+
 ## Project layout
 
 ```
