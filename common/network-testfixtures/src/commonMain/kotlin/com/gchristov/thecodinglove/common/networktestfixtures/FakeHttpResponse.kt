@@ -32,6 +32,13 @@ class FakeHttpResponse : HttpResponse {
         lastStatus = status
     }
 
+    fun assertRedirect(path: String) {
+        assertEquals(
+            expected = path,
+            actual = lastRedirectPath
+        )
+    }
+
     fun assertEquals(
         header: String?,
         headerValue: String?,
