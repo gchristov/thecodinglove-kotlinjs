@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 
 class FakeStatisticsSearchRepository(
     private val searchStatisticsResult: Either<Throwable, StatisticsReport.SearchStatistics> = Either.Right(
-        StatisticsReport.SearchStatistics(messagesSent = 0, activeSearchSessions = 0, messagesSelfDestruct = 0)
+        StatisticsReportCreator.searchStatistics()
     ),
 ) : StatisticsSearchRepository {
     private var invocations = 0

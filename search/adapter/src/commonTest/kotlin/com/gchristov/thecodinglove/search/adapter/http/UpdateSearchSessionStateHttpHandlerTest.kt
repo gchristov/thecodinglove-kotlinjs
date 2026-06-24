@@ -1,9 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.http
 
-import arrow.core.Either
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
-import com.gchristov.thecodinglove.common.kotlin.ParameterMap
-import com.gchristov.thecodinglove.common.network.http.HttpRequest
+import com.gchristov.thecodinglove.common.networktestfixtures.FakeBodyHttpRequest
 import com.gchristov.thecodinglove.common.networktestfixtures.FakeHttpResponse
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
@@ -14,7 +12,6 @@ import com.gchristov.thecodinglove.search.testfixtures.SearchSessionCreator
 import io.ktor.http.*
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.DeserializationStrategy
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -96,9 +93,9 @@ class UpdateSearchSessionStateHttpHandlerTest {
             id = TestSessionId,
             query = "kotlin",
         ),
-        testBlock: suspend (UpdateSearchSessionStateHttpHandler, FakeUpdateSessionRequest, FakeHttpResponse) -> Unit,
+        testBlock: suspend (UpdateSearchSessionStateHttpHandler, FakeBodyHttpRequest, FakeHttpResponse) -> Unit,
     ): TestResult = runTest {
-        val request = FakeUpdateSessionRequest(fakeBody = body)
+        val request = FakeBodyHttpRequest(fakeBody = body)
         val response = FakeHttpResponse()
         val handler = UpdateSearchSessionStateHttpHandler(
             dispatcher = FakeCoroutineDispatcher,
@@ -111,29 +108,3 @@ class UpdateSearchSessionStateHttpHandlerTest {
 }
 
 private const val TestSessionId = "session_123"
-
-private class FakeUpdateSessionRequest(
-    private val fakeBody: ApiUpdateSearchSessionState?,
-) : HttpRequest {
-    override val baseURL = ""
-    override val hostname = ""
-    override val ip = ""
-    override val ips: Array<String>? = null
-    override val method = ""
-    override val path = ""
-    override val protocol = ""
-    override val headers: ParameterMap = object : ParameterMap {
-        override fun <T> get(key: String): T? = null
-    }
-    override val query: ParameterMap = object : ParameterMap {
-        override fun <T> get(key: String): T? = null
-    }
-    override val bodyString: String? = null
-    override val body: Any? get() = fakeBody
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T> decodeBodyFromJson(
-        jsonSerializer: JsonSerializer,
-        strategy: DeserializationStrategy<T>,
-    ): Either<Throwable, T?> = Either.Right(fakeBody as T?)
-}

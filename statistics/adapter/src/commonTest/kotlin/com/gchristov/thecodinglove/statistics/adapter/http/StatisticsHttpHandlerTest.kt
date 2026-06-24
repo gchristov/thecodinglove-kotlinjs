@@ -8,6 +8,7 @@ import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.statistics.domain.model.StatisticsReport
 import com.gchristov.thecodinglove.statistics.testfixtures.FakeStatisticsReportUseCase
+import com.gchristov.thecodinglove.statistics.testfixtures.StatisticsReportCreator
 import io.ktor.http.*
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
@@ -50,7 +51,7 @@ class StatisticsHttpHandlerTest {
     }
 
     private fun runBlockingTest(
-        reportResult: Either<Throwable, StatisticsReport> = Either.Right(TestReport),
+        reportResult: Either<Throwable, StatisticsReport> = Either.Right(StatisticsReportCreator.report()),
         testBlock: suspend (StatisticsHttpHandler, FakeHttpResponse) -> Unit,
     ): TestResult = runTest {
         val response = FakeHttpResponse()
@@ -63,16 +64,3 @@ class StatisticsHttpHandlerTest {
         testBlock(handler, response)
     }
 }
-
-private val TestReport = StatisticsReport(
-    searchStatistics = StatisticsReport.SearchStatistics(
-        messagesSent = 100,
-        activeSearchSessions = 5,
-        messagesSelfDestruct = 3,
-    ),
-    slackStatistics = StatisticsReport.SlackStatistics(
-        activeSelfDestructMessages = 2,
-        users = 50,
-        teams = 10,
-    ),
-)

@@ -7,18 +7,7 @@ import kotlin.test.assertEquals
 
 class FakeStatisticsReportUseCase(
     private val invocationResult: Either<Throwable, StatisticsReport> = Either.Right(
-        StatisticsReport(
-            searchStatistics = StatisticsReport.SearchStatistics(
-                messagesSent = 0,
-                activeSearchSessions = 0,
-                messagesSelfDestruct = 0,
-            ),
-            slackStatistics = StatisticsReport.SlackStatistics(
-                activeSelfDestructMessages = 0,
-                users = 0,
-                teams = 0,
-            ),
-        )
+        StatisticsReportCreator.report()
     ),
 ) : StatisticsReportUseCase {
     private var invocations = 0

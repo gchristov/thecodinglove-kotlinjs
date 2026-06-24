@@ -6,6 +6,7 @@ import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.statistics.domain.model.StatisticsReport
 import com.gchristov.thecodinglove.statistics.testfixtures.FakeStatisticsSearchRepository
 import com.gchristov.thecodinglove.statistics.testfixtures.FakeStatisticsSlackRepository
+import com.gchristov.thecodinglove.statistics.testfixtures.StatisticsReportCreator
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -29,21 +30,18 @@ class RealStatisticsReportUseCaseTest {
 
     @Test
     fun reportCombinesBothSources(): TestResult = runBlockingTest(
-        searchStatisticsResult = Either.Right(TestSearchStatistics),
-        slackStatisticsResult = Either.Right(TestSlackStatistics),
+        searchStatisticsResult = Either.Right(StatisticsReportCreator.searchStatistics()),
+        slackStatisticsResult = Either.Right(StatisticsReportCreator.slackStatistics()),
     ) { useCase ->
         assertEquals(
-            expected = Either.Right(StatisticsReport(
-                searchStatistics = TestSearchStatistics,
-                slackStatistics = TestSlackStatistics,
-            )),
+            expected = Either.Right(StatisticsReportCreator.report()),
             actual = useCase.invoke(),
         )
     }
 
     private fun runBlockingTest(
-        searchStatisticsResult: Either<Throwable, StatisticsReport.SearchStatistics> = Either.Right(TestSearchStatistics),
-        slackStatisticsResult: Either<Throwable, StatisticsReport.SlackStatistics> = Either.Right(TestSlackStatistics),
+        searchStatisticsResult: Either<Throwable, StatisticsReport.SearchStatistics> = Either.Right(StatisticsReportCreator.searchStatistics()),
+        slackStatisticsResult: Either<Throwable, StatisticsReport.SlackStatistics> = Either.Right(StatisticsReportCreator.slackStatistics()),
         testBlock: suspend (StatisticsReportUseCase) -> Unit,
     ): TestResult = runTest {
         testBlock(
@@ -56,15 +54,3 @@ class RealStatisticsReportUseCaseTest {
         )
     }
 }
-
-private val TestSearchStatistics = StatisticsReport.SearchStatistics(
-    messagesSent = 100,
-    activeSearchSessions = 5,
-    messagesSelfDestruct = 3,
-)
-
-private val TestSlackStatistics = StatisticsReport.SlackStatistics(
-    activeSelfDestructMessages = 2,
-    users = 50,
-    teams = 10,
-)

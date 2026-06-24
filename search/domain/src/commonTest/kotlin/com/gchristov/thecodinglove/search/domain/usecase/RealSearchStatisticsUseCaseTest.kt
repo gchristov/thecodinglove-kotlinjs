@@ -3,9 +3,9 @@ package com.gchristov.thecodinglove.search.domain.usecase
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
-import com.gchristov.thecodinglove.search.domain.model.SearchStatistics
 import com.gchristov.thecodinglove.search.testfixtures.FakeSearchRepository
 import com.gchristov.thecodinglove.search.testfixtures.SearchSessionCreator
+import com.gchristov.thecodinglove.search.testfixtures.SearchStatisticsCreator
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -28,7 +28,7 @@ class RealSearchStatisticsUseCaseTest {
         )),
     ) { useCase ->
         assertEquals(
-            expected = Either.Right(SearchStatistics(
+            expected = Either.Right(SearchStatisticsCreator.statistics(
                 messagesSent = 2,
                 activeSearchSessions = 2,
                 messagesSelfDestruct = 2,

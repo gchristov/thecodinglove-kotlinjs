@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 
 class FakeStatisticsSlackRepository(
     private val slackStatisticsResult: Either<Throwable, StatisticsReport.SlackStatistics> = Either.Right(
-        StatisticsReport.SlackStatistics(activeSelfDestructMessages = 0, users = 0, teams = 0)
+        StatisticsReportCreator.slackStatistics()
     ),
 ) : StatisticsSlackRepository {
     private var invocations = 0

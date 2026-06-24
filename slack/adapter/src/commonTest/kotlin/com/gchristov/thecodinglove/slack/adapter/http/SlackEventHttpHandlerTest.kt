@@ -7,10 +7,10 @@ import com.gchristov.thecodinglove.common.networktestfixtures.FakeHttpResponse
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackEvent
-import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackHttpRequest
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackRevokeTokensUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackVerifyRequestUseCase
+import com.gchristov.thecodinglove.slack.testfixtures.SlackConfigCreator
 import io.ktor.http.*
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
@@ -123,12 +123,4 @@ class SlackEventHttpHandlerTest {
 }
 
 private const val TestChallenge = "challenge_token"
-private val TestSlackConfig = SlackConfig(
-    signingSecret = "signing_secret",
-    timestampValidityMinutes = 5,
-    requestVerificationEnabled = false,
-    clientId = "client_id",
-    clientSecret = "client_secret",
-    interactivityPubSubTopic = "interactivity_topic",
-    slashCommandPubSubTopic = "slash_topic",
-)
+private val TestSlackConfig = SlackConfigCreator.slackConfig()
