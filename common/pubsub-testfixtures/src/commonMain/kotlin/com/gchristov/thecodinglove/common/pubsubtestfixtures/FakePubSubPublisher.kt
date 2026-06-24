@@ -6,7 +6,9 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import kotlinx.serialization.SerializationStrategy
 import kotlin.test.assertEquals
 
-class FakePubSubPublisher : PubSubPublisher {
+class FakePubSubPublisher(
+    private val publishResult: Either<Throwable, String> = Either.Right("message_123"),
+) : PubSubPublisher {
     private var lastTopic: String? = null
     private var lastBody: Any? = null
     private var publishInvocations = 0
@@ -20,7 +22,7 @@ class FakePubSubPublisher : PubSubPublisher {
         lastTopic = topic
         lastBody = body
         publishInvocations++
-        return Either.Right("message_123")
+        return publishResult
     }
 
     fun assertEquals(

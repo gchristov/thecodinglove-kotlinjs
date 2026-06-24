@@ -13,7 +13,9 @@ import kotlin.test.assertTrue
 class FakeSearchRepository(
     private val totalPosts: Int? = null,
     private val pages: Map<Int, List<SearchPost>>? = null,
-    private val searchSession: SearchSession? = null
+    private val searchSession: SearchSession? = null,
+    private val deleteSearchSessionResult: Either<Throwable, Unit> = Either.Right(Unit),
+    private val findSearchSessionsResult: Either<Throwable, List<SearchSession>> = Either.Right(emptyList()),
 ) : SearchRepository {
     private val totalPostsResponse: FakeResponse = FakeResponse.CompletesNormally
     private val searchResponse: FakeResponse = FakeResponse.CompletesNormally
@@ -21,6 +23,7 @@ class FakeSearchRepository(
 
     private var searchSessionGetCalled = false
     private var lastSavedSession: SearchSession? = null
+    private var lastDeletedSessionId: String? = null
 
     override suspend fun getTotalPosts(query: String): Either<Throwable, Int> {
         return Either.Right(totalPostsResponse.execute(totalPosts!!))
@@ -45,12 +48,12 @@ class FakeSearchRepository(
     }
 
     override suspend fun deleteSearchSession(id: String): Either<Throwable, Unit> {
-        TODO("Not yet implemented")
+        lastDeletedSessionId = id
+        return deleteSearchSessionResult
     }
 
-    override suspend fun findSearchSessions(state: SearchSession.State): Either<Throwable, List<SearchSession>> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun findSearchSessions(state: SearchSession.State): Either<Throwable, List<SearchSession>> =
+        findSearchSessionsResult
 
     fun assertSessionFetched() {
         assertTrue(searchSessionGetCalled)
@@ -64,6 +67,13 @@ class FakeSearchRepository(
         assertEquals(
             expected = searchSession,
             actual = lastSavedSession
+        )
+    }
+
+    fun assertSessionDeleted(id: String) {
+        assertEquals(
+            expected = id,
+            actual = lastDeletedSessionId
         )
     }
 }

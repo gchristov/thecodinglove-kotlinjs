@@ -53,7 +53,6 @@ class SlackEventHttpHandlerTest {
         ),
     ) { handler, request, response ->
         handler.handleHttpRequest(request, response)
-        (handler as? SlackEventHttpHandler)
         response.assertEquals(
             header = "Content-Type",
             headerValue = ContentType.Application.Json.toString(),
