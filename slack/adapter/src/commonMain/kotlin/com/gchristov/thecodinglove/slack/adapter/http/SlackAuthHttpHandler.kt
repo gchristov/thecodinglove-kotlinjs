@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.http
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.benasher44.uuid.uuid4
 import com.gchristov.thecodinglove.common.analytics.Analytics
@@ -45,16 +45,14 @@ class SlackAuthHttpHandler(
     ): Either<Throwable, Unit> {
         val code: String? = request.query["code"]
         val state = request.query.get<String?>("state").takeIf { !it.isNullOrEmpty() }
-        return slackAuthUseCase(SlackAuthUseCase.Dto(code)).flatMap {
-            val stateResult = state?.let { handleAuthState(it) } ?: Either.Right(Unit)
-            stateResult.flatMap {
-                analytics.sendEvent(
-                    clientId = uuid4().toString(),
-                    name = "slack_auth_success",
-                )
-                response.redirect("/slack/auth/success")
-                Either.Right(Unit)
-            }
+        return either {
+            slackAuthUseCase(SlackAuthUseCase.Dto(code)).bind()
+            state?.let { handleAuthState(it).bind() }
+            analytics.sendEvent(
+                clientId = uuid4().toString(),
+                name = "slack_auth_success",
+            )
+            response.redirect("/slack/auth/success")
         }
     }
 

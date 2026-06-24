@@ -1,9 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.pubsub
 
 import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.left
-import arrow.core.right
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.error
@@ -37,19 +35,17 @@ class PreloadSearchPubSubHandler(
     )
 
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =
-        request.decodeBodyFromJson(
-            jsonSerializer = jsonSerializer,
-            strategy = PubSubPreloadSearchMessage.serializer(),
+        either {
+            val body = request.decodeBodyFromJson(
+                jsonSerializer = jsonSerializer,
+                strategy = PubSubPreloadSearchMessage.serializer(),
+            ).bind() ?: raise(Exception("Request body is invalid"))
+            preloadSearchResultUseCase(PreloadSearchResultUseCase.Dto(searchSessionId = body.searchSessionId)).bind()
+        }.fold(
+            // Swallow but report the error, so that we can investigate. Preload errors should not retry if the
+            // PubSub body cannot be parsed, or we get any of the search errors, which are currently Exhausted,
+            // Empty and NotFound, where retrying doesn't really make sense for any of them.
+            ifLeft = { log.error(tag, it) { "Error handling request" }; Either.Right(Unit) },
+            ifRight = { Either.Right(Unit) },
         )
-            .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
-            .flatMap { preloadSearchResultUseCase(PreloadSearchResultUseCase.Dto(searchSessionId = it.searchSessionId)) }
-            .fold(
-                ifLeft = {
-                    // Swallow but report the error, so that we can investigate. Preload errors should not retry if the
-                    // PubSub body cannot be parsed, or we get any of the search errors, which are currently Exhausted,
-                    // Empty and NotFound, where retrying doesn't really make sense for any of them.
-                    log.error(tag, it) { "Error handling request" }
-                    Either.Right(Unit)
-                }, ifRight = { Either.Right(Unit) }
-            )
 }

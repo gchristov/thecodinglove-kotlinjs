@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.common.pubsub
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.BaseHttpHandler
@@ -30,8 +30,10 @@ abstract class BasePubSubHandler(
         request: HttpRequest,
         response: HttpResponse,
     ): Either<Throwable, Unit> {
-        return pubSubDecoder.decode(request)
-            .flatMap { handlePubSubRequest(it) }
-            .flatMap { response.sendEmpty() }
+        return either {
+            val pubSubRequest = pubSubDecoder.decode(request).bind()
+            handlePubSubRequest(pubSubRequest).bind()
+            response.sendEmpty().bind()
+        }
     }
 }

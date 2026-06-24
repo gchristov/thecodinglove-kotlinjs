@@ -1,9 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.pubsub
 
 import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.left
-import arrow.core.right
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
@@ -44,25 +42,21 @@ class SlackInteractivityPubSubHandler(
     )
 
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =
-        request.decodeBodyFromJson(
-            jsonSerializer = jsonSerializer,
-            strategy = PubSubSlackInteractivityMessage.serializer(),
-        )
-            .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
-            .flatMap {
-                when (it.payload) {
-                    is PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage ->
-                        it.payload.handle()
-                }
+        either {
+            val message = request.decodeBodyFromJson(
+                jsonSerializer = jsonSerializer,
+                strategy = PubSubSlackInteractivityMessage.serializer(),
+            ).bind() ?: raise(Exception("Request body is invalid"))
+            when (message.payload) {
+                is PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage ->
+                    message.payload.handle().bind()
             }
-            .fold(
-                ifLeft = {
-                    // Swallow but report the error, so that we can investigate. At this point, the user will be seeing
-                    // a post with interactivity options, so from their POV nothing will happen, so they can re-shuffle.
-                    log.error(tag, it) { "Error handling request" }
-                    Either.Right(Unit)
-                }, ifRight = { Either.Right(Unit) }
-            )
+        }.fold(
+            // Swallow but report the error, so that we can investigate. At this point, the user will be seeing
+            // a post with interactivity options, so from their POV nothing will happen, so they can re-shuffle.
+            ifLeft = { log.error(tag, it) { "Error handling request" }; Either.Right(Unit) },
+            ifRight = { Either.Right(Unit) },
+        )
 
     private suspend fun PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.handle(): Either<Throwable, Unit> {
         val sendAction = sendAction()

@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.domain.usecase
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
@@ -42,18 +42,16 @@ internal class RealSlackAuthUseCase(
                 log.debug(tag, "Auth cancelled")
                 Either.Left(SlackAuthUseCase.Error.Cancelled())
             } else {
-                slackRepository.authUser(
-                    code = dto.code,
-                    clientId = slackConfig.clientId,
-                    clientSecret = slackConfig.clientSecret
-                )
-                    .mapLeft { SlackAuthUseCase.Error.Other(it.message) }
-                    .flatMap { authResponse ->
-                        log.debug(tag, "Persisting auth token")
-                        slackRepository
-                            .saveAuthToken(authResponse)
-                            .mapLeft { SlackAuthUseCase.Error.Other(it.message) }
-                    }
+                either {
+                    val authResponse = slackRepository.authUser(
+                        code = dto.code,
+                        clientId = slackConfig.clientId,
+                        clientSecret = slackConfig.clientSecret,
+                    ).mapLeft { SlackAuthUseCase.Error.Other(it.message) }.bind()
+                    log.debug(tag, "Persisting auth token")
+                    slackRepository.saveAuthToken(authResponse)
+                        .mapLeft { SlackAuthUseCase.Error.Other(it.message) }.bind()
+                }
             }
         }
 }

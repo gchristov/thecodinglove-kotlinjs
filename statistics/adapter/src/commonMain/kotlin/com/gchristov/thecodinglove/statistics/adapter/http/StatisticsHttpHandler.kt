@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.statistics.adapter.http
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
@@ -29,10 +29,8 @@ class StatisticsHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = statisticsReportUseCase().flatMap { report ->
-        response.sendJson(
-            data = report.toStatisticsReport(),
-            jsonSerializer = jsonSerializer,
-        )
+    ): Either<Throwable, Unit> = either {
+        val report = statisticsReportUseCase().bind()
+        response.sendJson(data = report.toStatisticsReport(), jsonSerializer = jsonSerializer).bind()
     }
 }

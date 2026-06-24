@@ -1,9 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.http
 
 import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.left
-import arrow.core.right
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Logger.Companion.tag
 import com.benasher44.uuid.uuid4
@@ -44,45 +42,38 @@ class SlackEventHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = if (slackConfig.requestVerificationEnabled) {
-        request
-            .toSlackRequestVerificationDto()
-            .flatMap { slackVerifyRequestUseCase(it) }
-    } else {
-        Either.Right(Unit)
+    ): Either<Throwable, Unit> = either {
+        if (slackConfig.requestVerificationEnabled) {
+            val verifyDto = request.toSlackRequestVerificationDto().bind()
+            slackVerifyRequestUseCase(verifyDto).bind()
+        }
+        val apiEvent = request.decodeBodyFromJson(
+            jsonSerializer = jsonSerializer,
+            strategy = ApiSlackEvent.serializer(),
+        ).bind() ?: raise(Exception("Request body is invalid"))
+        when (val event = apiEvent.toEvent()) {
+            is SlackEvent.UrlVerification -> event.handle(response).bind()
+            is SlackEvent.Callback -> event.handle(response).bind()
+        }
     }
-        .flatMap {
-            request.decodeBodyFromJson(
-                jsonSerializer = jsonSerializer,
-                strategy = ApiSlackEvent.serializer(),
-            )
-        }
-        .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
-        .flatMap {
-            when (val event = it.toEvent()) {
-                is SlackEvent.UrlVerification -> event.handle(response)
-                is SlackEvent.Callback -> event.handle(response)
-            }
-        }
 
     private fun SlackEvent.UrlVerification.handle(response: HttpResponse) = response.sendText(text = challenge)
 
     private suspend fun SlackEvent.Callback.handle(response: HttpResponse) =
         when (val typedEvent = event) {
-            is SlackEvent.Callback.Event.TokensRevoked -> {
+            is SlackEvent.Callback.Event.TokensRevoked -> either {
                 val revokeTokensDto = typedEvent.toSlackRevokeTokensDto()
-                slackRevokeTokensUseCase(revokeTokensDto).flatMap {
-                    val params = mutableMapOf<String, String>().apply {
-                        revokeTokensDto.bot?.forEach { put(it, true.toString()) }
-                        revokeTokensDto.oAuth?.forEach { put(it, true.toString()) }
-                    }
-                    analytics.sendEvent(
-                        clientId = uuid4().toString(),
-                        name = "app_revoke_tokens",
-                        params = params,
-                    )
-                    response.sendEmpty()
+                slackRevokeTokensUseCase(revokeTokensDto).bind()
+                val params = mutableMapOf<String, String>().apply {
+                    revokeTokensDto.bot?.forEach { put(it, true.toString()) }
+                    revokeTokensDto.oAuth?.forEach { put(it, true.toString()) }
                 }
+                analytics.sendEvent(
+                    clientId = uuid4().toString(),
+                    name = "app_revoke_tokens",
+                    params = params,
+                )
+                response.sendEmpty().bind()
             }
 
             is SlackEvent.Callback.Event.AppUninstalled -> {

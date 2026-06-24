@@ -1,9 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.pubsub
 
 import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.left
-import arrow.core.right
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
@@ -40,12 +38,13 @@ class SlackSlashCommandPubSubHandler(
     )
 
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =
-        request.decodeBodyFromJson(
-            jsonSerializer = jsonSerializer,
-            strategy = PubSubSlackSlashCommandMessage.serializer(),
-        )
-            .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
-            .flatMap { it.handle() }
+        either {
+            val message = request.decodeBodyFromJson(
+                jsonSerializer = jsonSerializer,
+                strategy = PubSubSlackSlashCommandMessage.serializer(),
+            ).bind() ?: raise(Exception("Request body is invalid"))
+            message.handle().bind()
+        }
 
     /*
      * This method handles errors as success without PubSub retries, but tries to notify the user of the error. If
@@ -63,12 +62,13 @@ class SlackSlashCommandPubSubHandler(
                 "team_id" to teamId,
             )
         )
-        return slackRepository.postMessageToUrl(
-            url = responseUrl,
-            message = slackMessageFactory.searchingMessage(),
-        )
-            .flatMap { slackSearchRepository.search(text) }
-            .fold(
+        return either {
+            slackRepository.postMessageToUrl(
+                url = responseUrl,
+                message = slackMessageFactory.searchingMessage(),
+            ).bind()
+            slackSearchRepository.search(text).bind()
+        }.fold(
                 ifLeft = { error ->
                     analytics.sendEvent(
                         clientId = userId,

@@ -1,9 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.http
 
 import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.left
-import arrow.core.right
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
@@ -32,17 +30,13 @@ class UpdateSearchSessionStateHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = request.decodeBodyFromJson(
-        jsonSerializer = jsonSerializer,
-        strategy = ApiUpdateSearchSessionState.serializer(),
-    )
-        .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
-        .flatMap { sessionUpdate ->
-            searchRepository
-                .getSearchSession(sessionUpdate.searchSessionId)
-                .flatMap {
-                    searchRepository.saveSearchSession(it.copy(state = sessionUpdate.state.toState()))
-                }
-        }
-        .flatMap { response.sendEmpty() }
+    ): Either<Throwable, Unit> = either {
+        val body = request.decodeBodyFromJson(
+            jsonSerializer = jsonSerializer,
+            strategy = ApiUpdateSearchSessionState.serializer(),
+        ).bind() ?: raise(Exception("Request body is invalid"))
+        val session = searchRepository.getSearchSession(body.searchSessionId).bind()
+        searchRepository.saveSearchSession(session.copy(state = body.state.toState())).bind()
+        response.sendEmpty().bind()
+    }
 }

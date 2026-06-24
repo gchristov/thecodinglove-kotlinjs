@@ -1,7 +1,6 @@
 package com.gchristov.thecodinglove.slack.adapter
 
 import arrow.core.Either
-import arrow.core.flatMap
 import arrow.core.raise.either
 import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
@@ -30,44 +29,31 @@ internal class RealSlackRepository(
         clientSecret = clientSecret,
     )
 
-    override suspend fun getAuthToken(tokenId: String): Either<Throwable, SlackAuthToken> = firebaseAdmin
-        .firestore()
-        .collection(AuthTokenCollection)
-        .document(tokenId)
-        .get()
-        .flatMap { document ->
-            if (document.exists) {
-                document.decodeDataFromJson(
-                    jsonSerializer = jsonSerializer,
-                    strategy = DbSlackAuthToken.serializer(),
-                ).flatMap { dbAuthToken ->
-                    dbAuthToken?.let {
-                        Either.Right(it.toAuthToken())
-                    } ?: Either.Left(Exception("Auth token not found"))
-                }
-            } else {
-                Either.Left(Exception("Auth token not found"))
-            }
-        }
+    override suspend fun getAuthToken(tokenId: String): Either<Throwable, SlackAuthToken> = either {
+        val document = firebaseAdmin
+            .firestore()
+            .collection(AuthTokenCollection)
+            .document(tokenId)
+            .get()
+            .bind()
+        if (!document.exists) raise(Exception("Auth token not found"))
+        val dbAuthToken = document.decodeDataFromJson(
+            jsonSerializer = jsonSerializer,
+            strategy = DbSlackAuthToken.serializer(),
+        ).bind()
+        dbAuthToken?.toAuthToken() ?: raise(Exception("Auth token not found"))
+    }
 
-    override suspend fun getAuthTokens(): Either<Throwable, List<SlackAuthToken>> = firebaseAdmin
-        .firestore()
-        .collection(AuthTokenCollection)
-        .get()
-        .flatMap {
-            it.docs
-                .map { document ->
-                    document.decodeDataFromJson(
-                        jsonSerializer = jsonSerializer,
-                        strategy = DbSlackAuthToken.serializer(),
-                    ).flatMap { dbAuthToken ->
-                        dbAuthToken?.let {
-                            Either.Right(it.toAuthToken())
-                        } ?: Either.Left(Throwable("Could not decode auth token"))
-                    }
-                }
-                .let { l -> either { l.bindAll() } }
+    override suspend fun getAuthTokens(): Either<Throwable, List<SlackAuthToken>> = either {
+        val result = firebaseAdmin.firestore().collection(AuthTokenCollection).get().bind()
+        result.docs.map { document ->
+            val dbAuthToken = document.decodeDataFromJson(
+                jsonSerializer = jsonSerializer,
+                strategy = DbSlackAuthToken.serializer(),
+            ).bind()
+            dbAuthToken?.toAuthToken() ?: raise(Throwable("Could not decode auth token"))
         }
+    }
 
     override suspend fun saveAuthToken(token: SlackAuthToken): Either<Throwable, Unit> = firebaseAdmin
         .firestore()
@@ -130,24 +116,16 @@ internal class RealSlackRepository(
         .document(messageId)
         .delete()
 
-    override suspend fun getSelfDestructMessages(): Either<Throwable, List<SlackSelfDestructMessage>> = firebaseAdmin
-        .firestore()
-        .collection(SelfDestructCollection)
-        .get()
-        .flatMap {
-            it.docs
-                .map { document ->
-                    document.decodeDataFromJson(
-                        jsonSerializer = jsonSerializer,
-                        strategy = DbSlackSelfDestructMessage.serializer(),
-                    ).flatMap { dbSelfDestructMessage ->
-                        dbSelfDestructMessage?.let {
-                            Either.Right(it.toSelfDestructMessage())
-                        } ?: Either.Left(Throwable("Could not decode self-destruct message"))
-                    }
-                }
-                .let { l -> either { l.bindAll() } }
+    override suspend fun getSelfDestructMessages(): Either<Throwable, List<SlackSelfDestructMessage>> = either {
+        val result = firebaseAdmin.firestore().collection(SelfDestructCollection).get().bind()
+        result.docs.map { document ->
+            val dbSelfDestructMessage = document.decodeDataFromJson(
+                jsonSerializer = jsonSerializer,
+                strategy = DbSlackSelfDestructMessage.serializer(),
+            ).bind()
+            dbSelfDestructMessage?.toSelfDestructMessage() ?: raise(Throwable("Could not decode self-destruct message"))
         }
+    }
 }
 
 private const val AuthTokenCollection = "slack_auth_token"
