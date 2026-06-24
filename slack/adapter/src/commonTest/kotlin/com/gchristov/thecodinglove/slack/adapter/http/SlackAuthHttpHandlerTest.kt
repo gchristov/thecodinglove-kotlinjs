@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 
 class SlackAuthHttpHandlerTest {
     @Test
-    fun httpConfig(): TestResult = runBlockingTest { handler, _, _ ->
+    fun httpConfig(): TestResult = runBlockingTest { handler, _, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Get, config.method)
         assertEquals("/api/slack/auth", config.path)
@@ -28,7 +28,7 @@ class SlackAuthHttpHandlerTest {
     @Test
     fun authCancelledRedirectsToHome(): TestResult = runBlockingTest(
         authResult = Either.Left(SlackAuthUseCase.Error.Cancelled()),
-    ) { handler, request, response ->
+    ) { handler, request, response, _ ->
         handler.handleHttpRequest(request, response)
         response.assertRedirect("/")
     }
@@ -36,7 +36,7 @@ class SlackAuthHttpHandlerTest {
     @Test
     fun authErrorRedirectsToErrorPage(): TestResult = runBlockingTest(
         authResult = Either.Left(SlackAuthUseCase.Error.Other()),
-    ) { handler, request, response ->
+    ) { handler, request, response, _ ->
         handler.handleHttpRequest(request, response)
         response.assertRedirect("/slack/auth/error")
     }
@@ -46,19 +46,48 @@ class SlackAuthHttpHandlerTest {
         authResult = Either.Right(Unit),
         fakeCode = "auth_code",
         fakeState = null,
-    ) { handler, request, response ->
+    ) { handler, request, response, _ ->
         handler.handleHttpRequest(request, response)
         response.assertRedirect("/slack/auth/success")
     }
 
+    @Test
+    fun authSuccessWithValidStateCallsSendSearch(): TestResult = runBlockingTest(
+        authResult = Either.Right(Unit),
+        fakeCode = "auth_code",
+        fakeState = TestEncodedState,
+    ) { handler, request, response, sendUseCase ->
+        handler.handleHttpRequest(request, response)
+        sendUseCase.assertInvokedOnce()
+        response.assertRedirect("/slack/auth/success")
+    }
+
+    @Test
+    fun authSuccessWithSendSearchErrorSendsError(): TestResult = runBlockingTest(
+        authResult = Either.Right(Unit),
+        sendSearchResult = Either.Left(Throwable("Search failed")),
+        fakeCode = "auth_code",
+        fakeState = TestEncodedState,
+    ) { handler, request, response, _ ->
+        handler.handleHttpRequest(request, response)
+        response.assertEquals(
+            header = "Content-Type",
+            headerValue = ContentType.Application.Json.toString(),
+            data = """{"errorMessage":"Search failed"}""",
+            status = 400,
+            filePath = null,
+        )
+    }
+
     private fun runBlockingTest(
         authResult: Either<SlackAuthUseCase.Error, Unit> = Either.Right(Unit),
+        sendSearchResult: Either<Throwable, Unit> = Either.Right(Unit),
         fakeCode: String? = null,
         fakeState: String? = null,
-        testBlock: suspend (SlackAuthHttpHandler, FakeSlackAuthHttpRequest, FakeHttpResponse) -> Unit,
+        testBlock: suspend (SlackAuthHttpHandler, FakeSlackAuthHttpRequest, FakeHttpResponse, FakeSlackSendSearchUseCase) -> Unit,
     ): TestResult = runTest {
         val authUseCase = FakeSlackAuthUseCase(invocationResult = authResult)
-        val sendUseCase = FakeSlackSendSearchUseCase()
+        val sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendSearchResult)
         val request = FakeSlackAuthHttpRequest(fakeCode = fakeCode, fakeState = fakeState)
         val response = FakeHttpResponse()
         val handler = SlackAuthHttpHandler(
@@ -69,6 +98,10 @@ class SlackAuthHttpHandlerTest {
             slackSendSearchUseCase = sendUseCase,
             analytics = FakeAnalytics(),
         )
-        testBlock(handler, request, response)
+        testBlock(handler, request, response, sendUseCase)
     }
 }
+
+// Base64 of: {"search_session_id":"session_1","channel_id":"ch_1","team_id":"team_1","user_id":"user_1","response_url":"https://response.com","self_destruct_minutes":5}
+private const val TestEncodedState =
+    "eyJzZWFyY2hfc2Vzc2lvbl9pZCI6InNlc3Npb25fMSIsImNoYW5uZWxfaWQiOiJjaF8xIiwidGVhbV9pZCI6InRlYW1fMSIsInVzZXJfaWQiOiJ1c2VyXzEiLCJyZXNwb25zZV91cmwiOiJodHRwczovL3Jlc3BvbnNlLmNvbSIsInNlbGZfZGVzdHJ1Y3RfbWludXRlcyI6NX0="
