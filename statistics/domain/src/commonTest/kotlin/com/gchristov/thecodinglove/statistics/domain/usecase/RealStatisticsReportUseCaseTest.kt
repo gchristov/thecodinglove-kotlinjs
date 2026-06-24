@@ -4,8 +4,8 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.statistics.domain.model.StatisticsReport
-import com.gchristov.thecodinglove.statistics.domain.port.StatisticsSearchRepository
-import com.gchristov.thecodinglove.statistics.domain.port.StatisticsSlackRepository
+import com.gchristov.thecodinglove.statistics.testfixtures.FakeStatisticsSearchRepository
+import com.gchristov.thecodinglove.statistics.testfixtures.FakeStatisticsSlackRepository
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -68,15 +68,3 @@ private val TestSlackStatistics = StatisticsReport.SlackStatistics(
     users = 50,
     teams = 10,
 )
-
-private class FakeStatisticsSearchRepository(
-    private val result: Either<Throwable, StatisticsReport.SearchStatistics>,
-) : StatisticsSearchRepository {
-    override suspend fun searchStatistics() = result
-}
-
-private class FakeStatisticsSlackRepository(
-    private val result: Either<Throwable, StatisticsReport.SlackStatistics>,
-) : StatisticsSlackRepository {
-    override suspend fun slackStatistics() = result
-}

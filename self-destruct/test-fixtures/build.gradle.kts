@@ -7,12 +7,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(libs.common.kotlin)
-            }
-        }
-        val commonTest by getting {
-            dependencies {
                 implementation(libs.common.test)
-                implementation(projects.testFixtures)
+                implementation(projects.domain)
             }
         }
     }

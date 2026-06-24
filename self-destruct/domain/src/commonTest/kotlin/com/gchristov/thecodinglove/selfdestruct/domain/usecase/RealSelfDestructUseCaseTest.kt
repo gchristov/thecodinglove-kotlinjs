@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.selfdestruct.domain.usecase
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
-import com.gchristov.thecodinglove.selfdestruct.domain.port.SelfDestructSlackRepository
+import com.gchristov.thecodinglove.selfdestruct.testfixtures.FakeSelfDestructSlackRepository
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -37,10 +37,4 @@ class RealSelfDestructUseCaseTest {
             )
         )
     }
-}
-
-private class FakeSelfDestructSlackRepository(
-    private val result: Either<Throwable, Unit>,
-) : SelfDestructSlackRepository {
-    override suspend fun selfDestruct() = result
 }

@@ -15,6 +15,7 @@ kotlin {
             dependencies {
                 implementation(libs.common.test)
                 implementation(libs.common.network.testFixtures)
+                implementation(projects.testFixtures)
             }
         }
     }
