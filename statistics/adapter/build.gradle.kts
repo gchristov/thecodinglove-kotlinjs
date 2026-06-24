@@ -11,5 +11,12 @@ kotlin {
                 implementation(projects.domain)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.common.test)
+                implementation(libs.common.network.testFixtures)
+                implementation(projects.testFixtures)
+            }
+        }
     }
 }

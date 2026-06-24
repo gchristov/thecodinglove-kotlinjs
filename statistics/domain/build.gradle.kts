@@ -9,5 +9,11 @@ kotlin {
                 implementation(libs.common.kotlin)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.common.test)
+                implementation(projects.testFixtures)
+            }
+        }
     }
 }

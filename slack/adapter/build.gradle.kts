@@ -18,6 +18,10 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(libs.common.test)
+                implementation(libs.common.analytics.testFixtures)
+                implementation(libs.common.network.testFixtures)
+                implementation(libs.common.pubsub.testFixtures)
+                implementation(projects.testFixtures)
             }
         }
     }

@@ -97,6 +97,87 @@ Uses `kotlin.test` with mocha as the JS runner. JUnit XML reports are written to
 
 Test files go in `src/commonTest/kotlin/`. Use `kotlin.test.assertEquals` etc. for pure functions; `runTest { }` for coroutines. No mocking — prefer real implementations or simple fakes.
 
+### Test structure
+
+Each test uses a private `runBlockingTest` helper that constructs the system under test and exposes it (and any fakes the test body needs to assert on) via a lambda. Return type is always `TestResult`:
+
+```kotlin
+@Test
+fun myTest(): TestResult = runBlockingTest { handler, response ->
+    handler.handleHttpRequest(FakeEmptyHttpRequest, response)
+    response.assertEquals(...)
+}
+
+private fun runBlockingTest(
+    someResult: Either<Throwable, Unit> = Either.Right(Unit),
+    testBlock: suspend (MyHandler, FakeHttpResponse) -> Unit,
+): TestResult = runTest {
+    val response = FakeHttpResponse()
+    val handler = MyHandler(
+        dispatcher = FakeCoroutineDispatcher,
+        jsonSerializer = JsonSerializer.Default,
+        log = FakeLogger,
+        myUseCase = FakeMyUseCase(someResult),
+    )
+    testBlock(handler, response)
+}
+```
+
+`FakeCoroutineDispatcher` is `Dispatchers.Unconfined`. `FakeLogger` is a pre-configured Kermit logger — both live in `common/test`.
+
+### Test fixtures
+
+Fakes and Creators live in `test-fixtures` modules, **never inline** in test files. Every microservice that has tests should have a `test-fixtures` module. Common shared fakes live in `common/*-testfixtures` modules.
+
+**Fakes** implement a single interface, accept a configurable result in the constructor, track invocation count, and expose assertion helpers:
+
+```kotlin
+class FakeMyUseCase(
+    private val invocationResult: Either<Throwable, Unit> = Either.Right(Unit),
+) : MyUseCase {
+    private var invocations = 0
+    override suspend fun invoke(): Either<Throwable, Unit> { invocations++; return invocationResult }
+    fun assertInvokedOnce() = assertEquals(expected = 1, actual = invocations)
+}
+```
+
+**Creators** produce domain objects with sensible defaults and named overrides. Use a Creator any time a test needs a domain object — don't construct domain objects inline in test files:
+
+```kotlin
+object MyDomainObjectCreator {
+    fun domainObject(id: String = "id_1", name: String = "name") = MyDomainObject(id = id, name = name)
+}
+```
+
+Simple scalar test values (strings, IDs) can stay as `private const val` inside the test file.
+
+### Common test fixtures modules
+
+| Module | Key contents |
+|--------|-------------|
+| `common/test` | `FakeCoroutineDispatcher`, `FakeLogger` |
+| `common/network-testfixtures` | `FakeHttpResponse`, `FakeEmptyHttpRequest`, `FakeBodyHttpRequest` |
+| `common/pubsub-testfixtures` | `FakePubSubPublisher`, `FakePubSubRequest` |
+| `common/analytics-testfixtures` | `FakeAnalytics` |
+| `search/test-fixtures` | `FakeSearchRepository`, `FakeSearchHttpRequest`, Creators for `SearchSession`, `SearchPost`, `SearchStatistics`, etc. |
+| `slack/test-fixtures` | Fakes for all Slack use cases, `FakeSlackHttpRequest`, `FakeSlackAuthHttpRequest`, `SlackConfigCreator`, Creators for Slack domain objects |
+| `self-destruct/test-fixtures` | `FakeSelfDestructUseCase`, `FakeSelfDestructSlackRepository` |
+| `statistics/test-fixtures` | `FakeStatisticsReportUseCase`, `FakeStatisticsSearchRepository`, `FakeStatisticsSlackRepository`, `StatisticsReportCreator` |
+
+### HTTP handler tests
+
+`FakeHttpResponse` records the last header, data, status, redirect path, and file path. Assert with:
+- `response.assertEquals(header, headerValue, data, status, filePath)` — for regular responses
+- `response.assertRedirect(path)` — for redirects
+
+`FakeEmptyHttpRequest` — all-null/empty request, no body. Use for handlers that don't read the request.
+`FakeBodyHttpRequest(fakeBody)` — same but returns `fakeBody as T?` from `decodeBodyFromJson`. Use when the handler deserialises a JSON body. Note: if the body type is `internal` to the adapter module, construct it in the test file and pass it as `Any?`.
+Module-specific request fakes (`FakeSearchHttpRequest`, `FakeSlackHttpRequest`, etc.) handle typed query parameters.
+
+### What not to test
+
+Repositories, service API clients, base classes, and pure field-copy mappers don't need unit tests — they belong to integration tests. Focus tests on use cases and HTTP/PubSub handlers that contain branching logic.
+
 ## Secrets
 
 Each microservice domain has a `secrets.properties` file (gitignored). Example:
