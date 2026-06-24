@@ -14,7 +14,9 @@ import kotlin.test.assertTrue
 class FakeSlackRepository(
     private val authUserResult: Either<Throwable, SlackAuthToken> = Either.Right(SlackAuthTokenCreator.token()),
     private val getAuthTokenResult: Either<Throwable, SlackAuthToken> = Either.Left(Throwable("Auth token not found")),
+    private val getAuthTokensResult: Either<Throwable, List<SlackAuthToken>> = Either.Right(emptyList()),
     private val saveAuthTokenResult: Either<Throwable, Unit> = Either.Right(Unit),
+    private val deleteAuthTokenResult: Either<Throwable, Unit> = Either.Right(Unit),
     private val postMessageToUrlResult: Either<Throwable, Unit> = Either.Right(Unit),
     private val postMessageResult: Either<Throwable, String> = Either.Right(TestMessageTs),
     private val deleteMessageResult: Either<Throwable, Unit> = Either.Right(Unit),
@@ -25,6 +27,7 @@ class FakeSlackRepository(
     private var authUserInvocations = 0
     private var getAuthTokenInvocations = 0
     private var lastSavedAuthToken: SlackAuthToken? = null
+    private var deleteAuthTokenInvocations = 0
     private var postMessageToUrlInvocations = 0
     private var postMessageInvocations = 0
     private var deleteMessageInvocations = 0
@@ -40,14 +43,13 @@ class FakeSlackRepository(
     override suspend fun getAuthToken(tokenId: String) =
         getAuthTokenResult.also { getAuthTokenInvocations++ }
 
-    override suspend fun getAuthTokens(): Either<Throwable, List<SlackAuthToken>> =
-        Either.Right(emptyList())
+    override suspend fun getAuthTokens(): Either<Throwable, List<SlackAuthToken>> = getAuthTokensResult
 
     override suspend fun saveAuthToken(token: SlackAuthToken) =
         saveAuthTokenResult.also { lastSavedAuthToken = token }
 
     override suspend fun deleteAuthToken(tokenId: String): Either<Throwable, Unit> =
-        Either.Right(Unit)
+        deleteAuthTokenResult.also { deleteAuthTokenInvocations++ }
 
     override suspend fun postMessageToUrl(url: String, message: SlackMessage) =
         postMessageToUrlResult.also { postMessageToUrlInvocations++ }
@@ -69,6 +71,7 @@ class FakeSlackRepository(
 
     override suspend fun getSelfDestructMessages() = getSelfDestructMessagesResult
 
+    fun assertDeleteAuthTokenCalledTimes(times: Int) = assertEquals(expected = times, actual = deleteAuthTokenInvocations)
     fun assertAuthUserCalled() = assertTrue(authUserInvocations > 0)
     fun assertAuthTokenSaved(token: SlackAuthToken) = assertEquals(expected = token, actual = lastSavedAuthToken)
     fun assertAuthTokenNotSaved() = assertNull(lastSavedAuthToken)
