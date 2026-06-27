@@ -7,7 +7,7 @@ import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubDecoder
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackInteractivityMessage
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackCancelSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSendSearchUseCase
@@ -19,12 +19,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class SlackInteractivityPubSubHandlerTest {
+class SlackInteractivityReceivedPubSubHandlerTest {
     @Test
     fun httpConfig(): TestResult = runBlockingTest { handler, _, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
-        assertEquals("/api/pubsub/slack/interactivity", config.path)
+        assertEquals("/api/pubsub/slack/interactivity-received", config.path)
         assertEquals(ContentType.Application.Json, config.contentType)
     }
 
@@ -83,18 +83,18 @@ class SlackInteractivityPubSubHandlerTest {
     }
 
     private fun runBlockingTest(
-        message: PubSubSlackInteractivityMessage? = interactivityMessage(action = SlackActionName.SEND),
+        message: SlackInteractivityReceivedEvent? = interactivityMessage(action = SlackActionName.SEND),
         sendResult: Either<Throwable, Unit> = Either.Right(Unit),
-        testBlock: suspend (SlackInteractivityPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase, FakePubSubRequest<PubSubSlackInteractivityMessage>) -> Unit,
+        testBlock: suspend (SlackInteractivityReceivedPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase, FakePubSubRequest<SlackInteractivityReceivedEvent>) -> Unit,
     ): TestResult = runTest {
         val sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)
         val shuffleUseCase = FakeSlackShuffleSearchUseCase()
         val cancelUseCase = FakeSlackCancelSearchUseCase()
         val request = FakePubSubRequest(
             message = message,
-            messageSerializer = PubSubSlackInteractivityMessage.serializer(),
+            messageSerializer = SlackInteractivityReceivedEvent.serializer(),
         )
-        val handler = SlackInteractivityPubSubHandler(
+        val handler = SlackInteractivityReceivedPubSubHandler(
             dispatcher = FakeCoroutineDispatcher,
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
@@ -108,23 +108,23 @@ class SlackInteractivityPubSubHandlerTest {
     }
 }
 
-private fun interactivityMessage(action: SlackActionName) = PubSubSlackInteractivityMessage(
-    payload = PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage(
+private fun interactivityMessage(action: SlackActionName) = SlackInteractivityReceivedEvent(
+    payload = SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage(
         actions = listOf(
-            PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.Action(
+            SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.Action(
                 name = action.apiValue,
                 value = "session_123",
             )
         ),
-        team = PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.Team(
+        team = SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.Team(
             id = "team_id",
             domain = "team_domain",
         ),
-        channel = PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.Channel(
+        channel = SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.Channel(
             id = "channel_id",
             name = "channel_name",
         ),
-        user = PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.User(
+        user = SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.User(
             id = "user_id",
             name = "user_name",
         ),

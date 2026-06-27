@@ -9,7 +9,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toPubSubMessage
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackRequestVerificationDto
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackInteractivity
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackInteractivityMessage
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackVerifyRequestUseCase
 import io.ktor.http.*
@@ -54,6 +54,6 @@ class SlackInteractivityHttpHandler(
             topic = slackConfig.interactivityPubSubTopic,
             body = interactivity.toPubSubMessage(),
             jsonSerializer = jsonSerializer,
-            strategy = PubSubSlackInteractivityMessage.serializer(),
+            strategy = SlackInteractivityReceivedEvent.serializer(),
         )
 }

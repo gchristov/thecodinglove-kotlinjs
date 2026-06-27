@@ -1,14 +1,14 @@
 package com.gchristov.thecodinglove.slack.adapter.http.mapper
 
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackInteractivity
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackInteractivityMessage
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
 
-internal fun ApiSlackInteractivity.toPubSubMessage() = PubSubSlackInteractivityMessage(
+internal fun ApiSlackInteractivity.toPubSubMessage() = SlackInteractivityReceivedEvent(
     payload = payload.toPayload()
 )
 
 private fun ApiSlackInteractivity.ApiSlackInteractivityPayload.toPayload() = when (this) {
-    is ApiSlackInteractivity.ApiSlackInteractivityPayload.ApiInteractiveMessage -> PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage(
+    is ApiSlackInteractivity.ApiSlackInteractivityPayload.ApiInteractiveMessage -> SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage(
         actions = actions.map { it.toAction() },
         team = team.toTeam(),
         channel = channel.toChannel(),
@@ -18,25 +18,25 @@ private fun ApiSlackInteractivity.ApiSlackInteractivityPayload.toPayload() = whe
 }
 
 private fun ApiSlackInteractivity.ApiSlackInteractivityPayload.ApiInteractiveMessage.ApiAction.toAction() =
-    PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.Action(
+    SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.Action(
         name = name,
         value = value
     )
 
 private fun ApiSlackInteractivity.ApiSlackInteractivityPayload.ApiInteractiveMessage.ApiTeam.toTeam() =
-    PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.Team(
+    SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.Team(
         id = id,
         domain = domain
     )
 
 private fun ApiSlackInteractivity.ApiSlackInteractivityPayload.ApiInteractiveMessage.ApiChannel.toChannel() =
-    PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.Channel(
+    SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.Channel(
         id = id,
         name = name
     )
 
 private fun ApiSlackInteractivity.ApiSlackInteractivityPayload.ApiInteractiveMessage.ApiUser.toUser() =
-    PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.User(
+    SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.User(
         id = id,
         name = name
     )
