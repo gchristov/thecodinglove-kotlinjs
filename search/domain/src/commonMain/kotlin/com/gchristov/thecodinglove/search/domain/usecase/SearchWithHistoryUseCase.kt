@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.search.domain.usecase
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import com.gchristov.thecodinglove.search.domain.RangeError
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.model.SearchPost
@@ -53,50 +53,38 @@ internal class RealSearchWithHistoryUseCase(
     override suspend operator fun invoke(
         dto: SearchWithHistoryUseCase.Dto
     ): Either<SearchWithHistoryUseCase.Error, SearchWithHistoryUseCase.Result> = withContext(dispatcher) {
-        // Find total number of posts
-        (dto.totalPosts?.let { Either.Right(it) } ?: searchRepository.getTotalPosts(dto.query))
-            .mapLeft { SearchWithHistoryUseCase.Error.Empty(additionalInfo = it.message) }
-            .flatMap { totalResults ->
-                if (totalResults <= 0) {
-                    return@withContext Either.Left(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "query=${dto.query}"))
-                }
-                // Generate random page number
-                Random.nextRandomPage(
-                    totalResults = totalResults,
-                    resultsPerPage = searchConfig.postsPerPage,
-                    exclusions = dto.searchHistory.getExcludedPages()
-                )
-                    .mapLeft { it.toSearchError(dto.query) }
-                    .flatMap { postPage ->
-                        // Get all posts on the random page
-                        searchRepository.search(
-                            page = postPage,
-                            query = dto.query
-                        )
-                            .mapLeft { SearchWithHistoryUseCase.Error.Empty(additionalInfo = it.message) }
-                            .flatMap { searchResults ->
-                                if (searchResults.isEmpty()) {
-                                    return@withContext Either.Left(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "query=${dto.query}"))
-                                }
-                                // Pick a post randomly from the page
-                                Random.nextRandomPostIndex(
-                                    posts = searchResults,
-                                    exclusions = dto.searchHistory.getExcludedPostIndexes(postPage)
-                                )
-                                    .mapLeft { it.toSearchError(dto.query) }
-                                    .map { postIndexOnPage ->
-                                        SearchWithHistoryUseCase.Result(
-                                            query = dto.query,
-                                            totalPosts = totalResults,
-                                            post = searchResults[postIndexOnPage],
-                                            postPage = postPage,
-                                            postIndexOnPage = postIndexOnPage,
-                                            postPageSize = searchResults.size
-                                        )
-                                    }
-                            }
-                    }
-            }
+        either {
+            // Find total number of posts
+            val totalResults = (dto.totalPosts?.let { Either.Right(it) } ?: searchRepository.getTotalPosts(dto.query))
+                .mapLeft { SearchWithHistoryUseCase.Error.Empty(additionalInfo = it.message) }
+                .bind()
+            if (totalResults <= 0) raise(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "query=${dto.query}"))
+            // Generate random page number
+            val postPage = Random.nextRandomPage(
+                totalResults = totalResults,
+                resultsPerPage = searchConfig.postsPerPage,
+                exclusions = dto.searchHistory.getExcludedPages(),
+            ).mapLeft { it.toSearchError(dto.query) }.bind()
+            // Get all posts on the random page
+            val searchResults = searchRepository.search(
+                page = postPage,
+                query = dto.query,
+            ).mapLeft { SearchWithHistoryUseCase.Error.Empty(additionalInfo = it.message) }.bind()
+            if (searchResults.isEmpty()) raise(SearchWithHistoryUseCase.Error.Empty(additionalInfo = "query=${dto.query}"))
+            // Pick a post randomly from the page
+            val postIndexOnPage = Random.nextRandomPostIndex(
+                posts = searchResults,
+                exclusions = dto.searchHistory.getExcludedPostIndexes(postPage),
+            ).mapLeft { it.toSearchError(dto.query) }.bind()
+            SearchWithHistoryUseCase.Result(
+                query = dto.query,
+                totalPosts = totalResults,
+                post = searchResults[postIndexOnPage],
+                postPage = postPage,
+                postIndexOnPage = postIndexOnPage,
+                postPageSize = searchResults.size,
+            )
+        }
     }
 }
 

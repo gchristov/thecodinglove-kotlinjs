@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.domain.usecase
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
@@ -51,22 +51,13 @@ internal class RealSlackSendSearchUseCase(
                 responseUrl = dto.responseUrl,
                 selfDestructMinutes = dto.selfDestructMinutes,
             )
-            slackRepository.getAuthToken(tokenId = dto.userId)
-                .fold(
-                    ifLeft = { error ->
-                        log.debug(tag, error) { "Error fetching user token${error.message?.let { ": $it" } ?: ""}" }
-                        authenticate(
-                            clientId = slackConfig.clientId,
-                            authState = authState,
-                        )
-                    },
-                    ifRight = {
-                        sendResult(
-                            authState = authState,
-                            authToken = it.token,
-                        )
-                    }
-                )
+            when (val tokenResult = slackRepository.getAuthToken(tokenId = dto.userId)) {
+                is Either.Left -> {
+                    log.debug(tag, tokenResult.value) { "Error fetching user token${tokenResult.value.message?.let { ": $it" } ?: ""}" }
+                    authenticate(clientId = slackConfig.clientId, authState = authState)
+                }
+                is Either.Right -> sendResult(authState = authState, authToken = tokenResult.value.token)
+            }
         }
 
     private suspend fun authenticate(
@@ -91,64 +82,48 @@ internal class RealSlackSendSearchUseCase(
     private suspend fun sendResult(
         authState: SlackAuthState,
         authToken: String,
-    ): Either<Throwable, Unit> {
+    ): Either<Throwable, Unit> = either {
         log.debug(tag, "Obtaining search session: searchSessionId=${authState.searchSessionId}")
-        return slackSearchRepository.getSearchSessionPost(authState.searchSessionId)
-            .flatMap { searchSessionPost ->
-                log.debug(tag, "Cancelling previous search: responseUrl=${authState.responseUrl}")
-                slackRepository.postMessageToUrl(
-                    url = authState.responseUrl,
-                    message = slackMessageFactory.cancelMessage()
-                ).flatMap {
-                    log.debug(tag, "Posting search result: searchSessionId=${authState.searchSessionId}")
-                    slackRepository.postMessage(
-                        authToken = authToken,
-                        message = slackMessageFactory.searchPostMessage(
-                            searchQuery = searchSessionPost.searchQuery,
-                            attachmentTitle = searchSessionPost.attachmentTitle,
-                            attachmentUrl = searchSessionPost.attachmentUrl,
-                            attachmentImageUrl = searchSessionPost.attachmentImageUrl,
-                            channelId = authState.channelId,
-                            selfDestructMinutes = authState.selfDestructMinutes,
-                        )
-                    ).flatMap { messageTs ->
-                        val logPlaceholder = authState.selfDestructMinutes?.let { "self-destruct" } ?: "sent"
-                        val state = authState.selfDestructMinutes?.let {
-                            SlackSearchRepository.SearchSessionStateDto.SelfDestruct
-                        } ?: SlackSearchRepository.SearchSessionStateDto.Sent
-                        log.debug(
-                            tag,
-                            "Marking search session as $logPlaceholder: searchSessionId=${authState.searchSessionId}"
-                        )
-                        slackSearchRepository
-                            .updateSearchSessionState(
-                                searchSessionId = authState.searchSessionId,
-                                state = state,
-                            )
-                            .flatMap {
-                                authState.selfDestructMinutes?.let {
-                                    log.debug(
-                                        tag,
-                                        "Persisting self-destruct state: searchSessionId=${authState.searchSessionId}"
-                                    )
-                                    val destroyTimestamp = clock.now().plus(
-                                        value = it,
-                                        unit = DateTimeUnit.MINUTE,
-                                    ).toEpochMilliseconds()
-                                    slackRepository.saveSelfDestructMessage(
-                                        SlackSelfDestructMessage(
-                                            id = authState.searchSessionId,
-                                            userId = authState.userId,
-                                            searchSessionId = authState.searchSessionId,
-                                            destroyTimestamp = destroyTimestamp,
-                                            channelId = authState.channelId,
-                                            messageTs = messageTs,
-                                        )
-                                    )
-                                } ?: Either.Right(Unit)
-                            }
-                    }
-                }
-            }
+        val searchSessionPost = slackSearchRepository.getSearchSessionPost(authState.searchSessionId).bind()
+        log.debug(tag, "Cancelling previous search: responseUrl=${authState.responseUrl}")
+        slackRepository.postMessageToUrl(
+            url = authState.responseUrl,
+            message = slackMessageFactory.cancelMessage(),
+        ).bind()
+        log.debug(tag, "Posting search result: searchSessionId=${authState.searchSessionId}")
+        val messageTs = slackRepository.postMessage(
+            authToken = authToken,
+            message = slackMessageFactory.searchPostMessage(
+                searchQuery = searchSessionPost.searchQuery,
+                attachmentTitle = searchSessionPost.attachmentTitle,
+                attachmentUrl = searchSessionPost.attachmentUrl,
+                attachmentImageUrl = searchSessionPost.attachmentImageUrl,
+                channelId = authState.channelId,
+                selfDestructMinutes = authState.selfDestructMinutes,
+            ),
+        ).bind()
+        val logPlaceholder = authState.selfDestructMinutes?.let { "self-destruct" } ?: "sent"
+        val state = authState.selfDestructMinutes?.let {
+            SlackSearchRepository.SearchSessionStateDto.SelfDestruct
+        } ?: SlackSearchRepository.SearchSessionStateDto.Sent
+        log.debug(tag, "Marking search session as $logPlaceholder: searchSessionId=${authState.searchSessionId}")
+        slackSearchRepository.updateSearchSessionState(
+            searchSessionId = authState.searchSessionId,
+            state = state,
+        ).bind()
+        authState.selfDestructMinutes?.let { minutes ->
+            log.debug(tag, "Persisting self-destruct state: searchSessionId=${authState.searchSessionId}")
+            val destroyTimestamp = clock.now().plus(value = minutes, unit = DateTimeUnit.MINUTE).toEpochMilliseconds()
+            slackRepository.saveSelfDestructMessage(
+                SlackSelfDestructMessage(
+                    id = authState.searchSessionId,
+                    userId = authState.userId,
+                    searchSessionId = authState.searchSessionId,
+                    destroyTimestamp = destroyTimestamp,
+                    channelId = authState.channelId,
+                    messageTs = messageTs,
+                )
+            ).bind()
+        }
     }
 }

@@ -1,9 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.http
 
 import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.left
-import arrow.core.right
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
@@ -38,22 +36,18 @@ class SlackSlashCommandHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = if (slackConfig.requestVerificationEnabled) {
-        request
-            .toSlackRequestVerificationDto()
-            .flatMap { slackVerifyRequestUseCase(it) }
-    } else {
-        Either.Right(Unit)
-    }
-        .flatMap {
-            request.decodeBodyFromJson(
-                jsonSerializer = jsonSerializer,
-                strategy = ApiSlackSlashCommand.serializer(),
-            )
+    ): Either<Throwable, Unit> = either {
+        if (slackConfig.requestVerificationEnabled) {
+            val verifyDto = request.toSlackRequestVerificationDto().bind()
+            slackVerifyRequestUseCase(verifyDto).bind()
         }
-        .flatMap { it?.right() ?: Exception("Request body is invalid").left<Throwable>() }
-        .flatMap { publishSlashCommandMessage(it) }
-        .flatMap { response.sendEmpty() }
+        val body = request.decodeBodyFromJson(
+            jsonSerializer = jsonSerializer,
+            strategy = ApiSlackSlashCommand.serializer(),
+        ).bind() ?: raise(Exception("Request body is invalid"))
+        publishSlashCommandMessage(body).bind()
+        response.sendEmpty().bind()
+    }
 
     private suspend fun publishSlashCommandMessage(slashCommand: ApiSlackSlashCommand) = pubSubPublisher
         .publishJson(

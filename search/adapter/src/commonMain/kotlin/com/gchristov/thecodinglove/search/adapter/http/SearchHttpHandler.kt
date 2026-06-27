@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.http
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
@@ -64,14 +64,12 @@ class SearchHttpHandler(
                         "total_posts" to searchResult.totalPosts.toString(),
                     ),
                 )
-                publishSearchPreloadMessage(
-                    searchSessionId = searchResult.searchSessionId,
-                    searchConfig = searchConfig,
-                ).flatMap {
-                    response.sendJson(
-                        data = searchResult.toSearchResult(),
-                        jsonSerializer = jsonSerializer,
-                    )
+                either {
+                    publishSearchPreloadMessage(
+                        searchSessionId = searchResult.searchSessionId,
+                        searchConfig = searchConfig,
+                    ).bind()
+                    response.sendJson(data = searchResult.toSearchResult(), jsonSerializer = jsonSerializer).bind()
                 }
             }
         )

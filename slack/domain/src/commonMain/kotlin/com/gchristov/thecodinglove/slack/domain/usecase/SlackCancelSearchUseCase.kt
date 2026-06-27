@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.domain.usecase
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
@@ -30,13 +30,14 @@ internal class RealSlackCancelSearchUseCase(
 
     override suspend operator fun invoke(dto: SlackCancelSearchUseCase.Dto): Either<Throwable, Unit> =
         withContext(dispatcher) {
-            log.debug(tag, "Cancelling search: responseUrl=${dto.responseUrl}")
-            slackRepository.postMessageToUrl(
-                url = dto.responseUrl,
-                message = slackMessageFactory.cancelMessage(),
-            ).flatMap {
+            either {
+                log.debug(tag, "Cancelling search: responseUrl=${dto.responseUrl}")
+                slackRepository.postMessageToUrl(
+                    url = dto.responseUrl,
+                    message = slackMessageFactory.cancelMessage(),
+                ).bind()
                 log.debug(tag, "Deleting search session: searchSessionId=${dto.searchSessionId}")
-                slackSearchRepository.deleteSearchSession(dto.searchSessionId)
+                slackSearchRepository.deleteSearchSession(dto.searchSessionId).bind()
             }
         }
 }

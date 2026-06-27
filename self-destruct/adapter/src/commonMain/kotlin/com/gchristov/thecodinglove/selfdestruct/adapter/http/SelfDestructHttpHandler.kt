@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.selfdestruct.adapter.http
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.*
@@ -28,5 +28,8 @@ class SelfDestructHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = selfDestructUseCase().flatMap { response.sendEmpty() }
+    ): Either<Throwable, Unit> = either {
+        selfDestructUseCase().bind()
+        response.sendEmpty().bind()
+    }
 }

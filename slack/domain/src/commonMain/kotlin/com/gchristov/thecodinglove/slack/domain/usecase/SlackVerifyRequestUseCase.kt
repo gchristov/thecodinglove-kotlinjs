@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.domain.usecase
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
@@ -50,21 +50,22 @@ internal class RealSlackVerifyRequestUseCase(
 
     override suspend fun invoke(dto: SlackVerifyRequestUseCase.Dto): Either<SlackVerifyRequestUseCase.Error, Unit> =
         withContext(dispatcher) {
-            log.debug(
-                tag = tag,
-                message = "Verifying request: timestamp=${dto.timestamp}, signature=${dto.signature}, body=${dto.rawBody}",
-            )
-            verifyTimestamp(
-                timestamp = dto.timestamp,
-                validityMinutes = slackConfig.timestampValidityMinutes,
-                clock = clock
-            ).flatMap {
+            either {
+                log.debug(
+                    tag = tag,
+                    message = "Verifying request: timestamp=${dto.timestamp}, signature=${dto.signature}, body=${dto.rawBody}",
+                )
+                verifyTimestamp(
+                    timestamp = dto.timestamp,
+                    validityMinutes = slackConfig.timestampValidityMinutes,
+                    clock = clock,
+                ).bind()
                 verifyRequest(
                     timestamp = dto.timestamp,
                     signature = dto.signature,
                     rawBody = dto.rawBody,
                     signingSecret = slackConfig.signingSecret,
-                )
+                ).bind()
             }
         }
 

@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.domain.usecase
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.kotlin.error
@@ -31,36 +31,34 @@ internal class RealSlackShuffleSearchUseCase(
 
     override suspend operator fun invoke(dto: SlackShuffleSearchUseCase.Dto): Either<Throwable, Unit> =
         withContext(dispatcher) {
-            log.debug(tag, "Shuffling search result: searchSessionId=${dto.searchSessionId}")
-            slackSearchRepository.shuffle(dto.searchSessionId)
-                .flatMap { shuffleResult ->
-                    when {
-                        shuffleResult.ok && shuffleResult.searchSession != null -> {
-                            log.debug(tag, "Sending shuffle response: responseUrl=${dto.responseUrl}")
-                            slackRepository.postMessageToUrl(
-                                url = dto.responseUrl,
-                                message = slackMessageFactory.searchResultMessage(
-                                    searchQuery = shuffleResult.searchSession.post.searchQuery,
-                                    searchResults = shuffleResult.searchSession.searchResults,
-                                    searchSessionId = shuffleResult.searchSession.searchSessionId,
-                                    attachmentTitle = shuffleResult.searchSession.post.attachmentTitle,
-                                    attachmentUrl = shuffleResult.searchSession.post.attachmentUrl,
-                                    attachmentImageUrl = shuffleResult.searchSession.post.attachmentImageUrl,
-                                )
+            either {
+                log.debug(tag, "Shuffling search result: searchSessionId=${dto.searchSessionId}")
+                val shuffleResult = slackSearchRepository.shuffle(dto.searchSessionId).bind()
+                when {
+                    shuffleResult.ok && shuffleResult.searchSession != null -> {
+                        log.debug(tag, "Sending shuffle response: responseUrl=${dto.responseUrl}")
+                        slackRepository.postMessageToUrl(
+                            url = dto.responseUrl,
+                            message = slackMessageFactory.searchResultMessage(
+                                searchQuery = shuffleResult.searchSession.post.searchQuery,
+                                searchResults = shuffleResult.searchSession.searchResults,
+                                searchSessionId = shuffleResult.searchSession.searchSessionId,
+                                attachmentTitle = shuffleResult.searchSession.post.attachmentTitle,
+                                attachmentUrl = shuffleResult.searchSession.post.attachmentUrl,
+                                attachmentImageUrl = shuffleResult.searchSession.post.attachmentImageUrl,
                             )
-                        }
-
-                        else -> {
-                            // Swallow but report the error, so that we can investigate. At this point, the user will be seeing
-                            // a post with interactivity options, so from their POV nothing will happen, so they can re-shuffle.
-                            log.error(tag, Throwable(shuffleResult.error?.let {
-                                when (it) {
-                                    is SlackSearchRepository.SearchResultDto.Error.NoResults -> "No results found"
-                                }
-                            } ?: "Unknown error")) { "Error shuffling" }
-                            Either.Right(Unit)
-                        }
+                        ).bind()
+                    }
+                    else -> {
+                        // Swallow but report the error, so that we can investigate. At this point, the user will be seeing
+                        // a post with interactivity options, so from their POV nothing will happen, so they can re-shuffle.
+                        log.error(tag, Throwable(shuffleResult.error?.let {
+                            when (it) {
+                                is SlackSearchRepository.SearchResultDto.Error.NoResults -> "No results found"
+                            }
+                        } ?: "Unknown error")) { "Error shuffling" }
                     }
                 }
+            }
         }
 }
