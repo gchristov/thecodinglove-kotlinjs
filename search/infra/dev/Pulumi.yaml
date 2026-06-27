@@ -8,30 +8,30 @@ resources:
   # Pub/Sub (dev)
   ########################################
 
-  # Manages the dev preload search PubSub topic.
-  pubsub-topic-preload-search-dev:
+  # Manages the dev search session result created PubSub topic.
+  pubsub-topic-search-session-result-created-dev:
     type: gcp:pubsub:Topic
     properties:
-      name: preload_search_dev
+      name: search_session_result_created_dev
     options:
       version: 8.6.0
       protect: true
-  # Manages the dev preload search PubSub subscription.
-  pubsub-subscription-preload-search-dev:
+  # Manages the dev search session result created PubSub subscription.
+  pubsub-subscription-search-session-result-created-dev:
     type: gcp:pubsub:Subscription
     properties:
       ackDeadlineSeconds: 10
       expirationPolicy:
         ttl: ""
       messageRetentionDuration: 600s
-      name: preload_search_dev_subscription
+      name: search_session_result_created_dev_subscription
       pushConfig:
         # If this changes, update the tunnel URL in run_local.sh and all other infra/dev Pulumi files too.
-        pushEndpoint: https://codinglove.serveousercontent.com/api/pubsub/search
+        pushEndpoint: https://codinglove.serveousercontent.com/api/pubsub/search/session-result-created
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s
-      topic: ${pubsub-topic-preload-search-dev.name}
+      topic: ${pubsub-topic-search-session-result-created-dev.name}
     options:
       version: 8.6.0
       protect: true

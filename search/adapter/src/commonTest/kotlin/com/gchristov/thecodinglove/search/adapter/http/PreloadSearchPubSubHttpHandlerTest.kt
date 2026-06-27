@@ -7,7 +7,7 @@ import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubHandler
-import com.gchristov.thecodinglove.search.adapter.pubsub.model.PubSubPreloadSearchMessage
+import com.gchristov.thecodinglove.search.adapter.pubsub.model.SearchSessionResultCreatedEvent
 import com.gchristov.thecodinglove.search.testfixtures.FakePreloadSearchResultUseCase
 import com.gchristov.thecodinglove.search.testfixtures.PreloadSearchPubSubCreator
 import io.ktor.http.*
@@ -25,7 +25,7 @@ class PreloadSearchPubSubHttpHandlerTest {
     ) { handler, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
-        assertEquals("/api/pubsub/search", config.path)
+        assertEquals("/api/pubsub/search/session-result-created", config.path)
         assertEquals(ContentType.Application.Json, config.contentType)
     }
 
@@ -62,16 +62,16 @@ class PreloadSearchPubSubHttpHandlerTest {
     }
 
     private fun runBlockingTest(
-        preloadSearchPubSubMessage: PubSubPreloadSearchMessage?,
+        preloadSearchPubSubMessage: SearchSessionResultCreatedEvent?,
         preloadSearchResultInvocationResult: Either<Throwable, Unit>,
-        testBlock: suspend (PreloadSearchPubSubHandler, FakePreloadSearchResultUseCase, FakePubSubRequest<PubSubPreloadSearchMessage>) -> Unit
+        testBlock: suspend (PreloadSearchPubSubHandler, FakePreloadSearchResultUseCase, FakePubSubRequest<SearchSessionResultCreatedEvent>) -> Unit
     ): TestResult = runTest {
         val preloadSearchResultUseCase = FakePreloadSearchResultUseCase(
             invocationResult = preloadSearchResultInvocationResult
         )
         val request = FakePubSubRequest(
             message = preloadSearchPubSubMessage,
-            messageSerializer = PubSubPreloadSearchMessage.serializer(),
+            messageSerializer = SearchSessionResultCreatedEvent.serializer(),
         )
         val handler = PreloadSearchPubSubHandler(
             dispatcher = FakeCoroutineDispatcher,

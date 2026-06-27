@@ -10,7 +10,7 @@ import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.search.domain.usecase.PreloadSearchResultUseCase
-import com.gchristov.thecodinglove.search.adapter.pubsub.model.PubSubPreloadSearchMessage
+import com.gchristov.thecodinglove.search.adapter.pubsub.model.SearchSessionResultCreatedEvent
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -30,7 +30,7 @@ class PreloadSearchPubSubHandler(
 
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
-        path = "/api/pubsub/search",
+        path = "/api/pubsub/search/session-result-created",
         contentType = ContentType.Application.Json,
     )
 
@@ -38,7 +38,7 @@ class PreloadSearchPubSubHandler(
         either {
             val body = request.decodeBodyFromJson(
                 jsonSerializer = jsonSerializer,
-                strategy = PubSubPreloadSearchMessage.serializer(),
+                strategy = SearchSessionResultCreatedEvent.serializer(),
             ).bind() ?: raise(Exception("Request body is invalid"))
             preloadSearchResultUseCase(PreloadSearchResultUseCase.Dto(searchSessionId = body.searchSessionId)).bind()
         }.fold(

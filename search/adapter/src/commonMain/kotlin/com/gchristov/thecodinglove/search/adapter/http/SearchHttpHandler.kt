@@ -11,7 +11,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.http.mapper.toSearchResult
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.usecase.SearchUseCase
-import com.gchristov.thecodinglove.search.adapter.pubsub.model.PubSubPreloadSearchMessage
+import com.gchristov.thecodinglove.search.adapter.pubsub.model.SearchSessionResultCreatedEvent
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -79,9 +79,9 @@ class SearchHttpHandler(
         searchConfig: SearchConfig,
     ) = pubSubPublisher.publishJson(
         topic = searchConfig.preloadPubSubTopic,
-        body = PubSubPreloadSearchMessage(searchSessionId),
+        body = SearchSessionResultCreatedEvent(searchSessionId),
         jsonSerializer = jsonSerializer,
-        strategy = PubSubPreloadSearchMessage.serializer(),
+        strategy = SearchSessionResultCreatedEvent.serializer(),
     )
 }
 
