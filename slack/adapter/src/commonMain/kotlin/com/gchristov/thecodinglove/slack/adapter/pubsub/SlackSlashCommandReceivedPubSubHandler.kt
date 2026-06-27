@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.pubsub
 
 import arrow.core.Either
+import arrow.core.flatMap
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.Analytics
@@ -9,14 +10,14 @@ import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackSlashCommandMessage
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSlashCommandReceivedEvent
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
-class SlackSlashCommandPubSubHandler(
+class SlackSlashCommandReceivedPubSubHandler(
     dispatcher: CoroutineDispatcher,
     private val jsonSerializer: JsonSerializer,
     log: Logger,
@@ -33,17 +34,17 @@ class SlackSlashCommandPubSubHandler(
 ) {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
-        path = "/api/pubsub/slack/slash",
+        path = "/api/pubsub/slack/slash-command-received",
         contentType = ContentType.Application.Json,
     )
 
     override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =
         either {
-            val message = request.decodeBodyFromJson(
+            val body = request.decodeBodyFromJson(
                 jsonSerializer = jsonSerializer,
-                strategy = PubSubSlackSlashCommandMessage.serializer(),
+                strategy = SlackSlashCommandReceivedEvent.serializer(),
             ).bind() ?: raise(Exception("Request body is invalid"))
-            message.handle().bind()
+            body.handle()
         }
 
     /*
@@ -51,7 +52,7 @@ class SlackSlashCommandPubSubHandler(
      * sending the Slack reply back fails, the entire PubSub chain will be retried automatically. This is to avoid
      * unnecessary PubSub retries which would most likely result in additional errors if the problem is on our end.
      */
-    private suspend fun PubSubSlackSlashCommandMessage.handle(): Either<Throwable, Unit> {
+    private suspend fun SlackSlashCommandReceivedEvent.handle(): Either<Throwable, Unit> {
         analytics.sendEvent(
             clientId = userId,
             name = "slack_slash_command",
@@ -62,13 +63,12 @@ class SlackSlashCommandPubSubHandler(
                 "team_id" to teamId,
             )
         )
-        return either {
-            slackRepository.postMessageToUrl(
-                url = responseUrl,
-                message = slackMessageFactory.searchingMessage(),
-            ).bind()
-            slackSearchRepository.search(text).bind()
-        }.fold(
+        return slackRepository.postMessageToUrl(
+            url = responseUrl,
+            message = slackMessageFactory.searchingMessage(),
+        )
+            .flatMap { slackSearchRepository.search(text) }
+            .fold(
                 ifLeft = { error ->
                     analytics.sendEvent(
                         clientId = userId,
