@@ -20,5 +20,10 @@ kotlin {
                 api(libs.diglol.encoding)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+            }
+        }
     }
 }
