@@ -6,18 +6,24 @@ import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.network.http.HttpRequest
 import com.gchristov.thecodinglove.common.network.http.HttpResponse
 import com.gchristov.thecodinglove.common.network.http.sendEmpty
+import kotlinx.serialization.DeserializationStrategy
 
-interface PubSubDispatchHandler : HttpHandler {
+interface PubSubHandler<T> : HttpHandler {
     val pubSubDecoder: PubSubDecoder
+    val strategy: DeserializationStrategy<T>
 
-    suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit>
+    suspend fun handle(event: T): Either<Throwable, Unit>
 
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
     ): Either<Throwable, Unit> = either {
         val pubSubRequest = pubSubDecoder.decode(request).bind()
-        handlePubSubRequest(pubSubRequest).bind()
+        val body = pubSubRequest.decodeBodyFromJson(
+            jsonSerializer = jsonSerializer,
+            strategy = strategy,
+        ).bind() ?: raise(Exception("Request body is invalid"))
+        handle(body).bind()
         response.sendEmpty().bind()
     }
 }

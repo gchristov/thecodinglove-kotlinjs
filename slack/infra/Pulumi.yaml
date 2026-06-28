@@ -24,7 +24,6 @@ resources:
           SLACK_REQUEST_VERIFICATION: "true"
           SLACK_SLASH_COMMAND_RECEIVED_PUBSUB_TOPIC: slack_slash_command_received
           SLACK_INTERACTIVITY_RECEIVED_PUBSUB_TOPIC: slack_interactivity_received
-          SLACK_SLASH_COMMAND: /codinglove
         platform: linux/amd64
         context: ../service/build/dist/js
       imageName: ${location}-docker.pkg.dev/${gcp:project}/${repositoryId}/slack-service:latest

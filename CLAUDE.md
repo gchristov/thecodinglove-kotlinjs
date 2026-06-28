@@ -98,16 +98,16 @@ The `handleHttpRequest` fire-and-forget coroutine, error logging, and `handleErr
 
 Two interfaces, no base classes:
 
-- **`PubSubEventHandler<T>`** (`fun interface`) — a leaf handler that processes one event type. Implement `handle(event: T)`. Each handler checks whether the event is relevant to it and returns `Either.Right(Unit)` to skip.
-- **`PubSubDispatchHandler`** (extends `HttpHandler`) — decodes the raw HTTP request into a `PubSubRequest`, then fans out to a `List<PubSubEventHandler<T>>`. The HTTP decoding and `sendEmpty()` response are handled by the interface default. Implement `handlePubSubRequest` to decode the typed body and invoke event handlers.
+- **`PubSubHandler<T>`** (extends `HttpHandler`) — the single interface for all PubSub consumers. Provide `strategy: DeserializationStrategy<T>` and `pubSubDecoder`. The interface default decodes the raw HTTP push into a typed `T` and calls `handle(event: T)`. Implement `handle` to contain your business logic. For fan-out (multiple actions on one topic), implement `handle` by iterating a `List<PubSubEventHandler<T>>`.
+- **`PubSubEventHandler<T>`** (`fun interface`) — a leaf handler used only when one topic fans out to multiple actions. Implement `handle(event: T)`. Each handler checks whether the event is relevant and returns `Either.Right(Unit)` to skip.
 
 **Naming conventions:**
-- Dispatch handlers: `[Domain][EventVerb]PubSubDispatchHandler` (e.g. `SlackInteractivityReceivedPubSubDispatchHandler`)
-- Event handlers: `[Domain][Action]PubSubEventHandler` (e.g. `SlackSendPubSubEventHandler`, `SlackShufflePubSubEventHandler`)
+- Handlers: `[Domain][Action]PubSubHandler` — named after what the handler *does*, not what the message *is* (e.g. `SearchPreloadPubSubHandler`, `SlackSearchPubSubHandler`, `SlackInteractivityPubSubHandler`)
+- Event handlers (fan-out only): `[Domain][Action]PubSubEventHandler` (e.g. `SlackSendPubSubEventHandler`, `SlackShufflePubSubEventHandler`)
 
-**Error handling in dispatch handlers:**
-- Swallow and log errors (don't retry) when retrying makes no sense — e.g. parse failures or exhausted search results.
-- Propagate errors (return `Either.Left`) when the operation should be retried by PubSub.
+**Error handling:**
+- To swallow errors and prevent PubSub retries: swallow in `handle` via `fold`, and override `handleError` to call `response.sendEmpty()` (covers parse errors too).
+- To propagate errors and trigger PubSub retries: return `Either.Left` from `handle` and don't override `handleError`.
 
 ## Error handling
 

@@ -18,9 +18,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class SlackInteractivityReceivedPubSubDispatchHandlerTest {
+class SlackInteractivityPubSubHandlerTest {
     @Test
-    fun httpConfig(): TestResult = runBlockingTest { handler, _, _, _ ->
+    fun httpConfig(): TestResult = runBlockingTest { handler, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
         assertEquals("/api/pubsub/slack/interactivity-received", config.path)
@@ -28,61 +28,40 @@ class SlackInteractivityReceivedPubSubDispatchHandlerTest {
     }
 
     @Test
-    fun nullBodySwallowsError(): TestResult = runBlockingTest(
-        message = null,
-    ) { handler, _, _, request ->
-        val result = handler.handlePubSubRequest(request)
-        assertTrue { result.isRight() }
-    }
-
-    @Test
-    fun sendActionRoutesToSendHandler(): TestResult = runBlockingTest(
-        message = interactivityMessage(action = SlackActionName.SEND),
-    ) { handler, sendUseCase, _, request ->
-        val result = handler.handlePubSubRequest(request)
+    fun sendActionRoutesToSendHandler(): TestResult = runBlockingTest { handler, sendUseCase, _ ->
+        val result = handler.handle(interactivityMessage(action = SlackActionName.SEND))
         assertTrue { result.isRight() }
         sendUseCase.assertInvokedOnce()
     }
 
     @Test
-    fun shuffleActionRoutesToShuffleHandler(): TestResult = runBlockingTest(
-        message = interactivityMessage(action = SlackActionName.SHUFFLE),
-    ) { handler, _, shuffleUseCase, request ->
-        val result = handler.handlePubSubRequest(request)
+    fun shuffleActionRoutesToShuffleHandler(): TestResult = runBlockingTest { handler, _, shuffleUseCase ->
+        val result = handler.handle(interactivityMessage(action = SlackActionName.SHUFFLE))
         assertTrue { result.isRight() }
         shuffleUseCase.assertInvokedOnce()
     }
 
     @Test
-    fun selfDestructActionRoutesToSelfDestructHandler(): TestResult = runBlockingTest(
-        message = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN),
-    ) { handler, sendUseCase, _, request ->
-        val result = handler.handlePubSubRequest(request)
+    fun selfDestructActionRoutesToSelfDestructHandler(): TestResult = runBlockingTest { handler, sendUseCase, _ ->
+        val result = handler.handle(interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN))
         assertTrue { result.isRight() }
         sendUseCase.assertInvokedOnce()
     }
 
     @Test
-    fun cancelActionRoutesToCancelHandler(): TestResult = runBlockingTest(
-        message = interactivityMessage(action = SlackActionName.CANCEL),
-    ) { handler, _, _, request ->
-        val result = handler.handlePubSubRequest(request)
+    fun cancelActionRoutesToCancelHandler(): TestResult = runBlockingTest { handler, _, _ ->
+        val result = handler.handle(interactivityMessage(action = SlackActionName.CANCEL))
         assertTrue { result.isRight() }
     }
 
     private fun runBlockingTest(
-        message: SlackInteractivityReceivedEvent? = interactivityMessage(action = SlackActionName.SEND),
-        testBlock: suspend (SlackInteractivityReceivedPubSubDispatchHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase, FakePubSubRequest<SlackInteractivityReceivedEvent>) -> Unit,
+        testBlock: suspend (SlackInteractivityPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase) -> Unit,
     ): TestResult = runTest {
         val sendUseCase = FakeSlackSendSearchUseCase()
         val shuffleUseCase = FakeSlackShuffleSearchUseCase()
         val cancelUseCase = FakeSlackCancelSearchUseCase()
         val analytics = FakeAnalytics()
-        val request = FakePubSubRequest(
-            message = message,
-            messageSerializer = SlackInteractivityReceivedEvent.serializer(),
-        )
-        val handler = SlackInteractivityReceivedPubSubDispatchHandler(
+        val handler = SlackInteractivityPubSubHandler(
             dispatcher = FakeCoroutineDispatcher,
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
@@ -92,9 +71,9 @@ class SlackInteractivityReceivedPubSubDispatchHandlerTest {
                 SlackShufflePubSubEventHandler(shuffleUseCase, analytics),
                 SlackCancelSearchPubSubEventHandler(cancelUseCase, analytics),
             ),
-            pubSubDecoder = FakePubSubDecoder(request),
+            pubSubDecoder = FakePubSubDecoder(FakePubSubRequest(null, SlackInteractivityReceivedEvent.serializer())),
         )
-        testBlock(handler, sendUseCase, shuffleUseCase, request)
+        testBlock(handler, sendUseCase, shuffleUseCase)
     }
 }
 

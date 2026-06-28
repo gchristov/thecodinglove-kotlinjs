@@ -9,4 +9,3 @@ services:
       - SLACK_REQUEST_VERIFICATION=true
       - SLACK_SLASH_COMMAND_RECEIVED_PUBSUB_TOPIC=slack_slash_command_received_dev
       - SLACK_INTERACTIVITY_RECEIVED_PUBSUB_TOPIC=slack_interactivity_received_dev
-      - SLACK_SLASH_COMMAND=/codinglove_dev
