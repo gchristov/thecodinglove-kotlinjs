@@ -96,14 +96,13 @@ The `handleHttpRequest` fire-and-forget coroutine, error logging, and `handleErr
 
 ## PubSub handlers
 
-Two interfaces, no base classes:
+One interface, no base classes:
 
-- **`PubSubHandler<T>`** (extends `HttpHandler`) — the single interface for all PubSub consumers. Provide `strategy: DeserializationStrategy<T>` and `pubSubDecoder`. The interface default decodes the raw HTTP push into a typed `T` and calls `handle(event: T)`. Implement `handle` to contain your business logic. For fan-out (multiple actions on one topic), implement `handle` by iterating a `List<PubSubEventHandler<T>>`.
-- **`PubSubEventHandler<T>`** (`fun interface`) — a leaf handler used only when one topic fans out to multiple actions. Implement `handle(event: T)`. Each handler checks whether the event is relevant and returns `Either.Right(Unit)` to skip.
+- **`PubSubHandler<T>`** (extends `HttpHandler`) — the single interface for all PubSub consumers. Provide `strategy: DeserializationStrategy<T>` and `pubSubDecoder`. The interface default decodes the raw HTTP push into a typed `T` and calls `handle(event: T)`. Implement `handle` to contain your business logic. For fan-out (multiple actions on one topic), implement `handle` by iterating a `List<PubSubHandler<T>>`. Fan-out leaf handlers stub the HTTP-related properties with `error("not used")` — same pattern as `StaticFileHttpHandler`.
 
 **Naming conventions:**
 - Handlers: `[Domain][Action]PubSubHandler` — named after what the handler *does*, not what the message *is* (e.g. `SearchPreloadPubSubHandler`, `SlackSearchPubSubHandler`, `SlackInteractivityPubSubHandler`)
-- Event handlers (fan-out only): `[Domain][Action]PubSubEventHandler` (e.g. `SlackSendPubSubEventHandler`, `SlackShufflePubSubEventHandler`)
+- Fan-out leaf handlers: `[Domain][Action]PubSubEventHandler` (e.g. `SlackSendPubSubEventHandler`, `SlackShufflePubSubEventHandler`)
 
 **Error handling:**
 - To swallow errors and prevent PubSub retries: swallow in `handle` via `fold`, and override `handleError` to call `response.sendEmpty()` (covers parse errors too).

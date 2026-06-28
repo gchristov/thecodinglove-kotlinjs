@@ -9,7 +9,6 @@ import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.network.http.HttpResponse
 import com.gchristov.thecodinglove.common.network.http.sendEmpty
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
-import com.gchristov.thecodinglove.common.pubsub.PubSubEventHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
 import io.ktor.http.*
@@ -19,7 +18,7 @@ class SlackInteractivityPubSubHandler internal constructor(
     override val dispatcher: CoroutineDispatcher,
     override val jsonSerializer: JsonSerializer,
     override val log: Logger,
-    private val eventHandlers: List<PubSubEventHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage>>,
+    private val eventHandlers: List<PubSubHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage>>,
     override val pubSubDecoder: PubSubDecoder,
 ) : PubSubHandler<SlackInteractivityReceivedEvent> {
     private val tag = this::class.simpleName
