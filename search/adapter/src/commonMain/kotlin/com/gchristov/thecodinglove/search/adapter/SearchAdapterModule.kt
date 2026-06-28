@@ -11,8 +11,8 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.http.*
-import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultCreatedPubSubHandler
-import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultEventHandler
+import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultCreatedPubSubDispatchHandler
+import com.gchristov.thecodinglove.search.adapter.pubsub.SearchPreloadPubSubEventHandler
 import com.gchristov.thecodinglove.search.domain.model.Environment
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
@@ -58,7 +58,7 @@ object SearchAdapterModule : DiModule() {
                 )
             }
             bindSingleton {
-                provideSearchSessionResultCreatedPubSubHandler(
+                provideSearchSessionResultCreatedPubSubDispatchHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     preloadSearchResultUseCase = instance(),
@@ -134,16 +134,16 @@ object SearchAdapterModule : DiModule() {
         analytics = analytics,
     )
 
-    private fun provideSearchSessionResultCreatedPubSubHandler(
+    private fun provideSearchSessionResultCreatedPubSubDispatchHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         preloadSearchResultUseCase: PreloadSearchResultUseCase,
         pubSubSubDecoder: PubSubDecoder,
-    ): SearchSessionResultCreatedPubSubHandler = SearchSessionResultCreatedPubSubHandler(
+    ): SearchSessionResultCreatedPubSubDispatchHandler = SearchSessionResultCreatedPubSubDispatchHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
-        eventHandlers = listOf(SearchSessionResultEventHandler(preloadSearchResultUseCase)),
+        eventHandlers = listOf(SearchPreloadPubSubEventHandler(preloadSearchResultUseCase)),
         pubSubDecoder = pubSubSubDecoder,
     )
 

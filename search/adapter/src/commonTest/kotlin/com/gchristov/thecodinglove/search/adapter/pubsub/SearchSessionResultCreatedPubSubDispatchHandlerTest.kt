@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.search.adapter.http
+package com.gchristov.thecodinglove.search.adapter.pubsub
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
@@ -6,8 +6,6 @@ import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubDecoder
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
-import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultCreatedPubSubHandler
-import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultEventHandler
 import com.gchristov.thecodinglove.search.adapter.pubsub.model.SearchSessionResultCreatedEvent
 import com.gchristov.thecodinglove.search.testfixtures.FakePreloadSearchResultUseCase
 import com.gchristov.thecodinglove.search.testfixtures.SearchSessionResultCreatedPubSubCreator
@@ -18,7 +16,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class SearchSessionResultCreatedPubSubHandlerTest {
+class SearchSessionResultCreatedPubSubDispatchHandlerTest {
     @Test
     fun httpConfig(): TestResult = runBlockingTest(
         message = null,
@@ -53,7 +51,7 @@ class SearchSessionResultCreatedPubSubHandlerTest {
     private fun runBlockingTest(
         message: SearchSessionResultCreatedEvent?,
         preloadSearchResultInvocationResult: Either<Throwable, Unit>,
-        testBlock: suspend (SearchSessionResultCreatedPubSubHandler, FakePreloadSearchResultUseCase, FakePubSubRequest<SearchSessionResultCreatedEvent>) -> Unit
+        testBlock: suspend (SearchSessionResultCreatedPubSubDispatchHandler, FakePreloadSearchResultUseCase, FakePubSubRequest<SearchSessionResultCreatedEvent>) -> Unit
     ): TestResult = runTest {
         val preloadSearchResultUseCase = FakePreloadSearchResultUseCase(
             invocationResult = preloadSearchResultInvocationResult
@@ -62,11 +60,11 @@ class SearchSessionResultCreatedPubSubHandlerTest {
             message = message,
             messageSerializer = SearchSessionResultCreatedEvent.serializer(),
         )
-        val handler = SearchSessionResultCreatedPubSubHandler(
+        val handler = SearchSessionResultCreatedPubSubDispatchHandler(
             dispatcher = FakeCoroutineDispatcher,
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
-            eventHandlers = listOf(SearchSessionResultEventHandler(preloadSearchResultUseCase)),
+            eventHandlers = listOf(SearchPreloadPubSubEventHandler(preloadSearchResultUseCase)),
             pubSubDecoder = FakePubSubDecoder(request),
         )
         testBlock(handler, preloadSearchResultUseCase, request)

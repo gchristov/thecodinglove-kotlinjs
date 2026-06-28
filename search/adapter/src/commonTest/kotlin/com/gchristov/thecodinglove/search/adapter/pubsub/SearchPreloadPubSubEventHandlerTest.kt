@@ -9,7 +9,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class SearchSessionResultEventHandlerTest {
+class SearchPreloadPubSubEventHandlerTest {
     @Test
     fun handleInvokesPreload(): TestResult = runBlockingTest(
         preloadResult = Either.Right(Unit)
@@ -28,9 +28,9 @@ class SearchSessionResultEventHandlerTest {
 
     private fun runBlockingTest(
         preloadResult: Either<Throwable, Unit> = Either.Right(Unit),
-        testBlock: suspend (SearchSessionResultEventHandler) -> Unit,
+        testBlock: suspend (SearchPreloadPubSubEventHandler) -> Unit,
     ): TestResult = runTest {
-        val handler = SearchSessionResultEventHandler(
+        val handler = SearchPreloadPubSubEventHandler(
             preloadSearchResultUseCase = FakePreloadSearchResultUseCase(invocationResult = preloadResult)
         )
         testBlock(handler)

@@ -11,15 +11,11 @@ import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 class SlackStatisticsHttpHandler(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    log: Logger,
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
     private val statisticsUseCase: SlackStatisticsUseCase,
-) : BaseHttpHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log,
-) {
+) : HttpHandler {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Get,
         path = "/api/slack/statistics",

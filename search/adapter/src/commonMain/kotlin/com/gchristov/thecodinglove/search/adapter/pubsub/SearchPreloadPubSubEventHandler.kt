@@ -5,7 +5,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubEventHandler
 import com.gchristov.thecodinglove.search.adapter.pubsub.model.SearchSessionResultCreatedEvent
 import com.gchristov.thecodinglove.search.domain.usecase.PreloadSearchResultUseCase
 
-internal class SearchSessionResultEventHandler(
+internal class SearchPreloadPubSubEventHandler(
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
 ) : PubSubEventHandler<SearchSessionResultCreatedEvent> {
     override suspend fun handle(event: SearchSessionResultCreatedEvent): Either<Throwable, Unit> =

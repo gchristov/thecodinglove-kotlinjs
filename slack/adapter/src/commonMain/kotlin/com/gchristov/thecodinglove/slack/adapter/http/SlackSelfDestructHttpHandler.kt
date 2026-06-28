@@ -10,15 +10,11 @@ import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 class SlackSelfDestructHttpHandler(
-    dispatcher: CoroutineDispatcher,
-    jsonSerializer: JsonSerializer,
-    log: Logger,
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
     private val selfDestructUseCase: SlackSelfDestructUseCase,
-) : BaseHttpHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log,
-) {
+) : HttpHandler {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Get,
         path = "/api/slack/self-destruct",

@@ -7,7 +7,7 @@ import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivity
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackCancelSearchUseCase
 
-internal class SlackCancelInteractivityEventHandler(
+internal class SlackCancelSearchPubSubEventHandler(
     private val slackCancelSearchUseCase: SlackCancelSearchUseCase,
     private val analytics: Analytics,
 ) : PubSubEventHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage> {

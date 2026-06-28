@@ -9,7 +9,7 @@ import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 
-internal class SlackSearchSlashCommandEventHandler(
+internal class SlackSearchPubSubEventHandler(
     private val slackRepository: SlackRepository,
     private val slackMessageFactory: SlackMessageFactory,
     private val slackSearchRepository: SlackSearchRepository,

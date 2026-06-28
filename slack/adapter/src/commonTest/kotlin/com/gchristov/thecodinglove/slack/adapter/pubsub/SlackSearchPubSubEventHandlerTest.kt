@@ -13,7 +13,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class SlackSearchSlashCommandEventHandlerTest {
+class SlackSearchPubSubEventHandlerTest {
     @Test
     fun handleOtherCommandSkips(): TestResult = runBlockingTest { handler ->
         val result = handler.handle(TestSlashCommandEvent.copy(command = "/other"))
@@ -52,10 +52,10 @@ class SlackSearchSlashCommandEventHandlerTest {
 
     private fun runBlockingTest(
         searchResult: Either<Throwable, com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository.SearchResultDto> = Either.Right(SlackSearchResultCreator.success()),
-        testBlock: suspend (SlackSearchSlashCommandEventHandler) -> Unit,
+        testBlock: suspend (SlackSearchPubSubEventHandler) -> Unit,
     ): TestResult = runTest {
         repository = FakeSlackRepository()
-        val handler = SlackSearchSlashCommandEventHandler(
+        val handler = SlackSearchPubSubEventHandler(
             slackRepository = repository,
             slackMessageFactory = FakeSlackMessageFactory(),
             slackSearchRepository = FakeSlackSearchRepository(searchResult = searchResult),

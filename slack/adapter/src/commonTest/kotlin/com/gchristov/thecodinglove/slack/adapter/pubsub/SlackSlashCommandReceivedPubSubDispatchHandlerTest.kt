@@ -19,7 +19,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class SlackSlashCommandReceivedPubSubHandlerTest {
+class SlackSlashCommandReceivedPubSubDispatchHandlerTest {
     @Test
     fun httpConfig(): TestResult = runBlockingTest { handler, _ ->
         val config = handler.httpConfig()
@@ -47,7 +47,7 @@ class SlackSlashCommandReceivedPubSubHandlerTest {
     private fun runBlockingTest(
         message: SlackSlashCommandReceivedEvent? = TestSlashCommandEvent,
         searchResult: Either<Throwable, com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository.SearchResultDto> = Either.Right(SlackSearchResultCreator.success()),
-        testBlock: suspend (SlackSlashCommandReceivedPubSubHandler, FakePubSubRequest<SlackSlashCommandReceivedEvent>) -> Unit,
+        testBlock: suspend (SlackSlashCommandReceivedPubSubDispatchHandler, FakePubSubRequest<SlackSlashCommandReceivedEvent>) -> Unit,
     ): TestResult = runTest {
         val repository = FakeSlackRepository()
         val searchRepository = FakeSlackSearchRepository(searchResult = searchResult)
@@ -55,12 +55,12 @@ class SlackSlashCommandReceivedPubSubHandlerTest {
             message = message,
             messageSerializer = SlackSlashCommandReceivedEvent.serializer(),
         )
-        val handler = SlackSlashCommandReceivedPubSubHandler(
+        val handler = SlackSlashCommandReceivedPubSubDispatchHandler(
             dispatcher = FakeCoroutineDispatcher,
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
             eventHandlers = listOf(
-                SlackSearchSlashCommandEventHandler(
+                SlackSearchPubSubEventHandler(
                     slackRepository = repository,
                     slackMessageFactory = FakeSlackMessageFactory(),
                     slackSearchRepository = searchRepository,

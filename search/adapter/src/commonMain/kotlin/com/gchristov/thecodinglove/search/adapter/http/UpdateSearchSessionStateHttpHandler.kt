@@ -12,15 +12,11 @@ import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 class UpdateSearchSessionStateHttpHandler(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    log: Logger,
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
     private val searchRepository: SearchRepository,
-) : BaseHttpHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log,
-) {
+) : HttpHandler {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Put,
         path = "/api/search/session-state",

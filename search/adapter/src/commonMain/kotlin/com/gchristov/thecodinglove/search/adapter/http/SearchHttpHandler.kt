@@ -16,18 +16,14 @@ import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 class SearchHttpHandler(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    private val log: Logger,
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
     private val searchUseCase: SearchUseCase,
     private val pubSubPublisher: PubSubPublisher,
     private val searchConfig: SearchConfig,
     private val analytics: Analytics,
-) : BaseHttpHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log
-) {
+) : HttpHandler {
     private val tag = this::class.simpleName
 
     override fun httpConfig() = HttpHandler.HttpConfig(

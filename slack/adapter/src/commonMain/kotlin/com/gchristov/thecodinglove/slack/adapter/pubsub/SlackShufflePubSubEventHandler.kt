@@ -5,30 +5,24 @@ import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.pubsub.PubSubEventHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
-import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
+import com.gchristov.thecodinglove.slack.domain.usecase.SlackShuffleSearchUseCase
 
-internal class SlackSendInteractivityEventHandler(
-    private val slackSendSearchUseCase: SlackSendSearchUseCase,
+internal class SlackShufflePubSubEventHandler(
+    private val slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
     private val analytics: Analytics,
 ) : PubSubEventHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage> {
     override suspend fun handle(event: SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage): Either<Throwable, Unit> {
-        val action = event.actions.firstOrNull {
-            it.name == SlackActionName.SEND.apiValue || it.name == SlackActionName.SELF_DESTRUCT_5_MIN.apiValue
-        } ?: return Either.Right(Unit)
-        val isSelfDestruct = action.name == SlackActionName.SELF_DESTRUCT_5_MIN.apiValue
+        val action = event.actions.firstOrNull { it.name == SlackActionName.SHUFFLE.apiValue }
+            ?: return Either.Right(Unit)
         analytics.sendEvent(
             clientId = event.user.id,
-            name = if (isSelfDestruct) "slack_interactivity_self_destruct" else "slack_interactivity_send",
+            name = "slack_interactivity_shuffle",
             params = mapOf("user_id" to event.user.id, "team_id" to event.team.id),
         )
-        return slackSendSearchUseCase(
-            SlackSendSearchUseCase.Dto(
-                userId = event.user.id,
-                teamId = event.team.id,
-                channelId = event.channel.id,
+        return slackShuffleSearchUseCase(
+            SlackShuffleSearchUseCase.Dto(
                 responseUrl = event.responseUrl,
                 searchSessionId = action.value,
-                selfDestructMinutes = if (isSelfDestruct) 5 else null,
             )
         )
     }

@@ -5,26 +5,21 @@ import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.HttpHandler
-import com.gchristov.thecodinglove.common.pubsub.BasePubSubDispatcherHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
+import com.gchristov.thecodinglove.common.pubsub.PubSubDispatchHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubEventHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSlashCommandReceivedEvent
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
-class SlackSlashCommandReceivedPubSubHandler internal constructor(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    log: Logger,
+class SlackSlashCommandReceivedPubSubDispatchHandler internal constructor(
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
     private val eventHandlers: List<PubSubEventHandler<SlackSlashCommandReceivedEvent>>,
-    pubSubDecoder: PubSubDecoder,
-) : BasePubSubDispatcherHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log,
-    pubSubDecoder = pubSubDecoder,
-) {
+    override val pubSubDecoder: PubSubDecoder,
+) : PubSubDispatchHandler {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
         path = "/api/pubsub/slack/slash-command-received",

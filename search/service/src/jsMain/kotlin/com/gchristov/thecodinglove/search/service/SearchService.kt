@@ -21,7 +21,7 @@ import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
 import com.gchristov.thecodinglove.search.adapter.SearchAdapterModule
 import com.gchristov.thecodinglove.search.adapter.http.*
-import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultCreatedPubSubHandler
+import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultCreatedPubSubDispatchHandler
 import com.gchristov.thecodinglove.search.domain.SearchDomainModule
 import com.gchristov.thecodinglove.search.domain.model.Environment
 
@@ -73,7 +73,7 @@ private fun setupMonitoring(): Either<Throwable, Unit> {
 private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
     val handlers = listOf(
         DiGraph.inject<SearchHttpHandler>(),
-        DiGraph.inject<SearchSessionResultCreatedPubSubHandler>(),
+        DiGraph.inject<SearchSessionResultCreatedPubSubDispatchHandler>(),
         DiGraph.inject<SearchStatisticsHttpHandler>(),
         DiGraph.inject<DeleteSearchSessionHttpHandler>(),
         DiGraph.inject<SearchSessionPostHttpHandler>(),

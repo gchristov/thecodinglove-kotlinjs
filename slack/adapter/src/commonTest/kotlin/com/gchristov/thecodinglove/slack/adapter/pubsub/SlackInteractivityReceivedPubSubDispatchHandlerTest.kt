@@ -1,6 +1,5 @@
 package com.gchristov.thecodinglove.slack.adapter.pubsub
 
-import arrow.core.Either
 import com.gchristov.thecodinglove.common.analyticstestfixtures.FakeAnalytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubDecoder
@@ -19,7 +18,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class SlackInteractivityReceivedPubSubHandlerTest {
+class SlackInteractivityReceivedPubSubDispatchHandlerTest {
     @Test
     fun httpConfig(): TestResult = runBlockingTest { handler, _, _, _ ->
         val config = handler.httpConfig()
@@ -55,6 +54,15 @@ class SlackInteractivityReceivedPubSubHandlerTest {
     }
 
     @Test
+    fun selfDestructActionRoutesToSelfDestructHandler(): TestResult = runBlockingTest(
+        message = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN),
+    ) { handler, sendUseCase, _, request ->
+        val result = handler.handlePubSubRequest(request)
+        assertTrue { result.isRight() }
+        sendUseCase.assertInvokedOnce()
+    }
+
+    @Test
     fun cancelActionRoutesToCancelHandler(): TestResult = runBlockingTest(
         message = interactivityMessage(action = SlackActionName.CANCEL),
     ) { handler, _, _, request ->
@@ -64,7 +72,7 @@ class SlackInteractivityReceivedPubSubHandlerTest {
 
     private fun runBlockingTest(
         message: SlackInteractivityReceivedEvent? = interactivityMessage(action = SlackActionName.SEND),
-        testBlock: suspend (SlackInteractivityReceivedPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase, FakePubSubRequest<SlackInteractivityReceivedEvent>) -> Unit,
+        testBlock: suspend (SlackInteractivityReceivedPubSubDispatchHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase, FakePubSubRequest<SlackInteractivityReceivedEvent>) -> Unit,
     ): TestResult = runTest {
         val sendUseCase = FakeSlackSendSearchUseCase()
         val shuffleUseCase = FakeSlackShuffleSearchUseCase()
@@ -74,14 +82,15 @@ class SlackInteractivityReceivedPubSubHandlerTest {
             message = message,
             messageSerializer = SlackInteractivityReceivedEvent.serializer(),
         )
-        val handler = SlackInteractivityReceivedPubSubHandler(
+        val handler = SlackInteractivityReceivedPubSubDispatchHandler(
             dispatcher = FakeCoroutineDispatcher,
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
             eventHandlers = listOf(
-                SlackSendInteractivityEventHandler(sendUseCase, analytics),
-                SlackShuffleInteractivityEventHandler(shuffleUseCase, analytics),
-                SlackCancelInteractivityEventHandler(cancelUseCase, analytics),
+                SlackSendPubSubEventHandler(sendUseCase, analytics),
+                SlackSelfDestructPubSubEventHandler(sendUseCase, analytics),
+                SlackShufflePubSubEventHandler(shuffleUseCase, analytics),
+                SlackCancelSearchPubSubEventHandler(cancelUseCase, analytics),
             ),
             pubSubDecoder = FakePubSubDecoder(request),
         )

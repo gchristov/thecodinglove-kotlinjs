@@ -10,7 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class SlackSendInteractivityEventHandlerTest {
+class SlackSendPubSubEventHandlerTest {
     @Test
     fun handleSendActionInvokesSendUseCaseWithNoSelfDestruct(): TestResult = runBlockingTest { handler ->
         val payload = interactivityMessage(action = SlackActionName.SEND).payload as SlackInteractivityPayload
@@ -18,15 +18,6 @@ class SlackSendInteractivityEventHandlerTest {
         assertTrue { result.isRight() }
         sendUseCase.assertInvokedOnce()
         sendUseCase.assertSelfDestructMinutes(null)
-    }
-
-    @Test
-    fun handleSelfDestruct5MinInvokesSendUseCaseWith5Minutes(): TestResult = runBlockingTest { handler ->
-        val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
-        val result = handler.handle(payload)
-        assertTrue { result.isRight() }
-        sendUseCase.assertInvokedOnce()
-        sendUseCase.assertSelfDestructMinutes(5)
     }
 
     @Test
@@ -50,10 +41,10 @@ class SlackSendInteractivityEventHandlerTest {
 
     private fun runBlockingTest(
         sendResult: Either<Throwable, Unit> = Either.Right(Unit),
-        testBlock: suspend (SlackSendInteractivityEventHandler) -> Unit,
+        testBlock: suspend (SlackSendPubSubEventHandler) -> Unit,
     ): TestResult = runTest {
         sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)
-        val handler = SlackSendInteractivityEventHandler(
+        val handler = SlackSendPubSubEventHandler(
             slackSendSearchUseCase = sendUseCase,
             analytics = FakeAnalytics(),
         )

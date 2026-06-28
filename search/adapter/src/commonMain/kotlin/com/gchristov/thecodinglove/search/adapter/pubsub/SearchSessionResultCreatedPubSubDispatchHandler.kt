@@ -1,4 +1,4 @@
-package com.gchristov.thecodinglove.slack.adapter.pubsub
+package com.gchristov.thecodinglove.search.adapter.pubsub
 
 import arrow.core.Either
 import arrow.core.raise.either
@@ -6,31 +6,26 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.error
 import com.gchristov.thecodinglove.common.network.http.HttpHandler
-import com.gchristov.thecodinglove.common.pubsub.BasePubSubDispatcherHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
+import com.gchristov.thecodinglove.common.pubsub.PubSubDispatchHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubEventHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
+import com.gchristov.thecodinglove.search.adapter.pubsub.model.SearchSessionResultCreatedEvent
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
-class SlackInteractivityReceivedPubSubHandler internal constructor(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    private val log: Logger,
-    private val eventHandlers: List<PubSubEventHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage>>,
-    pubSubDecoder: PubSubDecoder,
-) : BasePubSubDispatcherHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log,
-    pubSubDecoder = pubSubDecoder,
-) {
+class SearchSessionResultCreatedPubSubDispatchHandler(
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
+    private val eventHandlers: List<PubSubEventHandler<SearchSessionResultCreatedEvent>>,
+    override val pubSubDecoder: PubSubDecoder,
+) : PubSubDispatchHandler {
     private val tag = this::class.simpleName
 
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
-        path = "/api/pubsub/slack/interactivity-received",
+        path = "/api/pubsub/search/session-result-created",
         contentType = ContentType.Application.Json,
     )
 
@@ -38,12 +33,13 @@ class SlackInteractivityReceivedPubSubHandler internal constructor(
         either {
             val body = request.decodeBodyFromJson(
                 jsonSerializer = jsonSerializer,
-                strategy = SlackInteractivityReceivedEvent.serializer(),
+                strategy = SearchSessionResultCreatedEvent.serializer(),
             ).bind() ?: raise(Exception("Request body is invalid"))
-            val payload = body.payload as? SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage
-                ?: raise(Exception("Unexpected payload type"))
-            eventHandlers.forEach { it.handle(payload).bind() }
+            eventHandlers.forEach { it.handle(body).bind() }
         }.fold(
+            // Swallow but report the error, so that we can investigate. Preload errors should not retry if the
+            // PubSub body cannot be parsed, or we get any of the search errors, which are currently Exhausted,
+            // Empty and NotFound, where retrying doesn't really make sense for any of them.
             ifLeft = { log.error(tag, it) { "Error handling request" }; Either.Right(Unit) },
             ifRight = { Either.Right(Unit) },
         )

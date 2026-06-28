@@ -16,17 +16,13 @@ import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 class SlackSlashCommandHttpHandler(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    log: Logger,
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
     private val slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
     private val slackConfig: SlackConfig,
     private val pubSubPublisher: PubSubPublisher,
-) : BaseHttpHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log,
-) {
+) : HttpHandler {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
         path = "/api/slack/slash",
