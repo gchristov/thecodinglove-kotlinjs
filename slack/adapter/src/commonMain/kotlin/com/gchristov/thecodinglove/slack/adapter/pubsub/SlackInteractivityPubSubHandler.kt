@@ -15,7 +15,7 @@ import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivity
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
-class SlackInteractivityPubSubHandler internal constructor(
+internal class SlackInteractivityPubSubHandler(
     override val dispatcher: CoroutineDispatcher,
     override val jsonSerializer: JsonSerializer,
     override val log: Logger,

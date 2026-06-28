@@ -14,7 +14,7 @@ import com.gchristov.thecodinglove.search.domain.usecase.PreloadSearchResultUseC
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
-class SearchPreloadPubSubHandler(
+internal class SearchPreloadPubSubHandler(
     override val dispatcher: CoroutineDispatcher,
     override val jsonSerializer: JsonSerializer,
     override val log: Logger,
