@@ -12,6 +12,7 @@ import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPo
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.http.*
 import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultCreatedPubSubHandler
+import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultEventHandler
 import com.gchristov.thecodinglove.search.domain.model.Environment
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
@@ -142,7 +143,7 @@ object SearchAdapterModule : DiModule() {
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
-        preloadSearchResultUseCase = preloadSearchResultUseCase,
+        eventHandlers = listOf(SearchSessionResultEventHandler(preloadSearchResultUseCase)),
         pubSubDecoder = pubSubSubDecoder,
     )
 

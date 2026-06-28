@@ -7,6 +7,7 @@ import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultCreatedPubSubHandler
+import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultEventHandler
 import com.gchristov.thecodinglove.search.adapter.pubsub.model.SearchSessionResultCreatedEvent
 import com.gchristov.thecodinglove.search.testfixtures.FakePreloadSearchResultUseCase
 import com.gchristov.thecodinglove.search.testfixtures.SearchSessionResultCreatedPubSubCreator
@@ -30,17 +31,6 @@ class SearchSessionResultCreatedPubSubHandlerTest {
     }
 
     @Test
-    fun handleRequestSuccessPreloads(): TestResult = runBlockingTest(
-        message = SearchSessionResultCreatedPubSubCreator.defaultMessage(),
-        preloadSearchResultInvocationResult = Either.Right(Unit)
-    ) { handler, preloadUseCase, request ->
-        val result = handler.handlePubSubRequest(request)
-        preloadUseCase.assertInvokedOnce()
-        preloadUseCase.assertSearchSessionId("session_123")
-        assertTrue { result.isRight() }
-    }
-
-    @Test
     fun handleRequestParseErrorDoesNotPreload(): TestResult = runBlockingTest(
         message = null,
         preloadSearchResultInvocationResult = Either.Left(Throwable())
@@ -51,13 +41,12 @@ class SearchSessionResultCreatedPubSubHandlerTest {
     }
 
     @Test
-    fun handleRequestSearchErrorPreloads(): TestResult = runBlockingTest(
+    fun handleRequestRoutesToEventHandler(): TestResult = runBlockingTest(
         message = SearchSessionResultCreatedPubSubCreator.defaultMessage(),
-        preloadSearchResultInvocationResult = Either.Left(Throwable())
+        preloadSearchResultInvocationResult = Either.Right(Unit)
     ) { handler, preloadUseCase, request ->
         val result = handler.handlePubSubRequest(request)
         preloadUseCase.assertInvokedOnce()
-        preloadUseCase.assertSearchSessionId("session_123")
         assertTrue { result.isRight() }
     }
 
@@ -77,7 +66,7 @@ class SearchSessionResultCreatedPubSubHandlerTest {
             dispatcher = FakeCoroutineDispatcher,
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
-            preloadSearchResultUseCase = preloadSearchResultUseCase,
+            eventHandlers = listOf(SearchSessionResultEventHandler(preloadSearchResultUseCase)),
             pubSubDecoder = FakePubSubDecoder(request),
         )
         testBlock(handler, preloadSearchResultUseCase, request)

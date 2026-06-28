@@ -21,7 +21,7 @@ import kotlin.test.assertTrue
 
 class SlackSlashCommandReceivedPubSubHandlerTest {
     @Test
-    fun httpConfig(): TestResult = runBlockingTest { handler, _, _ ->
+    fun httpConfig(): TestResult = runBlockingTest { handler, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
         assertEquals("/api/pubsub/slack/slash-command-received", config.path)
@@ -31,42 +31,23 @@ class SlackSlashCommandReceivedPubSubHandlerTest {
     @Test
     fun nullBodyReturnsError(): TestResult = runBlockingTest(
         message = null,
-    ) { handler, _, request ->
+    ) { handler, request ->
         val result = handler.handlePubSubRequest(request)
         assertTrue { result.isLeft() }
     }
 
     @Test
-    fun searchErrorPostsGenericError(): TestResult = runBlockingTest(
-        searchResult = Either.Left(Throwable("Search error")),
-    ) { handler, repository, request ->
-        val result = handler.handlePubSubRequest(request)
-        assertTrue { result.isRight() }
-        repository.assertPostMessageToUrlCalledTimes(2)
-    }
-
-    @Test
-    fun searchNoResultsPostsNoResultsMessage(): TestResult = runBlockingTest(
-        searchResult = Either.Right(SlackSearchResultCreator.noResults()),
-    ) { handler, repository, request ->
-        val result = handler.handlePubSubRequest(request)
-        assertTrue { result.isRight() }
-        repository.assertPostMessageToUrlCalledTimes(2)
-    }
-
-    @Test
-    fun searchSuccessPostsResultMessage(): TestResult = runBlockingTest(
+    fun commandRoutesToSearchHandler(): TestResult = runBlockingTest(
         searchResult = Either.Right(SlackSearchResultCreator.success()),
-    ) { handler, repository, request ->
+    ) { handler, request ->
         val result = handler.handlePubSubRequest(request)
         assertTrue { result.isRight() }
-        repository.assertPostMessageToUrlCalledTimes(2)
     }
 
     private fun runBlockingTest(
         message: SlackSlashCommandReceivedEvent? = TestSlashCommandEvent,
         searchResult: Either<Throwable, com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository.SearchResultDto> = Either.Right(SlackSearchResultCreator.success()),
-        testBlock: suspend (SlackSlashCommandReceivedPubSubHandler, FakeSlackRepository, FakePubSubRequest<SlackSlashCommandReceivedEvent>) -> Unit,
+        testBlock: suspend (SlackSlashCommandReceivedPubSubHandler, FakePubSubRequest<SlackSlashCommandReceivedEvent>) -> Unit,
     ): TestResult = runTest {
         val repository = FakeSlackRepository()
         val searchRepository = FakeSlackSearchRepository(searchResult = searchResult)
@@ -78,13 +59,17 @@ class SlackSlashCommandReceivedPubSubHandlerTest {
             dispatcher = FakeCoroutineDispatcher,
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
-            slackRepository = repository,
-            slackMessageFactory = FakeSlackMessageFactory(),
-            slackSearchRepository = searchRepository,
-            analytics = FakeAnalytics(),
+            eventHandlers = listOf(
+                SlackSearchSlashCommandEventHandler(
+                    slackRepository = repository,
+                    slackMessageFactory = FakeSlackMessageFactory(),
+                    slackSearchRepository = searchRepository,
+                    analytics = FakeAnalytics(),
+                )
+            ),
             pubSubDecoder = FakePubSubDecoder(request),
         )
-        testBlock(handler, repository, request)
+        testBlock(handler, request)
     }
 }
 

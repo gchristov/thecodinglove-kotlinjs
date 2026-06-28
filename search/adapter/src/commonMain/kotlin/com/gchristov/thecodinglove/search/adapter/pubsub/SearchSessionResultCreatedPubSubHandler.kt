@@ -8,8 +8,8 @@ import com.gchristov.thecodinglove.common.kotlin.error
 import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
+import com.gchristov.thecodinglove.common.pubsub.PubSubEventHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
-import com.gchristov.thecodinglove.search.domain.usecase.PreloadSearchResultUseCase
 import com.gchristov.thecodinglove.search.adapter.pubsub.model.SearchSessionResultCreatedEvent
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
@@ -18,7 +18,7 @@ class SearchSessionResultCreatedPubSubHandler(
     dispatcher: CoroutineDispatcher,
     private val jsonSerializer: JsonSerializer,
     private val log: Logger,
-    private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
+    private val eventHandlers: List<PubSubEventHandler<SearchSessionResultCreatedEvent>>,
     pubSubDecoder: PubSubDecoder,
 ) : BasePubSubHandler(
     dispatcher = dispatcher,
@@ -40,7 +40,8 @@ class SearchSessionResultCreatedPubSubHandler(
                 jsonSerializer = jsonSerializer,
                 strategy = SearchSessionResultCreatedEvent.serializer(),
             ).bind() ?: raise(Exception("Request body is invalid"))
-            preloadSearchResultUseCase(PreloadSearchResultUseCase.Dto(searchSessionId = body.searchSessionId)).bind()
+            eventHandlers.firstOrNull { it.canHandle(body) }?.handle(body)?.bind()
+            Unit
         }.fold(
             // Swallow but report the error, so that we can investigate. Preload errors should not retry if the
             // PubSub body cannot be parsed, or we get any of the search errors, which are currently Exhausted,

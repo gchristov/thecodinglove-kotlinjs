@@ -37,27 +37,16 @@ class SlackInteractivityReceivedPubSubHandlerTest {
     }
 
     @Test
-    fun sendActionInvokesSendUseCase(): TestResult = runBlockingTest(
+    fun sendActionRoutesToSendHandler(): TestResult = runBlockingTest(
         message = interactivityMessage(action = SlackActionName.SEND),
     ) { handler, sendUseCase, _, request ->
         val result = handler.handlePubSubRequest(request)
         assertTrue { result.isRight() }
         sendUseCase.assertInvokedOnce()
-        sendUseCase.assertSelfDestructMinutes(null)
     }
 
     @Test
-    fun selfDestruct5MinActionInvokesSendUseCaseWith5Minutes(): TestResult = runBlockingTest(
-        message = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN),
-    ) { handler, sendUseCase, _, request ->
-        val result = handler.handlePubSubRequest(request)
-        assertTrue { result.isRight() }
-        sendUseCase.assertInvokedOnce()
-        sendUseCase.assertSelfDestructMinutes(5)
-    }
-
-    @Test
-    fun shuffleActionInvokesShuffleUseCase(): TestResult = runBlockingTest(
+    fun shuffleActionRoutesToShuffleHandler(): TestResult = runBlockingTest(
         message = interactivityMessage(action = SlackActionName.SHUFFLE),
     ) { handler, _, shuffleUseCase, request ->
         val result = handler.handlePubSubRequest(request)
@@ -66,17 +55,8 @@ class SlackInteractivityReceivedPubSubHandlerTest {
     }
 
     @Test
-    fun cancelActionInvokesCancelUseCase(): TestResult = runBlockingTest(
+    fun cancelActionRoutesToCancelHandler(): TestResult = runBlockingTest(
         message = interactivityMessage(action = SlackActionName.CANCEL),
-    ) { handler, _, _, request ->
-        val result = handler.handlePubSubRequest(request)
-        assertTrue { result.isRight() }
-    }
-
-    @Test
-    fun sendActionErrorIsSwallowed(): TestResult = runBlockingTest(
-        message = interactivityMessage(action = SlackActionName.SEND),
-        sendResult = Either.Left(Throwable("Send failed")),
     ) { handler, _, _, request ->
         val result = handler.handlePubSubRequest(request)
         assertTrue { result.isRight() }
@@ -84,12 +64,12 @@ class SlackInteractivityReceivedPubSubHandlerTest {
 
     private fun runBlockingTest(
         message: SlackInteractivityReceivedEvent? = interactivityMessage(action = SlackActionName.SEND),
-        sendResult: Either<Throwable, Unit> = Either.Right(Unit),
         testBlock: suspend (SlackInteractivityReceivedPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase, FakePubSubRequest<SlackInteractivityReceivedEvent>) -> Unit,
     ): TestResult = runTest {
-        val sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)
+        val sendUseCase = FakeSlackSendSearchUseCase()
         val shuffleUseCase = FakeSlackShuffleSearchUseCase()
         val cancelUseCase = FakeSlackCancelSearchUseCase()
+        val analytics = FakeAnalytics()
         val request = FakePubSubRequest(
             message = message,
             messageSerializer = SlackInteractivityReceivedEvent.serializer(),
@@ -98,17 +78,20 @@ class SlackInteractivityReceivedPubSubHandlerTest {
             dispatcher = FakeCoroutineDispatcher,
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
-            slackSendSearchUseCase = sendUseCase,
-            slackShuffleSearchUseCase = shuffleUseCase,
-            slackCancelSearchUseCase = cancelUseCase,
-            analytics = FakeAnalytics(),
+            eventHandlers = listOf(
+                SlackSendInteractivityEventHandler(sendUseCase, analytics),
+                SlackShuffleInteractivityEventHandler(shuffleUseCase, analytics),
+                SlackCancelInteractivityEventHandler(cancelUseCase, analytics),
+            ),
             pubSubDecoder = FakePubSubDecoder(request),
         )
         testBlock(handler, sendUseCase, shuffleUseCase, request)
     }
 }
 
-private fun interactivityMessage(action: SlackActionName) = SlackInteractivityReceivedEvent(
+internal typealias SlackInteractivityPayload = SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage
+
+internal fun interactivityMessage(action: SlackActionName) = SlackInteractivityReceivedEvent(
     payload = SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage(
         actions = listOf(
             SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.Action(

@@ -10,7 +10,11 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.common.slack.SlackSender
 import com.gchristov.thecodinglove.slack.adapter.http.*
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackCancelInteractivityEventHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityReceivedPubSubHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSearchSlashCommandEventHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSendInteractivityEventHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackShuffleInteractivityEventHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandReceivedPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.search.RealSlackSearchRepository
 import com.gchristov.thecodinglove.slack.adapter.search.SlackSearchServiceApi
@@ -210,11 +214,15 @@ object SlackAdapterModule : DiModule() {
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
-        slackRepository = slackRepository,
-        slackMessageFactory = slackMessageFactory,
-        slackSearchRepository = searchRepository,
+        eventHandlers = listOf(
+            SlackSearchSlashCommandEventHandler(
+                slackRepository = slackRepository,
+                slackMessageFactory = slackMessageFactory,
+                slackSearchRepository = searchRepository,
+                analytics = analytics,
+            )
+        ),
         pubSubDecoder = pubSubDecoder,
-        analytics = analytics,
     )
 
     private fun provideSlackInteractivityHttpHandler(
@@ -244,11 +252,12 @@ object SlackAdapterModule : DiModule() {
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
-        slackSendSearchUseCase = slackSendSearchUseCase,
-        slackShuffleSearchUseCase = slackShuffleSearchUseCase,
-        slackCancelSearchUseCase = slackCancelSearchUseCase,
+        eventHandlers = listOf(
+            SlackSendInteractivityEventHandler(slackSendSearchUseCase, analytics),
+            SlackShuffleInteractivityEventHandler(slackShuffleSearchUseCase, analytics),
+            SlackCancelInteractivityEventHandler(slackCancelSearchUseCase, analytics),
+        ),
         pubSubDecoder = pubSubDecoder,
-        analytics = analytics,
     )
 
     private fun provideSlackSelfDestructHttpHandler(
