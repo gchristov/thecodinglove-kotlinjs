@@ -68,7 +68,7 @@ class SearchHttpHandlerTest {
                 response = response
             )
             pubSub.assertEquals(
-                topic = TestPreloadSearchPubSubTopic,
+                topic = TestSearchSessionResultCreatedPubSubTopic,
                 message = SearchSessionResultCreatedEvent(TestSearchSessionId),
             )
         }
@@ -213,7 +213,7 @@ class SearchHttpHandlerTest {
             pubSubPublisher = pubSubPublisher,
             searchConfig = SearchConfig(
                 postsPerPage = TestSearchPostsPerPage,
-                searchSessionResultCreatedPubSubTopic = TestPreloadSearchPubSubTopic,
+                searchSessionResultCreatedPubSubTopic = TestSearchSessionResultCreatedPubSubTopic,
             ),
             analytics = FakeAnalytics(),
         )
@@ -224,4 +224,4 @@ class SearchHttpHandlerTest {
 private const val TestSearchQuery = "test"
 private const val TestSearchSessionId = "session_123"
 private const val TestSearchPostsPerPage = 4
-private const val TestPreloadSearchPubSubTopic = "topic_123"
+private const val TestSearchSessionResultCreatedPubSubTopic = "topic_123"

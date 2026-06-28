@@ -196,8 +196,8 @@ class RealSearchWithHistoryUseCaseTest {
 }
 
 private const val TestSearchQuery = "test"
-private const val TestSearchPreloadPubSubTopic = "topic_123"
+private const val TestSearchSessionResultCreatedPubSubTopic = "topic_123"
 private val TestSearchConfig = SearchConfig(
     postsPerPage = SearchPostCreator.multiPageMultiPostPageSize(),
-    searchSessionResultCreatedPubSubTopic = TestSearchPreloadPubSubTopic,
+    searchSessionResultCreatedPubSubTopic = TestSearchSessionResultCreatedPubSubTopic,
 )

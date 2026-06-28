@@ -11,7 +11,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.http.*
-import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubHandler
+import com.gchristov.thecodinglove.search.adapter.pubsub.SearchSessionResultCreatedPubSubHandler
 import com.gchristov.thecodinglove.search.domain.model.Environment
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
@@ -57,7 +57,7 @@ object SearchAdapterModule : DiModule() {
                 )
             }
             bindSingleton {
-                providePreloadSearchPubSubHttpHandler(
+                provideSearchSessionResultCreatedPubSubHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     preloadSearchResultUseCase = instance(),
@@ -133,12 +133,12 @@ object SearchAdapterModule : DiModule() {
         analytics = analytics,
     )
 
-    private fun providePreloadSearchPubSubHttpHandler(
+    private fun provideSearchSessionResultCreatedPubSubHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         preloadSearchResultUseCase: PreloadSearchResultUseCase,
         pubSubSubDecoder: PubSubDecoder,
-    ): PreloadSearchPubSubHandler = PreloadSearchPubSubHandler(
+    ): SearchSessionResultCreatedPubSubHandler = SearchSessionResultCreatedPubSubHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,

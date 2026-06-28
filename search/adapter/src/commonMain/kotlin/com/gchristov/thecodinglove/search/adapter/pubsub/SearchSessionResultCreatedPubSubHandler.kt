@@ -14,7 +14,7 @@ import com.gchristov.thecodinglove.search.adapter.pubsub.model.SearchSessionResu
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
-class PreloadSearchPubSubHandler(
+class SearchSessionResultCreatedPubSubHandler(
     dispatcher: CoroutineDispatcher,
     private val jsonSerializer: JsonSerializer,
     private val log: Logger,
