@@ -67,6 +67,48 @@ object CommonSlackModule : DiModule() {
 
 Services wire modules in `*Service.kt`. Order matters — provide dependencies before consumers.
 
+## HTTP handlers
+
+`HttpHandler` is an interface (no base class). Every concrete handler implements it directly and declares the three required properties in the primary constructor:
+
+```kotlin
+class MyHttpHandler(
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
+    private val myUseCase: MyUseCase,
+) : HttpHandler {
+    override fun httpConfig() = HttpHandler.HttpConfig(
+        method = HttpMethod.Post,
+        path = "/api/my-path",
+        contentType = ContentType.Application.Json,
+    )
+    override suspend fun handleHttpRequestAsync(
+        request: HttpRequest,
+        response: HttpResponse,
+    ): Either<Throwable, Unit> = either { ... }
+}
+```
+
+The `handleHttpRequest` fire-and-forget coroutine, error logging, and `handleError` default are all provided by the interface. Override `handleError` only when custom error responses are needed (call `super<HttpHandler>.handleError(error, response)` for the default branch).
+
+`StaticFileHttpHandler` is a special case — it overrides `handleHttpRequest` directly and stubs the three properties with `error("not used")`.
+
+## PubSub handlers
+
+Two interfaces, no base classes:
+
+- **`PubSubEventHandler<T>`** (`fun interface`) — a leaf handler that processes one event type. Implement `handle(event: T)`. Each handler checks whether the event is relevant to it and returns `Either.Right(Unit)` to skip.
+- **`PubSubDispatchHandler`** (extends `HttpHandler`) — decodes the raw HTTP request into a `PubSubRequest`, then fans out to a `List<PubSubEventHandler<T>>`. The HTTP decoding and `sendEmpty()` response are handled by the interface default. Implement `handlePubSubRequest` to decode the typed body and invoke event handlers.
+
+**Naming conventions:**
+- Dispatch handlers: `[Domain][EventVerb]PubSubDispatchHandler` (e.g. `SlackInteractivityReceivedPubSubDispatchHandler`)
+- Event handlers: `[Domain][Action]PubSubEventHandler` (e.g. `SlackSendPubSubEventHandler`, `SlackShufflePubSubEventHandler`)
+
+**Error handling in dispatch handlers:**
+- Swallow and log errors (don't retry) when retrying makes no sense — e.g. parse failures or exhausted search results.
+- Propagate errors (return `Either.Left`) when the operation should be retried by PubSub.
+
 ## Error handling
 
 Arrow `Either<Throwable, T>` throughout. Use `either { }` DSL and `.bind()`.
@@ -88,6 +130,12 @@ Arrow `Either<Throwable, T>` throughout. Use `either { }` DSL and `.bind()`.
 ./gradlew build
 ./gradlew :slack:jsNodeTest   # test a specific common module
 ```
+
+**Stale klib workaround:** when files are deleted or renamed inside `common/`, Gradle's incremental cache can serve a stale klib to dependent microservices even after `clean`. If you see "Unresolved reference" errors that shouldn't exist, add `--rerun-tasks`:
+```bash
+./gradlew jsTest --no-daemon --max-workers=1 --rerun-tasks
+```
+Run microservices sequentially (not in parallel with `&`) to avoid `DirectoryNotEmptyException` on shared `common` compile tasks.
 
 ## Tests
 
@@ -157,7 +205,7 @@ Simple scalar test values (strings, IDs) can stay as `private const val` inside 
 |--------|-------------|
 | `common/test` | `FakeCoroutineDispatcher`, `FakeLogger` |
 | `common/network-testfixtures` | `FakeHttpResponse`, `FakeEmptyHttpRequest`, `FakeBodyHttpRequest` |
-| `common/pubsub-testfixtures` | `FakePubSubPublisher`, `FakePubSubRequest` |
+| `common/pubsub-testfixtures` | `FakePubSubPublisher`, `FakePubSubRequest`, `FakePubSubDecoder` |
 | `common/analytics-testfixtures` | `FakeAnalytics` |
 | `search/test-fixtures` | `FakeSearchRepository`, `FakeSearchHttpRequest`, Creators for `SearchSession`, `SearchPost`, `SearchStatistics`, etc. |
 | `slack/test-fixtures` | Fakes for all Slack use cases, `FakeSlackHttpRequest`, `FakeSlackAuthHttpRequest`, `SlackConfigCreator`, Creators for Slack domain objects |
@@ -176,7 +224,7 @@ Module-specific request fakes (`FakeSearchHttpRequest`, `FakeSlackHttpRequest`, 
 
 ### What not to test
 
-Repositories, service API clients, base classes, and pure field-copy mappers don't need unit tests — they belong to integration tests. Focus tests on use cases and HTTP/PubSub handlers that contain branching logic.
+Repositories, service API clients, and pure field-copy mappers don't need unit tests — they belong to integration tests. Focus tests on use cases and HTTP/PubSub handlers that contain branching logic.
 
 ## Secrets
 
