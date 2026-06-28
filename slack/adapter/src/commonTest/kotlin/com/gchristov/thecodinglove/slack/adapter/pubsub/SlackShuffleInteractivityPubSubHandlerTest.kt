@@ -10,7 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class SlackShufflePubSubHandlerTest {
+class SlackShuffleInteractivityPubSubHandlerTest {
     @Test
     fun handleShuffleInvokesShuffleUseCase(): TestResult = runBlockingTest { handler ->
         val payload = interactivityMessage(action = SlackActionName.SHUFFLE).payload as SlackInteractivityPayload
@@ -40,10 +40,10 @@ class SlackShufflePubSubHandlerTest {
 
     private fun runBlockingTest(
         shuffleResult: Either<Throwable, Unit> = Either.Right(Unit),
-        testBlock: suspend (SlackShufflePubSubHandler) -> Unit,
+        testBlock: suspend (SlackShuffleInteractivityPubSubHandler) -> Unit,
     ): TestResult = runTest {
         shuffleUseCase = FakeSlackShuffleSearchUseCase(invocationResult = shuffleResult)
-        val handler = SlackShufflePubSubHandler(
+        val handler = SlackShuffleInteractivityPubSubHandler(
             slackShuffleSearchUseCase = shuffleUseCase,
             analytics = FakeAnalytics(),
         )

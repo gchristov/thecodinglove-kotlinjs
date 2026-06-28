@@ -113,7 +113,7 @@ resources:
       messageRetentionDuration: 600s
       name: slack_interactivity_received_subscription
       pushConfig:
-        pushEndpoint: ${slack-service.uri}/api/pubsub/slack/interactivity-received
+        pushEndpoint: ${slack-service.uri}/api/pubsub/slack/interactivity
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s
@@ -139,7 +139,7 @@ resources:
       messageRetentionDuration: 600s
       name: slack_slash_command_received_subscription
       pushConfig:
-        pushEndpoint: ${slack-service.uri}/api/pubsub/slack/slash-command-received
+        pushEndpoint: ${slack-service.uri}/api/pubsub/slack/search
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s

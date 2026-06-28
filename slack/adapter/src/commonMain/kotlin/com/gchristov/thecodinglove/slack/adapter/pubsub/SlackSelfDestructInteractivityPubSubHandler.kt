@@ -12,7 +12,7 @@ import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.DeserializationStrategy
 
-internal class SlackSelfDestructPubSubHandler(
+internal class SlackSelfDestructInteractivityPubSubHandler(
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
     private val analytics: Analytics,
 ) : PubSubHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage> {

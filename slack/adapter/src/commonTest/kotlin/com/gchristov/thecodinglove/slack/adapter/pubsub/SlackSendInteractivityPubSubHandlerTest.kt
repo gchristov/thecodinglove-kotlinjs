@@ -10,7 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class SlackSendPubSubHandlerTest {
+class SlackSendInteractivityPubSubHandlerTest {
     @Test
     fun handleSendActionInvokesSendUseCaseWithNoSelfDestruct(): TestResult = runBlockingTest { handler ->
         val payload = interactivityMessage(action = SlackActionName.SEND).payload as SlackInteractivityPayload
@@ -41,10 +41,10 @@ class SlackSendPubSubHandlerTest {
 
     private fun runBlockingTest(
         sendResult: Either<Throwable, Unit> = Either.Right(Unit),
-        testBlock: suspend (SlackSendPubSubHandler) -> Unit,
+        testBlock: suspend (SlackSendInteractivityPubSubHandler) -> Unit,
     ): TestResult = runTest {
         sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)
-        val handler = SlackSendPubSubHandler(
+        val handler = SlackSendInteractivityPubSubHandler(
             slackSendSearchUseCase = sendUseCase,
             analytics = FakeAnalytics(),
         )

@@ -30,7 +30,7 @@ resources:
       name: slack_interactivity_received_dev_subscription
       pushConfig:
         # If this changes, update the tunnel URL in run_local.sh and all other infra/dev Pulumi files too.
-        pushEndpoint: https://codinglove.serveousercontent.com/api/pubsub/slack/interactivity-received
+        pushEndpoint: https://codinglove.serveousercontent.com/api/pubsub/slack/interactivity
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s
@@ -57,7 +57,7 @@ resources:
       name: slack_slash_command_received_dev_subscription
       pushConfig:
         # If this changes, update the tunnel URL in run_local.sh and all other infra/dev Pulumi files too.
-        pushEndpoint: https://codinglove.serveousercontent.com/api/pubsub/slack/slash-command-received
+        pushEndpoint: https://codinglove.serveousercontent.com/api/pubsub/slack/search
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s

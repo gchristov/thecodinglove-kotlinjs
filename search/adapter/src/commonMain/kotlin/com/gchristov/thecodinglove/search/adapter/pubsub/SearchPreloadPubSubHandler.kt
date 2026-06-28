@@ -27,7 +27,7 @@ class SearchPreloadPubSubHandler(
 
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
-        path = "/api/pubsub/search/session-result-created",
+        path = "/api/pubsub/search/preload",
         contentType = ContentType.Application.Json,
     )
 

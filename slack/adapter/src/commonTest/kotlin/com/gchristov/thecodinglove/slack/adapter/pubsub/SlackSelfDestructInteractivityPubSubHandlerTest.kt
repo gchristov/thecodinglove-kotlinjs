@@ -10,7 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class SlackSelfDestructPubSubHandlerTest {
+class SlackSelfDestructInteractivityPubSubHandlerTest {
     @Test
     fun handleSelfDestruct5MinInvokesSendUseCaseWith5Minutes(): TestResult = runBlockingTest { handler ->
         val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
@@ -41,10 +41,10 @@ class SlackSelfDestructPubSubHandlerTest {
 
     private fun runBlockingTest(
         sendResult: Either<Throwable, Unit> = Either.Right(Unit),
-        testBlock: suspend (SlackSelfDestructPubSubHandler) -> Unit,
+        testBlock: suspend (SlackSelfDestructInteractivityPubSubHandler) -> Unit,
     ): TestResult = runTest {
         sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)
-        val handler = SlackSelfDestructPubSubHandler(
+        val handler = SlackSelfDestructInteractivityPubSubHandler(
             slackSendSearchUseCase = sendUseCase,
             analytics = FakeAnalytics(),
         )

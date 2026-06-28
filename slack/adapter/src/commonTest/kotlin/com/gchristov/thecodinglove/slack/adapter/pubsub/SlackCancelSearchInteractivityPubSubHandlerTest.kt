@@ -10,7 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class SlackCancelSearchPubSubHandlerTest {
+class SlackCancelSearchInteractivityPubSubHandlerTest {
     @Test
     fun handleCancelInvokesCancelUseCase(): TestResult = runBlockingTest { handler ->
         val payload = interactivityMessage(action = SlackActionName.CANCEL).payload as SlackInteractivityPayload
@@ -40,10 +40,10 @@ class SlackCancelSearchPubSubHandlerTest {
 
     private fun runBlockingTest(
         cancelResult: Either<Throwable, Unit> = Either.Right(Unit),
-        testBlock: suspend (SlackCancelSearchPubSubHandler) -> Unit,
+        testBlock: suspend (SlackCancelSearchInteractivityPubSubHandler) -> Unit,
     ): TestResult = runTest {
         cancelUseCase = FakeSlackCancelSearchUseCase(invocationResult = cancelResult)
-        val handler = SlackCancelSearchPubSubHandler(
+        val handler = SlackCancelSearchInteractivityPubSubHandler(
             slackCancelSearchUseCase = cancelUseCase,
             analytics = FakeAnalytics(),
         )

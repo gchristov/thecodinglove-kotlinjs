@@ -24,7 +24,7 @@ class SlackSearchPubSubHandlerTest {
     fun httpConfig(): TestResult = runBlockingTest { handler, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
-        assertEquals("/api/pubsub/slack/slash-command-received", config.path)
+        assertEquals("/api/pubsub/slack/search", config.path)
         assertEquals(ContentType.Application.Json, config.contentType)
     }
 

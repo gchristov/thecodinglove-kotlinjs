@@ -111,7 +111,7 @@ resources:
       messageRetentionDuration: 600s
       name: search_session_result_created_subscription
       pushConfig:
-        pushEndpoint: ${search-service.uri}/api/pubsub/search/session-result-created
+        pushEndpoint: ${search-service.uri}/api/pubsub/search/preload
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s
@@ -123,4 +123,4 @@ resources:
 outputs:
   searchServiceHost: ${search-service.uri}
   searchServicePath: api/search
-  searchServicePubSubPath: api/pubsub/search/session-result-created
+  searchServicePubSubPath: api/pubsub/search/preload

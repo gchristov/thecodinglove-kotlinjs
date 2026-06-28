@@ -29,7 +29,7 @@ class SlackSearchPubSubHandler(
 
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
-        path = "/api/pubsub/slack/slash-command-received",
+        path = "/api/pubsub/slack/search",
         contentType = ContentType.Application.Json,
     )
 

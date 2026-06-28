@@ -12,7 +12,7 @@ import com.gchristov.thecodinglove.slack.domain.usecase.SlackShuffleSearchUseCas
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.DeserializationStrategy
 
-internal class SlackShufflePubSubHandler(
+internal class SlackShuffleInteractivityPubSubHandler(
     private val slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
     private val analytics: Analytics,
 ) : PubSubHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage> {

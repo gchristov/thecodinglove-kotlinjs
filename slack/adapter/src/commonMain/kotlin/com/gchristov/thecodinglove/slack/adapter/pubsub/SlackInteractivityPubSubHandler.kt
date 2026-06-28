@@ -27,7 +27,7 @@ class SlackInteractivityPubSubHandler internal constructor(
 
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
-        path = "/api/pubsub/slack/interactivity-received",
+        path = "/api/pubsub/slack/interactivity",
         contentType = ContentType.Application.Json,
     )
 

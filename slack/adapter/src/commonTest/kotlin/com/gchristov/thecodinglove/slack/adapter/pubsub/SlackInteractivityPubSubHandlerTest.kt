@@ -23,7 +23,7 @@ class SlackInteractivityPubSubHandlerTest {
     fun httpConfig(): TestResult = runBlockingTest { handler, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
-        assertEquals("/api/pubsub/slack/interactivity-received", config.path)
+        assertEquals("/api/pubsub/slack/interactivity", config.path)
         assertEquals(ContentType.Application.Json, config.contentType)
     }
 
@@ -66,10 +66,10 @@ class SlackInteractivityPubSubHandlerTest {
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
             eventHandlers = listOf(
-                SlackSendPubSubHandler(sendUseCase, analytics),
-                SlackSelfDestructPubSubHandler(sendUseCase, analytics),
-                SlackShufflePubSubHandler(shuffleUseCase, analytics),
-                SlackCancelSearchPubSubHandler(cancelUseCase, analytics),
+                SlackSendInteractivityPubSubHandler(sendUseCase, analytics),
+                SlackSelfDestructInteractivityPubSubHandler(sendUseCase, analytics),
+                SlackShuffleInteractivityPubSubHandler(shuffleUseCase, analytics),
+                SlackCancelSearchInteractivityPubSubHandler(cancelUseCase, analytics),
             ),
             pubSubDecoder = FakePubSubDecoder(FakePubSubRequest(null, SlackInteractivityReceivedEvent.serializer())),
         )

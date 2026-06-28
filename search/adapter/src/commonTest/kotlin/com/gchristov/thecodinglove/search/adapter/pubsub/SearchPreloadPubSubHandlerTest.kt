@@ -20,7 +20,7 @@ class SearchPreloadPubSubHandlerTest {
     fun httpConfig(): TestResult = runBlockingTest { handler, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
-        assertEquals("/api/pubsub/search/session-result-created", config.path)
+        assertEquals("/api/pubsub/search/preload", config.path)
         assertEquals(ContentType.Application.Json, config.contentType)
     }
 
