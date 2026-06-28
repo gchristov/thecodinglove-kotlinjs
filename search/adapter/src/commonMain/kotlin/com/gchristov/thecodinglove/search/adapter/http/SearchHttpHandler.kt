@@ -61,7 +61,7 @@ class SearchHttpHandler(
                     ),
                 )
                 either {
-                    publishSearchPreloadMessage(
+                    publishSearchSessionResultCreatedEvent(
                         searchSessionId = searchResult.searchSessionId,
                         searchConfig = searchConfig,
                     ).bind()
@@ -70,7 +70,7 @@ class SearchHttpHandler(
             }
         )
 
-    private suspend fun publishSearchPreloadMessage(
+    private suspend fun publishSearchSessionResultCreatedEvent(
         searchSessionId: String,
         searchConfig: SearchConfig,
     ) = pubSubPublisher.publishJson(

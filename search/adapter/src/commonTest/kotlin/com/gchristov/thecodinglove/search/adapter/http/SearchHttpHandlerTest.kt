@@ -54,7 +54,7 @@ class SearchHttpHandlerTest {
     }
 
     @Test
-    fun handleRequestSuccessPreloads(): TestResult {
+    fun handleRequestSuccessPublishesSessionResultCreatedEvent(): TestResult {
         val expectedResult = SearchResultCreator.validResult(
             searchSessionId = TestSearchSessionId,
             query = TestSearchQuery
@@ -136,7 +136,7 @@ class SearchHttpHandlerTest {
     }
 
     @Test
-    fun handleRequestErrorDoesNotPreload(): TestResult = runBlockingTest(
+    fun handleRequestErrorDoesNotPublishSessionResultCreatedEvent(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchUseCase.Error.Empty(additionalInfo = "test"))
