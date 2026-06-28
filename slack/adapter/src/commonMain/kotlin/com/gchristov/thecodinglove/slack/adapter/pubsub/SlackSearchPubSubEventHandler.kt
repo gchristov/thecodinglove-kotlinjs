@@ -14,6 +14,7 @@ internal class SlackSearchPubSubEventHandler(
     private val slackMessageFactory: SlackMessageFactory,
     private val slackSearchRepository: SlackSearchRepository,
     private val analytics: Analytics,
+    private val slashCommand: String,
 ) : PubSubEventHandler<SlackSlashCommandReceivedEvent> {
     /*
      * Handles errors as success without PubSub retries, but tries to notify the user of the error. If sending
@@ -21,7 +22,7 @@ internal class SlackSearchPubSubEventHandler(
      * unnecessary PubSub retries which would most likely result in additional errors if the problem is on our end.
      */
     override suspend fun handle(event: SlackSlashCommandReceivedEvent): Either<Throwable, Unit> {
-        if (event.command != "/codinglove") return Either.Right(Unit)
+        if (event.command != slashCommand) return Either.Right(Unit)
         analytics.sendEvent(
             clientId = event.userId,
             name = "slack_slash_command",

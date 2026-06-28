@@ -93,6 +93,7 @@ object SlackAdapterModule : DiModule() {
                     searchRepository = instance(),
                     pubSubDecoder = instance(),
                     analytics = instance(),
+                    slackConfig = instance(),
                 )
             }
             bindSingleton {
@@ -211,6 +212,7 @@ object SlackAdapterModule : DiModule() {
         searchRepository: SlackSearchRepository,
         pubSubDecoder: PubSubDecoder,
         analytics: Analytics,
+        slackConfig: SlackConfig,
     ): SlackSlashCommandReceivedPubSubDispatchHandler = SlackSlashCommandReceivedPubSubDispatchHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
@@ -221,6 +223,7 @@ object SlackAdapterModule : DiModule() {
                 slackMessageFactory = slackMessageFactory,
                 slackSearchRepository = searchRepository,
                 analytics = analytics,
+                slashCommand = slackConfig.slashCommand,
             )
         ),
         pubSubDecoder = pubSubDecoder,

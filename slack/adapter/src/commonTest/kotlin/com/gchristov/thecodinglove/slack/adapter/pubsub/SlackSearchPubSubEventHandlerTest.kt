@@ -60,6 +60,7 @@ class SlackSearchPubSubEventHandlerTest {
             slackMessageFactory = FakeSlackMessageFactory(),
             slackSearchRepository = FakeSlackSearchRepository(searchResult = searchResult),
             analytics = FakeAnalytics(),
+            slashCommand = TestSlashCommandEvent.command,
         )
         testBlock(handler)
     }

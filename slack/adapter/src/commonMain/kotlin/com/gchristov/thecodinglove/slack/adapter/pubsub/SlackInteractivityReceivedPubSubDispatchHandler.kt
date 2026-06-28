@@ -36,7 +36,7 @@ class SlackInteractivityReceivedPubSubDispatchHandler internal constructor(
                 strategy = SlackInteractivityReceivedEvent.serializer(),
             ).bind() ?: raise(Exception("Request body is invalid"))
             val payload = body.payload as? SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage
-                ?: raise(Exception("Unexpected payload type"))
+                ?: raise(Exception("Unexpected payload type: ${body.payload::class.simpleName}"))
             eventHandlers.forEach { it.handle(payload).bind() }
         }.fold(
             ifLeft = { log.error(tag, it) { "Error handling request" }; Either.Right(Unit) },

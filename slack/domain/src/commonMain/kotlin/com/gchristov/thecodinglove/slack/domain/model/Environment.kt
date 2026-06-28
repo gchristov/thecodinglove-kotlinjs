@@ -8,6 +8,7 @@ data class Environment(
     val slackRequestVerification: Boolean,
     val slackSlashCommandReceivedPubSubTopic: String,
     val slackInteractivityReceivedPubSubTopic: String,
+    val slackSlashCommand: String,
 ) {
     companion object {
         fun of(args: Array<String>) = with(parseMainArgs(args)) {
@@ -18,6 +19,7 @@ data class Environment(
                     .toBoolean(),
                 slackSlashCommandReceivedPubSubTopic = requireNotNull(this["-slackSlashCommandReceivedPubSubTopic"]) { "-slackSlashCommandReceivedPubSubTopic url not specified." }.first(),
                 slackInteractivityReceivedPubSubTopic = requireNotNull(this["-slackInteractivityReceivedPubSubTopic"]) { "-slackInteractivityReceivedPubSubTopic url not specified." }.first(),
+                slackSlashCommand = requireNotNull(this["-slackSlashCommand"]) { "-slackSlashCommand not specified." }.first(),
             )
         }
     }
