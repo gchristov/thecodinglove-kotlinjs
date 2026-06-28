@@ -41,7 +41,7 @@ class SlackSlashCommandHttpHandlerTest {
     }
 
     @Test
-    fun validBodyPublishesToPubSub(): TestResult = runBlockingTest { handler, pubSub, response ->
+    fun validBodyPublishesSlashCommandReceivedEvent(): TestResult = runBlockingTest { handler, pubSub, response ->
         handler.handleHttpRequest(FakeSlackHttpRequest(fakeBody = TestSlashCommand), response)
         pubSub.assertEquals(
             topic = TestSlackConfig.slashCommandReceivedPubSubTopic,
@@ -57,7 +57,7 @@ class SlackSlashCommandHttpHandlerTest {
     }
 
     @Test
-    fun pubSubErrorSendsError(): TestResult = runBlockingTest(
+    fun publishSlashCommandReceivedEventErrorSendsError(): TestResult = runBlockingTest(
         publishResult = Either.Left(Throwable("PubSub error")),
     ) { handler, _, response ->
         handler.handleHttpRequest(FakeSlackHttpRequest(fakeBody = TestSlashCommand), response)

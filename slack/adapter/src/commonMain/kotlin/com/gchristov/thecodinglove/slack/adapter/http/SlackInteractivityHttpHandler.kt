@@ -41,11 +41,11 @@ class SlackInteractivityHttpHandler(
             jsonSerializer = jsonSerializer,
             strategy = ApiSlackInteractivity.serializer(),
         ).bind() ?: raise(Exception("Request body is invalid"))
-        publishInteractivityMessage(body).bind()
+        publishInteractivityReceivedEvent(body).bind()
         response.sendEmpty().bind()
     }
 
-    private suspend fun publishInteractivityMessage(interactivity: ApiSlackInteractivity) = pubSubPublisher
+    private suspend fun publishInteractivityReceivedEvent(interactivity: ApiSlackInteractivity) = pubSubPublisher
         .publishJson(
             topic = slackConfig.interactivityReceivedPubSubTopic,
             body = interactivity.toPubSubMessage(),

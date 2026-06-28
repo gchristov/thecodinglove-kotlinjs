@@ -41,11 +41,11 @@ class SlackSlashCommandHttpHandler(
             jsonSerializer = jsonSerializer,
             strategy = ApiSlackSlashCommand.serializer(),
         ).bind() ?: raise(Exception("Request body is invalid"))
-        publishSlashCommandMessage(body).bind()
+        publishSlashCommandReceivedEvent(body).bind()
         response.sendEmpty().bind()
     }
 
-    private suspend fun publishSlashCommandMessage(slashCommand: ApiSlackSlashCommand) = pubSubPublisher
+    private suspend fun publishSlashCommandReceivedEvent(slashCommand: ApiSlackSlashCommand) = pubSubPublisher
         .publishJson(
             topic = slackConfig.slashCommandReceivedPubSubTopic,
             body = slashCommand.toPubSubMessage(),

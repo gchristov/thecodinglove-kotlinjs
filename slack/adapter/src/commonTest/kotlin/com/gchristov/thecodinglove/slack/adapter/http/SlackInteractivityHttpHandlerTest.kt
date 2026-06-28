@@ -42,7 +42,7 @@ class SlackInteractivityHttpHandlerTest {
     }
 
     @Test
-    fun validBodyPublishesToPubSub(): TestResult = runBlockingTest { handler, pubSub, response ->
+    fun validBodyPublishesInteractivityReceivedEvent(): TestResult = runBlockingTest { handler, pubSub, response ->
         handler.handleHttpRequest(FakeSlackHttpRequest(fakeBody = TestInteractivity), response)
         pubSub.assertEquals(
             topic = TestSlackConfig.interactivityReceivedPubSubTopic,
@@ -58,7 +58,7 @@ class SlackInteractivityHttpHandlerTest {
     }
 
     @Test
-    fun pubSubErrorSendsError(): TestResult = runBlockingTest(
+    fun publishInteractivityReceivedEventErrorSendsError(): TestResult = runBlockingTest(
         publishResult = Either.Left(Throwable("PubSub error")),
     ) { handler, _, response ->
         handler.handleHttpRequest(FakeSlackHttpRequest(fakeBody = TestInteractivity), response)
