@@ -40,8 +40,7 @@ class SearchSessionResultCreatedPubSubHandler(
                 jsonSerializer = jsonSerializer,
                 strategy = SearchSessionResultCreatedEvent.serializer(),
             ).bind() ?: raise(Exception("Request body is invalid"))
-            eventHandlers.firstOrNull { it.canHandle(body) }?.handle(body)?.bind()
-            Unit
+            eventHandlers.forEach { it.handle(body).bind() }
         }.fold(
             // Swallow but report the error, so that we can investigate. Preload errors should not retry if the
             // PubSub body cannot be parsed, or we get any of the search errors, which are currently Exhausted,

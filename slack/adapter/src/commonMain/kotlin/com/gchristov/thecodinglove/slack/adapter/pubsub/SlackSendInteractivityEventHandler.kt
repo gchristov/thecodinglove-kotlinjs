@@ -11,11 +11,10 @@ internal class SlackSendInteractivityEventHandler(
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
     private val analytics: Analytics,
 ) : PubSubEventHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage> {
-    override fun canHandle(event: SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage) =
-        event.actions.any { it.name == SlackActionName.SEND.apiValue || it.name == SlackActionName.SELF_DESTRUCT_5_MIN.apiValue }
-
     override suspend fun handle(event: SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage): Either<Throwable, Unit> {
-        val action = event.actions.first { it.name == SlackActionName.SEND.apiValue || it.name == SlackActionName.SELF_DESTRUCT_5_MIN.apiValue }
+        val action = event.actions.firstOrNull {
+            it.name == SlackActionName.SEND.apiValue || it.name == SlackActionName.SELF_DESTRUCT_5_MIN.apiValue
+        } ?: return Either.Right(Unit)
         val isSelfDestruct = action.name == SlackActionName.SELF_DESTRUCT_5_MIN.apiValue
         analytics.sendEvent(
             clientId = event.user.id,

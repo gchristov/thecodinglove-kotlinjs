@@ -2,7 +2,6 @@ package com.gchristov.thecodinglove.common.pubsub
 
 import arrow.core.Either
 
-interface PubSubEventHandler<T> {
-    fun canHandle(event: T): Boolean
+fun interface PubSubEventHandler<T> {
     suspend fun handle(event: T): Either<Throwable, Unit>
 }

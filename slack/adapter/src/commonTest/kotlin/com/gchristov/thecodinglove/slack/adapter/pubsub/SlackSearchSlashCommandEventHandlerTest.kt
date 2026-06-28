@@ -15,13 +15,10 @@ import kotlin.test.assertTrue
 
 class SlackSearchSlashCommandEventHandlerTest {
     @Test
-    fun canHandleReturnsTrueForCodingLoveCommand(): TestResult = runBlockingTest { handler ->
-        assertTrue { handler.canHandle(TestSlashCommandEvent) }
-    }
-
-    @Test
-    fun canHandleReturnsFalseForOtherCommand(): TestResult = runBlockingTest { handler ->
-        assertFalse { handler.canHandle(TestSlashCommandEvent.copy(command = "/other")) }
+    fun handleOtherCommandSkips(): TestResult = runBlockingTest { handler ->
+        val result = handler.handle(TestSlashCommandEvent.copy(command = "/other"))
+        assertTrue { result.isRight() }
+        repository.assertPostMessageToUrlCalledTimes(0)
     }
 
     @Test

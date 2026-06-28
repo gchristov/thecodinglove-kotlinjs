@@ -11,11 +11,9 @@ internal class SlackShuffleInteractivityEventHandler(
     private val slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
     private val analytics: Analytics,
 ) : PubSubEventHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage> {
-    override fun canHandle(event: SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage) =
-        event.actions.any { it.name == SlackActionName.SHUFFLE.apiValue }
-
     override suspend fun handle(event: SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage): Either<Throwable, Unit> {
-        val action = event.actions.first { it.name == SlackActionName.SHUFFLE.apiValue }
+        val action = event.actions.firstOrNull { it.name == SlackActionName.SHUFFLE.apiValue }
+            ?: return Either.Right(Unit)
         analytics.sendEvent(
             clientId = event.user.id,
             name = "slack_interactivity_shuffle",

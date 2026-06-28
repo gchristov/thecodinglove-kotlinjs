@@ -37,7 +37,6 @@ class SlackSlashCommandReceivedPubSubHandler internal constructor(
                 jsonSerializer = jsonSerializer,
                 strategy = SlackSlashCommandReceivedEvent.serializer(),
             ).bind() ?: raise(Exception("Request body is invalid"))
-            eventHandlers.firstOrNull { it.canHandle(body) }?.handle(body)?.bind()
-            Unit
+            eventHandlers.forEach { it.handle(body).bind() }
         }
 }

@@ -11,11 +11,9 @@ internal class SlackCancelInteractivityEventHandler(
     private val slackCancelSearchUseCase: SlackCancelSearchUseCase,
     private val analytics: Analytics,
 ) : PubSubEventHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage> {
-    override fun canHandle(event: SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage) =
-        event.actions.any { it.name == SlackActionName.CANCEL.apiValue }
-
     override suspend fun handle(event: SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage): Either<Throwable, Unit> {
-        val action = event.actions.first { it.name == SlackActionName.CANCEL.apiValue }
+        val action = event.actions.firstOrNull { it.name == SlackActionName.CANCEL.apiValue }
+            ?: return Either.Right(Unit)
         analytics.sendEvent(
             clientId = event.user.id,
             name = "slack_interactivity_cancel",

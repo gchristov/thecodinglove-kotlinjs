@@ -12,21 +12,19 @@ import kotlin.test.assertTrue
 
 class SlackCancelInteractivityEventHandlerTest {
     @Test
-    fun canHandleReturnsTrueForCancelAction(): TestResult = runBlockingTest { handler ->
-        assertTrue { handler.canHandle(interactivityMessage(action = SlackActionName.CANCEL).payload as SlackInteractivityPayload) }
-    }
-
-    @Test
-    fun canHandleReturnsFalseForOtherAction(): TestResult = runBlockingTest { handler ->
-        assertFalse { handler.canHandle(interactivityMessage(action = SlackActionName.SEND).payload as SlackInteractivityPayload) }
-    }
-
-    @Test
     fun handleCancelInvokesCancelUseCase(): TestResult = runBlockingTest { handler ->
         val payload = interactivityMessage(action = SlackActionName.CANCEL).payload as SlackInteractivityPayload
         val result = handler.handle(payload)
         assertTrue { result.isRight() }
         cancelUseCase.assertInvokedOnce()
+    }
+
+    @Test
+    fun handleOtherActionSkips(): TestResult = runBlockingTest { handler ->
+        val payload = interactivityMessage(action = SlackActionName.SEND).payload as SlackInteractivityPayload
+        val result = handler.handle(payload)
+        assertTrue { result.isRight() }
+        cancelUseCase.assertNotInvoked()
     }
 
     @Test

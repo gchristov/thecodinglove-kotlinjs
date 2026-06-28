@@ -12,21 +12,6 @@ import kotlin.test.assertTrue
 
 class SlackSendInteractivityEventHandlerTest {
     @Test
-    fun canHandleReturnsTrueForSendAction(): TestResult = runBlockingTest { handler ->
-        assertTrue { handler.canHandle(interactivityMessage(action = SlackActionName.SEND).payload as SlackInteractivityPayload) }
-    }
-
-    @Test
-    fun canHandleReturnsTrueForSelfDestruct5MinAction(): TestResult = runBlockingTest { handler ->
-        assertTrue { handler.canHandle(interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload) }
-    }
-
-    @Test
-    fun canHandleReturnsFalseForOtherAction(): TestResult = runBlockingTest { handler ->
-        assertFalse { handler.canHandle(interactivityMessage(action = SlackActionName.SHUFFLE).payload as SlackInteractivityPayload) }
-    }
-
-    @Test
     fun handleSendActionInvokesSendUseCaseWithNoSelfDestruct(): TestResult = runBlockingTest { handler ->
         val payload = interactivityMessage(action = SlackActionName.SEND).payload as SlackInteractivityPayload
         val result = handler.handle(payload)
@@ -42,6 +27,14 @@ class SlackSendInteractivityEventHandlerTest {
         assertTrue { result.isRight() }
         sendUseCase.assertInvokedOnce()
         sendUseCase.assertSelfDestructMinutes(5)
+    }
+
+    @Test
+    fun handleOtherActionSkips(): TestResult = runBlockingTest { handler ->
+        val payload = interactivityMessage(action = SlackActionName.SHUFFLE).payload as SlackInteractivityPayload
+        val result = handler.handle(payload)
+        assertTrue { result.isRight() }
+        sendUseCase.assertNotInvoked()
     }
 
     @Test

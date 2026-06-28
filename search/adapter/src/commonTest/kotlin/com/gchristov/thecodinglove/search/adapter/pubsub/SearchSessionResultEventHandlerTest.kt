@@ -11,11 +11,6 @@ import kotlin.test.assertTrue
 
 class SearchSessionResultEventHandlerTest {
     @Test
-    fun canHandleAlwaysReturnsTrue(): TestResult = runBlockingTest { handler ->
-        assertTrue { handler.canHandle(TestEvent) }
-    }
-
-    @Test
     fun handleInvokesPreload(): TestResult = runBlockingTest(
         preloadResult = Either.Right(Unit)
     ) { handler ->

@@ -8,8 +8,6 @@ import com.gchristov.thecodinglove.search.domain.usecase.PreloadSearchResultUseC
 internal class SearchSessionResultEventHandler(
     private val preloadSearchResultUseCase: PreloadSearchResultUseCase,
 ) : PubSubEventHandler<SearchSessionResultCreatedEvent> {
-    override fun canHandle(event: SearchSessionResultCreatedEvent) = true
-
     override suspend fun handle(event: SearchSessionResultCreatedEvent): Either<Throwable, Unit> =
         preloadSearchResultUseCase(PreloadSearchResultUseCase.Dto(searchSessionId = event.searchSessionId))
 }
