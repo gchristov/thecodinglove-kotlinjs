@@ -6,7 +6,7 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.error
 import com.gchristov.thecodinglove.common.network.http.HttpHandler
-import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
+import com.gchristov.thecodinglove.common.pubsub.BasePubSubDispatcherHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubEventHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
@@ -20,7 +20,7 @@ class SlackInteractivityReceivedPubSubHandler internal constructor(
     private val log: Logger,
     private val eventHandlers: List<PubSubEventHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage>>,
     pubSubDecoder: PubSubDecoder,
-) : BasePubSubHandler(
+) : BasePubSubDispatcherHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
     log = log,

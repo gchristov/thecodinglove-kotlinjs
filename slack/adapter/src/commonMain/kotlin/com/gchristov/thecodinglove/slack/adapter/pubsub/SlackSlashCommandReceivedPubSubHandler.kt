@@ -5,7 +5,7 @@ import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.HttpHandler
-import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
+import com.gchristov.thecodinglove.common.pubsub.BasePubSubDispatcherHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubEventHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
@@ -19,7 +19,7 @@ class SlackSlashCommandReceivedPubSubHandler internal constructor(
     log: Logger,
     private val eventHandlers: List<PubSubEventHandler<SlackSlashCommandReceivedEvent>>,
     pubSubDecoder: PubSubDecoder,
-) : BasePubSubHandler(
+) : BasePubSubDispatcherHandler(
     dispatcher = dispatcher,
     jsonSerializer = jsonSerializer,
     log = log,

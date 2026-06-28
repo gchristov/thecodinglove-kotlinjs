@@ -11,7 +11,7 @@ import com.gchristov.thecodinglove.common.network.http.sendEmpty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-abstract class BasePubSubHandler(
+abstract class BasePubSubDispatcherHandler(
     dispatcher: CoroutineDispatcher,
     jsonSerializer: JsonSerializer,
     log: Logger,
@@ -20,7 +20,7 @@ abstract class BasePubSubHandler(
     dispatcher,
     jsonSerializer = jsonSerializer,
     log = log,
-), PubSubHandler {
+), PubSubDispatcherHandler {
     /**
      * Decodes and exposes the PubSub message to subclasses. A success response is always sent to the [response] after
      * the PubSub message has been handled.,
