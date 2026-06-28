@@ -66,10 +66,10 @@ class SlackInteractivityPubSubHandlerTest {
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
             eventHandlers = listOf(
-                SlackSendPubSubEventHandler(sendUseCase, analytics),
-                SlackSelfDestructPubSubEventHandler(sendUseCase, analytics),
-                SlackShufflePubSubEventHandler(shuffleUseCase, analytics),
-                SlackCancelSearchPubSubEventHandler(cancelUseCase, analytics),
+                SlackSendPubSubHandler(sendUseCase, analytics),
+                SlackSelfDestructPubSubHandler(sendUseCase, analytics),
+                SlackShufflePubSubHandler(shuffleUseCase, analytics),
+                SlackCancelSearchPubSubHandler(cancelUseCase, analytics),
             ),
             pubSubDecoder = FakePubSubDecoder(FakePubSubRequest(null, SlackInteractivityReceivedEvent.serializer())),
         )

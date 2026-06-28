@@ -102,7 +102,7 @@ One interface, no base classes:
 
 **Naming conventions:**
 - Handlers: `[Domain][Action]PubSubHandler` — named after what the handler *does*, not what the message *is* (e.g. `SearchPreloadPubSubHandler`, `SlackSearchPubSubHandler`, `SlackInteractivityPubSubHandler`)
-- Fan-out leaf handlers: `[Domain][Action]PubSubEventHandler` (e.g. `SlackSendPubSubEventHandler`, `SlackShufflePubSubEventHandler`)
+- Fan-out leaf handlers follow the same `[Domain][Action]PubSubHandler` convention (e.g. `SlackSendPubSubHandler`, `SlackShufflePubSubHandler`)
 
 **Error handling:**
 - To swallow errors and prevent PubSub retries: swallow in `handle` via `fold`, and override `handleError` to call `response.sendEmpty()` (covers parse errors too).

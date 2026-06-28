@@ -10,14 +10,14 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class SlackSendPubSubEventHandlerTest {
+class SlackSelfDestructPubSubHandlerTest {
     @Test
-    fun handleSendActionInvokesSendUseCaseWithNoSelfDestruct(): TestResult = runBlockingTest { handler ->
-        val payload = interactivityMessage(action = SlackActionName.SEND).payload as SlackInteractivityPayload
+    fun handleSelfDestruct5MinInvokesSendUseCaseWith5Minutes(): TestResult = runBlockingTest { handler ->
+        val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
         val result = handler.handle(payload)
         assertTrue { result.isRight() }
         sendUseCase.assertInvokedOnce()
-        sendUseCase.assertSelfDestructMinutes(null)
+        sendUseCase.assertSelfDestructMinutes(5)
     }
 
     @Test
@@ -29,10 +29,10 @@ class SlackSendPubSubEventHandlerTest {
     }
 
     @Test
-    fun handleSendErrorReturnsLeft(): TestResult = runBlockingTest(
+    fun handleSelfDestructErrorReturnsLeft(): TestResult = runBlockingTest(
         sendResult = Either.Left(Throwable("Send failed"))
     ) { handler ->
-        val payload = interactivityMessage(action = SlackActionName.SEND).payload as SlackInteractivityPayload
+        val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
         val result = handler.handle(payload)
         assertFalse { result.isRight() }
     }
@@ -41,10 +41,10 @@ class SlackSendPubSubEventHandlerTest {
 
     private fun runBlockingTest(
         sendResult: Either<Throwable, Unit> = Either.Right(Unit),
-        testBlock: suspend (SlackSendPubSubEventHandler) -> Unit,
+        testBlock: suspend (SlackSelfDestructPubSubHandler) -> Unit,
     ): TestResult = runTest {
         sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)
-        val handler = SlackSendPubSubEventHandler(
+        val handler = SlackSelfDestructPubSubHandler(
             slackSendSearchUseCase = sendUseCase,
             analytics = FakeAnalytics(),
         )
