@@ -51,7 +51,7 @@ class SlackInteractivityHttpHandler(
 
     private suspend fun publishInteractivityMessage(interactivity: ApiSlackInteractivity) = pubSubPublisher
         .publishJson(
-            topic = slackConfig.interactivityPubSubTopic,
+            topic = slackConfig.interactivityReceivedPubSubTopic,
             body = interactivity.toPubSubMessage(),
             jsonSerializer = jsonSerializer,
             strategy = SlackInteractivityReceivedEvent.serializer(),

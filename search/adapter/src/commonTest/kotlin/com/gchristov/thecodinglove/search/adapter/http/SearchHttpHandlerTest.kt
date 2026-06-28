@@ -213,7 +213,7 @@ class SearchHttpHandlerTest {
             pubSubPublisher = pubSubPublisher,
             searchConfig = SearchConfig(
                 postsPerPage = TestSearchPostsPerPage,
-                preloadPubSubTopic = TestPreloadSearchPubSubTopic,
+                searchSessionResultCreatedPubSubTopic = TestPreloadSearchPubSubTopic,
             ),
             analytics = FakeAnalytics(),
         )

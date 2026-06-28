@@ -199,5 +199,5 @@ private const val TestSearchQuery = "test"
 private const val TestSearchPreloadPubSubTopic = "topic_123"
 private val TestSearchConfig = SearchConfig(
     postsPerPage = SearchPostCreator.multiPageMultiPostPageSize(),
-    preloadPubSubTopic = TestSearchPreloadPubSubTopic,
+    searchSessionResultCreatedPubSubTopic = TestSearchPreloadPubSubTopic,
 )

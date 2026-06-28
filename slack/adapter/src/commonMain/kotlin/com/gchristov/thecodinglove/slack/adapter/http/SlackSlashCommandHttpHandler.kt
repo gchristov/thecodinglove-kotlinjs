@@ -51,7 +51,7 @@ class SlackSlashCommandHttpHandler(
 
     private suspend fun publishSlashCommandMessage(slashCommand: ApiSlackSlashCommand) = pubSubPublisher
         .publishJson(
-            topic = slackConfig.slashCommandPubSubTopic,
+            topic = slackConfig.slashCommandReceivedPubSubTopic,
             body = slashCommand.toPubSubMessage(),
             jsonSerializer = jsonSerializer,
             strategy = SlackSlashCommandReceivedEvent.serializer(),

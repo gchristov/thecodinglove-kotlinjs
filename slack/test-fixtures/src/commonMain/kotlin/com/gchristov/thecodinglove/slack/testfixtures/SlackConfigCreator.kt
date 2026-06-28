@@ -9,15 +9,15 @@ object SlackConfigCreator {
         requestVerificationEnabled: Boolean = false,
         clientId: String = "client_id",
         clientSecret: String = "client_secret",
-        interactivityPubSubTopic: String = "interactivity_topic",
-        slashCommandPubSubTopic: String = "slash_topic",
+        interactivityReceivedPubSubTopic: String = "interactivity_topic",
+        slashCommandReceivedPubSubTopic: String = "slash_topic",
     ) = SlackConfig(
         signingSecret = signingSecret,
         timestampValidityMinutes = timestampValidityMinutes,
         requestVerificationEnabled = requestVerificationEnabled,
         clientId = clientId,
         clientSecret = clientSecret,
-        interactivityPubSubTopic = interactivityPubSubTopic,
-        slashCommandPubSubTopic = slashCommandPubSubTopic,
+        interactivityReceivedPubSubTopic = interactivityReceivedPubSubTopic,
+        slashCommandReceivedPubSubTopic = slashCommandReceivedPubSubTopic,
     )
 }

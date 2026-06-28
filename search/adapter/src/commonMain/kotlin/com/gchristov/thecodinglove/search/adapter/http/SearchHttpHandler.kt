@@ -78,7 +78,7 @@ class SearchHttpHandler(
         searchSessionId: String,
         searchConfig: SearchConfig,
     ) = pubSubPublisher.publishJson(
-        topic = searchConfig.preloadPubSubTopic,
+        topic = searchConfig.searchSessionResultCreatedPubSubTopic,
         body = SearchSessionResultCreatedEvent(searchSessionId),
         jsonSerializer = jsonSerializer,
         strategy = SearchSessionResultCreatedEvent.serializer(),

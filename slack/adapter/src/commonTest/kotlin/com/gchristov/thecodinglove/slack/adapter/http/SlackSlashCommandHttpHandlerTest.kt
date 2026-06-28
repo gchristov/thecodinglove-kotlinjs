@@ -44,7 +44,7 @@ class SlackSlashCommandHttpHandlerTest {
     fun validBodyPublishesToPubSub(): TestResult = runBlockingTest { handler, pubSub, response ->
         handler.handleHttpRequest(FakeSlackHttpRequest(fakeBody = TestSlashCommand), response)
         pubSub.assertEquals(
-            topic = TestSlackConfig.slashCommandPubSubTopic,
+            topic = TestSlackConfig.slashCommandReceivedPubSubTopic,
             message = TestExpectedPubSubMessage,
         )
         response.assertEquals(

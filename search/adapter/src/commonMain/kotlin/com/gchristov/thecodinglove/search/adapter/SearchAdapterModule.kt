@@ -113,7 +113,7 @@ object SearchAdapterModule : DiModule() {
 
     private fun provideSearchConfig(environment: Environment): SearchConfig = SearchConfig(
         postsPerPage = 5,
-        preloadPubSubTopic = environment.preloadSearchPubSubTopic,
+        searchSessionResultCreatedPubSubTopic = environment.searchSessionResultCreatedPubSubTopic,
     )
 
     private fun provideSearchHttpHandler(

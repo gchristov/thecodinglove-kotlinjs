@@ -45,7 +45,7 @@ class SlackInteractivityHttpHandlerTest {
     fun validBodyPublishesToPubSub(): TestResult = runBlockingTest { handler, pubSub, response ->
         handler.handleHttpRequest(FakeSlackHttpRequest(fakeBody = TestInteractivity), response)
         pubSub.assertEquals(
-            topic = TestSlackConfig.interactivityPubSubTopic,
+            topic = TestSlackConfig.interactivityReceivedPubSubTopic,
             message = TestExpectedPubSubMessage,
         )
         response.assertEquals(

@@ -21,7 +21,7 @@ resources:
         args:
           PORT: "8081"
           API_URL: https://${domain}/api
-          PRELOAD_SEARCH_PUBSUB_TOPIC: search_session_result_created
+          SEARCH_SESSION_RESULT_CREATED_PUBSUB_TOPIC: search_session_result_created
         platform: linux/amd64
         context: ../service/build/dist/js
       imageName: ${location}-docker.pkg.dev/${gcp:project}/${repositoryId}/search-service:latest
