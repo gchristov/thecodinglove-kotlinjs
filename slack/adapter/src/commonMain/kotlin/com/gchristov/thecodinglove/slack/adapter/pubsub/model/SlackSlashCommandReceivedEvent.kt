@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.slack.adapter.pubsub.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class SlackSlashCommandReceivedEvent(
+data class SlackSlashCommandReceivedEvent(
     val teamId: String,
     val teamDomain: String,
     val channelId: String,

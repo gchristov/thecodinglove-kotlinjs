@@ -15,7 +15,7 @@ import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
-internal class SlackSearchPubSubHandler(
+class SlackSearchPubSubHandler(
     override val dispatcher: CoroutineDispatcher,
     override val jsonSerializer: JsonSerializer,
     override val log: Logger,
