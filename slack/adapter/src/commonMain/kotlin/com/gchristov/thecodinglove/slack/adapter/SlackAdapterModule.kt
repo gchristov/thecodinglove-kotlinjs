@@ -10,8 +10,12 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.common.slack.SlackSender
 import com.gchristov.thecodinglove.slack.adapter.http.*
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackCancelSearchInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSearchPubSubHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSelfDestructInteractivityPubSubHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSendInteractivityPubSubHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackShuffleInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.search.RealSlackSearchRepository
 import com.gchristov.thecodinglove.slack.adapter.search.SlackSearchServiceApi
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
@@ -80,7 +84,7 @@ object SlackAdapterModule : DiModule() {
                 )
             }
             bindSingleton {
-                provideSlackSlashCommandPubSubHttpHandler(
+                provideSlackSearchPubSubHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     slackRepository = instance(),
@@ -198,7 +202,7 @@ object SlackAdapterModule : DiModule() {
         pubSubPublisher = pubSubPublisher,
     )
 
-    private fun provideSlackSlashCommandPubSubHttpHandler(
+    private fun provideSlackSearchPubSubHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackRepository: SlackRepository,
@@ -206,14 +210,14 @@ object SlackAdapterModule : DiModule() {
         searchRepository: SlackSearchRepository,
         pubSubDecoder: PubSubDecoder,
         analytics: Analytics,
-    ): SlackSlashCommandPubSubHandler = SlackSlashCommandPubSubHandler(
+    ): SlackSearchPubSubHandler = SlackSearchPubSubHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
+        pubSubDecoder = pubSubDecoder,
         slackRepository = slackRepository,
         slackMessageFactory = slackMessageFactory,
         slackSearchRepository = searchRepository,
-        pubSubDecoder = pubSubDecoder,
         analytics = analytics,
     )
 
@@ -244,11 +248,13 @@ object SlackAdapterModule : DiModule() {
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
-        slackSendSearchUseCase = slackSendSearchUseCase,
-        slackShuffleSearchUseCase = slackShuffleSearchUseCase,
-        slackCancelSearchUseCase = slackCancelSearchUseCase,
+        eventHandlers = listOf(
+            SlackSendInteractivityPubSubHandler(slackSendSearchUseCase, analytics),
+            SlackSelfDestructInteractivityPubSubHandler(slackSendSearchUseCase, analytics),
+            SlackShuffleInteractivityPubSubHandler(slackShuffleSearchUseCase, analytics),
+            SlackCancelSearchInteractivityPubSubHandler(slackCancelSearchUseCase, analytics),
+        ),
         pubSubDecoder = pubSubDecoder,
-        analytics = analytics,
     )
 
     private fun provideSlackSelfDestructHttpHandler(

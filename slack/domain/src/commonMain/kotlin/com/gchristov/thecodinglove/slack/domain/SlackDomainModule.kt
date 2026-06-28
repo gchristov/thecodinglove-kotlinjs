@@ -89,8 +89,8 @@ object SlackDomainModule : DiModule() {
         requestVerificationEnabled = environment.slackRequestVerification,
         clientId = BuildConfig.SLACK_CLIENT_ID,
         clientSecret = BuildConfig.SLACK_CLIENT_SECRET,
-        interactivityPubSubTopic = environment.slackInteractivityPubSubTopic,
-        slashCommandPubSubTopic = environment.slackSlashCommandPubSubTopic,
+        interactivityReceivedPubSubTopic = environment.slackInteractivityReceivedPubSubTopic,
+        slashCommandReceivedPubSubTopic = environment.slackSlashCommandReceivedPubSubTopic,
     )
 
     private fun provideSlackMessageFactory(slackAuthStateSerializer: SlackAuthStateSerializer): SlackMessageFactory =

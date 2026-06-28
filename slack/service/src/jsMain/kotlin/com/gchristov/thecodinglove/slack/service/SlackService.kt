@@ -20,7 +20,7 @@ import com.gchristov.thecodinglove.common.pubsub.CommonPubSubModule
 import com.gchristov.thecodinglove.slack.adapter.SlackAdapterModule
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSlashCommandPubSubHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSearchPubSubHandler
 import com.gchristov.thecodinglove.slack.domain.SlackDomainModule
 import com.gchristov.thecodinglove.slack.domain.model.Environment
 
@@ -71,7 +71,7 @@ private fun setupMonitoring(): Either<Throwable, Unit> {
 private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
     val handlers = listOf(
         DiGraph.inject<SlackSlashCommandHttpHandler>(),
-        DiGraph.inject<SlackSlashCommandPubSubHandler>(),
+        DiGraph.inject<SlackSearchPubSubHandler>(),
         DiGraph.inject<SlackInteractivityHttpHandler>(),
         DiGraph.inject<SlackInteractivityPubSubHandler>(),
         DiGraph.inject<SlackAuthHttpHandler>(),

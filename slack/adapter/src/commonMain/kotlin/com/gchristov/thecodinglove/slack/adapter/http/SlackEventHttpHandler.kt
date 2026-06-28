@@ -21,18 +21,14 @@ import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 class SlackEventHttpHandler(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    private val log: Logger,
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
     private val slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
     private val slackConfig: SlackConfig,
     private val slackRevokeTokensUseCase: SlackRevokeTokensUseCase,
     private val analytics: Analytics,
-) : BaseHttpHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log,
-) {
+) : HttpHandler {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
         path = "/api/slack/event",

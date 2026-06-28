@@ -9,7 +9,7 @@ import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.usecase.SearchUseCase
-import com.gchristov.thecodinglove.search.adapter.pubsub.model.PubSubPreloadSearchMessage
+import com.gchristov.thecodinglove.search.adapter.pubsub.model.SearchSessionResultCreatedEvent
 import com.gchristov.thecodinglove.search.testfixtures.FakeSearchHttpRequest
 import com.gchristov.thecodinglove.search.testfixtures.FakeSearchUseCase
 import com.gchristov.thecodinglove.search.testfixtures.SearchResultCreator
@@ -54,7 +54,7 @@ class SearchHttpHandlerTest {
     }
 
     @Test
-    fun handleRequestSuccessPreloads(): TestResult {
+    fun handleRequestSuccessPublishesSessionResultCreatedEvent(): TestResult {
         val expectedResult = SearchResultCreator.validResult(
             searchSessionId = TestSearchSessionId,
             query = TestSearchQuery
@@ -68,8 +68,8 @@ class SearchHttpHandlerTest {
                 response = response
             )
             pubSub.assertEquals(
-                topic = TestPreloadSearchPubSubTopic,
-                message = PubSubPreloadSearchMessage(TestSearchSessionId),
+                topic = TestSearchSessionResultCreatedPubSubTopic,
+                message = SearchSessionResultCreatedEvent(TestSearchSessionId),
             )
         }
     }
@@ -136,7 +136,7 @@ class SearchHttpHandlerTest {
     }
 
     @Test
-    fun handleRequestErrorDoesNotPreload(): TestResult = runBlockingTest(
+    fun handleRequestErrorDoesNotPublishSessionResultCreatedEvent(): TestResult = runBlockingTest(
         searchSessionId = TestSearchSessionId,
         searchQuery = TestSearchQuery,
         searchInvocationResult = Either.Left(SearchUseCase.Error.Empty(additionalInfo = "test"))
@@ -213,7 +213,7 @@ class SearchHttpHandlerTest {
             pubSubPublisher = pubSubPublisher,
             searchConfig = SearchConfig(
                 postsPerPage = TestSearchPostsPerPage,
-                preloadPubSubTopic = TestPreloadSearchPubSubTopic,
+                searchSessionResultCreatedPubSubTopic = TestSearchSessionResultCreatedPubSubTopic,
             ),
             analytics = FakeAnalytics(),
         )
@@ -224,4 +224,4 @@ class SearchHttpHandlerTest {
 private const val TestSearchQuery = "test"
 private const val TestSearchSessionId = "session_123"
 private const val TestSearchPostsPerPage = 4
-private const val TestPreloadSearchPubSubTopic = "topic_123"
+private const val TestSearchSessionResultCreatedPubSubTopic = "topic_123"

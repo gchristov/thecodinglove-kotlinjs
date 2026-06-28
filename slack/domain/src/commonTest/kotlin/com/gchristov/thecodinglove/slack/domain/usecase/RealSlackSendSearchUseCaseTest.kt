@@ -135,8 +135,8 @@ private val TestSlackConfig = SlackConfig(
     requestVerificationEnabled = true,
     clientId = "client_id",
     clientSecret = "client_secret",
-    interactivityPubSubTopic = "interactivity_topic",
-    slashCommandPubSubTopic = "slash_topic",
+    interactivityReceivedPubSubTopic = "interactivity_topic",
+    slashCommandReceivedPubSubTopic = "slash_topic",
 )
 private val TestClock = object : Clock {
     override fun now(): Instant = Instant.fromEpochMilliseconds(1000L)

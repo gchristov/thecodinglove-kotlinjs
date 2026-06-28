@@ -1,87 +1,67 @@
 package com.gchristov.thecodinglove.slack.adapter.pubsub
 
 import arrow.core.Either
-import arrow.core.raise.either
+import arrow.core.flatMap
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.network.http.HttpHandler
-import com.gchristov.thecodinglove.common.pubsub.BasePubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
-import com.gchristov.thecodinglove.common.pubsub.PubSubRequest
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackSlashCommandMessage
+import com.gchristov.thecodinglove.common.pubsub.PubSubHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSlashCommandReceivedEvent
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
-class SlackSlashCommandPubSubHandler(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    log: Logger,
+class SlackSearchPubSubHandler(
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
+    override val pubSubDecoder: PubSubDecoder,
     private val slackRepository: SlackRepository,
     private val slackMessageFactory: SlackMessageFactory,
     private val slackSearchRepository: SlackSearchRepository,
     private val analytics: Analytics,
-    pubSubDecoder: PubSubDecoder,
-) : BasePubSubHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log,
-    pubSubDecoder = pubSubDecoder,
-) {
+) : PubSubHandler<SlackSlashCommandReceivedEvent> {
+    override val strategy = SlackSlashCommandReceivedEvent.serializer()
+
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
-        path = "/api/pubsub/slack/slash",
+        path = "/api/pubsub/slack/search",
         contentType = ContentType.Application.Json,
     )
 
-    override suspend fun handlePubSubRequest(request: PubSubRequest): Either<Throwable, Unit> =
-        either {
-            val message = request.decodeBodyFromJson(
-                jsonSerializer = jsonSerializer,
-                strategy = PubSubSlackSlashCommandMessage.serializer(),
-            ).bind() ?: raise(Exception("Request body is invalid"))
-            message.handle().bind()
-        }
-
     /*
-     * This method handles errors as success without PubSub retries, but tries to notify the user of the error. If
-     * sending the Slack reply back fails, the entire PubSub chain will be retried automatically. This is to avoid
-     * unnecessary PubSub retries which would most likely result in additional errors if the problem is on our end.
+     * Propagates errors so that PubSub retries on network failures. Handles search errors internally by posting
+     * an error message back to the user, so those don't cause retries.
      */
-    private suspend fun PubSubSlackSlashCommandMessage.handle(): Either<Throwable, Unit> {
+    override suspend fun handle(event: SlackSlashCommandReceivedEvent): Either<Throwable, Unit> {
         analytics.sendEvent(
-            clientId = userId,
+            clientId = event.userId,
             name = "slack_slash_command",
             params = mapOf(
-                "command" to command,
-                "text" to text,
-                "user_id" to userId,
-                "team_id" to teamId,
+                "command" to event.command,
+                "text" to event.text,
+                "user_id" to event.userId,
+                "team_id" to event.teamId,
             )
         )
-        return either {
-            slackRepository.postMessageToUrl(
-                url = responseUrl,
-                message = slackMessageFactory.searchingMessage(),
-            ).bind()
-            slackSearchRepository.search(text).bind()
-        }.fold(
+        return slackRepository.postMessageToUrl(
+            url = event.responseUrl,
+            message = slackMessageFactory.searchingMessage(),
+        )
+            .flatMap { slackSearchRepository.search(event.text) }
+            .fold(
                 ifLeft = { error ->
                     analytics.sendEvent(
-                        clientId = userId,
+                        clientId = event.userId,
                         name = "slack_slash_command_error",
-                        params = error.message?.let {
-                            mapOf(
-                                "type" to "generic",
-                                "info" to it,
-                            )
-                        }
+                        params = error.message?.let { mapOf("type" to "generic", "info" to it) }
                     )
                     slackRepository.postMessageToUrl(
-                        url = responseUrl,
+                        url = event.responseUrl,
                         message = slackMessageFactory.searchGenericErrorMessage()
                     )
                 },
@@ -90,7 +70,7 @@ class SlackSlashCommandPubSubHandler(
                     when {
                         searchResult.ok && searchSession != null -> {
                             analytics.sendEvent(
-                                clientId = userId,
+                                clientId = event.userId,
                                 name = "slack_slash_command_success",
                                 params = mapOf(
                                     "query" to searchSession.post.searchQuery,
@@ -98,7 +78,7 @@ class SlackSlashCommandPubSubHandler(
                                 ),
                             )
                             slackRepository.postMessageToUrl(
-                                url = responseUrl,
+                                url = event.responseUrl,
                                 message = slackMessageFactory.searchResultMessage(
                                     searchQuery = searchSession.post.searchQuery,
                                     searchResults = searchSession.searchResults,
@@ -109,28 +89,26 @@ class SlackSlashCommandPubSubHandler(
                                 )
                             )
                         }
-
                         else -> when (searchResult.error) {
                             is SlackSearchRepository.SearchResultDto.Error.NoResults -> {
                                 analytics.sendEvent(
-                                    clientId = userId,
+                                    clientId = event.userId,
                                     name = "slack_slash_command_error",
                                     params = mapOf("type" to "no_results")
                                 )
                                 slackRepository.postMessageToUrl(
-                                    url = responseUrl,
-                                    message = slackMessageFactory.noSearchResultsMessage(text)
+                                    url = event.responseUrl,
+                                    message = slackMessageFactory.noSearchResultsMessage(event.text)
                                 )
                             }
-
                             null -> {
                                 analytics.sendEvent(
-                                    clientId = userId,
+                                    clientId = event.userId,
                                     name = "slack_slash_command_error",
                                     params = mapOf("type" to "generic")
                                 )
                                 slackRepository.postMessageToUrl(
-                                    url = responseUrl,
+                                    url = event.responseUrl,
                                     message = slackMessageFactory.searchGenericErrorMessage()
                                 )
                             }

@@ -7,7 +7,6 @@ import com.benasher44.uuid.uuid4
 import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.debug
-import com.gchristov.thecodinglove.common.network.http.BaseHttpHandler
 import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.network.http.HttpRequest
 import com.gchristov.thecodinglove.common.network.http.HttpResponse
@@ -20,17 +19,13 @@ import io.ktor.util.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 class SlackAuthHttpHandler(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    private val log: Logger,
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
     private val slackAuthUseCase: SlackAuthUseCase,
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
     private val analytics: Analytics,
-) : BaseHttpHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log,
-) {
+) : HttpHandler {
     private val tag = this::class.simpleName
 
     override fun httpConfig() = HttpHandler.HttpConfig(
@@ -79,7 +74,7 @@ class SlackAuthHttpHandler(
             Either.Right(Unit)
         }
 
-        else -> super.handleError(error, response)
+        else -> super<HttpHandler>.handleError(error, response)
     }
 
     private suspend fun handleAuthState(state: String) = try {

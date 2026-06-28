@@ -11,7 +11,7 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.htmlparser.usecase.ParseHtmlTotalPostsUseCase
 import com.gchristov.thecodinglove.search.adapter.http.*
-import com.gchristov.thecodinglove.search.adapter.pubsub.PreloadSearchPubSubHandler
+import com.gchristov.thecodinglove.search.adapter.pubsub.SearchPreloadPubSubHandler
 import com.gchristov.thecodinglove.search.domain.model.Environment
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.port.SearchRepository
@@ -57,11 +57,11 @@ object SearchAdapterModule : DiModule() {
                 )
             }
             bindSingleton {
-                providePreloadSearchPubSubHttpHandler(
+                provideSearchPreloadPubSubHandler(
                     jsonSerializer = instance(),
                     log = instance(),
                     preloadSearchResultUseCase = instance(),
-                    pubSubSubDecoder = instance(),
+                    pubSubDecoder = instance(),
                 )
             }
             bindSingleton {
@@ -113,7 +113,7 @@ object SearchAdapterModule : DiModule() {
 
     private fun provideSearchConfig(environment: Environment): SearchConfig = SearchConfig(
         postsPerPage = 5,
-        preloadPubSubTopic = environment.preloadSearchPubSubTopic,
+        searchSessionResultCreatedPubSubTopic = environment.searchSessionResultCreatedPubSubTopic,
     )
 
     private fun provideSearchHttpHandler(
@@ -133,17 +133,17 @@ object SearchAdapterModule : DiModule() {
         analytics = analytics,
     )
 
-    private fun providePreloadSearchPubSubHttpHandler(
+    private fun provideSearchPreloadPubSubHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         preloadSearchResultUseCase: PreloadSearchResultUseCase,
-        pubSubSubDecoder: PubSubDecoder,
-    ): PreloadSearchPubSubHandler = PreloadSearchPubSubHandler(
+        pubSubDecoder: PubSubDecoder,
+    ): SearchPreloadPubSubHandler = SearchPreloadPubSubHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
+        pubSubDecoder = pubSubDecoder,
         preloadSearchResultUseCase = preloadSearchResultUseCase,
-        pubSubDecoder = pubSubSubDecoder,
     )
 
     private fun provideSearchStatisticsHttpHandler(

@@ -6,8 +6,8 @@ data class Environment(
     val port: Int,
     val apiUrl: String,
     val slackRequestVerification: Boolean,
-    val slackSlashCommandPubSubTopic: String,
-    val slackInteractivityPubSubTopic: String,
+    val slackSlashCommandReceivedPubSubTopic: String,
+    val slackInteractivityReceivedPubSubTopic: String,
 ) {
     companion object {
         fun of(args: Array<String>) = with(parseMainArgs(args)) {
@@ -16,8 +16,8 @@ data class Environment(
                 apiUrl = requireNotNull(this["-apiUrl"]) { "-apiUrl url not specified." }.first(),
                 slackRequestVerification = requireNotNull(this["-slackRequestVerification"]) { "-slackRequestVerification not specified." }.first()
                     .toBoolean(),
-                slackSlashCommandPubSubTopic = requireNotNull(this["-slackSlashCommandPubSubTopic"]) { "-slackSlashCommandPubSubTopic url not specified." }.first(),
-                slackInteractivityPubSubTopic = requireNotNull(this["-slackInteractivityPubSubTopic"]) { "-slackInteractivityPubSubTopic url not specified." }.first(),
+                slackSlashCommandReceivedPubSubTopic = requireNotNull(this["-slackSlashCommandReceivedPubSubTopic"]) { "-slackSlashCommandReceivedPubSubTopic url not specified." }.first(),
+                slackInteractivityReceivedPubSubTopic = requireNotNull(this["-slackInteractivityReceivedPubSubTopic"]) { "-slackInteractivityReceivedPubSubTopic url not specified." }.first(),
             )
         }
     }

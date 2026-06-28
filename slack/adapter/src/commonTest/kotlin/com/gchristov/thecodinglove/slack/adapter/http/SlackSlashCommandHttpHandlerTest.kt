@@ -7,7 +7,7 @@ import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubPublisher
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackSlashCommand
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackSlashCommandMessage
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSlashCommandReceivedEvent
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackHttpRequest
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackVerifyRequestUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.SlackConfigCreator
@@ -41,10 +41,10 @@ class SlackSlashCommandHttpHandlerTest {
     }
 
     @Test
-    fun validBodyPublishesToPubSub(): TestResult = runBlockingTest { handler, pubSub, response ->
+    fun validBodyPublishesSlashCommandReceivedEvent(): TestResult = runBlockingTest { handler, pubSub, response ->
         handler.handleHttpRequest(FakeSlackHttpRequest(fakeBody = TestSlashCommand), response)
         pubSub.assertEquals(
-            topic = TestSlackConfig.slashCommandPubSubTopic,
+            topic = TestSlackConfig.slashCommandReceivedPubSubTopic,
             message = TestExpectedPubSubMessage,
         )
         response.assertEquals(
@@ -57,7 +57,7 @@ class SlackSlashCommandHttpHandlerTest {
     }
 
     @Test
-    fun pubSubErrorSendsError(): TestResult = runBlockingTest(
+    fun publishSlashCommandReceivedEventErrorSendsError(): TestResult = runBlockingTest(
         publishResult = Either.Left(Throwable("PubSub error")),
     ) { handler, _, response ->
         handler.handleHttpRequest(FakeSlackHttpRequest(fakeBody = TestSlashCommand), response)
@@ -101,7 +101,7 @@ private val TestSlashCommand = ApiSlackSlashCommand(
     responseUrl = "https://response.url",
 )
 
-private val TestExpectedPubSubMessage = PubSubSlackSlashCommandMessage(
+private val TestExpectedPubSubMessage = SlackSlashCommandReceivedEvent(
     teamId = "team_id",
     teamDomain = "team_domain",
     channelId = "channel_id",

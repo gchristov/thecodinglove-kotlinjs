@@ -6,4 +6,4 @@ services:
     environment:
       - PORT=8081
       - API_URL=http://host.docker.internal:8080/api
-      - PRELOAD_SEARCH_PUBSUB_TOPIC=preload_search_dev
+      - SEARCH_SESSION_RESULT_CREATED_PUBSUB_TOPIC=search_session_result_created_dev

@@ -9,24 +9,20 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toPubSubMessage
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackRequestVerificationDto
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackSlashCommand
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackSlashCommandMessage
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSlashCommandReceivedEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackVerifyRequestUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 class SlackSlashCommandHttpHandler(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    log: Logger,
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
     private val slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
     private val slackConfig: SlackConfig,
     private val pubSubPublisher: PubSubPublisher,
-) : BaseHttpHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log,
-) {
+) : HttpHandler {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
         path = "/api/slack/slash",
@@ -45,15 +41,15 @@ class SlackSlashCommandHttpHandler(
             jsonSerializer = jsonSerializer,
             strategy = ApiSlackSlashCommand.serializer(),
         ).bind() ?: raise(Exception("Request body is invalid"))
-        publishSlashCommandMessage(body).bind()
+        publishSlashCommandReceivedEvent(body).bind()
         response.sendEmpty().bind()
     }
 
-    private suspend fun publishSlashCommandMessage(slashCommand: ApiSlackSlashCommand) = pubSubPublisher
+    private suspend fun publishSlashCommandReceivedEvent(slashCommand: ApiSlackSlashCommand) = pubSubPublisher
         .publishJson(
-            topic = slackConfig.slashCommandPubSubTopic,
+            topic = slackConfig.slashCommandReceivedPubSubTopic,
             body = slashCommand.toPubSubMessage(),
             jsonSerializer = jsonSerializer,
-            strategy = PubSubSlackSlashCommandMessage.serializer(),
+            strategy = SlackSlashCommandReceivedEvent.serializer(),
         )
 }

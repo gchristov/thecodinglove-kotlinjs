@@ -11,23 +11,19 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.search.adapter.http.mapper.toSearchResult
 import com.gchristov.thecodinglove.search.domain.model.SearchConfig
 import com.gchristov.thecodinglove.search.domain.usecase.SearchUseCase
-import com.gchristov.thecodinglove.search.adapter.pubsub.model.PubSubPreloadSearchMessage
+import com.gchristov.thecodinglove.search.adapter.pubsub.model.SearchSessionResultCreatedEvent
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 class SearchHttpHandler(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    private val log: Logger,
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
     private val searchUseCase: SearchUseCase,
     private val pubSubPublisher: PubSubPublisher,
     private val searchConfig: SearchConfig,
     private val analytics: Analytics,
-) : BaseHttpHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log
-) {
+) : HttpHandler {
     private val tag = this::class.simpleName
 
     override fun httpConfig() = HttpHandler.HttpConfig(
@@ -65,7 +61,7 @@ class SearchHttpHandler(
                     ),
                 )
                 either {
-                    publishSearchPreloadMessage(
+                    publishSearchSessionResultCreatedEvent(
                         searchSessionId = searchResult.searchSessionId,
                         searchConfig = searchConfig,
                     ).bind()
@@ -74,14 +70,14 @@ class SearchHttpHandler(
             }
         )
 
-    private suspend fun publishSearchPreloadMessage(
+    private suspend fun publishSearchSessionResultCreatedEvent(
         searchSessionId: String,
         searchConfig: SearchConfig,
     ) = pubSubPublisher.publishJson(
-        topic = searchConfig.preloadPubSubTopic,
-        body = PubSubPreloadSearchMessage(searchSessionId),
+        topic = searchConfig.searchSessionResultCreatedPubSubTopic,
+        body = SearchSessionResultCreatedEvent(searchSessionId),
         jsonSerializer = jsonSerializer,
-        strategy = PubSubPreloadSearchMessage.serializer(),
+        strategy = SearchSessionResultCreatedEvent.serializer(),
     )
 }
 

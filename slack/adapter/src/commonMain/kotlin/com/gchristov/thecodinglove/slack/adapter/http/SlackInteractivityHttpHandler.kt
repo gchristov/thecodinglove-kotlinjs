@@ -9,24 +9,20 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toPubSubMessage
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toSlackRequestVerificationDto
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackInteractivity
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackInteractivityMessage
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackVerifyRequestUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 class SlackInteractivityHttpHandler(
-    dispatcher: CoroutineDispatcher,
-    private val jsonSerializer: JsonSerializer,
-    log: Logger,
+    override val dispatcher: CoroutineDispatcher,
+    override val jsonSerializer: JsonSerializer,
+    override val log: Logger,
     private val slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
     private val slackConfig: SlackConfig,
     private val pubSubPublisher: PubSubPublisher,
-) : BaseHttpHandler(
-    dispatcher = dispatcher,
-    jsonSerializer = jsonSerializer,
-    log = log,
-) {
+) : HttpHandler {
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
         path = "/api/slack/interactivity",
@@ -45,15 +41,15 @@ class SlackInteractivityHttpHandler(
             jsonSerializer = jsonSerializer,
             strategy = ApiSlackInteractivity.serializer(),
         ).bind() ?: raise(Exception("Request body is invalid"))
-        publishInteractivityMessage(body).bind()
+        publishInteractivityReceivedEvent(body).bind()
         response.sendEmpty().bind()
     }
 
-    private suspend fun publishInteractivityMessage(interactivity: ApiSlackInteractivity) = pubSubPublisher
+    private suspend fun publishInteractivityReceivedEvent(interactivity: ApiSlackInteractivity) = pubSubPublisher
         .publishJson(
-            topic = slackConfig.interactivityPubSubTopic,
+            topic = slackConfig.interactivityReceivedPubSubTopic,
             body = interactivity.toPubSubMessage(),
             jsonSerializer = jsonSerializer,
-            strategy = PubSubSlackInteractivityMessage.serializer(),
+            strategy = SlackInteractivityReceivedEvent.serializer(),
         )
 }

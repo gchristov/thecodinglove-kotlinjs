@@ -21,7 +21,7 @@ resources:
         args:
           PORT: "8081"
           API_URL: https://${domain}/api
-          PRELOAD_SEARCH_PUBSUB_TOPIC: preload_search
+          SEARCH_SESSION_RESULT_CREATED_PUBSUB_TOPIC: search_session_result_created
         platform: linux/amd64
         context: ../service/build/dist/js
       imageName: ${location}-docker.pkg.dev/${gcp:project}/${repositoryId}/search-service:latest
@@ -93,29 +93,29 @@ resources:
   # Pub/Sub
   ########################################
 
-  # Manages the preload search PubSub topic.
-  pubsub-topic-preload-search:
+  # Manages the search session result created PubSub topic.
+  pubsub-topic-search-session-result-created:
     type: gcp:pubsub:Topic
     properties:
-      name: preload_search
+      name: search_session_result_created
     options:
       version: 8.6.0
       protect: true
-  # Manages the preload search PubSub subscription.
-  pubsub-subscription-preload-search:
+  # Manages the search session result created PubSub subscription.
+  pubsub-subscription-search-session-result-created:
     type: gcp:pubsub:Subscription
     properties:
       ackDeadlineSeconds: 10
       expirationPolicy:
         ttl: ""
       messageRetentionDuration: 600s
-      name: preload_search_subscription
+      name: search_session_result_created_subscription
       pushConfig:
-        pushEndpoint: ${search-service.uri}/api/pubsub/search
+        pushEndpoint: ${search-service.uri}/api/pubsub/search/preload
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s
-      topic: ${pubsub-topic-preload-search.name}
+      topic: ${pubsub-topic-search-session-result-created.name}
     options:
       version: 8.6.0
       protect: true
@@ -123,4 +123,4 @@ resources:
 outputs:
   searchServiceHost: ${search-service.uri}
   searchServicePath: api/search
-  searchServicePubSubPath: api/pubsub/search
+  searchServicePubSubPath: api/pubsub/search/preload

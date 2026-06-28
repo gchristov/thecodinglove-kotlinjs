@@ -7,7 +7,7 @@ import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubPublisher
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackInteractivity
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.PubSubSlackInteractivityMessage
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackHttpRequest
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackVerifyRequestUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.SlackConfigCreator
@@ -42,10 +42,10 @@ class SlackInteractivityHttpHandlerTest {
     }
 
     @Test
-    fun validBodyPublishesToPubSub(): TestResult = runBlockingTest { handler, pubSub, response ->
+    fun validBodyPublishesInteractivityReceivedEvent(): TestResult = runBlockingTest { handler, pubSub, response ->
         handler.handleHttpRequest(FakeSlackHttpRequest(fakeBody = TestInteractivity), response)
         pubSub.assertEquals(
-            topic = TestSlackConfig.interactivityPubSubTopic,
+            topic = TestSlackConfig.interactivityReceivedPubSubTopic,
             message = TestExpectedPubSubMessage,
         )
         response.assertEquals(
@@ -58,7 +58,7 @@ class SlackInteractivityHttpHandlerTest {
     }
 
     @Test
-    fun pubSubErrorSendsError(): TestResult = runBlockingTest(
+    fun publishInteractivityReceivedEventErrorSendsError(): TestResult = runBlockingTest(
         publishResult = Either.Left(Throwable("PubSub error")),
     ) { handler, _, response ->
         handler.handleHttpRequest(FakeSlackHttpRequest(fakeBody = TestInteractivity), response)
@@ -112,21 +112,21 @@ private val TestInteractivity = ApiSlackInteractivity(
     )
 )
 
-private val TestExpectedPubSubMessage = PubSubSlackInteractivityMessage(
-    payload = PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage(
-        actions = listOf(PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.Action(
+private val TestExpectedPubSubMessage = SlackInteractivityReceivedEvent(
+    payload = SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage(
+        actions = listOf(SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.Action(
             name = "send",
             value = "session_123",
         )),
-        team = PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.Team(
+        team = SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.Team(
             id = "team_id",
             domain = "team_domain",
         ),
-        channel = PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.Channel(
+        channel = SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.Channel(
             id = "channel_id",
             name = "channel_name",
         ),
-        user = PubSubSlackInteractivityMessage.InteractivityPayload.InteractiveMessage.User(
+        user = SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage.User(
             id = "user_id",
             name = "user_name",
         ),
