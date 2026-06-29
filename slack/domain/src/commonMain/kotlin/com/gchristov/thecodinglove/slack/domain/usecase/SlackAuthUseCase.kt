@@ -40,18 +40,17 @@ internal class RealSlackAuthUseCase(
             log.debug(tag, "Processing user auth request: code=${dto.code}")
             if (dto.code.isNullOrEmpty()) {
                 log.debug(tag, "Auth cancelled")
-                Either.Left(SlackAuthUseCase.Error.Cancelled())
-            } else {
-                either {
-                    val authResponse = slackRepository.authUser(
-                        code = dto.code,
-                        clientId = slackConfig.clientId,
-                        clientSecret = slackConfig.clientSecret,
-                    ).mapLeft { SlackAuthUseCase.Error.Other(it.message) }.bind()
-                    log.debug(tag, "Persisting auth token")
-                    slackRepository.saveAuthToken(authResponse)
-                        .mapLeft { SlackAuthUseCase.Error.Other(it.message) }.bind()
-                }
+                return@withContext Either.Left(SlackAuthUseCase.Error.Cancelled())
+            }
+            either {
+                val authResponse = slackRepository.authUser(
+                    code = dto.code,
+                    clientId = slackConfig.clientId,
+                    clientSecret = slackConfig.clientSecret,
+                ).mapLeft { SlackAuthUseCase.Error.Other(it.message) }.bind()
+                log.debug(tag, "Persisting auth token")
+                slackRepository.saveAuthToken(authResponse)
+                    .mapLeft { SlackAuthUseCase.Error.Other(it.message) }.bind()
             }
         }
 }

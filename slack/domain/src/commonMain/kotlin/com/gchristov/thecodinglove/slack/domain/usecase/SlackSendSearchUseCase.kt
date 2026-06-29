@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.domain.usecase
 
 import arrow.core.Either
-import arrow.core.raise.either
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
@@ -51,13 +51,11 @@ internal class RealSlackSendSearchUseCase(
                 responseUrl = dto.responseUrl,
                 selfDestructMinutes = dto.selfDestructMinutes,
             )
-            when (val tokenResult = slackRepository.getAuthToken(tokenId = dto.userId)) {
-                is Either.Left -> {
-                    log.debug(tag, tokenResult.value) { "Error fetching user token${tokenResult.value.message?.let { ": $it" } ?: ""}" }
-                    authenticate(clientId = slackConfig.clientId, authState = authState)
-                }
-                is Either.Right -> sendResult(authState = authState, authToken = tokenResult.value.token)
+            val token = slackRepository.getAuthToken(tokenId = dto.userId).getOrElse { error ->
+                log.debug(tag, error) { "Error fetching user token${error.message?.let { ": $it" } ?: ""}" }
+                return@withContext authenticate(clientId = slackConfig.clientId, authState = authState)
             }
+            sendResult(authState = authState, authToken = token.token)
         }
 
     private suspend fun authenticate(
@@ -82,14 +80,15 @@ internal class RealSlackSendSearchUseCase(
     private suspend fun sendResult(
         authState: SlackAuthState,
         authToken: String,
-    ): Either<Throwable, Unit> = either {
+    ): Either<Throwable, Unit> {
         log.debug(tag, "Obtaining search session: searchSessionId=${authState.searchSessionId}")
-        val searchSessionPost = slackSearchRepository.getSearchSessionPost(authState.searchSessionId).bind()
+        val searchSessionPost = slackSearchRepository.getSearchSessionPost(authState.searchSessionId)
+            .getOrElse { return Either.Left(it) }
         log.debug(tag, "Cancelling previous search: responseUrl=${authState.responseUrl}")
         slackRepository.postMessageToUrl(
             url = authState.responseUrl,
             message = slackMessageFactory.cancelMessage(),
-        ).bind()
+        ).getOrElse { return Either.Left(it) }
         log.debug(tag, "Posting search result: searchSessionId=${authState.searchSessionId}")
         val messageTs = slackRepository.postMessage(
             authToken = authToken,
@@ -101,7 +100,7 @@ internal class RealSlackSendSearchUseCase(
                 channelId = authState.channelId,
                 selfDestructMinutes = authState.selfDestructMinutes,
             ),
-        ).bind()
+        ).getOrElse { return Either.Left(it) }
         val logPlaceholder = authState.selfDestructMinutes?.let { "self-destruct" } ?: "sent"
         val state = authState.selfDestructMinutes?.let {
             SlackSearchRepository.SearchSessionStateDto.SelfDestruct
@@ -110,7 +109,7 @@ internal class RealSlackSendSearchUseCase(
         slackSearchRepository.updateSearchSessionState(
             searchSessionId = authState.searchSessionId,
             state = state,
-        ).bind()
+        ).getOrElse { return Either.Left(it) }
         authState.selfDestructMinutes?.let { minutes ->
             log.debug(tag, "Persisting self-destruct state: searchSessionId=${authState.searchSessionId}")
             val destroyTimestamp = clock.now().plus(value = minutes, unit = DateTimeUnit.MINUTE).toEpochMilliseconds()
@@ -123,7 +122,8 @@ internal class RealSlackSendSearchUseCase(
                     channelId = authState.channelId,
                     messageTs = messageTs,
                 )
-            ).bind()
+            ).getOrElse { return Either.Left(it) }
         }
+        return Either.Right(Unit)
     }
 }
