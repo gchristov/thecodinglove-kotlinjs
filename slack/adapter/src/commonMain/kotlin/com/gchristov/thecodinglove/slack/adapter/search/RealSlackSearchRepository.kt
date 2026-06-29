@@ -1,6 +1,6 @@
 package com.gchristov.thecodinglove.slack.adapter.search
 
-import arrow.core.Either
+import com.gchristov.thecodinglove.common.network.safeApiCall
 import com.gchristov.thecodinglove.slack.adapter.search.mapper.toSearchResult
 import com.gchristov.thecodinglove.slack.adapter.search.mapper.toSearchSessionPost
 import com.gchristov.thecodinglove.slack.adapter.search.model.ApiSlackSearchResult
@@ -11,40 +11,24 @@ import io.ktor.client.call.*
 
 internal class RealSlackSearchRepository(private val slackSearchServiceApi: SlackSearchServiceApi) :
     SlackSearchRepository {
-    override suspend fun search(query: String) = try {
-        val response: ApiSlackSearchResult = slackSearchServiceApi.search(query).body()
-        Either.Right(response.toSearchResult())
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during search${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+    override suspend fun search(query: String) = safeApiCall("Error during search") {
+        slackSearchServiceApi.search(query).body<ApiSlackSearchResult>().toSearchResult()
     }
 
-    override suspend fun shuffle(searchSessionId: String) = try {
-        val response: ApiSlackSearchResult = slackSearchServiceApi.shuffle(searchSessionId).body()
-        Either.Right(response.toSearchResult())
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during shuffle${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+    override suspend fun shuffle(searchSessionId: String) = safeApiCall("Error during shuffle") {
+        slackSearchServiceApi.shuffle(searchSessionId).body<ApiSlackSearchResult>().toSearchResult()
     }
 
-    override suspend fun deleteSearchSession(searchSessionId: String): Either<Throwable, Unit> = try {
-        slackSearchServiceApi.deleteSearchSession(searchSessionId)
-        Either.Right(Unit)
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during delete search session${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
-    }
+    override suspend fun deleteSearchSession(searchSessionId: String) =
+        safeApiCall("Error during delete search session") {
+            slackSearchServiceApi.deleteSearchSession(searchSessionId)
+            Unit
+        }
 
     override suspend fun updateSearchSessionState(
         searchSessionId: String,
-        state: SlackSearchRepository.SearchSessionStateDto
-    ) = try {
+        state: SlackSearchRepository.SearchSessionStateDto,
+    ) = safeApiCall("Error during update search session state") {
         slackSearchServiceApi.updateSearchSessionState(
             ApiSlackUpdateSearchSessionState(
                 searchSessionId = searchSessionId,
@@ -54,21 +38,13 @@ internal class RealSlackSearchRepository(private val slackSearchServiceApi: Slac
                 },
             )
         )
-        Either.Right(Unit)
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during update search session state${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+        Unit
     }
 
-    override suspend fun getSearchSessionPost(searchSessionId: String) = try {
-        val response: ApiSlackSearchSessionPost = slackSearchServiceApi.getSearchSessionPost(searchSessionId).body()
-        Either.Right(response.toSearchSessionPost())
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during search session post${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
-    }
+    override suspend fun getSearchSessionPost(searchSessionId: String) =
+        safeApiCall("Error during search session post") {
+            slackSearchServiceApi.getSearchSessionPost(searchSessionId)
+                .body<ApiSlackSearchSessionPost>()
+                .toSearchSessionPost()
+        }
 }
