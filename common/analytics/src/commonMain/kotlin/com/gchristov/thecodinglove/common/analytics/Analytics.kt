@@ -1,9 +1,10 @@
 package com.gchristov.thecodinglove.common.analytics
 
-import arrow.core.raise.either
+import arrow.core.getOrElse
 import com.gchristov.thecodinglove.common.analytics.google.AnalyticsGoogleRepository
-import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 interface Analytics {
     fun sendEvent(
@@ -14,47 +15,25 @@ interface Analytics {
 }
 
 internal class RealAnalytics(
-    private val dispatcher: CoroutineDispatcher,
+    dispatcher: CoroutineDispatcher,
     private val analyticsGoogleRepository: AnalyticsGoogleRepository,
-) : Analytics, CoroutineScope {
-    private val job = Job()
-
-    override val coroutineContext: CoroutineContext
-        get() = job
+) : Analytics {
+    private val scope = CoroutineScope(dispatcher)
 
     override fun sendEvent(
         clientId: String,
         name: String,
         params: Map<String, String>?,
     ) {
-        launch(dispatcher) {
-            val google = async {
-                sendToGoogle(
-                    clientId = clientId,
-                    name = name,
-                    params = params,
-                )
+        scope.launch {
+            analyticsGoogleRepository.sendEvent(
+                clientId = clientId,
+                name = name,
+                params = params,
+            ).getOrElse {
+                it.printStackTrace()
+                return@launch
             }
-            either {
-                google.await().bind()
-            }.fold(
-                ifLeft = {
-                    it.printStackTrace()
-                },
-                ifRight = {
-                    // No-op
-                }
-            )
         }
     }
-
-    private suspend fun sendToGoogle(
-        clientId: String,
-        name: String,
-        params: Map<String, String>?,
-    ) = analyticsGoogleRepository.sendEvent(
-        clientId = clientId,
-        name = name,
-        params = params,
-    )
 }

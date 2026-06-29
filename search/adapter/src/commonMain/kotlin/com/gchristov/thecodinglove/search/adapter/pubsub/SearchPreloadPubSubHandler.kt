@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.pubsub
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.error
@@ -37,10 +38,12 @@ class SearchPreloadPubSubHandler(
         return response.sendEmpty()
     }
 
-    override suspend fun handle(event: SearchSessionResultCreatedEvent): Either<Throwable, Unit> =
+    override suspend fun handle(event: SearchSessionResultCreatedEvent): Either<Throwable, Unit> {
         preloadSearchResultUseCase(PreloadSearchResultUseCase.Dto(searchSessionId = event.searchSessionId))
-            .fold(
-                ifLeft = { log.error(tag, it) { "Error preloading search" }; Either.Right(Unit) },
-                ifRight = { Either.Right(Unit) },
-            )
+            .getOrElse {
+                log.error(tag, it) { "Error preloading search" }
+                return Either.Right(Unit)
+            }
+        return Either.Right(Unit)
+    }
 }

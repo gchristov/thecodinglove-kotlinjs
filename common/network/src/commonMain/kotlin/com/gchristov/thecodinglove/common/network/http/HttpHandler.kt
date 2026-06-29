@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.common.network.http
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.debug
@@ -44,36 +45,24 @@ interface HttpHandler : Handler {
                 ?.let { log.debug(tag, "Received request: bodyString=$it") }
                 ?: log.debug(tag, "Received request")
             try {
-                handleHttpRequestAsync(request, response).fold(
-                    ifLeft = { handlerError ->
-                        log.error(tag, handlerError) { "Error handling request" }
-                        handleError(handlerError, response).fold(
-                            ifLeft = { errorHandlerError ->
-                                log.error(tag, errorHandlerError) { "Error sending error response" }
-                            },
-                            ifRight = {
-                                // TODO: Add some request metrics in here
-                                log.debug(tag, "Request error sent successfully")
-                            }
-                        )
-                    },
-                    ifRight = {
-                        // TODO: Add some request metrics in here
-                        log.debug(tag, "Request handled successfully")
+                handleHttpRequestAsync(request, response).getOrElse { handlerError ->
+                    log.error(tag, handlerError) { "Error handling request" }
+                    handleError(handlerError, response).getOrElse { errorHandlerError ->
+                        log.error(tag, errorHandlerError) { "Error sending error response" }
+                        return@launch
                     }
-                )
+                    log.debug(tag, "Request error sent successfully")
+                    return@launch
+                }
+                log.debug(tag, "Request handled successfully")
             } catch (uncaughtHandlerError: Throwable) {
                 log.error(tag, uncaughtHandlerError) { "Uncaught handler error" }
                 try {
-                    handleError(uncaughtHandlerError, response).fold(
-                        ifLeft = { errorHandlerError ->
-                            log.error(tag, errorHandlerError) { "Error sending uncaught handler error" }
-                        },
-                        ifRight = {
-                            // TODO: Add some request metrics in here
-                            log.debug(tag, "Request uncaught handler error sent successfully")
-                        }
-                    )
+                    handleError(uncaughtHandlerError, response).getOrElse { errorHandlerError ->
+                        log.error(tag, errorHandlerError) { "Error sending uncaught handler error" }
+                        return@launch
+                    }
+                    log.debug(tag, "Request uncaught handler error sent successfully")
                 } catch (lastResort: Throwable) {
                     log.error(tag, lastResort) { "Uncaught last resort error" }
                 }

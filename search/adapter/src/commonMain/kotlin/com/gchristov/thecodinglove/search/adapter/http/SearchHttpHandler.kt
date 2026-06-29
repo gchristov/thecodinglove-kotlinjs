@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.http
 
 import arrow.core.Either
-import arrow.core.raise.either
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
@@ -35,40 +35,34 @@ class SearchHttpHandler(
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
-    ): Either<Throwable, Unit> = searchUseCase(SearchUseCase.Dto(request.toSearchType()))
-        .fold(
-            ifLeft = {
-                when (it) {
-                    is SearchUseCase.Error.Empty -> {
-                        // Empty search results are expected so we respond with 200 and the relevant error type.
-                        log.error(tag, it) { "Error handling request" }
-                        response.sendJson(
-                            data = it.toSearchResult(),
-                            jsonSerializer = jsonSerializer,
-                        )
-                    }
-
-                    is SearchUseCase.Error.SessionNotFound -> Either.Left(it)
+    ): Either<Throwable, Unit> {
+        val searchResult = searchUseCase(SearchUseCase.Dto(request.toSearchType())).getOrElse { error ->
+            when (error) {
+                is SearchUseCase.Error.Empty -> {
+                    // Empty search results are expected so we respond with 200 and the relevant error type.
+                    log.error(tag, error) { "Error handling request" }
+                    return response.sendJson(
+                        data = error.toSearchResult(),
+                        jsonSerializer = jsonSerializer,
+                    )
                 }
-            },
-            ifRight = { searchResult ->
-                analytics.sendEvent(
-                    clientId = searchResult.searchSessionId,
-                    name = "search",
-                    params = mapOf(
-                        "query" to searchResult.query,
-                        "total_posts" to searchResult.totalPosts.toString(),
-                    ),
-                )
-                either {
-                    publishSearchSessionResultCreatedEvent(
-                        searchSessionId = searchResult.searchSessionId,
-                        searchConfig = searchConfig,
-                    ).bind()
-                    response.sendJson(data = searchResult.toSearchResult(), jsonSerializer = jsonSerializer).bind()
-                }
+                is SearchUseCase.Error.SessionNotFound -> return Either.Left(error)
             }
+        }
+        analytics.sendEvent(
+            clientId = searchResult.searchSessionId,
+            name = "search",
+            params = mapOf(
+                "query" to searchResult.query,
+                "total_posts" to searchResult.totalPosts.toString(),
+            ),
         )
+        publishSearchSessionResultCreatedEvent(
+            searchSessionId = searchResult.searchSessionId,
+            searchConfig = searchConfig,
+        ).getOrElse { return Either.Left(it) }
+        return response.sendJson(data = searchResult.toSearchResult(), jsonSerializer = jsonSerializer)
+    }
 
     private suspend fun publishSearchSessionResultCreatedEvent(
         searchSessionId: String,

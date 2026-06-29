@@ -1,24 +1,22 @@
 package com.gchristov.thecodinglove.common.monitoring
 
-import arrow.core.raise.either
+import arrow.core.getOrElse
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
 import com.gchristov.thecodinglove.common.slack.SlackSender
 import com.gchristov.thecodinglove.common.slack.model.SlackMessage
-import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 abstract class MonitoringLogWriter : LogWriter()
 
 internal class RealMonitoringLogWriter(
-    private val dispatcher: CoroutineDispatcher,
+    dispatcher: CoroutineDispatcher,
     private val slackSender: SlackSender,
     private val monitoringSlackUrl: String,
-) : MonitoringLogWriter(), CoroutineScope {
-    private val job = Job()
-
-    override val coroutineContext: CoroutineContext
-        get() = job
+) : MonitoringLogWriter() {
+    private val scope = CoroutineScope(dispatcher)
 
     override fun log(
         severity: Severity,
@@ -40,40 +38,23 @@ internal class RealMonitoringLogWriter(
     private fun reportException(
         message: String,
         throwable: Throwable?,
-    ) = launch(dispatcher) {
+    ) = scope.launch {
         val stacktrace = throwable?.stackTraceToString() ?: "Missing stacktrace"
-        val slack = async {
-            reportToSlack(
-                message = message,
-                stacktrace = stacktrace,
-            )
-        }
-        either {
-            slack.await().bind()
-        }.fold(
-            ifLeft = {
-                // The logger has already attempted to post to Slack but has failed, so just log the error locally.
-                it.printStackTrace()
-            },
-            ifRight = {
-                // No-op
-            }
-        )
-    }
-
-    private suspend fun reportToSlack(
-        message: String,
-        stacktrace: String,
-    ) = slackSender.postMessageToUrl(
-        url = monitoringSlackUrl,
-        message = SlackMessage(
-            text = message,
-            attachments = listOf(
-                SlackMessage.Attachment(
-                    text = stacktrace,
-                    color = "#D00000",
-                )
+        slackSender.postMessageToUrl(
+            url = monitoringSlackUrl,
+            message = SlackMessage(
+                text = message,
+                attachments = listOf(
+                    SlackMessage.Attachment(
+                        text = stacktrace,
+                        color = "#D00000",
+                    )
+                ),
             ),
-        ),
-    )
+        ).getOrElse {
+            // The logger has already attempted to post to Slack but has failed, so just log the error locally.
+            it.printStackTrace()
+            return@launch
+        }
+    }
 }

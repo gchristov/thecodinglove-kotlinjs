@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.search.domain.usecase
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.benasher44.uuid.uuid4
@@ -61,47 +62,42 @@ internal class RealSearchUseCase(
                 searchSession.usePreloadedPost(preloadedPost, searchRepository)
                     .mapLeft { SearchUseCase.Error.SessionNotFound(additionalInfo = it.message) }
                     .bind()
-                SearchUseCase.Result(
+                return@either SearchUseCase.Result(
                     searchSessionId = searchSession.id,
                     query = searchSession.query,
                     post = preloadedPost,
                     totalPosts = searchSession.totalPosts ?: 0,
                 )
-            } else {
-                log.debug(tag, "No preloaded post, running normal search")
-                val historyResult = searchWithHistoryUseCase(
-                    SearchWithHistoryUseCase.Dto(
-                        query = searchSession.query,
-                        totalPosts = searchSession.totalPosts,
-                        searchHistory = searchSession.searchHistory,
-                    )
+            }
+            log.debug(tag, "No preloaded post, running normal search")
+            val searchResult = searchWithHistoryUseCase(
+                SearchWithHistoryUseCase.Dto(
+                    query = searchSession.query,
+                    totalPosts = searchSession.totalPosts,
+                    searchHistory = searchSession.searchHistory,
                 )
-                when (historyResult) {
-                    is Either.Left -> when (historyResult.value) {
-                        is SearchWithHistoryUseCase.Error.Exhausted -> {
-                            searchSession.clearExhaustedHistory(searchRepository)
-                                .mapLeft { SearchUseCase.Error.SessionNotFound(additionalInfo = it.message) }
-                                .bind()
-                            invoke(dto).bind()
-                        }
-                        is SearchWithHistoryUseCase.Error.Empty -> raise(
-                            SearchUseCase.Error.Empty(additionalInfo = historyResult.value.additionalInfo)
-                        )
-                    }
-                    is Either.Right -> {
-                        val searchResult = historyResult.value
-                        searchSession.insertCurrentPost(searchResult, searchRepository)
+            ).getOrElse { error ->
+                when (error) {
+                    is SearchWithHistoryUseCase.Error.Exhausted -> {
+                        searchSession.clearExhaustedHistory(searchRepository)
                             .mapLeft { SearchUseCase.Error.SessionNotFound(additionalInfo = it.message) }
                             .bind()
-                        SearchUseCase.Result(
-                            searchSessionId = searchSession.id,
-                            query = searchResult.query,
-                            post = searchResult.post,
-                            totalPosts = searchResult.totalPosts,
-                        )
+                        return@either invoke(dto).bind()
                     }
+                    is SearchWithHistoryUseCase.Error.Empty -> raise(
+                        SearchUseCase.Error.Empty(additionalInfo = error.additionalInfo)
+                    )
                 }
             }
+            searchSession.insertCurrentPost(searchResult, searchRepository)
+                .mapLeft { SearchUseCase.Error.SessionNotFound(additionalInfo = it.message) }
+                .bind()
+            SearchUseCase.Result(
+                searchSessionId = searchSession.id,
+                query = searchResult.query,
+                post = searchResult.post,
+                totalPosts = searchResult.totalPosts,
+            )
         }
     }
 }
