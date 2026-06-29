@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slackweb.service
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.CommonAnalyticsModule
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
@@ -27,20 +27,21 @@ suspend fun main() {
     val tag = "SlackWebService"
 
     setupDi()
-        .flatMap { setupMonitoring() }
-        .flatMap { setupService(environment.port) }
-        .flatMap { startService(it) }
-        .fold(ifLeft = { error ->
-            val log = DiGraph.inject<Logger>()
-            log.debug(tag, "Error starting${error.message?.let { ": $it" } ?: ""}")
-            error.printStackTrace()
-        }, ifRight = {
-            val log = DiGraph.inject<Logger>()
-            log.debug(tag, "Started: environment=$environment")
-        })
+    setupMonitoring()
+    val service = setupService(environment.port).getOrElse { error ->
+        DiGraph.inject<Logger>().debug(tag, "Error starting${error.message?.let { ": $it" } ?: ""}")
+        error.printStackTrace()
+        return
+    }
+    startService(service).getOrElse { error ->
+        DiGraph.inject<Logger>().debug(tag, "Error starting${error.message?.let { ": $it" } ?: ""}")
+        error.printStackTrace()
+        return
+    }
+    DiGraph.inject<Logger>().debug(tag, "Started: environment=$environment")
 }
 
-private fun setupDi(): Either<Throwable, Unit> {
+private fun setupDi() {
     DiGraph.registerModules(
         listOf(
             CommonAnalyticsModule.module,
@@ -52,14 +53,12 @@ private fun setupDi(): Either<Throwable, Unit> {
             SlackWebDomainModule.module,
         )
     )
-    return Either.Right(Unit)
 }
 
-private fun setupMonitoring(): Either<Throwable, Unit> {
+private fun setupMonitoring() {
     DiGraph.inject<MonitoringLogWriter>().apply {
         Logger.addLogWriter(this)
     }
-    return Either.Right(Unit)
 }
 
 private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
@@ -70,13 +69,12 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
         StaticFileHttpHandler("$staticWebsiteRoot/index.html"),
     )
     val service = DiGraph.inject<HttpService>()
-    return service.initialise(
-        handlers = handlers,
-        port = port,
-        staticWebsiteRoot = staticWebsiteRoot,
-    ).flatMap { Either.Right(service) }
+    service.initialise(handlers = handlers, port = port, staticWebsiteRoot = staticWebsiteRoot)
+        .getOrElse { return Either.Left(it) }
+    return Either.Right(service)
 }
 
-private suspend fun startService(service: HttpService): Either<Throwable, Unit> = service
-    .start()
-    .flatMap { Either.Right(Unit) }
+private suspend fun startService(service: HttpService): Either<Throwable, Unit> {
+    service.start().getOrElse { return Either.Left(it) }
+    return Either.Right(Unit)
+}

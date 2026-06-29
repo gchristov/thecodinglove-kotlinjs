@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.pubsub
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
@@ -48,73 +48,76 @@ class SlackSearchPubSubHandler(
                 "team_id" to event.teamId,
             )
         )
-        return slackRepository.postMessageToUrl(
+        slackRepository.postMessageToUrl(
             url = event.responseUrl,
             message = slackMessageFactory.searchingMessage(),
-        )
-            .flatMap { slackSearchRepository.search(event.text) }
-            .fold(
-                ifLeft = { error ->
+        ).getOrElse { error ->
+            analytics.sendEvent(
+                clientId = event.userId,
+                name = "slack_slash_command_error",
+                params = error.message?.let { mapOf("type" to "generic", "info" to it) }
+            )
+            return slackRepository.postMessageToUrl(
+                url = event.responseUrl,
+                message = slackMessageFactory.searchGenericErrorMessage()
+            )
+        }
+        val searchResult = slackSearchRepository.search(event.text).getOrElse { error ->
+            analytics.sendEvent(
+                clientId = event.userId,
+                name = "slack_slash_command_error",
+                params = error.message?.let { mapOf("type" to "generic", "info" to it) }
+            )
+            return slackRepository.postMessageToUrl(
+                url = event.responseUrl,
+                message = slackMessageFactory.searchGenericErrorMessage()
+            )
+        }
+        val searchSession = searchResult.searchSession
+        if (!searchResult.ok || searchSession == null) {
+            return when (searchResult.error) {
+                is SlackSearchRepository.SearchResultDto.Error.NoResults -> {
                     analytics.sendEvent(
                         clientId = event.userId,
                         name = "slack_slash_command_error",
-                        params = error.message?.let { mapOf("type" to "generic", "info" to it) }
+                        params = mapOf("type" to "no_results")
+                    )
+                    slackRepository.postMessageToUrl(
+                        url = event.responseUrl,
+                        message = slackMessageFactory.noSearchResultsMessage(event.text)
+                    )
+                }
+                null -> {
+                    analytics.sendEvent(
+                        clientId = event.userId,
+                        name = "slack_slash_command_error",
+                        params = mapOf("type" to "generic")
                     )
                     slackRepository.postMessageToUrl(
                         url = event.responseUrl,
                         message = slackMessageFactory.searchGenericErrorMessage()
                     )
-                },
-                ifRight = { searchResult ->
-                    val searchSession = searchResult.searchSession
-                    when {
-                        searchResult.ok && searchSession != null -> {
-                            analytics.sendEvent(
-                                clientId = event.userId,
-                                name = "slack_slash_command_success",
-                                params = mapOf(
-                                    "query" to searchSession.post.searchQuery,
-                                    "post_title" to searchSession.post.attachmentTitle,
-                                ),
-                            )
-                            slackRepository.postMessageToUrl(
-                                url = event.responseUrl,
-                                message = slackMessageFactory.searchResultMessage(
-                                    searchQuery = searchSession.post.searchQuery,
-                                    searchResults = searchSession.searchResults,
-                                    searchSessionId = searchSession.searchSessionId,
-                                    attachmentTitle = searchSession.post.attachmentTitle,
-                                    attachmentUrl = searchSession.post.attachmentUrl,
-                                    attachmentImageUrl = searchSession.post.attachmentImageUrl,
-                                )
-                            )
-                        }
-                        else -> when (searchResult.error) {
-                            is SlackSearchRepository.SearchResultDto.Error.NoResults -> {
-                                analytics.sendEvent(
-                                    clientId = event.userId,
-                                    name = "slack_slash_command_error",
-                                    params = mapOf("type" to "no_results")
-                                )
-                                slackRepository.postMessageToUrl(
-                                    url = event.responseUrl,
-                                    message = slackMessageFactory.noSearchResultsMessage(event.text)
-                                )
-                            }
-                            null -> {
-                                analytics.sendEvent(
-                                    clientId = event.userId,
-                                    name = "slack_slash_command_error",
-                                    params = mapOf("type" to "generic")
-                                )
-                                slackRepository.postMessageToUrl(
-                                    url = event.responseUrl,
-                                    message = slackMessageFactory.searchGenericErrorMessage()
-                                )
-                            }
-                        }
-                    }
                 }
+            }
+        }
+        analytics.sendEvent(
+            clientId = event.userId,
+            name = "slack_slash_command_success",
+            params = mapOf(
+                "query" to searchSession.post.searchQuery,
+                "post_title" to searchSession.post.attachmentTitle,
+            ),
+        )
+        return slackRepository.postMessageToUrl(
+            url = event.responseUrl,
+            message = slackMessageFactory.searchResultMessage(
+                searchQuery = searchSession.post.searchQuery,
+                searchResults = searchSession.searchResults,
+                searchSessionId = searchSession.searchSessionId,
+                attachmentTitle = searchSession.post.attachmentTitle,
+                attachmentUrl = searchSession.post.attachmentUrl,
+                attachmentImageUrl = searchSession.post.attachmentImageUrl,
             )
+        )
     }
 }

@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.pubsub
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
@@ -37,13 +38,15 @@ class SlackInteractivityPubSubHandler internal constructor(
         return response.sendEmpty()
     }
 
-    override suspend fun handle(event: SlackInteractivityReceivedEvent): Either<Throwable, Unit> =
+    override suspend fun handle(event: SlackInteractivityReceivedEvent): Either<Throwable, Unit> {
         either {
             val payload = event.payload as? SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage
                 ?: raise(Exception("Unexpected payload type: ${event.payload::class.simpleName}"))
             eventHandlers.forEach { it.handle(payload).bind() }
-        }.fold(
-            ifLeft = { log.error(tag, it) { "Error handling request" }; Either.Right(Unit) },
-            ifRight = { Either.Right(Unit) },
-        )
+        }.getOrElse {
+            log.error(tag, it) { "Error handling request" }
+            return Either.Right(Unit)
+        }
+        return Either.Right(Unit)
+    }
 }

@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.selfdestruct.service
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.CommonKotlinModule
 import com.gchristov.thecodinglove.common.kotlin.debug
@@ -24,21 +24,22 @@ suspend fun main() {
     val environment = Environment.of(process.argv.slice(2) as Array<String>)
     val tag = "SelfDestructService"
 
-    setupDi(environment = environment)
-        .flatMap { setupMonitoring() }
-        .flatMap { setupService(environment.port) }
-        .flatMap { startService(it) }
-        .fold(ifLeft = { error ->
-            val log = DiGraph.inject<Logger>()
-            log.debug(tag, "Error starting${error.message?.let { ": $it" } ?: ""}")
-            error.printStackTrace()
-        }, ifRight = {
-            val log = DiGraph.inject<Logger>()
-            log.debug(tag, "Started: environment=$environment")
-        })
+    setupDi(environment)
+    setupMonitoring()
+    val service = setupService(environment.port).getOrElse { error ->
+        DiGraph.inject<Logger>().debug(tag, "Error setting up${error.message?.let { ": $it" } ?: ""}")
+        error.printStackTrace()
+        return
+    }
+    startService(service).getOrElse { error ->
+        DiGraph.inject<Logger>().debug(tag, "Error starting${error.message?.let { ": $it" } ?: ""}")
+        error.printStackTrace()
+        return
+    }
+    DiGraph.inject<Logger>().debug(tag, "Started: environment=$environment")
 }
 
-private fun setupDi(environment: Environment): Either<Throwable, Unit> {
+private fun setupDi(environment: Environment) {
     DiGraph.registerModules(
         listOf(
             CommonKotlinModule.module,
@@ -50,14 +51,12 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
             SelfDestructServiceModule(environment).module,
         )
     )
-    return Either.Right(Unit)
 }
 
-private fun setupMonitoring(): Either<Throwable, Unit> {
+private fun setupMonitoring() {
     DiGraph.inject<MonitoringLogWriter>().apply {
         Logger.addLogWriter(this)
     }
-    return Either.Right(Unit)
 }
 
 private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
@@ -65,12 +64,11 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
         DiGraph.inject<SelfDestructHttpHandler>(),
     )
     val service = DiGraph.inject<HttpService>()
-    return service.initialise(
-        handlers = handlers,
-        port = port,
-    ).flatMap { Either.Right(service) }
+    service.initialise(handlers = handlers, port = port).getOrElse { return Either.Left(it) }
+    return Either.Right(service)
 }
 
-private suspend fun startService(service: HttpService): Either<Throwable, Unit> = service
-    .start()
-    .flatMap { Either.Right(Unit) }
+private suspend fun startService(service: HttpService): Either<Throwable, Unit> {
+    service.start().getOrElse { return Either.Left(it) }
+    return Either.Right(Unit)
+}

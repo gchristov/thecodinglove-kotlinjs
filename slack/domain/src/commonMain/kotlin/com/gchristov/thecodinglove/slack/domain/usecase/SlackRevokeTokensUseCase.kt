@@ -36,6 +36,5 @@ internal class RealSlackRevokeTokensUseCase(
                     slackRepository.deleteAuthToken(it)
                 }
                 .let { l -> either { l.bindAll() } }
-                .map {}
         }
 }

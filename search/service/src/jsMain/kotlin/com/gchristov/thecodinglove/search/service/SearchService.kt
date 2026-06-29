@@ -1,8 +1,7 @@
 package com.gchristov.thecodinglove.search.service
 
 import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.raise.either
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.CommonAnalyticsModule
 import com.gchristov.thecodinglove.common.firebase.CommonFirebaseModule
@@ -30,22 +29,27 @@ suspend fun main() {
     val environment = Environment.of(process.argv.slice(2) as Array<String>)
     val tag = "SearchService"
 
-    setupDi(environment = environment)
-        .flatMap { setupMonitoring() }
-        .flatMap { setupService(environment.port) }
-        .flatMap { startService(it) }
-        .flatMap { runDatabaseMigrations() }
-        .fold(ifLeft = { error ->
-            val log = DiGraph.inject<Logger>()
-            log.debug(tag, "Error starting${error.message?.let { ": $it" } ?: ""}")
-            error.printStackTrace()
-        }, ifRight = {
-            val log = DiGraph.inject<Logger>()
-            log.debug(tag, "Started: environment=$environment")
-        })
+    setupDi(environment)
+    setupMonitoring()
+    val service = setupService(environment.port).getOrElse { error ->
+        DiGraph.inject<Logger>().debug(tag, "Error setting up${error.message?.let { ": $it" } ?: ""}")
+        error.printStackTrace()
+        return
+    }
+    startService(service).getOrElse { error ->
+        DiGraph.inject<Logger>().debug(tag, "Error starting${error.message?.let { ": $it" } ?: ""}")
+        error.printStackTrace()
+        return
+    }
+    runDatabaseMigrations().getOrElse { error ->
+        DiGraph.inject<Logger>().debug(tag, "Error run database migrations${error.message?.let { ": $it" } ?: ""}")
+        error.printStackTrace()
+        return
+    }
+    DiGraph.inject<Logger>().debug(tag, "Started: environment=$environment")
 }
 
-private fun setupDi(environment: Environment): Either<Throwable, Unit> {
+private fun setupDi(environment: Environment) {
     DiGraph.registerModules(
         listOf(
             CommonAnalyticsModule.module,
@@ -60,14 +64,12 @@ private fun setupDi(environment: Environment): Either<Throwable, Unit> {
             SearchServiceModule(environment).module,
         )
     )
-    return Either.Right(Unit)
 }
 
-private fun setupMonitoring(): Either<Throwable, Unit> {
+private fun setupMonitoring() {
     DiGraph.inject<MonitoringLogWriter>().apply {
         Logger.addLogWriter(this)
     }
-    return Either.Right(Unit)
 }
 
 private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
@@ -80,19 +82,19 @@ private suspend fun setupService(port: Int): Either<Throwable, HttpService> {
         DiGraph.inject<UpdateSearchSessionStateHttpHandler>(),
     )
     val service = DiGraph.inject<HttpService>()
-    return service.initialise(
-        handlers = handlers,
-        port = port,
-    ).flatMap { Either.Right(service) }
+    service.initialise(handlers = handlers, port = port).getOrElse { return Either.Left(it) }
+    return Either.Right(service)
 }
 
-private suspend fun startService(service: HttpService): Either<Throwable, Unit> = service
-    .start()
-    .flatMap { Either.Right(Unit) }
+private suspend fun startService(service: HttpService): Either<Throwable, Unit> {
+    service.start().getOrElse { return Either.Left(it) }
+    return Either.Right(Unit)
+}
 
 private suspend fun runDatabaseMigrations(): Either<Throwable, Unit> {
     val migrations = DiGraph.inject<List<FirestoreMigration>>()
-    return migrations
-        .map { it.invoke() }
-        .let { l -> either { l.bindAll() } }
+    for (migration in migrations) {
+        migration.invoke().getOrElse { return Either.Left(it) }
+    }
+    return Either.Right(Unit)
 }

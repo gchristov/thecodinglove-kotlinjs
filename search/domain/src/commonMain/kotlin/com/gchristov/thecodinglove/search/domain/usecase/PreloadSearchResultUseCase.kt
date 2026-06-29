@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.search.domain.usecase
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.error
@@ -29,27 +30,27 @@ internal class RealPreloadSearchResultUseCase(
     ): Either<Throwable, Unit> = withContext(dispatcher) {
         either {
             val searchSession = searchRepository.getSearchSession(dto.searchSessionId).bind()
-            val historyResult = searchWithHistoryUseCase(
+            val searchResult = searchWithHistoryUseCase(
                 SearchWithHistoryUseCase.Dto(
                     query = searchSession.query,
                     totalPosts = searchSession.totalPosts,
                     searchHistory = searchSession.searchHistory,
                 )
-            )
-            when (historyResult) {
-                is Either.Left -> when (historyResult.value) {
+            ).getOrElse { error ->
+                when (error) {
                     is SearchWithHistoryUseCase.Error.Exhausted -> {
                         // Only clear the preloaded post and let session search deal with updating the history
                         searchSession.clearPreloadedPost(searchRepository).bind()
-                        log.error(tag, historyResult.value) { "Search exhausted" }
+                        log.error(tag, error) { "Search exhausted" }
+                        return@either
                     }
-                    is SearchWithHistoryUseCase.Error.Empty -> raise(historyResult.value)
+                    is SearchWithHistoryUseCase.Error.Empty -> raise(error)
                 }
-                is Either.Right -> searchSession.insertPreloadedPost(
-                    searchResult = historyResult.value,
-                    searchRepository = searchRepository,
-                ).bind()
             }
+            searchSession.insertPreloadedPost(
+                searchResult = searchResult,
+                searchRepository = searchRepository,
+            ).bind()
         }
     }
 }
