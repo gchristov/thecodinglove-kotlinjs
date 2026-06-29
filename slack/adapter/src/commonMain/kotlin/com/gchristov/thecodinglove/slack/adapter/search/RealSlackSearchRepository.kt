@@ -8,7 +8,6 @@ import com.gchristov.thecodinglove.slack.adapter.search.model.ApiSlackSearchSess
 import com.gchristov.thecodinglove.slack.adapter.search.model.ApiSlackUpdateSearchSessionState
 import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import io.ktor.client.call.*
-import io.ktor.http.*
 
 internal class RealSlackSearchRepository(private val slackSearchServiceApi: SlackSearchServiceApi) :
     SlackSearchRepository {
@@ -33,8 +32,7 @@ internal class RealSlackSearchRepository(private val slackSearchServiceApi: Slac
     }
 
     override suspend fun deleteSearchSession(searchSessionId: String): Either<Throwable, Unit> = try {
-        val response = slackSearchServiceApi.deleteSearchSession(searchSessionId)
-        if (!response.status.isSuccess()) throw Exception("HTTP ${response.status.value}")
+        slackSearchServiceApi.deleteSearchSession(searchSessionId)
         Either.Right(Unit)
     } catch (error: Throwable) {
         Either.Left(Throwable(
@@ -47,7 +45,7 @@ internal class RealSlackSearchRepository(private val slackSearchServiceApi: Slac
         searchSessionId: String,
         state: SlackSearchRepository.SearchSessionStateDto
     ) = try {
-        val response = slackSearchServiceApi.updateSearchSessionState(
+        slackSearchServiceApi.updateSearchSessionState(
             ApiSlackUpdateSearchSessionState(
                 searchSessionId = searchSessionId,
                 state = when (state) {
@@ -56,7 +54,6 @@ internal class RealSlackSearchRepository(private val slackSearchServiceApi: Slac
                 },
             )
         )
-        if (!response.status.isSuccess()) throw Exception("HTTP ${response.status.value}")
         Either.Right(Unit)
     } catch (error: Throwable) {
         Either.Left(Throwable(
