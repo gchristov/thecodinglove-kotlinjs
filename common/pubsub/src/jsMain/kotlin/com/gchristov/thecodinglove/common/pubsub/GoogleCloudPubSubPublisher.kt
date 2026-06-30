@@ -1,9 +1,9 @@
 package com.gchristov.thecodinglove.common.pubsub
 
-import arrow.core.Either
 import com.gchristov.thecodinglove.common.kotlin.Buffer
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.kotlin.process
+import com.gchristov.thecodinglove.common.kotlin.safeJsCall
 import kotlinx.coroutines.await
 import kotlinx.serialization.SerializationStrategy
 
@@ -19,18 +19,9 @@ internal class GoogleCloudPubSubPublisher(
         topic: String,
         body: T,
         jsonSerializer: JsonSerializer,
-        strategy: SerializationStrategy<T>
-    ): Either<Throwable, String> = try {
+        strategy: SerializationStrategy<T>,
+    ) = safeJsCall("Error publishing PubSub JSON") {
         val jsonString = jsonSerializer.json.encodeToString(strategy, body)
-        val result = pubSub
-            .topic(topic)
-            .publish(Buffer.from(jsonString))
-            .await()
-        Either.Right(result)
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error publishing PubSub JSON${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+        pubSub.topic(topic).publish(Buffer.from(jsonString)).await()
     }
 }

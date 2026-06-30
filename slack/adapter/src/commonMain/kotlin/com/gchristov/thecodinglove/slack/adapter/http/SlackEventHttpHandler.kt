@@ -53,7 +53,7 @@ class SlackEventHttpHandler(
         }
     }
 
-    private fun SlackEvent.UrlVerification.handle(response: HttpResponse) = response.sendText(text = challenge)
+    private suspend fun SlackEvent.UrlVerification.handle(response: HttpResponse) = response.sendText(text = challenge)
 
     private suspend fun SlackEvent.Callback.handle(response: HttpResponse) =
         when (val typedEvent = event) {

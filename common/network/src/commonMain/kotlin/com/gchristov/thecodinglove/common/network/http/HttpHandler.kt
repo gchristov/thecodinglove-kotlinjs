@@ -26,7 +26,7 @@ interface HttpHandler : Handler {
 
     override suspend fun initialise(): Either<Throwable, Unit> = Either.Right(Unit)
 
-    fun handleError(
+    suspend fun handleError(
         error: Throwable,
         response: HttpResponse,
     ): Either<Throwable, Unit> = response.sendJson(

@@ -1,8 +1,8 @@
 package com.gchristov.thecodinglove.common.firebase.firestore
 
-import arrow.core.Either
 import com.gchristov.thecodinglove.common.firebase.GoogleFirebaseAdminExternals
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.kotlin.safeJsCall
 import kotlinx.coroutines.await
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
@@ -12,14 +12,8 @@ import kotlin.js.json
 internal class GoogleFirestoreDocumentReference(
     private val js: GoogleFirebaseAdminExternals.firestore.DocumentReference
 ) : FirestoreDocumentReference {
-    override suspend fun get(): Either<Throwable, FirestoreDocumentSnapshot> = try {
-        val result = js.get().await()
-        Either.Right(GoogleFirestoreDocumentSnapshot(result))
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error getting Firestore document${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+    override suspend fun get() = safeJsCall("Error getting Firestore document") {
+        GoogleFirestoreDocumentSnapshot(js.get().await())
     }
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -28,24 +22,14 @@ internal class GoogleFirestoreDocumentReference(
         strategy: SerializationStrategy<T>,
         data: T,
         merge: Boolean,
-    ): Either<Throwable, Unit> = try {
+    ) = safeJsCall("Error setting Firestore document") {
         js.set(jsonSerializer.json.encodeToDynamic(strategy, data), json("merge" to merge)).await()
-        Either.Right(Unit)
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error setting Firestore document${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+        Unit
     }
 
-    override suspend fun delete(): Either<Throwable, Unit> = try {
+    override suspend fun delete() = safeJsCall("Error deleting Firestore document") {
         js.delete().await()
-        Either.Right(Unit)
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error deleting Firestore document${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+        Unit
     }
 }
 

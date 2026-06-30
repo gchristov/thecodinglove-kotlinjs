@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.common.firebase.firestore
 
-import arrow.core.Either
 import com.gchristov.thecodinglove.common.firebase.GoogleFirebaseAdminExternals
+import com.gchristov.thecodinglove.common.kotlin.safeJsCall
 import kotlinx.coroutines.await
 
 internal class GoogleFirestoreCollectionReference(
@@ -13,14 +13,8 @@ internal class GoogleFirestoreCollectionReference(
 internal open class GoogleFirestoreCollectionQuery(
     private val js: GoogleFirebaseAdminExternals.firestore.Query
 ) : FirestoreCollectionQuery {
-    override suspend fun get(): Either<Throwable, FirestoreCollectionQuerySnapshot> = try {
-        val result = js.get().await()
-        Either.Right(GoogleFirestoreCollectionQuerySnapshot(result))
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error getting Firestore collection query${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+    override suspend fun get() = safeJsCall("Error getting Firestore collection query") {
+        GoogleFirestoreCollectionQuerySnapshot(js.get().await())
     }
 
     override fun where(

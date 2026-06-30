@@ -1,7 +1,9 @@
 package com.gchristov.thecodinglove.slack.adapter.pubsub
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.common.analyticstestfixtures.FakeAnalytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.networktestfixtures.FakeHttpResponse
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubDecoder
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
@@ -54,10 +56,33 @@ class SlackInteractivityPubSubHandlerTest {
         assertTrue { result.isRight() }
     }
 
+    @Test
+    fun handleErrorSwallows(): TestResult = runBlockingTest(
+        sendResult = Either.Left(Throwable("send failed"))
+    ) { handler, _, _ ->
+        val result = handler.handle(interactivityMessage(action = SlackActionName.SEND))
+        assertTrue { result.isRight() }
+    }
+
+    @Test
+    fun handleParseErrorSendsEmpty(): TestResult = runBlockingTest { handler, _, _ ->
+        val response = FakeHttpResponse()
+        val result = handler.handleError(Throwable("parse error"), response)
+        assertTrue { result.isRight() }
+        response.assertEquals(
+            header = "Content-Type",
+            headerValue = ContentType.Application.Json.toString(),
+            data = "",
+            status = 200,
+            filePath = null,
+        )
+    }
+
     private fun runBlockingTest(
+        sendResult: Either<Throwable, Unit> = Either.Right(Unit),
         testBlock: suspend (SlackInteractivityPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase) -> Unit,
     ): TestResult = runTest {
-        val sendUseCase = FakeSlackSendSearchUseCase()
+        val sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)
         val shuffleUseCase = FakeSlackShuffleSearchUseCase()
         val cancelUseCase = FakeSlackCancelSearchUseCase()
         val analytics = FakeAnalytics()

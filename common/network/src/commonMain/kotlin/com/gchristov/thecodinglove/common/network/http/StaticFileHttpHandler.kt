@@ -5,10 +5,13 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class StaticFileHttpHandler(private val path: String) : HttpHandler {
-    // File serving is synchronous — handleHttpRequest is fully overridden and the coroutine
-    // infrastructure (dispatcher, log, jsonSerializer, handleHttpRequestAsync) is never used.
+    // File serving bypasses the handler coroutine infrastructure — log, jsonSerializer,
+    // and handleHttpRequestAsync are never invoked.
     override val dispatcher: CoroutineDispatcher get() = error("not used")
     override val log: Logger get() = error("not used")
     override val jsonSerializer: JsonSerializer get() = error("not used")
@@ -23,7 +26,9 @@ class StaticFileHttpHandler(private val path: String) : HttpHandler {
         request: HttpRequest,
         response: HttpResponse,
     ) {
-        response.sendFile(localPath = path)
+        CoroutineScope(Dispatchers.Default).launch {
+            response.sendFile(localPath = path)
+        }
     }
 
     override suspend fun handleHttpRequestAsync(
