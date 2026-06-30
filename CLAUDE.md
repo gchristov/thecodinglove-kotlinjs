@@ -52,20 +52,78 @@ Each microservice follows hexagonal architecture:
 
 ## DI framework
 
-Kodein. Every module extends `DiModule()`:
+kotlin-inject (compile-time, KSP-generated). Each layer gets a `@Component` interface with `@Provides` factory methods. The root service component is an `abstract class` annotated with `@Singleton @Component` that extends all the layer components.
+
+**`@Singleton` is user-defined** — there is no built-in annotation. The project defines it in `common/kotlin`:
 
 ```kotlin
-object CommonSlackModule : DiModule() {
-    override fun name() = "common-slack"
-    override fun bindDependencies(builder: DI.Builder) {
-        builder.apply {
-            bindSingleton { provideSlackSender(networkClient = instance()) }
-        }
-    }
+// common/kotlin/.../di/Scopes.kt
+@Scope
+@Target(CLASS, FUNCTION, PROPERTY_GETTER)
+annotation class Singleton
+```
+
+**Layer components** — one interface per layer (`domain/`, `adapter/`), `@Provides` methods return the public interface type and construct the `internal` implementation inline:
+
+```kotlin
+// common/slack/.../CommonSlackComponent.kt
+@Component
+interface CommonSlackComponent {
+    @Provides @Singleton
+    fun provideSlackSender(networkClient: NetworkClient.Json): SlackSender =
+        SlackSender(client = networkClient)
 }
 ```
 
-Services wire modules in `*Service.kt`. Order matters — provide dependencies before consumers.
+**Service component** — `abstract class` in `service/`, takes `Environment` as a constructor parameter exposed via `@get:Provides`, extends all layer components, and declares abstract vals for every type the service entry point needs:
+
+```kotlin
+@Singleton
+@Component
+abstract class SlackComponent(
+    @get:Provides val environment: Environment,
+) : CommonKotlinComponent,
+    CommonNetworkComponent,
+    CommonSlackComponent,
+    SlackDomainComponent,
+    SlackAdapterComponent {
+
+    abstract val httpService: HttpService
+    abstract val log: Logger
+    // ... one abstract val per injected type
+}
+```
+
+**Service entry point** — KSP generates a `KClass<T>.create(...)` extension; call it with the constructor arguments:
+
+```kotlin
+val component = SlackComponent::class.create(environment)
+```
+
+**`expect/actual` providers** — for platform-specific bindings (e.g. `HttpService`, `PubSubPublisher`, `FirebaseAdmin`), the `expect fun` lives in a `*Providers.kt` file in `commonMain`. The `@Provides` method in the component calls it under a different name to avoid a conflict:
+
+```kotlin
+// CommonNetworkProviders.kt (commonMain)
+expect fun provideHttpService(log: Logger): HttpService
+
+// CommonNetworkComponent.kt
+@Provides
+fun httpService(log: Logger): HttpService = provideHttpService(log)
+```
+
+**`internal` types** — construct them inline inside the `@Provides` method that lives in the same module; don't expose them as graph nodes.
+
+**KSP setup** — applied only in service modules (not domain or adapter):
+
+```kotlin
+// service/build.gradle.kts
+apply(plugin = "com.google.devtools.ksp")
+dependencies { add("kspJs", libs.kotlin.inject.compiler) }
+```
+
+`kotlin-inject-runtime` is declared as `api()` in `common/kotlin` and is therefore available transitively to all modules — do not add it to individual domain/adapter/service build files.
+
+**Visibility** — `@Component` interfaces and the root `@Component abstract class` are public (they are effectively the DI module boundary). All implementation types remain `internal`.
 
 ## HTTP handlers
 
@@ -115,7 +173,7 @@ Arrow `Either<Throwable, T>` throughout. Use `either { }` DSL and `.bind()`.
 ## Visibility conventions
 
 - `internal` for all implementation types (adapters, mappers, API models, DB models)
-- Public only for domain interfaces, domain models, and DI modules
+- Public only for domain interfaces, domain models, and `@Component` interfaces
 
 ## Build commands
 

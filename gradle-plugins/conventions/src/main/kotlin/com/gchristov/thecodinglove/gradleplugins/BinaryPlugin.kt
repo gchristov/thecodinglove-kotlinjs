@@ -8,11 +8,13 @@ class NodeBinaryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
             plugins.apply(libs.findPlugin("thecodinglove-node-module").get().get().pluginId)
+            plugins.apply("com.google.devtools.ksp")
             extensions.configure(KotlinMultiplatformExtension::class.java) {
                 js {
                     binaries.library()
                 }
             }
+            dependencies.add("kspJs", libs.findLibrary("kotlin-inject-compiler").get())
             // Copy the output binaries to their final destination
             tasks.named("assemble") {
                 doLast {

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.thecodinglove.node.binary)
 }
 
+
 kotlin {
     sourceSets {
         val commonMain by getting {
@@ -17,3 +18,4 @@ kotlin {
         }
     }
 }
+

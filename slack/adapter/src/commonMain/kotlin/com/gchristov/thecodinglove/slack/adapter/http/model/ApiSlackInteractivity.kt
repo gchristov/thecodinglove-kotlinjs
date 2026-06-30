@@ -1,8 +1,6 @@
 package com.gchristov.thecodinglove.slack.adapter.http.model
 
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
-import com.gchristov.thecodinglove.common.kotlin.di.DiGraph
-import com.gchristov.thecodinglove.common.kotlin.di.inject
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -58,7 +56,7 @@ internal data class ApiSlackInteractivity(
 // Payload is encoded as application/x-www-form-urlencoded
 // https://api.slack.com/legacy/message-buttons
 private object PayloadSerializer : KSerializer<ApiSlackInteractivity.ApiSlackInteractivityPayload> {
-    private val jsonSerializer = DiGraph.inject<JsonSerializer.ExplicitNulls>()
+    private val jsonSerializer = JsonSerializer.ExplicitNulls
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
         serialName = "ApiSlackInteractivity.ApiSlackInteractivityPayload",
         kind = PrimitiveKind.STRING

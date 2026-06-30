@@ -9,7 +9,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(libs.kodein)
+                api(libs.kotlin.inject.runtime)
                 api(libs.touchlab.kermit)
                 api(libs.kotlinx.coroutines.core)
                 api(libs.kotlinx.datetime)

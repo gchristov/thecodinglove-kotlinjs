@@ -3,31 +3,18 @@ package com.gchristov.thecodinglove.slackweb.adapter
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
-import com.gchristov.thecodinglove.common.kotlin.di.DiModule
+import com.gchristov.thecodinglove.common.kotlin.di.Singleton
 import com.gchristov.thecodinglove.slackweb.adapter.http.SlackAuthRedirectHttpHandler
 import com.gchristov.thecodinglove.slackweb.domain.model.SlackConfig
 import kotlinx.coroutines.Dispatchers
-import org.kodein.di.DI
-import org.kodein.di.bindSingleton
-import org.kodein.di.instance
+import me.tatarka.inject.annotations.Component
+import me.tatarka.inject.annotations.Provides
 
-object SlackWebAdapterModule : DiModule() {
-    override fun name() = "slack-web-adapter"
-
-    override fun bindDependencies(builder: DI.Builder) {
-        builder.apply {
-            bindSingleton {
-                provideSlackAuthRedirectHttpHandler(
-                    jsonSerializer = instance(),
-                    log = instance(),
-                    slackConfig = instance(),
-                    analytics = instance(),
-                )
-            }
-        }
-    }
-
-    private fun provideSlackAuthRedirectHttpHandler(
+@Component
+interface SlackWebAdapterComponent {
+    @Provides
+    @Singleton
+    fun provideSlackAuthRedirectHttpHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackConfig: SlackConfig,

@@ -35,4 +35,5 @@ dependencies {
     // classpath so kotlin-dsl's embedded Kotlin 1.9.x compiler doesn't reject 2.x-compiled JARs.
     runtimeOnly(libs.kotlin.serialization.gradlePlugin)
     runtimeOnly(libs.buildKonfig.gradlePlugin)
+    runtimeOnly(libs.ksp.gradlePlugin)
 }
