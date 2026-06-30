@@ -11,13 +11,15 @@ import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackRepository
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSearchRepository
 import com.gchristov.thecodinglove.slack.testfixtures.SlackAuthTokenCreator
 import com.gchristov.thecodinglove.slack.testfixtures.SlackSearchSessionPostCreator
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalTime::class)
 class RealSlackSendSearchUseCaseTest {
     @Test
     fun sendWithNoAuthTokenPostsAuthMessage(): TestResult = runBlockingTest(
@@ -138,6 +140,7 @@ private val TestSlackConfig = SlackConfig(
     interactivityReceivedPubSubTopic = "interactivity_topic",
     slashCommandReceivedPubSubTopic = "slash_topic",
 )
+@OptIn(ExperimentalTime::class)
 private val TestClock = object : Clock {
     override fun now(): Instant = Instant.fromEpochMilliseconds(1000L)
 }

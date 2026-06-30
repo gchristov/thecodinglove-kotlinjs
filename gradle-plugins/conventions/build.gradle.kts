@@ -31,7 +31,8 @@ gradlePlugin {
 
 dependencies {
     compileOnly(libs.kotlin.gradlePlugin)
-    // Allows these to be available and applied in the pre-compiled conventions plugin
-    implementation(libs.kotlin.serialization.gradlePlugin)
-    implementation(libs.buildKonfig.gradlePlugin)
+    // runtimeOnly: applied by plugin ID only (no class imports), keeping them off the compile
+    // classpath so kotlin-dsl's embedded Kotlin 1.9.x compiler doesn't reject 2.x-compiled JARs.
+    runtimeOnly(libs.kotlin.serialization.gradlePlugin)
+    runtimeOnly(libs.buildKonfig.gradlePlugin)
 }

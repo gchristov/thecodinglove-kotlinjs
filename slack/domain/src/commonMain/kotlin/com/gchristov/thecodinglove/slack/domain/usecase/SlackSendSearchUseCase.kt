@@ -10,9 +10,10 @@ import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.plus
 
@@ -29,6 +30,7 @@ interface SlackSendSearchUseCase {
     )
 }
 
+@OptIn(ExperimentalTime::class)
 internal class RealSlackSendSearchUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,

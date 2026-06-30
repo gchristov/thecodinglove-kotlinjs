@@ -20,7 +20,7 @@ class BaseNodePlugin : BaseMultiplatformPlugin() {
         super.apply(target)
         target.run {
             extensions.configure(KotlinMultiplatformExtension::class.java) {
-                js(IR) {
+                js {
                     nodejs {
                         distribution {
                             outputDirectory = file("${binaryRootDirectory()}/productionExecutable")
@@ -38,7 +38,7 @@ class BaseBrowserPlugin : BaseMultiplatformPlugin() {
         super.apply(target)
         target.run {
             extensions.configure(KotlinMultiplatformExtension::class.java) {
-                js(IR) {
+                js {
                     browser {
                         commonWebpackConfig {
                             cssSupport {

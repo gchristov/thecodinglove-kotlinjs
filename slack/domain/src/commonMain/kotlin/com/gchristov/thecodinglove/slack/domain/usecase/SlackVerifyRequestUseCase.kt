@@ -7,11 +7,12 @@ import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import diglol.crypto.Hmac
 import diglol.encoding.encodeHexToString
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.Instant
 import kotlinx.datetime.plus
 
 interface SlackVerifyRequestUseCase {
@@ -40,6 +41,7 @@ interface SlackVerifyRequestUseCase {
     )
 }
 
+@OptIn(ExperimentalTime::class)
 internal class RealSlackVerifyRequestUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val slackConfig: SlackConfig,

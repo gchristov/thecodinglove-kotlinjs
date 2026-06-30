@@ -6,13 +6,15 @@ import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.usecase.RealSlackVerifyRequestUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackVerifyRequestUseCase
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalTime::class)
 class RealVerifySlackRequestUseCaseTest {
     @Test
     fun verifyWithTooOldTimestampReturnsError(): TestResult {
@@ -106,6 +108,7 @@ private const val TestSigningSecret = "12345678901234567890"
 private const val TestTimestampValidityInMinutes = 5
 private const val TestClientId = "client_1"
 private const val TestClientSecret = "client_secret_1"
+@OptIn(ExperimentalTime::class)
 private val TestClock = object : Clock {
     override fun now(): Instant = Instant.fromEpochMilliseconds(1675611196847)
 }
