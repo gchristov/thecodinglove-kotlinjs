@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.domain
 
 import co.touchlab.kermit.Logger
-import com.gchristov.thecodinglove.common.kotlin.di.DiModule
+import com.gchristov.thecodinglove.common.kotlin.di.Singleton
 import com.gchristov.thecodinglove.slack.domain.model.Environment
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
@@ -11,81 +11,14 @@ import com.gchristov.thecodinglove.slack.domain.usecase.*
 import kotlinx.coroutines.Dispatchers
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import org.kodein.di.DI
-import org.kodein.di.bindProvider
-import org.kodein.di.bindSingleton
-import org.kodein.di.instance
+import me.tatarka.inject.annotations.Component
+import me.tatarka.inject.annotations.Provides
 
-@OptIn(ExperimentalTime::class)
-object SlackDomainModule : DiModule() {
-    override fun name() = "slack-domain"
-
-    override fun bindDependencies(builder: DI.Builder) {
-        builder.apply {
-            bindSingleton { provideSlackConfig(environment = instance()) }
-            bindProvider {
-                provideSlackMessageFactory(slackAuthStateSerializer = instance())
-            }
-            bindProvider {
-                provideSlackAuthUseCase(
-                    slackConfig = instance(),
-                    log = instance(),
-                    slackRepository = instance(),
-                )
-            }
-            bindProvider {
-                provideSlackRevokeTokensUseCase(
-                    log = instance(),
-                    slackRepository = instance(),
-                )
-            }
-            bindProvider {
-                provideSelfDestructUseCase(
-                    log = instance(),
-                    slackRepository = instance(),
-                )
-            }
-            bindProvider {
-                provideSlackVerifyRequestUseCase(
-                    slackConfig = instance(),
-                    log = instance()
-                )
-            }
-            bindProvider {
-                provideSlackCancelSearchUseCase(
-                    log = instance(),
-                    slackSearchRepository = instance(),
-                    slackRepository = instance(),
-                    slackMessageFactory = instance(),
-                )
-            }
-            bindProvider {
-                provideSlackSendSearchUseCase(
-                    log = instance(),
-                    slackSearchRepository = instance(),
-                    slackRepository = instance(),
-                    slackConfig = instance(),
-                    slackMessageFactory = instance(),
-                )
-            }
-            bindProvider {
-                provideSlackShuffleSearchUseCase(
-                    log = instance(),
-                    slackSearchRepository = instance(),
-                    slackRepository = instance(),
-                    slackMessageFactory = instance(),
-                )
-            }
-            bindProvider {
-                provideStatisticsUseCase(
-                    log = instance(),
-                    slackRepository = instance(),
-                )
-            }
-        }
-    }
-
-    private fun provideSlackConfig(environment: Environment): SlackConfig = SlackConfig(
+@Component
+interface SlackDomainComponent {
+    @Provides
+    @Singleton
+    fun provideSlackConfig(environment: Environment): SlackConfig = SlackConfig(
         signingSecret = BuildConfig.SLACK_SIGNING_SECRET,
         timestampValidityMinutes = 5,
         requestVerificationEnabled = environment.slackRequestVerification,
@@ -95,10 +28,15 @@ object SlackDomainModule : DiModule() {
         slashCommandReceivedPubSubTopic = environment.slackSlashCommandReceivedPubSubTopic,
     )
 
-    private fun provideSlackMessageFactory(slackAuthStateSerializer: SlackAuthStateSerializer): SlackMessageFactory =
-        RealSlackMessageFactory(slackAuthStateSerializer = slackAuthStateSerializer)
+    @Provides
+    fun provideSlackMessageFactory(
+        slackAuthStateSerializer: SlackAuthStateSerializer,
+    ): SlackMessageFactory = RealSlackMessageFactory(
+        slackAuthStateSerializer = slackAuthStateSerializer,
+    )
 
-    private fun provideSlackAuthUseCase(
+    @Provides
+    fun provideSlackAuthUseCase(
         slackConfig: SlackConfig,
         log: Logger,
         slackRepository: SlackRepository,
@@ -109,7 +47,8 @@ object SlackDomainModule : DiModule() {
         slackRepository = slackRepository,
     )
 
-    private fun provideSlackRevokeTokensUseCase(
+    @Provides
+    fun provideSlackRevokeTokensUseCase(
         log: Logger,
         slackRepository: SlackRepository,
     ): SlackRevokeTokensUseCase = RealSlackRevokeTokensUseCase(
@@ -118,7 +57,9 @@ object SlackDomainModule : DiModule() {
         slackRepository = slackRepository,
     )
 
-    private fun provideSelfDestructUseCase(
+    @OptIn(ExperimentalTime::class)
+    @Provides
+    fun provideSelfDestructUseCase(
         log: Logger,
         slackRepository: SlackRepository,
     ): SlackSelfDestructUseCase = RealSlackSelfDestructUseCase(
@@ -128,7 +69,9 @@ object SlackDomainModule : DiModule() {
         clock = Clock.System,
     )
 
-    private fun provideSlackVerifyRequestUseCase(
+    @OptIn(ExperimentalTime::class)
+    @Provides
+    fun provideSlackVerifyRequestUseCase(
         slackConfig: SlackConfig,
         log: Logger,
     ): SlackVerifyRequestUseCase = RealSlackVerifyRequestUseCase(
@@ -138,7 +81,8 @@ object SlackDomainModule : DiModule() {
         log = log,
     )
 
-    private fun provideSlackCancelSearchUseCase(
+    @Provides
+    fun provideSlackCancelSearchUseCase(
         log: Logger,
         slackSearchRepository: SlackSearchRepository,
         slackRepository: SlackRepository,
@@ -151,7 +95,9 @@ object SlackDomainModule : DiModule() {
         slackMessageFactory = slackMessageFactory,
     )
 
-    private fun provideSlackSendSearchUseCase(
+    @OptIn(ExperimentalTime::class)
+    @Provides
+    fun provideSlackSendSearchUseCase(
         log: Logger,
         slackSearchRepository: SlackSearchRepository,
         slackRepository: SlackRepository,
@@ -167,7 +113,8 @@ object SlackDomainModule : DiModule() {
         clock = Clock.System,
     )
 
-    private fun provideSlackShuffleSearchUseCase(
+    @Provides
+    fun provideSlackShuffleSearchUseCase(
         log: Logger,
         slackSearchRepository: SlackSearchRepository,
         slackRepository: SlackRepository,
@@ -180,7 +127,8 @@ object SlackDomainModule : DiModule() {
         slackMessageFactory = slackMessageFactory,
     )
 
-    private fun provideStatisticsUseCase(
+    @Provides
+    fun provideSlackStatisticsUseCase(
         log: Logger,
         slackRepository: SlackRepository,
     ): SlackStatisticsUseCase = RealSlackStatisticsUseCase(

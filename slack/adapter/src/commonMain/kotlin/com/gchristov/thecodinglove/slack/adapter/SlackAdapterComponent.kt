@@ -4,18 +4,13 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
-import com.gchristov.thecodinglove.common.kotlin.di.DiModule
+import com.gchristov.thecodinglove.common.kotlin.di.Singleton
 import com.gchristov.thecodinglove.common.network.NetworkClient
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.common.slack.SlackSender
 import com.gchristov.thecodinglove.slack.adapter.http.*
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackCancelSearchInteractivityPubSubHandler
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSearchPubSubHandler
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSelfDestructInteractivityPubSubHandler
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSendInteractivityPubSubHandler
-import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackShuffleInteractivityPubSubHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.*
 import com.gchristov.thecodinglove.slack.adapter.search.RealSlackSearchRepository
 import com.gchristov.thecodinglove.slack.adapter.search.SlackSearchServiceApi
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
@@ -26,112 +21,14 @@ import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import com.gchristov.thecodinglove.slack.domain.usecase.*
 import kotlinx.coroutines.Dispatchers
-import org.kodein.di.DI
-import org.kodein.di.bindProvider
-import org.kodein.di.bindSingleton
-import org.kodein.di.instance
+import me.tatarka.inject.annotations.Component
+import me.tatarka.inject.annotations.Provides
 
-object SlackAdapterModule : DiModule() {
-    override fun name() = "slack-adapter"
-
-    override fun bindDependencies(builder: DI.Builder) {
-        builder.apply {
-            bindSingleton {
-                provideSlackRepository(
-                    slackSender = instance(),
-                    firebaseAdmin = instance(),
-                    jsonSerializer = instance(),
-                )
-            }
-            bindProvider {
-                provideSlackAuthStateSerializer(jsonSerializer = instance())
-            }
-            bindSingleton {
-                provideSlackSearchServiceApi(
-                    networkClient = instance(),
-                    environment = instance(),
-                )
-            }
-            bindSingleton {
-                provideSlackSearchRepository(slackSearchServiceApi = instance())
-            }
-            bindSingleton {
-                provideSlackEventHttpHandler(
-                    jsonSerializer = instance(),
-                    log = instance(),
-                    slackVerifyRequestUseCase = instance(),
-                    slackConfig = instance(),
-                    slackRevokeTokensUseCase = instance(),
-                    analytics = instance(),
-                )
-            }
-            bindSingleton {
-                provideSlackAuthHttpHandler(
-                    jsonSerializer = instance(),
-                    log = instance(),
-                    slackAuthUseCase = instance(),
-                    slackSendSearchUseCase = instance(),
-                    analytics = instance(),
-                )
-            }
-            bindSingleton {
-                provideSlackSlashCommandHttpHandler(
-                    jsonSerializer = instance(),
-                    log = instance(),
-                    slackVerifyRequestUseCase = instance(),
-                    slackConfig = instance(),
-                    pubSubPublisher = instance(),
-                )
-            }
-            bindSingleton {
-                provideSlackSearchPubSubHandler(
-                    jsonSerializer = instance(),
-                    log = instance(),
-                    slackRepository = instance(),
-                    slackMessageFactory = instance(),
-                    searchRepository = instance(),
-                    pubSubDecoder = instance(),
-                    analytics = instance(),
-                )
-            }
-            bindSingleton {
-                provideSlackInteractivityHttpHandler(
-                    jsonSerializer = instance(),
-                    log = instance(),
-                    slackVerifyRequestUseCase = instance(),
-                    slackConfig = instance(),
-                    pubSubPublisher = instance(),
-                )
-            }
-            bindSingleton {
-                provideSlackInteractivityPubSubHandler(
-                    jsonSerializer = instance(),
-                    log = instance(),
-                    slackSendSearchUseCase = instance(),
-                    slackShuffleSearchUseCase = instance(),
-                    slackCancelSearchUseCase = instance(),
-                    pubSubDecoder = instance(),
-                    analytics = instance(),
-                )
-            }
-            bindSingleton {
-                provideSlackSelfDestructHttpHandler(
-                    jsonSerializer = instance(),
-                    log = instance(),
-                    selfDestructUseCase = instance(),
-                )
-            }
-            bindSingleton {
-                provideSlackStatisticsHttpHandler(
-                    jsonSerializer = instance(),
-                    log = instance(),
-                    statisticsUseCase = instance(),
-                )
-            }
-        }
-    }
-
-    private fun provideSlackRepository(
+@Component
+interface SlackAdapterComponent {
+    @Provides
+    @Singleton
+    fun provideSlackRepository(
         slackSender: SlackSender,
         firebaseAdmin: FirebaseAdmin,
         jsonSerializer: JsonSerializer.ExplicitNulls,
@@ -141,21 +38,28 @@ object SlackAdapterModule : DiModule() {
         jsonSerializer = jsonSerializer,
     )
 
-    private fun provideSlackAuthStateSerializer(jsonSerializer: JsonSerializer.Default): SlackAuthStateSerializer =
-        RealSlackAuthStateSerializer(jsonSerializer = jsonSerializer)
-
-    private fun provideSlackSearchServiceApi(
-        networkClient: NetworkClient.Json,
-        environment: Environment,
-    ): SlackSearchServiceApi = SlackSearchServiceApi(
-        client = networkClient,
-        environment = environment,
+    @Provides
+    fun provideSlackAuthStateSerializer(
+        jsonSerializer: JsonSerializer.Default,
+    ): SlackAuthStateSerializer = RealSlackAuthStateSerializer(
+        jsonSerializer = jsonSerializer,
     )
 
-    private fun provideSlackSearchRepository(slackSearchServiceApi: SlackSearchServiceApi): SlackSearchRepository =
-        RealSlackSearchRepository(slackSearchServiceApi = slackSearchServiceApi)
+    @Provides
+    @Singleton
+    fun provideSlackSearchRepository(
+        networkClient: NetworkClient.Json,
+        environment: Environment,
+    ): SlackSearchRepository = RealSlackSearchRepository(
+        slackSearchServiceApi = SlackSearchServiceApi(
+            client = networkClient,
+            environment = environment,
+        ),
+    )
 
-    private fun provideSlackEventHttpHandler(
+    @Provides
+    @Singleton
+    fun provideSlackEventHttpHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
@@ -172,7 +76,9 @@ object SlackAdapterModule : DiModule() {
         analytics = analytics,
     )
 
-    private fun provideSlackAuthHttpHandler(
+    @Provides
+    @Singleton
+    fun provideSlackAuthHttpHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackAuthUseCase: SlackAuthUseCase,
@@ -187,7 +93,9 @@ object SlackAdapterModule : DiModule() {
         analytics = analytics,
     )
 
-    private fun provideSlackSlashCommandHttpHandler(
+    @Provides
+    @Singleton
+    fun provideSlackSlashCommandHttpHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
@@ -202,12 +110,14 @@ object SlackAdapterModule : DiModule() {
         pubSubPublisher = pubSubPublisher,
     )
 
-    private fun provideSlackSearchPubSubHandler(
+    @Provides
+    @Singleton
+    fun provideSlackSearchPubSubHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackRepository: SlackRepository,
         slackMessageFactory: SlackMessageFactory,
-        searchRepository: SlackSearchRepository,
+        slackSearchRepository: SlackSearchRepository,
         pubSubDecoder: PubSubDecoder,
         analytics: Analytics,
     ): SlackSearchPubSubHandler = SlackSearchPubSubHandler(
@@ -217,11 +127,13 @@ object SlackAdapterModule : DiModule() {
         pubSubDecoder = pubSubDecoder,
         slackRepository = slackRepository,
         slackMessageFactory = slackMessageFactory,
-        slackSearchRepository = searchRepository,
+        slackSearchRepository = slackSearchRepository,
         analytics = analytics,
     )
 
-    private fun provideSlackInteractivityHttpHandler(
+    @Provides
+    @Singleton
+    fun provideSlackInteractivityHttpHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackVerifyRequestUseCase: SlackVerifyRequestUseCase,
@@ -236,7 +148,9 @@ object SlackAdapterModule : DiModule() {
         pubSubPublisher = pubSubPublisher,
     )
 
-    private fun provideSlackInteractivityPubSubHandler(
+    @Provides
+    @Singleton
+    fun provideSlackInteractivityPubSubHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         slackSendSearchUseCase: SlackSendSearchUseCase,
@@ -257,7 +171,9 @@ object SlackAdapterModule : DiModule() {
         pubSubDecoder = pubSubDecoder,
     )
 
-    private fun provideSlackSelfDestructHttpHandler(
+    @Provides
+    @Singleton
+    fun provideSlackSelfDestructHttpHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         selfDestructUseCase: SlackSelfDestructUseCase,
@@ -268,7 +184,9 @@ object SlackAdapterModule : DiModule() {
         selfDestructUseCase = selfDestructUseCase,
     )
 
-    private fun provideSlackStatisticsHttpHandler(
+    @Provides
+    @Singleton
+    fun provideSlackStatisticsHttpHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
         statisticsUseCase: SlackStatisticsUseCase,

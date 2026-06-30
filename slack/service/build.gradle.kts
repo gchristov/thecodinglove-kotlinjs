@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.thecodinglove.node.binary)
 }
 
+apply(plugin = "com.google.devtools.ksp")
+
 kotlin {
     sourceSets {
         val commonMain by getting {
@@ -15,7 +17,12 @@ kotlin {
                 implementation(libs.common.firebase)
                 implementation(projects.domain)
                 implementation(projects.adapter)
+                implementation(libs.kotlin.inject.runtime)
             }
         }
     }
+}
+
+dependencies {
+    add("kspJs", libs.kotlin.inject.compiler)
 }
