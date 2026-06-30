@@ -1,9 +1,11 @@
 package com.gchristov.thecodinglove.search.adapter
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.raise.either
 import com.gchristov.thecodinglove.common.firebase.FirebaseAdmin
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.network.safeApiCall
 import com.gchristov.thecodinglove.search.adapter.db.DbSearchSession
 import com.gchristov.thecodinglove.search.adapter.db.mapper.toSearchSession
 import com.gchristov.thecodinglove.search.adapter.htmlparser.mapper.toPost
@@ -22,34 +24,26 @@ internal class RealSearchRepository(
     private val firebaseAdmin: FirebaseAdmin,
     private val jsonSerializer: JsonSerializer,
 ) : SearchRepository {
-    override suspend fun getTotalPosts(query: String): Either<Throwable, Int> = try {
+    override suspend fun getTotalPosts(query: String) = safeApiCall("Error during finding total posts") {
         val responseHtml = theCodingLoveApi.search(
             // First page should always exist if there are results
             page = 1,
-            query = query
+            query = query,
         ).bodyAsText()
-        parseHtmlTotalPostsUseCase(ParseHtmlTotalPostsUseCase.Dto(responseHtml))
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during finding total posts${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+        parseHtmlTotalPostsUseCase(ParseHtmlTotalPostsUseCase.Dto(responseHtml)).getOrElse { throw it }
     }
 
     override suspend fun search(
         page: Int,
-        query: String
-    ): Either<Throwable, List<SearchPost>> = try {
+        query: String,
+    ) = safeApiCall("Error during search") {
         val responseHtml = theCodingLoveApi.search(
             page = page,
-            query = query
+            query = query,
         ).bodyAsText()
-        parseHtmlPostsUseCase(ParseHtmlPostsUseCase.Dto(responseHtml)).map { posts -> posts.map { it.toPost() } }
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during search${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+        parseHtmlPostsUseCase(ParseHtmlPostsUseCase.Dto(responseHtml))
+            .map { posts -> posts.map { it.toPost() } }
+            .getOrElse { throw it }
     }
 
     override suspend fun getSearchSession(id: String): Either<Throwable, SearchSession> = either {

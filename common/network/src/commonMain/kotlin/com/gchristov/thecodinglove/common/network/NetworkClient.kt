@@ -28,6 +28,7 @@ sealed class NetworkClient {
 }
 
 private fun buildHttpClient(logLevel: LogLevel) = HttpClient {
+    expectSuccess = true
     install(Logging) {
         logger = Logger.SIMPLE
         level = logLevel
