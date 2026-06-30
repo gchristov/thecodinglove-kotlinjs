@@ -8,7 +8,6 @@ arrow = "2.1.2"
 uuid = "0.8.4"
 diglolCrypto = "0.2.0"
 diglolEncoding = "0.3.0"
-kodein = "7.26.1"
 kotlin-inject = "0.7.2"
 ksp = "2.2.0-2.0.2"
 touchlab-kermit = "2.0.6"
@@ -31,7 +30,6 @@ arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 diglol-crypto = { module = "com.diglol.crypto:mac", version.ref = "diglolCrypto" }
 diglol-encoding = { module = "com.diglol.encoding:encoding", version.ref = "diglolEncoding" }
-kodein = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
 kotlin-inject-runtime = { module = "me.tatarka.inject:kotlin-inject-runtime-kmp", version.ref = "kotlin-inject" }
 kotlin-inject-compiler = { module = "me.tatarka.inject:kotlin-inject-compiler-ksp", version.ref = "kotlin-inject" }
 touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "touchlab-kermit" }
