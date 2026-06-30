@@ -16,6 +16,7 @@ kotlin {
             dependencies {
                 implementation(projects.kotlin)
                 implementation(projects.network)
+                implementation(libs.kotlin.inject.runtime)
             }
         }
     }
