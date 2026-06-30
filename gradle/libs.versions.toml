@@ -72,4 +72,3 @@ thecodinglove-node-module = { id = "node-module-plugin", version = "unspecified"
 thecodinglove-build-config = { id = "build-config-plugin", version = "unspecified" }
 thecodinglove-browser-binary = { id = "browser-binary-plugin", version = "unspecified" }
 thecodinglove-node-binary = { id = "node-binary-plugin", version = "unspecified" }
-google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
