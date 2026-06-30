@@ -8,13 +8,15 @@ import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackRepository
 import com.gchristov.thecodinglove.slack.testfixtures.SlackAuthTokenCreator
 import com.gchristov.thecodinglove.slack.testfixtures.SlackSelfDestructMessageCreator
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalTime::class)
 class RealSlackSelfDestructUseCaseTest {
     @Test
     fun selfDestructWithNoMessagesSucceeds(): TestResult = runBlockingTest(
@@ -79,6 +81,7 @@ class RealSlackSelfDestructUseCaseTest {
     }
 }
 
+@OptIn(ExperimentalTime::class)
 private val TestClock = object : Clock {
     override fun now(): Instant = Instant.fromEpochMilliseconds(1000L)
 }

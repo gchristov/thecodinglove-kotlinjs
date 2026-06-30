@@ -1,4 +1,4 @@
-FROM node:16-slim AS npm
+FROM node:22-slim AS npm
 
 ARG PORT
 # Args get wiped on multistage builds so we persist them in the environment

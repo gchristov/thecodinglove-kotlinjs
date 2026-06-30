@@ -6,14 +6,16 @@ import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 
 interface SlackSelfDestructUseCase {
     suspend operator fun invoke() : Either<Throwable, Unit>
 }
 
+@OptIn(ExperimentalTime::class)
 internal class RealSlackSelfDestructUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val log: Logger,

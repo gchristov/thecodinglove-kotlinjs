@@ -9,7 +9,7 @@ class NodeBinaryPlugin : Plugin<Project> {
         target.run {
             plugins.apply(libs.findPlugin("thecodinglove-node-module").get().get().pluginId)
             extensions.configure(KotlinMultiplatformExtension::class.java) {
-                js(IR) {
+                js {
                     binaries.library()
                 }
             }
@@ -35,7 +35,7 @@ class BrowserBinaryPlugin : Plugin<Project> {
         target.run {
             plugins.apply(libs.findPlugin("thecodinglove-base-browser").get().get().pluginId)
             extensions.configure(KotlinMultiplatformExtension::class.java) {
-                js(IR) {
+                js {
                     binaries.executable()
                 }
             }
