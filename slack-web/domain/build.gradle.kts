@@ -12,6 +12,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(libs.common.kotlin)
+                implementation(libs.kotlin.inject.runtime)
             }
         }
     }

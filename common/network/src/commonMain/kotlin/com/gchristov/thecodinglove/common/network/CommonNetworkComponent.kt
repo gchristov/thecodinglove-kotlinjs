@@ -11,6 +11,10 @@ import me.tatarka.inject.annotations.Provides
 interface CommonNetworkComponent {
     @Provides
     @Singleton
+    fun provideHtmlNetworkClient(): NetworkClient.Html = NetworkClient.Html
+
+    @Provides
+    @Singleton
     fun provideJsonNetworkClient(jsonSerializer: JsonSerializer.Default): NetworkClient.Json =
         NetworkClient.Json(jsonSerializer)
 
