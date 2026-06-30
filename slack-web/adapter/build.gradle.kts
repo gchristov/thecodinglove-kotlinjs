@@ -10,7 +10,6 @@ kotlin {
                 implementation(libs.common.kotlin)
                 implementation(libs.common.network)
                 implementation(projects.domain)
-                implementation(libs.kotlin.inject.runtime)
             }
         }
         val commonTest by getting {

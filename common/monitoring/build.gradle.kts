@@ -16,7 +16,6 @@ kotlin {
             dependencies {
                 implementation(projects.kotlin)
                 implementation(projects.slack)
-                implementation(libs.kotlin.inject.runtime)
             }
         }
     }

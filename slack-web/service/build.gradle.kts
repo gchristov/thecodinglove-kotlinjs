@@ -15,7 +15,6 @@ kotlin {
                 implementation(libs.common.slack)
                 implementation(projects.domain)
                 implementation(projects.adapter)
-                implementation(libs.kotlin.inject.runtime)
             }
         }
     }

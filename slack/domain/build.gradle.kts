@@ -13,7 +13,6 @@ kotlin {
             dependencies {
                 implementation(libs.common.kotlin)
                 implementation(libs.common.slack)
-                implementation(libs.kotlin.inject.runtime)
             }
         }
         val commonTest by getting {

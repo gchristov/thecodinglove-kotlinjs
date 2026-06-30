@@ -17,7 +17,6 @@ kotlin {
                 implementation(libs.common.pubsub)
                 implementation(projects.domain)
                 implementation(projects.adapter)
-                implementation(libs.kotlin.inject.runtime)
             }
         }
     }

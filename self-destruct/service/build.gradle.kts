@@ -14,7 +14,6 @@ kotlin {
                 implementation(libs.common.network)
                 implementation(projects.adapter)
                 implementation(projects.domain)
-                implementation(libs.kotlin.inject.runtime)
             }
         }
     }

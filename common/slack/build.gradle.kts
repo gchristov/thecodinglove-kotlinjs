@@ -10,7 +10,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.kotlin)
-                implementation(libs.kotlin.inject.runtime)
                 implementation(projects.network)
             }
         }

@@ -13,7 +13,6 @@ kotlin {
                 implementation(libs.common.firebase)
                 implementation(libs.common.slack)
                 implementation(projects.domain)
-                implementation(libs.kotlin.inject.runtime)
             }
         }
         val commonTest by getting {

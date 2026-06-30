@@ -11,7 +11,6 @@ kotlin {
             dependencies {
                 implementation(projects.kotlin)
                 implementation(projects.network)
-                implementation(libs.kotlin.inject.runtime)
             }
         }
         val jsMain by getting {
