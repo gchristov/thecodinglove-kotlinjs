@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.thecodinglove.node.binary)
 }
 
-apply(plugin = "com.google.devtools.ksp")
 
 kotlin {
     sourceSets {
@@ -20,6 +19,3 @@ kotlin {
     }
 }
 
-dependencies {
-    add("kspJs", libs.kotlin.inject.compiler)
-}
