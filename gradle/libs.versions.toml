@@ -9,6 +9,8 @@ uuid = "0.8.4"
 diglolCrypto = "0.2.0"
 diglolEncoding = "0.3.0"
 kodein = "7.26.1"
+kotlin-inject = "0.7.2"
+ksp = "2.2.0-2.0.2"
 touchlab-kermit = "2.0.6"
 ktor = "3.2.0"
 logback = "1.4.11"
@@ -30,6 +32,8 @@ uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 diglol-crypto = { module = "com.diglol.crypto:mac", version.ref = "diglolCrypto" }
 diglol-encoding = { module = "com.diglol.encoding:encoding", version.ref = "diglolEncoding" }
 kodein = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
+kotlin-inject-runtime = { module = "me.tatarka.inject:kotlin-inject-runtime-kmp", version.ref = "kotlin-inject" }
+kotlin-inject-compiler = { module = "me.tatarka.inject:kotlin-inject-compiler-ksp", version.ref = "kotlin-inject" }
 touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "touchlab-kermit" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
@@ -46,6 +50,7 @@ npm-google-pubsub = { group = "npm", name = "@google-cloud/pubsub", version.ref 
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-serialization-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 buildKonfig-gradlePlugin = { module = "com.codingfeline.buildkonfig:buildkonfig-gradle-plugin", version.ref = "buildKonfig" }
+ksp-gradlePlugin = { module = "com.google.devtools.ksp:symbol-processing-gradle-plugin", version.ref = "ksp" }
 
 # Dependency notations for internal libraries
 common-analytics = { group = "com.gchristov.thecodinglove.common", name = "analytics" }
@@ -69,3 +74,4 @@ thecodinglove-node-module = { id = "node-module-plugin", version = "unspecified"
 thecodinglove-build-config = { id = "build-config-plugin", version = "unspecified" }
 thecodinglove-browser-binary = { id = "browser-binary-plugin", version = "unspecified" }
 thecodinglove-node-binary = { id = "node-binary-plugin", version = "unspecified" }
+google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
