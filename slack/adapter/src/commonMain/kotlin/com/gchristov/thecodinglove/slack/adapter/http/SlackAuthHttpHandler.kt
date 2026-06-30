@@ -47,11 +47,11 @@ class SlackAuthHttpHandler(
                 clientId = uuid4().toString(),
                 name = "slack_auth_success",
             )
-            response.redirect("/slack/auth/success")
+            response.redirect("/slack/auth/success").bind()
         }
     }
 
-    override fun handleError(
+    override suspend fun handleError(
         error: Throwable,
         response: HttpResponse,
     ): Either<Throwable, Unit> = when (error) {
@@ -61,7 +61,6 @@ class SlackAuthHttpHandler(
                 name = "slack_auth_cancel",
             )
             response.redirect("/")
-            Either.Right(Unit)
         }
 
         is SlackAuthUseCase.Error.Other -> {
@@ -71,7 +70,6 @@ class SlackAuthHttpHandler(
                 params = error.message?.let { mapOf("info" to it) }
             )
             response.redirect("/slack/auth/error")
-            Either.Right(Unit)
         }
 
         else -> super<HttpHandler>.handleError(error, response)

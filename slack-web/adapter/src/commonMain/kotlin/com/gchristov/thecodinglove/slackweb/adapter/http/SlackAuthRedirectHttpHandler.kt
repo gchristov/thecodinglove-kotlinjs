@@ -33,7 +33,6 @@ class SlackAuthRedirectHttpHandler(
             clientId = uuid4().toString(),
             name = "slack_auth_start",
         )
-        response.redirect("https://slack.com/oauth/v2/authorize?client_id=${slackConfig.clientId}&scope=commands")
-        return Either.Right(Unit)
+        return response.redirect("https://slack.com/oauth/v2/authorize?client_id=${slackConfig.clientId}&scope=commands")
     }
 }

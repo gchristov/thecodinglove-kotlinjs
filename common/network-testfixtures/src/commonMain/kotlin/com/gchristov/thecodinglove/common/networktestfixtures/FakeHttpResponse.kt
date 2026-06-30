@@ -1,5 +1,6 @@
 package com.gchristov.thecodinglove.common.networktestfixtures
 
+import arrow.core.Either
 import com.gchristov.thecodinglove.common.network.http.HttpResponse
 import kotlin.test.assertEquals
 
@@ -11,25 +12,30 @@ class FakeHttpResponse : HttpResponse {
     private var lastRedirectPath: String? = null
     private var lastFilePath: String? = null
 
-    override fun send(string: String) {
+    override suspend fun send(string: String): Either<Throwable, Unit> {
         lastData = string
+        return Either.Right(Unit)
     }
 
-    override fun sendFile(localPath: String) {
+    override suspend fun sendFile(localPath: String): Either<Throwable, Unit> {
         lastFilePath = localPath
+        return Either.Right(Unit)
     }
 
-    override fun setHeader(header: String, value: String) {
+    override suspend fun setHeader(header: String, value: String): Either<Throwable, Unit> {
         lastHeader = header
         lastHeaderValue = value
+        return Either.Right(Unit)
     }
 
-    override fun redirect(path: String) {
+    override suspend fun redirect(path: String): Either<Throwable, Unit> {
         lastRedirectPath = path
+        return Either.Right(Unit)
     }
 
-    override fun status(status: Int) {
+    override suspend fun status(status: Int): Either<Throwable, Unit> {
         lastStatus = status
+        return Either.Right(Unit)
     }
 
     fun assertRedirect(path: String) {
@@ -46,25 +52,10 @@ class FakeHttpResponse : HttpResponse {
         status: Int?,
         filePath: String?,
     ) {
-        assertEquals(
-            expected = header,
-            actual = lastHeader
-        )
-        assertEquals(
-            expected = headerValue,
-            actual = lastHeaderValue
-        )
-        assertEquals(
-            expected = data,
-            actual = lastData
-        )
-        assertEquals(
-            expected = status,
-            actual = lastStatus
-        )
-        assertEquals(
-            expected = filePath,
-            actual = lastFilePath
-        )
+        assertEquals(expected = header, actual = lastHeader)
+        assertEquals(expected = headerValue, actual = lastHeaderValue)
+        assertEquals(expected = data, actual = lastData)
+        assertEquals(expected = status, actual = lastStatus)
+        assertEquals(expected = filePath, actual = lastFilePath)
     }
 }

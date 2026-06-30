@@ -2,6 +2,7 @@ package com.gchristov.thecodinglove.search.adapter.pubsub
 
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
+import com.gchristov.thecodinglove.common.networktestfixtures.FakeHttpResponse
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubDecoder
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
@@ -37,6 +38,20 @@ class SearchPreloadPubSubHandlerTest {
     ) { handler, _ ->
         val result = handler.handle(TestEvent)
         assertTrue { result.isRight() }
+    }
+
+    @Test
+    fun handleParseErrorSendsEmpty(): TestResult = runBlockingTest { handler, _ ->
+        val response = FakeHttpResponse()
+        val result = handler.handleError(Throwable("parse error"), response)
+        assertTrue { result.isRight() }
+        response.assertEquals(
+            header = "Content-Type",
+            headerValue = ContentType.Application.Json.toString(),
+            data = "",
+            status = 200,
+            filePath = null,
+        )
     }
 
     private fun runBlockingTest(

@@ -33,7 +33,7 @@ class SlackInteractivityPubSubHandler internal constructor(
     )
 
     // Swallow all errors — interactivity failures and parse errors should not trigger PubSub retries.
-    override fun handleError(error: Throwable, response: HttpResponse): Either<Throwable, Unit> {
+    override suspend fun handleError(error: Throwable, response: HttpResponse): Either<Throwable, Unit> {
         log.error(tag, error) { "Error handling request" }
         return response.sendEmpty()
     }
