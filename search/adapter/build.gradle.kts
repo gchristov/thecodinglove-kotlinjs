@@ -12,6 +12,7 @@ kotlin {
                 implementation(libs.common.pubsub)
                 implementation(libs.common.firebase)
                 implementation(projects.domain)
+                implementation(libs.kotlin.inject.runtime)
             }
         }
         val commonTest by getting {
