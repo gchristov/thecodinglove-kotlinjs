@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.search.adapter.htmlparser.usecase
 
-import arrow.core.Either
 import com.gchristov.thecodinglove.common.kotlin.requireModule
+import com.gchristov.thecodinglove.common.kotlin.safeJsCall
 import com.gchristov.thecodinglove.search.adapter.htmlparser.model.HtmlPost
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -9,9 +9,9 @@ import kotlinx.coroutines.withContext
 internal class NodeParseHtmlPostsUseCase(
     private val dispatcher: CoroutineDispatcher,
 ) : ParseHtmlPostsUseCase {
-    override suspend operator fun invoke(dto: ParseHtmlPostsUseCase.Dto): Either<Throwable, List<HtmlPost>> =
+    override suspend operator fun invoke(dto: ParseHtmlPostsUseCase.Dto) =
         withContext(dispatcher) {
-            try {
+            safeJsCall("Error during post parse") {
                 val posts = mutableListOf<HtmlPost>()
                 val root = acquireRootNode(dto.html)
                 val postNodes = root.querySelectorAll(PostSelector)
@@ -26,17 +26,12 @@ internal class NodeParseHtmlPostsUseCase(
                             HtmlPost(
                                 title = postTitle,
                                 url = postUrl,
-                                imageUrl = postImageUrl
+                                imageUrl = postImageUrl,
                             )
                         )
                     }
                 }
-                Either.Right(posts)
-            } catch (error: Throwable) {
-                Either.Left(Throwable(
-                    message = "Error during post parse${error.message?.let { ": $it" } ?: ""}",
-                    cause = error,
-                ))
+                posts
             }
         }
 
