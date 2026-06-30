@@ -1,12 +1,12 @@
 package com.gchristov.thecodinglove.common.network.http
 
-import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.getOrElse
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.__dirname
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.kotlin.requireModule
+import com.gchristov.thecodinglove.common.kotlin.safeJsCall
 import io.ktor.http.*
 
 internal class ExpressHttpService(
@@ -20,16 +20,14 @@ internal class ExpressHttpService(
     override suspend fun initialise(
         handlers: List<HttpHandler>,
         staticWebsiteRoot: String?,
-        port: Int
-    ): Either<Throwable, Unit> = try {
+        port: Int,
+    ) = safeJsCall("Error initialising $tag") {
         log.debug(tag, "Initialising")
         this.port = port
-
         staticWebsiteRoot?.let {
             val path = requireModule("path")
             app.use(express.static(path.join(__dirname, it) as String))
         }
-
         handlers
             .map { handler ->
                 handler
@@ -40,25 +38,13 @@ internal class ExpressHttpService(
                     }
             }
             .let { l -> either { l.bindAll() } }
-            .flatMap {
-                log.debug(tag, "Initialised")
-                Either.Right(Unit)
-            }
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error initialising $tag${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+            .getOrElse { throw it }
+        log.debug(tag, "Initialised")
     }
 
-    override suspend fun start(): Either<Throwable, Unit> = try {
+    override suspend fun start() = safeJsCall("Error starting $tag") {
         app.listen(requireNotNull(port))
-        Either.Right(Unit)
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error starting $tag${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+        Unit
     }
 }
 
