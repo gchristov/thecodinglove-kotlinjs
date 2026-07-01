@@ -65,14 +65,18 @@ internal class GoogleCloudPubSubPublisher(
 
         val projectId = cloudTasks.auth.getProjectId().await()
         val serviceAccountEmail = cloudTasks.auth.getCredentials().await().client_email as String
-        val scheduleSeconds = (Clock.System.now() + delay).epochSeconds
+        // Kotlin Long isn't a plain JS number - the gRPC client's protobuf encoder can't serialize
+        // it as-is (fails with "invalid encoding"), so convert to a native JS number first.
+        val scheduleSeconds = (Clock.System.now() + delay).epochSeconds.toDouble()
 
         val task = json(
             "httpRequest" to json(
                 "httpMethod" to "POST",
                 "url" to "https://pubsub.googleapis.com/v1/projects/$projectId/topics/$topic:publish",
                 "headers" to json("Content-Type" to "application/json"),
-                "body" to publishRequestBody,
+                // A plain string here is ambiguous for a protobuf bytes field (some encoders treat
+                // it as base64), so pass real bytes instead of the raw JSON text.
+                "body" to Buffer.from(publishRequestBody),
                 "oauthToken" to json(
                     "serviceAccountEmail" to serviceAccountEmail,
                     "scope" to PubSubOAuthScope,
