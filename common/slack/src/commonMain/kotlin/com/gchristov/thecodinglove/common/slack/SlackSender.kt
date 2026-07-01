@@ -13,6 +13,7 @@ import com.gchristov.thecodinglove.common.slack.api.model.ApiSlackReplyWithMessa
 import com.gchristov.thecodinglove.common.slack.model.SlackAuthToken
 import com.gchristov.thecodinglove.common.slack.model.SlackMessage
 import io.ktor.client.call.*
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.statement.*
 import io.ktor.http.*
 
@@ -36,10 +37,21 @@ class SlackSender(client: NetworkClient.Json) {
         url: String,
         message: SlackMessage,
     ) = safeApiCall("Error during message reply") {
-        val slackResponse = api.postMessageToUrl(
-            url = url,
-            message = message.toApiSlackMessage(),
-        )
+        val slackResponse = try {
+            api.postMessageToUrl(
+                url = url,
+                message = message.toApiSlackMessage(),
+            )
+        } catch (error: ClientRequestException) {
+            // PubSub can retry a handler after an earlier transient failure elsewhere in the same
+            // flow, replaying this call - but a response_url can only be used a limited number of
+            // times. "used_url" means an earlier attempt already sent the message, so treat this as
+            // success instead of failing (and triggering yet another retry).
+            if (error.response.status == HttpStatusCode.NotFound && error.response.bodyAsText().trim() == "used_url") {
+                return@safeApiCall Unit
+            }
+            throw error
+        }
         // Sending requests to Slack response URLs currently has an issue where the content type
         // does not honor the Accept header, so we get text/plain instead of application/json
         if (slackResponse.contentType()?.match(ContentType.Application.Json) == true) {
