@@ -64,6 +64,15 @@ resources:
     options:
       version: 8.6.0
       protect: true
+  # Enables the Cloud Tasks API. Needed for delayed PubSub publishing.
+  cloudtasks-api:
+    type: gcp:projects:Service
+    properties:
+      disableDependentServices: true
+      service: cloudtasks.googleapis.com
+    options:
+      version: 8.6.0
+      protect: true
 
   ########################################
   # Artifact Registry
@@ -144,3 +153,20 @@ resources:
     options:
       version: 8.6.0
       protect: true
+
+  ########################################
+  # Cloud Tasks
+  ########################################
+
+  # Manages the shared queue used for delayed PubSub publishing (see common/pubsub's
+  # GoogleCloudPubSubPublisher). Shared across all services, not service-specific.
+  cloudtasks-queue:
+    type: gcp:cloudtasks:Queue
+    properties:
+      name: scheduled-events
+      location: europe-west1
+    options:
+      version: 8.6.0
+      protect: true
+      dependsOn:
+        - ${cloudtasks-api}
