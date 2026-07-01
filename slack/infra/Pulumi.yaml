@@ -167,7 +167,7 @@ resources:
       messageRetentionDuration: 600s
       name: slack_self_destruct_message_subscription
       pushConfig:
-        pushEndpoint: ${slack-service.uri}/api/pubsub/self-destruct/message
+        pushEndpoint: ${slack-service.uri}/api/pubsub/self-destruct-message
       retryPolicy:
         maximumBackoff: 600s
         minimumBackoff: 10s

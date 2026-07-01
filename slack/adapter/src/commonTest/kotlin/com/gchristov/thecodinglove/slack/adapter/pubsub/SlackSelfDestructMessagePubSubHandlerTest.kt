@@ -6,7 +6,7 @@ import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubDecoder
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
-import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SelfDestructSlackMessageEvent
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSelfDestructMessageEvent
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSelfDestructUseCase
 import io.ktor.http.*
 import kotlinx.coroutines.test.TestResult
@@ -20,7 +20,7 @@ class SlackSelfDestructMessagePubSubHandlerTest {
     fun httpConfig(): TestResult = runBlockingTest { handler, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
-        assertEquals("/api/pubsub/self-destruct/message", config.path)
+        assertEquals("/api/pubsub/self-destruct-message", config.path)
         assertEquals(ContentType.Application.Json, config.contentType)
     }
 
@@ -49,14 +49,14 @@ class SlackSelfDestructMessagePubSubHandlerTest {
             dispatcher = FakeCoroutineDispatcher,
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
-            pubSubDecoder = FakePubSubDecoder(FakePubSubRequest(null, SelfDestructSlackMessageEvent.serializer())),
+            pubSubDecoder = FakePubSubDecoder(FakePubSubRequest(null, SlackSelfDestructMessageEvent.serializer())),
             selfDestructUseCase = useCase,
         )
         testBlock(handler, useCase)
     }
 }
 
-private val TestEvent = SelfDestructSlackMessageEvent(
+private val TestEvent = SlackSelfDestructMessageEvent(
     id = "message_id",
     userId = "user_id",
     channelId = "channel_id",

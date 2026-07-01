@@ -13,13 +13,16 @@ import com.gchristov.thecodinglove.common.network.http.HttpResponse
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toAuthState
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackAuthState
-import com.gchristov.thecodinglove.slack.adapter.scheduleSelfDestruct
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSelfDestructMessageEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackAuthUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import io.ktor.http.*
 import io.ktor.util.*
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class SlackAuthHttpHandler(
     override val dispatcher: CoroutineDispatcher,
@@ -39,6 +42,7 @@ class SlackAuthHttpHandler(
         contentType = ContentType.Application.FormUrlEncoded,
     )
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun handleHttpRequestAsync(
         request: HttpRequest,
         response: HttpResponse,
@@ -47,13 +51,23 @@ class SlackAuthHttpHandler(
         val state = request.query.get<String?>("state").takeIf { !it.isNullOrEmpty() }
         return either {
             slackAuthUseCase(SlackAuthUseCase.Dto(code)).bind()
-            val selfDestructMessage = state?.let { handleAuthState(it).bind() }
-            selfDestructMessage?.let {
-                pubSubPublisher.scheduleSelfDestruct(
-                    message = it,
-                    slackConfig = slackConfig,
-                    jsonSerializer = jsonSerializer,
-                ).bind()
+            // If there's state, this means we may be able to send (and possibly self-destruct) a message.
+            state?.let {
+                val selfDestructMessage = handleAuthState(it).bind()
+                selfDestructMessage?.let { message ->
+                    pubSubPublisher.publishJson(
+                        topic = slackConfig.selfDestructMessagePubSubTopic,
+                        body = SlackSelfDestructMessageEvent(
+                            id = message.id,
+                            userId = message.userId,
+                            channelId = message.channelId,
+                            messageTs = message.messageTs,
+                        ),
+                        jsonSerializer = jsonSerializer,
+                        strategy = SlackSelfDestructMessageEvent.serializer(),
+                        delay = Instant.fromEpochMilliseconds(message.destroyTimestamp) - Clock.System.now(),
+                    ).bind()
+                }
             }
             analytics.sendEvent(
                 clientId = uuid4().toString(),

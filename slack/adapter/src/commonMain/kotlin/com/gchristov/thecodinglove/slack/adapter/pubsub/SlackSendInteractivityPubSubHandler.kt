@@ -31,6 +31,8 @@ internal class SlackSendInteractivityPubSubHandler(
             name = "slack_interactivity_send",
             params = mapOf("user_id" to event.user.id, "team_id" to event.team.id),
         )
+        // This flow never self-destructs (selfDestructMinutes = null), so there's never a message to
+        // schedule - discard the returned SlackSelfDestructMessage? to satisfy PubSubHandler's Unit contract.
         return slackSendSearchUseCase(
             SlackSendSearchUseCase.Dto(
                 userId = event.user.id,

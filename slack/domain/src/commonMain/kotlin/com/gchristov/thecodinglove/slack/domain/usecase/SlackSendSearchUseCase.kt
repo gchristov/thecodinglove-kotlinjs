@@ -67,20 +67,16 @@ internal class RealSlackSendSearchUseCase(
     private suspend fun authenticate(
         clientId: String,
         authState: SlackAuthState,
-    ): Either<Throwable, SlackSelfDestructMessage?> = try {
+    ): Either<Throwable, SlackSelfDestructMessage?> {
         log.debug(tag, "Asking user to authenticate: userId=${authState.userId}")
-        slackRepository.postMessageToUrl(
+        // No message was sent - the user still needs to authenticate - so there's nothing to self-destruct yet.
+        return slackRepository.postMessageToUrl(
             url = authState.responseUrl,
             message = slackMessageFactory.authMessage(
                 clientId = clientId,
                 authState = authState,
             )
         ).map { null }
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during user authentication${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
     }
 
     private suspend fun sendResult(

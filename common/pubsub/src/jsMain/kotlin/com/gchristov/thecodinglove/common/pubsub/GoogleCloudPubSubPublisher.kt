@@ -18,7 +18,7 @@ private const val PubSubOAuthScope = "https://www.googleapis.com/auth/pubsub"
 
 internal class GoogleCloudPubSubPublisher(
     private val pubSub: GoogleCloudPubSubExternals.PubSub,
-    private val cloudTasks: GoogleCloudTasksExternals.CloudTasksClient,
+    private val cloudTasks: GoogleCloudTasksExternals.CloudTasks,
 ) : PubSubPublisher {
 
     init {

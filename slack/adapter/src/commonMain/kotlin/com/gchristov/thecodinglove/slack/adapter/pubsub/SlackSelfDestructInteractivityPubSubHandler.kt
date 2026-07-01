@@ -9,12 +9,15 @@ import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubHandler
 import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
-import com.gchristov.thecodinglove.slack.adapter.scheduleSelfDestruct
+import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSelfDestructMessageEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.DeserializationStrategy
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 internal class SlackSelfDestructInteractivityPubSubHandler(
     override val jsonSerializer: JsonSerializer,
@@ -29,6 +32,7 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
     override val strategy: DeserializationStrategy<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage> get() = error("not used")
     override fun httpConfig() = error("not used")
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun handle(event: SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage): Either<Throwable, Unit> {
         val action = event.actions.firstOrNull { it.name == SlackActionName.SELF_DESTRUCT_5_MIN.apiValue }
             ?: return Either.Right(Unit)
@@ -47,10 +51,17 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
                 selfDestructMinutes = 5,
             )
         ).getOrElse { return Either.Left(it) } ?: return Either.Right(Unit)
-        return pubSubPublisher.scheduleSelfDestruct(
-            message = selfDestructMessage,
-            slackConfig = slackConfig,
+        return pubSubPublisher.publishJson(
+            topic = slackConfig.selfDestructMessagePubSubTopic,
+            body = SlackSelfDestructMessageEvent(
+                id = selfDestructMessage.id,
+                userId = selfDestructMessage.userId,
+                channelId = selfDestructMessage.channelId,
+                messageTs = selfDestructMessage.messageTs,
+            ),
             jsonSerializer = jsonSerializer,
+            strategy = SlackSelfDestructMessageEvent.serializer(),
+            delay = Instant.fromEpochMilliseconds(selfDestructMessage.destroyTimestamp) - Clock.System.now(),
         ).map { }
     }
 }

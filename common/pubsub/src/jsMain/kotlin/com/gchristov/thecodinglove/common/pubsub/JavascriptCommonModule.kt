@@ -12,4 +12,4 @@ actual fun providePubSubDecoder(
 ): PubSubDecoder = GoogleCloudPubSubDecoder(jsonSerializer)
 
 private val PubSub = GoogleCloudPubSubExternals.PubSub()
-private val CloudTasks = GoogleCloudTasksExternals.CloudTasksClient()
+private val CloudTasks = GoogleCloudTasksExternals.CloudTasks()
