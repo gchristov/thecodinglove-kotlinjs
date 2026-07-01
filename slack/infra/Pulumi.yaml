@@ -180,3 +180,4 @@ outputs:
   slackServiceHost: ${slack-service.uri}
   slackServicePath: api/slack
   slackServicePubSubPath: api/pubsub/slack
+  slackServiceSelfDestructMessagePubSubPath: api/pubsub/self-destruct-message
