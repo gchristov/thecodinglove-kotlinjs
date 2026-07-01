@@ -59,6 +59,7 @@ The order to do this matters, so go with common/infra first, then all other micr
    7. Repeat for the remaining microservices.
 8. Find your auto-generated `firebase-adminsdk` Service Account and give it the following additional roles:
    - `Pub/Sub Publisher`, for publishing messages to PubSub topics;
+   - `Cloud Tasks Enqueuer`, for scheduling delayed PubSub publishes via Cloud Tasks;
 9. Export a JSON API key for your `firebase-adminsdk` Service Account and call it `credentials-gcp-app.json` - the app will need it later.
 </details>
 
