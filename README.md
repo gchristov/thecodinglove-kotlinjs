@@ -59,13 +59,15 @@ The order to do this matters, so go with common/infra first, then all other micr
 8. Find your auto-generated `firebase-adminsdk` Service Account and give it the following additional roles:
    - `Pub/Sub Publisher`, for publishing messages to PubSub topics;
    - `Cloud Tasks Enqueuer`, for scheduling delayed PubSub publishes via Cloud Tasks;
-9. Delayed PubSub publishes schedule a Cloud Task whose OAuth token impersonates the `firebase-adminsdk` Service Account itself, so that same Service Account needs permission to act as itself. This is a Service Account-level grant, not a project-level role, so it can't be added via the Console role list above - run:
-   ```
-   gcloud iam service-accounts add-iam-policy-binding \
-     YOUR_FIREBASE_ADMINSDK_SA_EMAIL \
-     --member="serviceAccount:YOUR_FIREBASE_ADMINSDK_SA_EMAIL" \
-     --role="roles/iam.serviceAccountUser"
-   ```
+9. Delayed PubSub publishes schedule a Cloud Task whose OAuth token impersonates the `firebase-adminsdk` Service Account itself, so that same Service Account needs permission to act as itself. This is a Service Account-level grant (`Service Account User`), not a project-level role, so it's added on a different page than the roles above - either:
+   - Console: `IAM & Admin` → `Service Accounts` → click the `firebase-adminsdk` Service Account → `Permissions` tab → `Grant Access` → add that same Service Account's email as the principal, with role `Service Account User`;
+   - or `gcloud`:
+     ```
+     gcloud iam service-accounts add-iam-policy-binding \
+       YOUR_FIREBASE_ADMINSDK_SA_EMAIL \
+       --member="serviceAccount:YOUR_FIREBASE_ADMINSDK_SA_EMAIL" \
+       --role="roles/iam.serviceAccountUser"
+     ```
 10. Export a JSON API key for your `firebase-adminsdk` Service Account and call it `credentials-gcp-app.json` - the app will need it later.
 </details>
 
