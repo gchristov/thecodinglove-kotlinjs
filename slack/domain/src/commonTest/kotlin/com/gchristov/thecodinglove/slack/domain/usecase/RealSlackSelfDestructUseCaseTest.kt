@@ -4,84 +4,80 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.common.slack.model.SlackAuthToken
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
-import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackRepository
 import com.gchristov.thecodinglove.slack.testfixtures.SlackAuthTokenCreator
-import com.gchristov.thecodinglove.slack.testfixtures.SlackSelfDestructMessageCreator
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalTime::class)
 class RealSlackSelfDestructUseCaseTest {
     @Test
-    fun selfDestructWithNoMessagesSucceeds(): TestResult = runBlockingTest(
-        getSelfDestructMessagesResult = Either.Right(emptyList()),
-    ) { useCase, repository ->
-        val actual = useCase.invoke()
-        assertTrue { actual.isRight() }
-        repository.assertDeleteSelfDestructMessageCalledTimes(0)
-        repository.assertDeleteMessageNotCalled()
-    }
-
-    @Test
-    fun selfDestructWithFutureMessageDoesNotDestroy(): TestResult = runBlockingTest(
-        getSelfDestructMessagesResult = Either.Right(listOf(SlackSelfDestructMessageCreator.futureMessage())),
-    ) { useCase, repository ->
-        val actual = useCase.invoke()
-        assertTrue { actual.isRight() }
-        repository.assertDeleteSelfDestructMessageCalledTimes(0)
-        repository.assertDeleteMessageNotCalled()
-    }
-
-    @Test
-    fun selfDestructWithPastMessageAndTokenDeletesMessageAndState(): TestResult = runBlockingTest(
-        getSelfDestructMessagesResult = Either.Right(listOf(SlackSelfDestructMessageCreator.pastMessage())),
+    fun selfDestructWithTokenDeletesMessageAndState(): TestResult = runBlockingTest(
         getAuthTokenResult = Either.Right(SlackAuthTokenCreator.token()),
     ) { useCase, repository ->
-        val actual = useCase.invoke()
+        val actual = useCase.invoke(
+            messageId = TestMessageId,
+            userId = TestUserId,
+            channelId = TestChannelId,
+            messageTs = TestMessageTs,
+        )
         assertTrue { actual.isRight() }
         repository.assertDeleteMessageCalled()
         repository.assertDeleteSelfDestructMessageCalledTimes(1)
     }
 
     @Test
-    fun selfDestructWithPastMessageAndNoTokenDeletesStateOnly(): TestResult = runBlockingTest(
-        getSelfDestructMessagesResult = Either.Right(listOf(SlackSelfDestructMessageCreator.pastMessage())),
+    fun selfDestructWithNoTokenDeletesStateOnly(): TestResult = runBlockingTest(
         getAuthTokenResult = Either.Left(Throwable("Token not found")),
     ) { useCase, repository ->
-        val actual = useCase.invoke()
+        val actual = useCase.invoke(
+            messageId = TestMessageId,
+            userId = TestUserId,
+            channelId = TestChannelId,
+            messageTs = TestMessageTs,
+        )
         assertTrue { actual.isRight() }
         repository.assertDeleteMessageNotCalled()
         repository.assertDeleteSelfDestructMessageCalledTimes(1)
     }
 
+    @Test
+    fun selfDestructWhenDeleteMessageFailsPropagatesError(): TestResult = runBlockingTest(
+        getAuthTokenResult = Either.Right(SlackAuthTokenCreator.token()),
+        deleteMessageResult = Either.Left(Throwable("Delete failed")),
+    ) { useCase, repository ->
+        val actual = useCase.invoke(
+            messageId = TestMessageId,
+            userId = TestUserId,
+            channelId = TestChannelId,
+            messageTs = TestMessageTs,
+        )
+        assertTrue { actual.isLeft() }
+        repository.assertDeleteSelfDestructMessageCalledTimes(0)
+    }
+
     private fun runBlockingTest(
-        getSelfDestructMessagesResult: Either<Throwable, List<SlackSelfDestructMessage>> = Either.Right(emptyList()),
         getAuthTokenResult: Either<Throwable, SlackAuthToken> = Either.Left(Throwable("Token not found")),
+        deleteMessageResult: Either<Throwable, Unit> = Either.Right(Unit),
         testBlock: suspend (SlackSelfDestructUseCase, FakeSlackRepository) -> Unit,
     ): TestResult = runTest {
         val repository = FakeSlackRepository(
-            getSelfDestructMessagesResult = getSelfDestructMessagesResult,
             getAuthTokenResult = getAuthTokenResult,
+            deleteMessageResult = deleteMessageResult,
         )
         testBlock(
             RealSlackSelfDestructUseCase(
                 dispatcher = FakeCoroutineDispatcher,
                 log = FakeLogger,
                 slackRepository = repository,
-                clock = TestClock,
             ),
             repository,
         )
     }
 }
 
-@OptIn(ExperimentalTime::class)
-private val TestClock = object : Clock {
-    override fun now(): Instant = Instant.fromEpochMilliseconds(1000L)
-}
+private const val TestMessageId = "message_id"
+private const val TestUserId = "user_id"
+private const val TestChannelId = "channel_id"
+private const val TestMessageTs = "message_ts"

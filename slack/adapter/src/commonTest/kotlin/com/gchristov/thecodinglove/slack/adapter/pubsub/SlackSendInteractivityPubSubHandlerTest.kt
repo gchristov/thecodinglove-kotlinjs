@@ -3,6 +3,7 @@ package com.gchristov.thecodinglove.slack.adapter.pubsub
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.analyticstestfixtures.FakeAnalytics
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
+import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSendSearchUseCase
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
@@ -40,7 +41,7 @@ class SlackSendInteractivityPubSubHandlerTest {
     private lateinit var sendUseCase: FakeSlackSendSearchUseCase
 
     private fun runBlockingTest(
-        sendResult: Either<Throwable, Unit> = Either.Right(Unit),
+        sendResult: Either<Throwable, SlackSelfDestructMessage?> = Either.Right(null),
         testBlock: suspend (SlackSendInteractivityPubSubHandler) -> Unit,
     ): TestResult = runTest {
         sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)

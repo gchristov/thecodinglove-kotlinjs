@@ -1,6 +1,7 @@
 package com.gchristov.thecodinglove.slack.domain.usecase
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import com.gchristov.thecodinglove.common.slack.model.SlackAuthToken
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
@@ -17,6 +18,8 @@ import kotlin.time.Instant
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTime::class)
@@ -74,6 +77,7 @@ class RealSlackSendSearchUseCaseTest {
     ) { useCase, repository, searchRepository ->
         val actual = useCase.invoke(TestDto)
         assertTrue { actual.isRight() }
+        assertNull(actual.getOrElse { null })
         repository.assertPostMessageToUrlCalledTimes(1)
         repository.assertPostMessageCalled()
         searchRepository.assertGetSessionPostInvokedOnce()
@@ -82,11 +86,12 @@ class RealSlackSendSearchUseCaseTest {
     }
 
     @Test
-    fun sendSuccessWithSelfDestructSavesSelfDestructState(): TestResult = runBlockingTest(
+    fun sendSuccessWithSelfDestructSavesSelfDestructStateAndReturnsIt(): TestResult = runBlockingTest(
         getAuthTokenResult = Either.Right(SlackAuthTokenCreator.token()),
     ) { useCase, repository, _ ->
         val actual = useCase.invoke(TestDto.copy(selfDestructMinutes = 5))
         assertTrue { actual.isRight() }
+        assertNotNull(actual.getOrElse { null })
         repository.assertSelfDestructMessageSaved()
     }
 
@@ -139,6 +144,7 @@ private val TestSlackConfig = SlackConfig(
     clientSecret = "client_secret",
     interactivityReceivedPubSubTopic = "interactivity_topic",
     slashCommandReceivedPubSubTopic = "slash_topic",
+    selfDestructMessagePubSubTopic = "self_destruct_message_topic",
 )
 @OptIn(ExperimentalTime::class)
 private val TestClock = object : Clock {

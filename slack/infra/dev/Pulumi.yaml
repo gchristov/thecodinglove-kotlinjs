@@ -65,3 +65,30 @@ resources:
     options:
       version: 8.6.0
       protect: true
+  # Manages the dev self-destruct message PubSub topic.
+  pubsub-topic-slack-self-destruct-message-dev:
+    type: gcp:pubsub:Topic
+    properties:
+      name: slack_self_destruct_message_dev
+    options:
+      version: 8.6.0
+      protect: true
+  # Manages the dev self-destruct message PubSub subscription.
+  pubsub-subscription-slack-self-destruct-message-dev:
+    type: gcp:pubsub:Subscription
+    properties:
+      ackDeadlineSeconds: 10
+      expirationPolicy:
+        ttl: ""
+      messageRetentionDuration: 600s
+      name: slack_self_destruct_message_dev_subscription
+      pushConfig:
+        # If this changes, update the tunnel URL in run_local.sh and all other infra/dev Pulumi files too.
+        pushEndpoint: https://codinglove.serveousercontent.com/api/pubsub/slack/self-destruct-message
+      retryPolicy:
+        maximumBackoff: 600s
+        minimumBackoff: 10s
+      topic: ${pubsub-topic-slack-self-destruct-message-dev.name}
+    options:
+      version: 8.6.0
+      protect: true

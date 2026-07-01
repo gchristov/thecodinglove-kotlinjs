@@ -1,16 +1,17 @@
 package com.gchristov.thecodinglove.slack.testfixtures
 
 import arrow.core.Either
+import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import kotlin.test.assertEquals
 
 class FakeSlackSendSearchUseCase(
-    private val invocationResult: Either<Throwable, Unit> = Either.Right(Unit),
+    private val invocationResult: Either<Throwable, SlackSelfDestructMessage?> = Either.Right(null),
 ) : SlackSendSearchUseCase {
     private var invocations = 0
     private var lastSelfDestructMinutes: Int? = null
 
-    override suspend fun invoke(dto: SlackSendSearchUseCase.Dto): Either<Throwable, Unit> {
+    override suspend fun invoke(dto: SlackSendSearchUseCase.Dto): Either<Throwable, SlackSelfDestructMessage?> {
         lastSelfDestructMinutes = dto.selfDestructMinutes
         invocations++
         return invocationResult

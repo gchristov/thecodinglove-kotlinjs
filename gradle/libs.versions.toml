@@ -18,6 +18,7 @@ npm-express = "4.18.2"
 npm-firebase-admin = "11.11.1"
 npm-google-firestore = "6.8.0"
 npm-google-pubsub = "4.0.7"
+npm-google-tasks = "6.2.3"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
@@ -43,6 +44,7 @@ npm-express = { group = "npm", name = "express", version.ref = "npm-express" }
 npm-firebase-admin = { group = "npm", name = "firebase-admin", version.ref = "npm-firebase-admin" }
 npm-google-firestore = { group = "npm", name = "@google-cloud/firestore", version.ref = "npm-google-firestore" }
 npm-google-pubsub = { group = "npm", name = "@google-cloud/pubsub", version.ref = "npm-google-pubsub" }
+npm-google-tasks = { group = "npm", name = "@google-cloud/tasks", version.ref = "npm-google-tasks" }
 
 # Plugin dependencies included in the pre-compiled gradle-plugins/conventions project
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

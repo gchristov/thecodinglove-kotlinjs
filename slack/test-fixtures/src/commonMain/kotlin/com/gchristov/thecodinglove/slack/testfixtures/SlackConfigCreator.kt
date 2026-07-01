@@ -11,6 +11,7 @@ object SlackConfigCreator {
         clientSecret: String = "client_secret",
         interactivityReceivedPubSubTopic: String = "interactivity_topic",
         slashCommandReceivedPubSubTopic: String = "slash_topic",
+        selfDestructMessagePubSubTopic: String = "self_destruct_message_topic",
     ) = SlackConfig(
         signingSecret = signingSecret,
         timestampValidityMinutes = timestampValidityMinutes,
@@ -19,5 +20,6 @@ object SlackConfigCreator {
         clientSecret = clientSecret,
         interactivityReceivedPubSubTopic = interactivityReceivedPubSubTopic,
         slashCommandReceivedPubSubTopic = slashCommandReceivedPubSubTopic,
+        selfDestructMessagePubSubTopic = selfDestructMessagePubSubTopic,
     )
 }

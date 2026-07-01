@@ -26,6 +26,7 @@ interface SlackDomainComponent {
         clientSecret = BuildConfig.SLACK_CLIENT_SECRET,
         interactivityReceivedPubSubTopic = environment.slackInteractivityReceivedPubSubTopic,
         slashCommandReceivedPubSubTopic = environment.slackSlashCommandReceivedPubSubTopic,
+        selfDestructMessagePubSubTopic = environment.slackSelfDestructMessagePubSubTopic,
     )
 
     @Provides
@@ -57,7 +58,6 @@ interface SlackDomainComponent {
         slackRepository = slackRepository,
     )
 
-    @OptIn(ExperimentalTime::class)
     @Provides
     fun provideSelfDestructUseCase(
         log: Logger,
@@ -66,7 +66,6 @@ interface SlackDomainComponent {
         dispatcher = Dispatchers.Default,
         log = log,
         slackRepository = slackRepository,
-        clock = Clock.System,
     )
 
     @OptIn(ExperimentalTime::class)

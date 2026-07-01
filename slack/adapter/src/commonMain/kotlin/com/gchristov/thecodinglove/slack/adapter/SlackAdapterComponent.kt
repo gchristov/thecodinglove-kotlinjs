@@ -83,6 +83,8 @@ interface SlackAdapterComponent {
         log: Logger,
         slackAuthUseCase: SlackAuthUseCase,
         slackSendSearchUseCase: SlackSendSearchUseCase,
+        pubSubPublisher: PubSubPublisher,
+        slackConfig: SlackConfig,
         analytics: Analytics,
     ): SlackAuthHttpHandler = SlackAuthHttpHandler(
         dispatcher = Dispatchers.Default,
@@ -90,6 +92,8 @@ interface SlackAdapterComponent {
         log = log,
         slackAuthUseCase = slackAuthUseCase,
         slackSendSearchUseCase = slackSendSearchUseCase,
+        pubSubPublisher = pubSubPublisher,
+        slackConfig = slackConfig,
         analytics = analytics,
     )
 
@@ -157,6 +161,8 @@ interface SlackAdapterComponent {
         slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
         slackCancelSearchUseCase: SlackCancelSearchUseCase,
         pubSubDecoder: PubSubDecoder,
+        pubSubPublisher: PubSubPublisher,
+        slackConfig: SlackConfig,
         analytics: Analytics,
     ): SlackInteractivityPubSubHandler = SlackInteractivityPubSubHandler(
         dispatcher = Dispatchers.Default,
@@ -164,7 +170,13 @@ interface SlackAdapterComponent {
         log = log,
         eventHandlers = listOf(
             SlackSendInteractivityPubSubHandler(slackSendSearchUseCase, analytics),
-            SlackSelfDestructInteractivityPubSubHandler(slackSendSearchUseCase, analytics),
+            SlackSelfDestructInteractivityPubSubHandler(
+                jsonSerializer = jsonSerializer,
+                slackSendSearchUseCase = slackSendSearchUseCase,
+                pubSubPublisher = pubSubPublisher,
+                slackConfig = slackConfig,
+                analytics = analytics,
+            ),
             SlackShuffleInteractivityPubSubHandler(slackShuffleSearchUseCase, analytics),
             SlackCancelSearchInteractivityPubSubHandler(slackCancelSearchUseCase, analytics),
         ),
@@ -173,14 +185,16 @@ interface SlackAdapterComponent {
 
     @Provides
     @Singleton
-    fun provideSlackSelfDestructHttpHandler(
+    fun provideSlackSelfDestructMessagePubSubHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
+        pubSubDecoder: PubSubDecoder,
         selfDestructUseCase: SlackSelfDestructUseCase,
-    ): SlackSelfDestructHttpHandler = SlackSelfDestructHttpHandler(
+    ): SlackSelfDestructMessagePubSubHandler = SlackSelfDestructMessagePubSubHandler(
         dispatcher = Dispatchers.Default,
         jsonSerializer = jsonSerializer,
         log = log,
+        pubSubDecoder = pubSubDecoder,
         selfDestructUseCase = selfDestructUseCase,
     )
 

@@ -18,7 +18,11 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.plus
 
 interface SlackSendSearchUseCase {
-    suspend operator fun invoke(dto: Dto): Either<Throwable, Unit>
+    /**
+     * @return the [SlackSelfDestructMessage] to schedule for deletion if the sent message should
+     * self-destruct, or `null` if no message was sent (yet) or it isn't self-destructing.
+     */
+    suspend operator fun invoke(dto: Dto): Either<Throwable, SlackSelfDestructMessage?>
 
     data class Dto(
         val userId: String,
@@ -42,7 +46,7 @@ internal class RealSlackSendSearchUseCase(
 ) : SlackSendSearchUseCase {
     private val tag = this::class.simpleName
 
-    override suspend operator fun invoke(dto: SlackSendSearchUseCase.Dto): Either<Throwable, Unit> =
+    override suspend operator fun invoke(dto: SlackSendSearchUseCase.Dto): Either<Throwable, SlackSelfDestructMessage?> =
         withContext(dispatcher) {
             log.debug(tag, "Checking auth token before sending message: userId=${dto.userId}")
             val authState = SlackAuthState(
@@ -63,26 +67,22 @@ internal class RealSlackSendSearchUseCase(
     private suspend fun authenticate(
         clientId: String,
         authState: SlackAuthState,
-    ): Either<Throwable, Unit> = try {
+    ): Either<Throwable, SlackSelfDestructMessage?> {
         log.debug(tag, "Asking user to authenticate: userId=${authState.userId}")
-        slackRepository.postMessageToUrl(
+        // No message was sent - the user still needs to authenticate - so there's nothing to self-destruct yet.
+        return slackRepository.postMessageToUrl(
             url = authState.responseUrl,
             message = slackMessageFactory.authMessage(
                 clientId = clientId,
                 authState = authState,
             )
-        )
-    } catch (error: Throwable) {
-        Either.Left(Throwable(
-            message = "Error during user authentication${error.message?.let { ": $it" } ?: ""}",
-            cause = error,
-        ))
+        ).map { null }
     }
 
     private suspend fun sendResult(
         authState: SlackAuthState,
         authToken: String,
-    ): Either<Throwable, Unit> {
+    ): Either<Throwable, SlackSelfDestructMessage?> {
         log.debug(tag, "Obtaining search session: searchSessionId=${authState.searchSessionId}")
         val searchSessionPost = slackSearchRepository.getSearchSessionPost(authState.searchSessionId)
             .getOrElse { return Either.Left(it) }
@@ -112,20 +112,20 @@ internal class RealSlackSendSearchUseCase(
             searchSessionId = authState.searchSessionId,
             state = state,
         ).getOrElse { return Either.Left(it) }
-        authState.selfDestructMinutes?.let { minutes ->
+        val selfDestructMessage = authState.selfDestructMinutes?.let { minutes ->
             log.debug(tag, "Persisting self-destruct state: searchSessionId=${authState.searchSessionId}")
             val destroyTimestamp = clock.now().plus(value = minutes, unit = DateTimeUnit.MINUTE).toEpochMilliseconds()
-            slackRepository.saveSelfDestructMessage(
-                SlackSelfDestructMessage(
-                    id = authState.searchSessionId,
-                    userId = authState.userId,
-                    searchSessionId = authState.searchSessionId,
-                    destroyTimestamp = destroyTimestamp,
-                    channelId = authState.channelId,
-                    messageTs = messageTs,
-                )
-            ).getOrElse { return Either.Left(it) }
+            val message = SlackSelfDestructMessage(
+                id = authState.searchSessionId,
+                userId = authState.userId,
+                searchSessionId = authState.searchSessionId,
+                destroyTimestamp = destroyTimestamp,
+                channelId = authState.channelId,
+                messageTs = messageTs,
+            )
+            slackRepository.saveSelfDestructMessage(message).getOrElse { return Either.Left(it) }
+            message
         }
-        return Either.Right(Unit)
+        return Either.Right(selfDestructMessage)
     }
 }

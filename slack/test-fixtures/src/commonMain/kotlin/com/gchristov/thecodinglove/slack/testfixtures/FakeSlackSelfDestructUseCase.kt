@@ -8,11 +8,19 @@ class FakeSlackSelfDestructUseCase(
     private val invocationResult: Either<Throwable, Unit> = Either.Right(Unit),
 ) : SlackSelfDestructUseCase {
     private var invocations = 0
+    private var lastMessageId: String? = null
 
-    override suspend fun invoke(): Either<Throwable, Unit> {
+    override suspend fun invoke(
+        messageId: String,
+        userId: String,
+        channelId: String,
+        messageTs: String,
+    ): Either<Throwable, Unit> {
         invocations++
+        lastMessageId = messageId
         return invocationResult
     }
 
     fun assertInvokedOnce() = assertEquals(expected = 1, actual = invocations)
+    fun assertInvokedWith(messageId: String) = assertEquals(expected = messageId, actual = lastMessageId)
 }
