@@ -22,7 +22,7 @@ class SlackSelfDestructMessagePubSubHandler(
 
     override fun httpConfig() = HttpHandler.HttpConfig(
         method = HttpMethod.Post,
-        path = "/api/pubsub/self-destruct-message",
+        path = "/api/pubsub/slack/self-destruct-message",
         contentType = ContentType.Application.Json,
     )
 

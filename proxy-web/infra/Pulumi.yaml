@@ -58,7 +58,6 @@ resources:
           SLACK_SERVICE_HOST: ${slack-reference.outputs["slackServiceHost"]}
           SLACK_SERVICE_PATH: ${slack-reference.outputs["slackServicePath"]}
           SLACK_SERVICE_PUBSUB_PATH: ${slack-reference.outputs["slackServicePubSubPath"]}
-          SLACK_SERVICE_SELF_DESTRUCT_MESSAGE_PATH: ${slack-reference.outputs["slackServiceSelfDestructMessagePubSubPath"]}
           SLACK_WEB_SERVICE_HOST: ${slack-web-reference.outputs["slackWebServiceHost"]}
           SLACK_WEB_SERVICE_PATH: ${slack-web-reference.outputs["slackWebServicePath"]}
           LANDING_PAGE_WEB_SERVICE_HOST: ${landing-page-web-reference.outputs["landingPageWebServiceHost"]}

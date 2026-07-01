@@ -51,7 +51,7 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
                 selfDestructMinutes = 5,
             )
         ).getOrElse { return Either.Left(it) } ?: return Either.Right(Unit)
-        return pubSubPublisher.publishJson(
+        val scheduleResult = pubSubPublisher.publishJson(
             topic = slackConfig.selfDestructMessagePubSubTopic,
             body = SlackSelfDestructMessageEvent(
                 id = selfDestructMessage.id,
@@ -62,6 +62,8 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
             jsonSerializer = jsonSerializer,
             strategy = SlackSelfDestructMessageEvent.serializer(),
             delay = Instant.fromEpochMilliseconds(selfDestructMessage.destroyTimestamp) - Clock.System.now(),
-        ).map { }
+        )
+        // Discard the scheduled Cloud Task's id - PubSubHandler.handle() only reports success/failure.
+        return scheduleResult.map { }
     }
 }

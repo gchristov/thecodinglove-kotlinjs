@@ -20,7 +20,7 @@ class SlackSelfDestructMessagePubSubHandlerTest {
     fun httpConfig(): TestResult = runBlockingTest { handler, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
-        assertEquals("/api/pubsub/self-destruct-message", config.path)
+        assertEquals("/api/pubsub/slack/self-destruct-message", config.path)
         assertEquals(ContentType.Application.Json, config.contentType)
     }
 
