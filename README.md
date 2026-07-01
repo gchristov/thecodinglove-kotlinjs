@@ -11,7 +11,7 @@
 - [Firestore](https://firebase.google.com/docs/firestore) - NoSQL database
 - [Docker](https://www.docker.com/) - containerised deployment
 - [Cloud Run](https://cloud.google.com/run) - serverless deployment of microservices
-- [Cloud Scheduler](https://cloud.google.com/scheduler) - cron jobs
+- [Cloud Tasks](https://cloud.google.com/tasks) - scheduled/delayed task execution
 - [GitHub Actions](https://github.com/features/actions) - CI automation
 - [Pulumi](https://www.pulumi.com/) - infrastructure as code, using [micro-stacks](https://www.pulumi.com/docs/using-pulumi/organizing-projects-stacks/#micro-stacks)
 - [nginx](https://nginx.org/) - web reverse proxy
@@ -36,7 +36,6 @@ The below setup assumes you've already cloned the project locally.
    - `Service Account User`
    - `Service Usage Admin`
    - `Pub/Sub Admin`
-   - `Cloud Scheduler Admin`
    - `Cloud Run Admin`
    - `Cloud Tasks Admin`
    - (Optional) If you're specifying a custom domain mapping, as we are, [verify domain ownership and add your service account as owner](https://search.google.com/search-console).
