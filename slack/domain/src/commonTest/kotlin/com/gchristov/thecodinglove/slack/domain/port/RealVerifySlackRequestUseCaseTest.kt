@@ -96,6 +96,7 @@ class RealVerifySlackRequestUseCaseTest {
                     clientSecret = TestClientSecret,
                     interactivityReceivedPubSubTopic = TestInteractivityPubSubTopic,
                     slashCommandReceivedPubSubTopic = TestSlashCommandPubSubTopic,
+                    selfDestructMessagePubSubTopic = TestSelfDestructMessagePubSubTopic,
                 ),
                 clock = TestClock,
                 log = FakeLogger,
@@ -114,3 +115,4 @@ private val TestClock = object : Clock {
 }
 private const val TestInteractivityPubSubTopic = "topic_123"
 private const val TestSlashCommandPubSubTopic = "topic_456"
+private const val TestSelfDestructMessagePubSubTopic = "topic_789"

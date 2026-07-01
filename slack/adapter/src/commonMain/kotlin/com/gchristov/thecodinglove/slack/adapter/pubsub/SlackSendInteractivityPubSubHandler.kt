@@ -40,6 +40,6 @@ internal class SlackSendInteractivityPubSubHandler(
                 searchSessionId = action.value,
                 selfDestructMinutes = null,
             )
-        )
+        ).map { }
     }
 }

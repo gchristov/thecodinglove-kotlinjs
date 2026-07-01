@@ -1,23 +1,29 @@
 package com.gchristov.thecodinglove.slack.adapter.pubsub
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.analytics.Analytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.pubsub.PubSubDecoder
 import com.gchristov.thecodinglove.common.pubsub.PubSubHandler
+import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
+import com.gchristov.thecodinglove.slack.adapter.scheduleSelfDestruct
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
+import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.DeserializationStrategy
 
 internal class SlackSelfDestructInteractivityPubSubHandler(
+    override val jsonSerializer: JsonSerializer,
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
+    private val pubSubPublisher: PubSubPublisher,
+    private val slackConfig: SlackConfig,
     private val analytics: Analytics,
 ) : PubSubHandler<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage> {
     override val dispatcher: CoroutineDispatcher get() = error("not used")
-    override val jsonSerializer: JsonSerializer get() = error("not used")
     override val log: Logger get() = error("not used")
     override val pubSubDecoder: PubSubDecoder get() = error("not used")
     override val strategy: DeserializationStrategy<SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage> get() = error("not used")
@@ -31,7 +37,7 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
             name = "slack_interactivity_self_destruct",
             params = mapOf("user_id" to event.user.id, "team_id" to event.team.id),
         )
-        return slackSendSearchUseCase(
+        val selfDestructMessage = slackSendSearchUseCase(
             SlackSendSearchUseCase.Dto(
                 userId = event.user.id,
                 teamId = event.team.id,
@@ -40,6 +46,11 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
                 searchSessionId = action.value,
                 selfDestructMinutes = 5,
             )
-        )
+        ).getOrElse { return Either.Left(it) } ?: return Either.Right(Unit)
+        return pubSubPublisher.scheduleSelfDestruct(
+            message = selfDestructMessage,
+            slackConfig = slackConfig,
+            jsonSerializer = jsonSerializer,
+        ).map { }
     }
 }

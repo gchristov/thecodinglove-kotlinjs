@@ -10,8 +10,11 @@ import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.common.network.http.HttpHandler
 import com.gchristov.thecodinglove.common.network.http.HttpRequest
 import com.gchristov.thecodinglove.common.network.http.HttpResponse
+import com.gchristov.thecodinglove.common.pubsub.PubSubPublisher
 import com.gchristov.thecodinglove.slack.adapter.http.mapper.toAuthState
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackAuthState
+import com.gchristov.thecodinglove.slack.adapter.scheduleSelfDestruct
+import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackAuthUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import io.ktor.http.*
@@ -24,6 +27,8 @@ class SlackAuthHttpHandler(
     override val log: Logger,
     private val slackAuthUseCase: SlackAuthUseCase,
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
+    private val pubSubPublisher: PubSubPublisher,
+    private val slackConfig: SlackConfig,
     private val analytics: Analytics,
 ) : HttpHandler {
     private val tag = this::class.simpleName
@@ -42,7 +47,14 @@ class SlackAuthHttpHandler(
         val state = request.query.get<String?>("state").takeIf { !it.isNullOrEmpty() }
         return either {
             slackAuthUseCase(SlackAuthUseCase.Dto(code)).bind()
-            state?.let { handleAuthState(it).bind() }
+            val selfDestructMessage = state?.let { handleAuthState(it).bind() }
+            selfDestructMessage?.let {
+                pubSubPublisher.scheduleSelfDestruct(
+                    message = it,
+                    slackConfig = slackConfig,
+                    jsonSerializer = jsonSerializer,
+                ).bind()
+            }
             analytics.sendEvent(
                 clientId = uuid4().toString(),
                 name = "slack_auth_success",

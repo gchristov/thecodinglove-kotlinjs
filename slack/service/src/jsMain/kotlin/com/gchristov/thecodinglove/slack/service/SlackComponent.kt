@@ -15,6 +15,7 @@ import com.gchristov.thecodinglove.slack.adapter.SlackAdapterComponent
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSearchPubSubHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSelfDestructMessagePubSubHandler
 import com.gchristov.thecodinglove.slack.domain.SlackDomainComponent
 import com.gchristov.thecodinglove.slack.domain.model.Environment
 import me.tatarka.inject.annotations.Component
@@ -40,7 +41,7 @@ abstract class SlackComponent(
     abstract val slackInteractivityPubSubHandler: SlackInteractivityPubSubHandler
     abstract val slackAuthHttpHandler: SlackAuthHttpHandler
     abstract val slackEventHttpHandler: SlackEventHttpHandler
-    abstract val slackSelfDestructHttpHandler: SlackSelfDestructHttpHandler
+    abstract val slackSelfDestructMessagePubSubHandler: SlackSelfDestructMessagePubSubHandler
     abstract val slackStatisticsHttpHandler: SlackStatisticsHttpHandler
     abstract val httpService: HttpService
     abstract val monitoringLogWriter: MonitoringLogWriter

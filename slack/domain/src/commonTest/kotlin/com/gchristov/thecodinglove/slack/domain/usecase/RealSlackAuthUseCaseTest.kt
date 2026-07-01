@@ -90,4 +90,5 @@ private val TestSlackConfig = SlackConfig(
     clientSecret = "client_secret",
     interactivityReceivedPubSubTopic = "interactivity_topic",
     slashCommandReceivedPubSubTopic = "slash_topic",
+    selfDestructMessagePubSubTopic = "self_destruct_message_topic",
 )

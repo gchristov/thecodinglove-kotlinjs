@@ -5,14 +5,17 @@ import com.gchristov.thecodinglove.common.analyticstestfixtures.FakeAnalytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.networktestfixtures.FakeHttpResponse
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubDecoder
+import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubPublisher
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubRequest
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
+import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackCancelSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSendSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackShuffleSearchUseCase
+import com.gchristov.thecodinglove.slack.testfixtures.SlackConfigCreator
 import io.ktor.http.*
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
@@ -79,7 +82,7 @@ class SlackInteractivityPubSubHandlerTest {
     }
 
     private fun runBlockingTest(
-        sendResult: Either<Throwable, Unit> = Either.Right(Unit),
+        sendResult: Either<Throwable, SlackSelfDestructMessage?> = Either.Right(null),
         testBlock: suspend (SlackInteractivityPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase) -> Unit,
     ): TestResult = runTest {
         val sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)
@@ -92,7 +95,13 @@ class SlackInteractivityPubSubHandlerTest {
             log = FakeLogger,
             eventHandlers = listOf(
                 SlackSendInteractivityPubSubHandler(sendUseCase, analytics),
-                SlackSelfDestructInteractivityPubSubHandler(sendUseCase, analytics),
+                SlackSelfDestructInteractivityPubSubHandler(
+                    jsonSerializer = JsonSerializer.Default,
+                    slackSendSearchUseCase = sendUseCase,
+                    pubSubPublisher = FakePubSubPublisher(),
+                    slackConfig = SlackConfigCreator.slackConfig(),
+                    analytics = analytics,
+                ),
                 SlackShuffleInteractivityPubSubHandler(shuffleUseCase, analytics),
                 SlackCancelSearchInteractivityPubSubHandler(cancelUseCase, analytics),
             ),

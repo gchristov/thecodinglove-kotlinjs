@@ -10,6 +10,7 @@ import com.gchristov.thecodinglove.common.network.http.HttpService
 import com.gchristov.thecodinglove.slack.adapter.http.*
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackInteractivityPubSubHandler
 import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSearchPubSubHandler
+import com.gchristov.thecodinglove.slack.adapter.pubsub.SlackSelfDestructMessagePubSubHandler
 import com.gchristov.thecodinglove.slack.domain.model.Environment
 
 suspend fun main() {
@@ -25,7 +26,7 @@ suspend fun main() {
         slackInteractivityPubSubHandler = component.slackInteractivityPubSubHandler,
         slackAuthHttpHandler = component.slackAuthHttpHandler,
         slackEventHttpHandler = component.slackEventHttpHandler,
-        slackSelfDestructHttpHandler = component.slackSelfDestructHttpHandler,
+        slackSelfDestructMessagePubSubHandler = component.slackSelfDestructMessagePubSubHandler,
         slackStatisticsHttpHandler = component.slackStatisticsHttpHandler,
         httpService = component.httpService,
         port = environment.port,
@@ -53,7 +54,7 @@ private suspend fun setupService(
     slackInteractivityPubSubHandler: SlackInteractivityPubSubHandler,
     slackAuthHttpHandler: SlackAuthHttpHandler,
     slackEventHttpHandler: SlackEventHttpHandler,
-    slackSelfDestructHttpHandler: SlackSelfDestructHttpHandler,
+    slackSelfDestructMessagePubSubHandler: SlackSelfDestructMessagePubSubHandler,
     slackStatisticsHttpHandler: SlackStatisticsHttpHandler,
     httpService: HttpService,
     port: Int,
@@ -66,7 +67,7 @@ private suspend fun setupService(
             slackInteractivityPubSubHandler,
             slackAuthHttpHandler,
             slackEventHttpHandler,
-            slackSelfDestructHttpHandler,
+            slackSelfDestructMessagePubSubHandler,
             slackStatisticsHttpHandler,
         ),
         port = port,

@@ -24,6 +24,7 @@ resources:
           SLACK_REQUEST_VERIFICATION: "true"
           SLACK_SLASH_COMMAND_RECEIVED_PUBSUB_TOPIC: slack_slash_command_received
           SLACK_INTERACTIVITY_RECEIVED_PUBSUB_TOPIC: slack_interactivity_received
+          SLACK_SELF_DESTRUCT_MESSAGE_PUBSUB_TOPIC: slack_self_destruct_message
         platform: linux/amd64
         context: ../service/build/dist/js
       imageName: ${location}-docker.pkg.dev/${gcp:project}/${repositoryId}/slack-service:latest
@@ -144,6 +145,33 @@ resources:
         maximumBackoff: 600s
         minimumBackoff: 10s
       topic: ${pubsub-topic-slack-slash-command-received.name}
+    options:
+      version: 8.6.0
+      protect: true
+  # Manages the self-destruct message PubSub topic. Published to (with a Cloud Tasks delay) when a
+  # self-destructing message is sent, consumed by this same service once the delay elapses.
+  pubsub-topic-slack-self-destruct-message:
+    type: gcp:pubsub:Topic
+    properties:
+      name: slack_self_destruct_message
+    options:
+      version: 8.6.0
+      protect: true
+  # Manages the self-destruct message PubSub subscription.
+  pubsub-subscription-slack-self-destruct-message:
+    type: gcp:pubsub:Subscription
+    properties:
+      ackDeadlineSeconds: 10
+      expirationPolicy:
+        ttl: ""
+      messageRetentionDuration: 600s
+      name: slack_self_destruct_message_subscription
+      pushConfig:
+        pushEndpoint: ${slack-service.uri}/api/pubsub/self-destruct/message
+      retryPolicy:
+        maximumBackoff: 600s
+        minimumBackoff: 10s
+      topic: ${pubsub-topic-slack-self-destruct-message.name}
     options:
       version: 8.6.0
       protect: true
