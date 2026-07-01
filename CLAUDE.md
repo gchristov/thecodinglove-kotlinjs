@@ -25,7 +25,6 @@ This project has a child: [personal-website-kotlinjs](../personal-website-kotlin
 │   └── test/            ← shared test utilities
 ├── slack/               ← Slack microservice (auth, message handling, GIF search results)
 ├── search/              ← Search microservice (scrapes thecodinglove.com)
-├── self-destruct/       ← Self-destruct microservice (deletes messages after timeout)
 ├── statistics/          ← Statistics microservice (tracks usage)
 ├── slack-web/           ← Slack OAuth web flow microservice
 ├── landing-page-web/    ← Landing page
@@ -266,7 +265,6 @@ Simple scalar test values (strings, IDs) can stay as `private const val` inside 
 | `common/analytics-testfixtures` | `FakeAnalytics` |
 | `search/test-fixtures` | `FakeSearchRepository`, `FakeSearchHttpRequest`, Creators for `SearchSession`, `SearchPost`, `SearchStatistics`, etc. |
 | `slack/test-fixtures` | Fakes for all Slack use cases, `FakeSlackHttpRequest`, `FakeSlackAuthHttpRequest`, `SlackConfigCreator`, Creators for Slack domain objects |
-| `self-destruct/test-fixtures` | `FakeSelfDestructUseCase`, `FakeSelfDestructSlackRepository` |
 | `statistics/test-fixtures` | `FakeStatisticsReportUseCase`, `FakeStatisticsSearchRepository`, `FakeStatisticsSlackRepository`, `StatisticsReportCreator` |
 
 ### HTTP handler tests

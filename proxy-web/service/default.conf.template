@@ -4,9 +4,6 @@ server {
   location /${STATISTICS_SERVICE_PATH} {
     proxy_pass ${STATISTICS_SERVICE_HOST}/${STATISTICS_SERVICE_PATH};
   }
-  location /${SELF_DESTRUCT_SERVICE_PATH} {
-    proxy_pass ${SELF_DESTRUCT_SERVICE_HOST}/${SELF_DESTRUCT_SERVICE_PATH};
-  }
   location /${SLACK_SERVICE_PATH} {
     proxy_pass ${SLACK_SERVICE_HOST}/${SLACK_SERVICE_PATH};
   }

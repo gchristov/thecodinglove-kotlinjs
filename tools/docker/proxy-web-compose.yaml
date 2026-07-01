@@ -9,8 +9,6 @@ services:
       - SEARCH_SERVICE_PUBSUB_PATH=api/pubsub/search
       - STATISTICS_SERVICE_HOST=http://statistics-service:8082
       - STATISTICS_SERVICE_PATH=api/statistics
-      - SELF_DESTRUCT_SERVICE_HOST=http://self-destruct-service:8083
-      - SELF_DESTRUCT_SERVICE_PATH=api/self-destruct
       - SLACK_SERVICE_HOST=http://slack-service:8084
       - SLACK_SERVICE_PATH=api/slack
       - SLACK_SERVICE_PUBSUB_PATH=api/pubsub/slack

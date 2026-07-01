@@ -21,10 +21,6 @@ resources:
     type: pulumi:pulumi:StackReference
     properties:
       name: gchristov/thecodinglove-statistics/prod
-  self-destruct-reference:
-    type: pulumi:pulumi:StackReference
-    properties:
-      name: gchristov/thecodinglove-self-destruct/prod
   slack-reference:
     type: pulumi:pulumi:StackReference
     properties:
@@ -53,8 +49,6 @@ resources:
           SEARCH_SERVICE_PUBSUB_PATH: ${search-reference.outputs["searchServicePubSubPath"]}
           STATISTICS_SERVICE_HOST: ${statistics-reference.outputs["statisticsServiceHost"]}
           STATISTICS_SERVICE_PATH: ${statistics-reference.outputs["statisticsServicePath"]}
-          SELF_DESTRUCT_SERVICE_HOST: ${self-destruct-reference.outputs["selfDestructServiceHost"]}
-          SELF_DESTRUCT_SERVICE_PATH: ${self-destruct-reference.outputs["selfDestructServicePath"]}
           SLACK_SERVICE_HOST: ${slack-reference.outputs["slackServiceHost"]}
           SLACK_SERVICE_PATH: ${slack-reference.outputs["slackServicePath"]}
           SLACK_SERVICE_PUBSUB_PATH: ${slack-reference.outputs["slackServicePubSubPath"]}
