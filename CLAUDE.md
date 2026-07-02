@@ -22,10 +22,10 @@ This project has a child: [personal-website-kotlinjs](../personal-website-kotlin
 │   ├── analytics/       ← Google Analytics
 │   ├── monitoring/      ← error reporting (posts to Slack webhook via common/slack)
 │   ├── slack/           ← Slack HTTP API client (SlackSender, SlackMessage, SlackAuthToken)
+│   ├── infra/           ← shared GCP infra (APIs, Artifact Registry, Firestore, Cloud Tasks queue) — Pulumi only, no Kotlin code
 │   └── test/            ← shared test utilities
 ├── slack/               ← Slack microservice (auth, message handling, GIF search results)
 ├── search/              ← Search microservice (scrapes thecodinglove.com)
-├── self-destruct/       ← Self-destruct microservice (deletes messages after timeout)
 ├── statistics/          ← Statistics microservice (tracks usage)
 ├── slack-web/           ← Slack OAuth web flow microservice
 ├── landing-page-web/    ← Landing page
@@ -166,6 +166,12 @@ One interface, no base classes:
 - To swallow errors and prevent PubSub retries: swallow in `handle` via `fold`, and override `handleError` to call `response.sendEmpty()` (covers parse errors too).
 - To propagate errors and trigger PubSub retries: return `Either.Left` from `handle` and don't override `handleError`.
 
+## Delayed publishing (Cloud Tasks)
+
+`PubSubPublisher.publishJson` takes an optional `delay: Duration = Duration.ZERO`. Cloud Pub/Sub has no native scheduled delivery, so a `delay > Duration.ZERO` is implemented by scheduling a Cloud Task (`common/pubsub/.../GoogleCloudTasksExternals.kt`) whose HTTP target is Pub/Sub's own REST publish endpoint, authenticated via an `oauthToken` using the calling service's own identity. The task fires — and the message actually publishes — once the delay elapses; callers see no intermediate callback or extra wiring, just a later publish.
+
+All delayed tasks share **one Cloud Tasks queue** (`scheduled-events`, `europe-west1`), provisioned once in `common/infra/Pulumi.yaml` rather than per-service — the queue name/location are hardcoded constants in `GoogleCloudPubSubPublisher` that must match. `FakePubSubPublisher` (`common/pubsub-testfixtures`) tracks `lastDelay`; use `assertEquals(topic, message, delay)` when the delay is a fixed test value, or `assertTopic(topic)` when it isn't (e.g. computed from a real wall-clock read).
+
 ## Error handling
 
 Arrow `Either<Throwable, T>` throughout. Use `either { }` DSL and `.bind()`.
@@ -266,7 +272,6 @@ Simple scalar test values (strings, IDs) can stay as `private const val` inside 
 | `common/analytics-testfixtures` | `FakeAnalytics` |
 | `search/test-fixtures` | `FakeSearchRepository`, `FakeSearchHttpRequest`, Creators for `SearchSession`, `SearchPost`, `SearchStatistics`, etc. |
 | `slack/test-fixtures` | Fakes for all Slack use cases, `FakeSlackHttpRequest`, `FakeSlackAuthHttpRequest`, `SlackConfigCreator`, Creators for Slack domain objects |
-| `self-destruct/test-fixtures` | `FakeSelfDestructUseCase`, `FakeSelfDestructSlackRepository` |
 | `statistics/test-fixtures` | `FakeStatisticsReportUseCase`, `FakeStatisticsSearchRepository`, `FakeStatisticsSlackRepository`, `StatisticsReportCreator` |
 
 ### HTTP handler tests
@@ -304,6 +309,8 @@ These are read by the `BuildConfigPlugin` and exposed as `BuildConfig.*` constan
 
 `SlackMessage` has all fields defaulted — only specify what you need.
 
+PubSub can retry a handler after an earlier transient failure elsewhere in the same flow, replaying a call that already succeeded once. `postMessageToUrl` and `deleteMessage` account for this by treating certain "already happened" errors from Slack as success rather than failing again (`used_url` on `postMessageToUrl`; `message_not_found`/`cant_delete_message` on `deleteMessage`) — follow this precedent for new `SlackSender` methods that PubSub handlers call.
+
 ## Infrastructure
 
 Each microservice has an `infra/` folder with a Pulumi YAML program (`Pulumi.yaml`) and a stack config (`Pulumi.prod.yaml`, stack name `prod`). Some services also have an `infra/dev/` folder with a separate program for dev-only resources (stack name `dev`, config in `Pulumi.dev.yaml`).
@@ -315,6 +322,10 @@ The `infra/dev/` push endpoints point to a local tunnel URL. If that URL changes
 
 GCP credentials (`credentials-gcp-infra.json`) sit alongside each `Pulumi.yaml`; `infra/dev/` programs reference the parent folder's credentials via `../credentials-gcp-infra.json`.
 
+**`common/infra/` is a special case:** it provisions project-wide shared resources (API enablement, Artifact Registry, Firestore, the shared Cloud Tasks queue) that no single microservice owns, and has no `service/` counterpart. It isn't wired into any microservice's PR/merge deploy flow — it's previewed nightly (`nightly-check.yml`) and only ever deployed via a manual `pulumi up`, run with explicit confirmation since it's shared, protected, prod infra.
+
+Tearing down a microservice's infra (e.g. decommissioning it) needs a manual `pulumi destroy` too — deleting the `infra/` folder only stops CI from touching that stack going forward, it doesn't delete the live resources. Cloud Run's `gcp:cloudrunv2:Service` also carries its own GCP-level `deletionProtection` flag independent of Pulumi's `protect: true` — both must be cleared (`pulumi state unprotect --all`, then a targeted `pulumi up` setting `deletionProtection: false` on the service) before `pulumi destroy` will succeed.
+
 ## CI
 
 GitHub Actions per microservice. Tests run with:
@@ -325,3 +336,5 @@ Results collected from `**/TEST-*.xml`.
 
 On pull requests: build, test, preview `infra/` (stack `prod`), and deploy `infra/dev/` (stack `dev`) for any service that has that folder.
 On merge to `master`: build, test, deploy `infra/` (stack `prod`).
+
+A separate nightly workflow (`nightly-check.yml`) builds all services, runs tests, and previews `common/infra/` (stack `prod`) — it never deploys `common/infra/`, only flags drift.

@@ -12,7 +12,6 @@ echo "🏁 Start app" && echo "" && docker compose \
 -f tools/docker/landing-page-web-compose.yaml \
 -f tools/docker/proxy-web-compose.yaml \
 -f tools/docker/search-compose.yaml \
--f tools/docker/self-destruct-compose.yaml \
 -f tools/docker/slack-compose.yaml \
 -f tools/docker/slack-web-compose.yaml \
 -f tools/docker/statistics-compose.yaml \
