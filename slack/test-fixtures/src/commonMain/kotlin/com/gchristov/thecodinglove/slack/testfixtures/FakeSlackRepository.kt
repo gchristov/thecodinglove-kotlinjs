@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.slack.testfixtures
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.slack.model.SlackAuthToken
 import com.gchristov.thecodinglove.common.slack.model.SlackMessage
-import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
+import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -22,7 +22,7 @@ class FakeSlackRepository(
     private val deleteMessageResult: Either<Throwable, Unit> = Either.Right(Unit),
     private val saveSelfDestructMessageResult: Either<Throwable, Unit> = Either.Right(Unit),
     private val deleteSelfDestructMessageResult: Either<Throwable, Unit> = Either.Right(Unit),
-    private val getSelfDestructMessagesResult: Either<Throwable, List<SlackSelfDestructMessage>> = Either.Right(emptyList()),
+    private val getSelfDestructMessagesResult: Either<Throwable, List<SlackSentMessage>> = Either.Right(emptyList()),
 ) : SlackRepository {
     private var authUserInvocations = 0
     private var getAuthTokenInvocations = 0
@@ -31,7 +31,7 @@ class FakeSlackRepository(
     private var postMessageToUrlInvocations = 0
     private var postMessageInvocations = 0
     private var deleteMessageInvocations = 0
-    private var lastSavedSelfDestructMessage: SlackSelfDestructMessage? = null
+    private var lastSavedSelfDestructMessage: SlackSentMessage? = null
     private var deleteSelfDestructMessageInvocations = 0
 
     override suspend fun authUser(
@@ -63,7 +63,7 @@ class FakeSlackRepository(
         messageTs: String,
     ) = deleteMessageResult.also { deleteMessageInvocations++ }
 
-    override suspend fun saveSelfDestructMessage(message: SlackSelfDestructMessage) =
+    override suspend fun saveSelfDestructMessage(message: SlackSentMessage) =
         saveSelfDestructMessageResult.also { lastSavedSelfDestructMessage = message }
 
     override suspend fun deleteSelfDestructMessage(messageId: String) =

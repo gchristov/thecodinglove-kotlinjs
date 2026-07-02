@@ -5,12 +5,12 @@ import com.gchristov.thecodinglove.common.analyticstestfixtures.FakeAnalytics
 import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubPublisher
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
-import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
+import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackEnsureAuthenticatedUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackEnsureAuthenticatedUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSendSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.SlackConfigCreator
-import com.gchristov.thecodinglove.slack.testfixtures.SlackSelfDestructMessageCreator
+import com.gchristov.thecodinglove.slack.testfixtures.SlackSentMessageCreator
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -48,7 +48,7 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
 
     @Test
     fun handleSelfDestructMessageSentSchedulesSelfDestruct(): TestResult = runBlockingTest(
-        sendResult = Either.Right(SlackSelfDestructMessageCreator.pastMessage()),
+        sendResult = Either.Right(SlackSentMessageCreator.pastMessage()),
     ) { handler, _, _, pubSubPublisher ->
         val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
         val result = handler.handle(payload)
@@ -91,7 +91,7 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
     private fun runBlockingTest(
         ensureAuthResult: Either<Throwable, SlackEnsureAuthenticatedUseCase.Result> =
             Either.Right(SlackEnsureAuthenticatedUseCase.Result.Authenticated),
-        sendResult: Either<Throwable, SlackSelfDestructMessage?> = Either.Right(null),
+        sendResult: Either<Throwable, SlackSentMessage?> = Either.Right(null),
         testBlock: suspend (
             SlackSelfDestructInteractivityPubSubHandler,
             FakeSlackEnsureAuthenticatedUseCase,

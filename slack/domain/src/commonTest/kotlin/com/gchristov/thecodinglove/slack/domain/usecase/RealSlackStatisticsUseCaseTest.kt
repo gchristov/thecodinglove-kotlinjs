@@ -4,11 +4,11 @@ import arrow.core.Either
 import com.gchristov.thecodinglove.common.slack.model.SlackAuthToken
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
-import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
+import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
 import com.gchristov.thecodinglove.slack.domain.model.SlackStatistics
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackRepository
 import com.gchristov.thecodinglove.slack.testfixtures.SlackAuthTokenCreator
-import com.gchristov.thecodinglove.slack.testfixtures.SlackSelfDestructMessageCreator
+import com.gchristov.thecodinglove.slack.testfixtures.SlackSentMessageCreator
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -35,8 +35,8 @@ class RealSlackStatisticsUseCaseTest {
     @Test
     fun statisticsCountsCorrectly(): TestResult = runBlockingTest(
         getSelfDestructMessagesResult = Either.Right(listOf(
-            SlackSelfDestructMessageCreator.pastMessage(),
-            SlackSelfDestructMessageCreator.futureMessage(),
+            SlackSentMessageCreator.pastMessage(),
+            SlackSentMessageCreator.futureMessage(),
         )),
         getAuthTokensResult = Either.Right(listOf(
             SlackAuthTokenCreator.token(id = "user_1"),
@@ -75,7 +75,7 @@ class RealSlackStatisticsUseCaseTest {
     }
 
     private fun runBlockingTest(
-        getSelfDestructMessagesResult: Either<Throwable, List<SlackSelfDestructMessage>> = Either.Right(emptyList()),
+        getSelfDestructMessagesResult: Either<Throwable, List<SlackSentMessage>> = Either.Right(emptyList()),
         getAuthTokensResult: Either<Throwable, List<SlackAuthToken>> = Either.Right(emptyList()),
         testBlock: suspend (SlackStatisticsUseCase) -> Unit,
     ): TestResult = runTest {

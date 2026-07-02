@@ -79,7 +79,7 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
             ),
             jsonSerializer = jsonSerializer,
             strategy = SlackSelfDestructMessageEvent.serializer(),
-            delay = Instant.fromEpochMilliseconds(selfDestructMessage.destroyTimestamp) - Clock.System.now(),
+            delay = Instant.fromEpochMilliseconds(selfDestructMessage.destroyTimestamp!!) - Clock.System.now(),
         )
         // Discard the scheduled Cloud Task's id - PubSubHandler.handle() only reports success/failure.
         return scheduleResult.map { }

@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.slack.adapter.pubsub
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.analyticstestfixtures.FakeAnalytics
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
-import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
+import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackEnsureAuthenticatedUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackEnsureAuthenticatedUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSendSearchUseCase
@@ -68,7 +68,7 @@ class SlackSendInteractivityPubSubHandlerTest {
     private fun runBlockingTest(
         ensureAuthResult: Either<Throwable, SlackEnsureAuthenticatedUseCase.Result> =
             Either.Right(SlackEnsureAuthenticatedUseCase.Result.Authenticated),
-        sendResult: Either<Throwable, SlackSelfDestructMessage?> = Either.Right(null),
+        sendResult: Either<Throwable, SlackSentMessage?> = Either.Right(null),
         testBlock: suspend (SlackSendInteractivityPubSubHandler) -> Unit,
     ): TestResult = runTest {
         ensureAuthUseCase = FakeSlackEnsureAuthenticatedUseCase(invocationResult = ensureAuthResult)

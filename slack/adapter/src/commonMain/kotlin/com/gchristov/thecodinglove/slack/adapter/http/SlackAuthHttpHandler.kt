@@ -65,7 +65,7 @@ class SlackAuthHttpHandler(
                         ),
                         jsonSerializer = jsonSerializer,
                         strategy = SlackSelfDestructMessageEvent.serializer(),
-                        delay = Instant.fromEpochMilliseconds(message.destroyTimestamp) - Clock.System.now(),
+                        delay = Instant.fromEpochMilliseconds(message.destroyTimestamp!!) - Clock.System.now(),
                     ).bind()
                 }
             }

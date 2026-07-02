@@ -7,13 +7,13 @@ import com.gchristov.thecodinglove.common.networktestfixtures.FakeHttpResponse
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubPublisher
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
-import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
+import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackAuthUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackAuthHttpRequest
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackAuthUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSendSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.SlackConfigCreator
-import com.gchristov.thecodinglove.slack.testfixtures.SlackSelfDestructMessageCreator
+import com.gchristov.thecodinglove.slack.testfixtures.SlackSentMessageCreator
 import io.ktor.http.*
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
@@ -86,7 +86,7 @@ class SlackAuthHttpHandlerTest {
     @Test
     fun authSuccessWithSelfDestructMessageSchedulesSelfDestruct(): TestResult = runBlockingTest(
         authResult = Either.Right(Unit),
-        sendSearchResult = Either.Right(SlackSelfDestructMessageCreator.pastMessage()),
+        sendSearchResult = Either.Right(SlackSentMessageCreator.pastMessage()),
         fakeCode = "auth_code",
         fakeState = TestEncodedState,
     ) { handler, request, response, _, pubSubPublisher ->
@@ -109,7 +109,7 @@ class SlackAuthHttpHandlerTest {
 
     private fun runBlockingTest(
         authResult: Either<SlackAuthUseCase.Error, Unit> = Either.Right(Unit),
-        sendSearchResult: Either<Throwable, SlackSelfDestructMessage?> = Either.Right(null),
+        sendSearchResult: Either<Throwable, SlackSentMessage?> = Either.Right(null),
         fakeCode: String? = null,
         fakeState: String? = null,
         testBlock: suspend (SlackAuthHttpHandler, FakeSlackAuthHttpRequest, FakeHttpResponse, FakeSlackSendSearchUseCase, FakePubSubPublisher) -> Unit,

@@ -11,7 +11,7 @@ import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivityReceivedEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
-import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
+import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackCancelSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackEnsureAuthenticatedUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSendSearchUseCase
@@ -83,7 +83,7 @@ class SlackInteractivityPubSubHandlerTest {
     }
 
     private fun runBlockingTest(
-        sendResult: Either<Throwable, SlackSelfDestructMessage?> = Either.Right(null),
+        sendResult: Either<Throwable, SlackSentMessage?> = Either.Right(null),
         testBlock: suspend (SlackInteractivityPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase) -> Unit,
     ): TestResult = runTest {
         val ensureAuthUseCase = FakeSlackEnsureAuthenticatedUseCase()

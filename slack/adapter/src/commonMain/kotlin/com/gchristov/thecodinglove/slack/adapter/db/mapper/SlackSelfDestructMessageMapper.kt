@@ -1,18 +1,18 @@
 package com.gchristov.thecodinglove.slack.adapter.db.mapper
 
 import com.gchristov.thecodinglove.slack.adapter.db.DbSlackSelfDestructMessage
-import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
+import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
 
-internal fun SlackSelfDestructMessage.toSelfDestructMessage() = DbSlackSelfDestructMessage(
+internal fun SlackSentMessage.toSelfDestructMessage() = DbSlackSelfDestructMessage(
     id = id,
     userId = userId,
     searchSessionId = searchSessionId,
-    destroyTimestamp = destroyTimestamp,
+    destroyTimestamp = requireNotNull(destroyTimestamp) { "Only self-destructing messages can be persisted" },
     channelId = channelId,
     messageTs = messageTs,
 )
 
-internal fun DbSlackSelfDestructMessage.toSelfDestructMessage() = SlackSelfDestructMessage(
+internal fun DbSlackSelfDestructMessage.toSelfDestructMessage() = SlackSentMessage(
     id = id,
     userId = userId,
     searchSessionId = searchSessionId,
