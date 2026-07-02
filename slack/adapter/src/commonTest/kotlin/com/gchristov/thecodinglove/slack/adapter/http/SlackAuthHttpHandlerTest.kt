@@ -98,7 +98,7 @@ class SlackAuthHttpHandlerTest {
     @Test
     fun authSuccessWithNoSelfDestructMessageDoesNotSchedule(): TestResult = runBlockingTest(
         authResult = Either.Right(Unit),
-        sendSearchResult = Either.Right(null),
+        sendSearchResult = Either.Right(SlackSentMessageCreator.message()),
         fakeCode = "auth_code",
         fakeState = TestEncodedState,
     ) { handler, request, response, _, pubSubPublisher ->
@@ -109,7 +109,7 @@ class SlackAuthHttpHandlerTest {
 
     private fun runBlockingTest(
         authResult: Either<SlackAuthUseCase.Error, Unit> = Either.Right(Unit),
-        sendSearchResult: Either<Throwable, SlackSentMessage?> = Either.Right(null),
+        sendSearchResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.message()),
         fakeCode: String? = null,
         fakeState: String? = null,
         testBlock: suspend (SlackAuthHttpHandler, FakeSlackAuthHttpRequest, FakeHttpResponse, FakeSlackSendSearchUseCase, FakePubSubPublisher) -> Unit,

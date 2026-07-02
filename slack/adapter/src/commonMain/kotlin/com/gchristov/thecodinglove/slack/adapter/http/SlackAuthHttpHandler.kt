@@ -15,6 +15,7 @@ import com.gchristov.thecodinglove.slack.adapter.http.mapper.toAuthState
 import com.gchristov.thecodinglove.slack.adapter.http.model.ApiSlackAuthState
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSelfDestructMessageEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
+import com.gchristov.thecodinglove.slack.domain.model.isSelfDestruct
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackAuthUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import io.ktor.http.*
@@ -53,19 +54,19 @@ class SlackAuthHttpHandler(
             slackAuthUseCase(SlackAuthUseCase.Dto(code)).bind()
             // If there's state, this means we may be able to send (and possibly self-destruct) a message.
             state?.let {
-                val selfDestructMessage = handleAuthState(it).bind()
-                selfDestructMessage?.let { message ->
+                val sentMessage = handleAuthState(it).bind()
+                if (sentMessage.isSelfDestruct) {
                     pubSubPublisher.publishJson(
                         topic = slackConfig.selfDestructMessagePubSubTopic,
                         body = SlackSelfDestructMessageEvent(
-                            id = message.id,
-                            userId = message.userId,
-                            channelId = message.channelId,
-                            messageTs = message.messageTs,
+                            id = sentMessage.id,
+                            userId = sentMessage.userId,
+                            channelId = sentMessage.channelId,
+                            messageTs = sentMessage.messageTs,
                         ),
                         jsonSerializer = jsonSerializer,
                         strategy = SlackSelfDestructMessageEvent.serializer(),
-                        delay = Instant.fromEpochMilliseconds(message.destroyTimestamp!!) - Clock.System.now(),
+                        delay = Instant.fromEpochMilliseconds(requireNotNull(sentMessage.destroyTimestamp)) - Clock.System.now(),
                     ).bind()
                 }
             }

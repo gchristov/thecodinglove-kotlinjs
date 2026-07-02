@@ -50,8 +50,8 @@ internal class SlackSendInteractivityPubSubHandler(
             return Either.Right(Unit)
         }
 
-        // This flow never self-destructs (selfDestructMinutes = null), so there's never a message to
-        // schedule - discard the returned SlackSelfDestructMessage? to satisfy PubSubHandler's Unit contract.
+        // This flow never self-destructs (selfDestructMinutes = null), so there's never anything to
+        // schedule - discard the returned SlackSentMessage to satisfy PubSubHandler's Unit contract.
         return slackSendSearchUseCase(
             SlackSendSearchUseCase.Dto(
                 userId = event.user.id,

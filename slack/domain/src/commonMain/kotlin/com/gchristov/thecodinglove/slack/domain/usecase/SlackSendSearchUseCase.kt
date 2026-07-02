@@ -7,6 +7,7 @@ import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
+import com.gchristov.thecodinglove.slack.domain.model.isSelfDestruct
 import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import kotlin.time.Clock
@@ -17,11 +18,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.plus
 
 interface SlackSendSearchUseCase {
-    /**
-     * @return the [SlackSentMessage] to schedule for deletion if the sent message should
-     * self-destruct, or `null` if it isn't self-destructing.
-     */
-    suspend operator fun invoke(dto: Dto): Either<Throwable, SlackSentMessage?>
+    suspend operator fun invoke(dto: Dto): Either<Throwable, SlackSentMessage>
 
     sealed class Error(message: String? = null) : Throwable(message) {
         data object NotAuthenticated : Error("User is not authenticated")
@@ -48,7 +45,7 @@ internal class RealSlackSendSearchUseCase(
 ) : SlackSendSearchUseCase {
     private val tag = this::class.simpleName
 
-    override suspend operator fun invoke(dto: SlackSendSearchUseCase.Dto): Either<Throwable, SlackSentMessage?> =
+    override suspend operator fun invoke(dto: SlackSendSearchUseCase.Dto): Either<Throwable, SlackSentMessage> =
         withContext(dispatcher) {
             log.debug(tag, "Checking auth token before sending message: userId=${dto.userId}")
             val authState = SlackAuthState(
@@ -69,7 +66,7 @@ internal class RealSlackSendSearchUseCase(
     private suspend fun sendResult(
         authState: SlackAuthState,
         authToken: String,
-    ): Either<Throwable, SlackSentMessage?> {
+    ): Either<Throwable, SlackSentMessage> {
         log.debug(tag, "Obtaining search session: searchSessionId=${authState.searchSessionId}")
         val searchSessionPost = slackSearchRepository.getSearchSessionPost(authState.searchSessionId)
             .getOrElse { return Either.Left(it) }
@@ -99,20 +96,21 @@ internal class RealSlackSendSearchUseCase(
             searchSessionId = authState.searchSessionId,
             state = state,
         ).getOrElse { return Either.Left(it) }
-        val selfDestructMessage = authState.selfDestructMinutes?.let { minutes ->
-            log.debug(tag, "Persisting self-destruct state: searchSessionId=${authState.searchSessionId}")
-            val destroyTimestamp = clock.now().plus(value = minutes, unit = DateTimeUnit.MINUTE).toEpochMilliseconds()
-            val message = SlackSentMessage(
-                id = authState.searchSessionId,
-                userId = authState.userId,
-                searchSessionId = authState.searchSessionId,
-                destroyTimestamp = destroyTimestamp,
-                channelId = authState.channelId,
-                messageTs = messageTs,
-            )
-            slackRepository.saveSelfDestructMessage(message).getOrElse { return Either.Left(it) }
-            message
+        val destroyTimestamp = authState.selfDestructMinutes?.let { minutes ->
+            clock.now().plus(value = minutes, unit = DateTimeUnit.MINUTE).toEpochMilliseconds()
         }
-        return Either.Right(selfDestructMessage)
+        val message = SlackSentMessage(
+            id = authState.searchSessionId,
+            userId = authState.userId,
+            searchSessionId = authState.searchSessionId,
+            destroyTimestamp = destroyTimestamp,
+            channelId = authState.channelId,
+            messageTs = messageTs,
+        )
+        if (message.isSelfDestruct) {
+            log.debug(tag, "Persisting self-destruct state: searchSessionId=${authState.searchSessionId}")
+            slackRepository.saveSelfDestructMessage(message).getOrElse { return Either.Left(it) }
+        }
+        return Either.Right(message)
     }
 }

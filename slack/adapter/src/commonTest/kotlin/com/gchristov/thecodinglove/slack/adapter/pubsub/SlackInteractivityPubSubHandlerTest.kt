@@ -17,6 +17,7 @@ import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackEnsureAuthenticat
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSendSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackShuffleSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.SlackConfigCreator
+import com.gchristov.thecodinglove.slack.testfixtures.SlackSentMessageCreator
 import io.ktor.http.*
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
@@ -83,7 +84,7 @@ class SlackInteractivityPubSubHandlerTest {
     }
 
     private fun runBlockingTest(
-        sendResult: Either<Throwable, SlackSentMessage?> = Either.Right(null),
+        sendResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.message()),
         testBlock: suspend (SlackInteractivityPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase) -> Unit,
     ): TestResult = runTest {
         val ensureAuthUseCase = FakeSlackEnsureAuthenticatedUseCase()

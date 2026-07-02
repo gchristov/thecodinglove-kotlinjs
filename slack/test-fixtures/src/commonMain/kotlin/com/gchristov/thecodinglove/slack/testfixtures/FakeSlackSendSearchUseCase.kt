@@ -6,12 +6,12 @@ import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import kotlin.test.assertEquals
 
 class FakeSlackSendSearchUseCase(
-    private val invocationResult: Either<Throwable, SlackSentMessage?> = Either.Right(null),
+    private val invocationResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.message()),
 ) : SlackSendSearchUseCase {
     private var invocations = 0
     private var lastSelfDestructMinutes: Int? = null
 
-    override suspend fun invoke(dto: SlackSendSearchUseCase.Dto): Either<Throwable, SlackSentMessage?> {
+    override suspend fun invoke(dto: SlackSendSearchUseCase.Dto): Either<Throwable, SlackSentMessage> {
         lastSelfDestructMinutes = dto.selfDestructMinutes
         invocations++
         return invocationResult

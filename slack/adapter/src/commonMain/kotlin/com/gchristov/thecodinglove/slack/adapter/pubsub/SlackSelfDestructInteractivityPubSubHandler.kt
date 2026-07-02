@@ -12,6 +12,7 @@ import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivity
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSelfDestructMessageEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
+import com.gchristov.thecodinglove.slack.domain.model.isSelfDestruct
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackEnsureAuthenticatedUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -59,7 +60,7 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
             return Either.Right(Unit)
         }
 
-        val selfDestructMessage = slackSendSearchUseCase(
+        val sentMessage = slackSendSearchUseCase(
             SlackSendSearchUseCase.Dto(
                 userId = event.user.id,
                 teamId = event.team.id,
@@ -68,18 +69,20 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
                 searchSessionId = action.value,
                 selfDestructMinutes = 5,
             )
-        ).getOrElse { return Either.Left(it) } ?: return Either.Right(Unit)
+        ).getOrElse { return Either.Left(it) }
+        if (!sentMessage.isSelfDestruct) return Either.Right(Unit)
+
         val scheduleResult = pubSubPublisher.publishJson(
             topic = slackConfig.selfDestructMessagePubSubTopic,
             body = SlackSelfDestructMessageEvent(
-                id = selfDestructMessage.id,
-                userId = selfDestructMessage.userId,
-                channelId = selfDestructMessage.channelId,
-                messageTs = selfDestructMessage.messageTs,
+                id = sentMessage.id,
+                userId = sentMessage.userId,
+                channelId = sentMessage.channelId,
+                messageTs = sentMessage.messageTs,
             ),
             jsonSerializer = jsonSerializer,
             strategy = SlackSelfDestructMessageEvent.serializer(),
-            delay = Instant.fromEpochMilliseconds(selfDestructMessage.destroyTimestamp!!) - Clock.System.now(),
+            delay = Instant.fromEpochMilliseconds(requireNotNull(sentMessage.destroyTimestamp)) - Clock.System.now(),
         )
         // Discard the scheduled Cloud Task's id - PubSubHandler.handle() only reports success/failure.
         return scheduleResult.map { }
