@@ -114,14 +114,12 @@ interface SlackDomainComponent {
         log: Logger,
         slackSearchRepository: SlackSearchRepository,
         slackRepository: SlackRepository,
-        slackConfig: SlackConfig,
         slackMessageFactory: SlackMessageFactory,
     ): SlackSendSearchUseCase = RealSlackSendSearchUseCase(
         dispatcher = Dispatchers.Default,
         log = log,
         slackSearchRepository = slackSearchRepository,
         slackRepository = slackRepository,
-        slackConfig = slackConfig,
         slackMessageFactory = slackMessageFactory,
         clock = Clock.System,
     )
