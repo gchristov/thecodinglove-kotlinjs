@@ -8,4 +8,5 @@ internal fun ApiSlackSearchSessionPost.toSearchSessionPost() = SlackSearchReposi
     attachmentTitle = attachmentTitle,
     attachmentUrl = attachmentUrl,
     attachmentImageUrl = attachmentImageUrl,
+    searchResults = searchResults,
 )

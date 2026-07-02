@@ -42,5 +42,6 @@ interface SlackSearchRepository {
         val attachmentTitle: String,
         val attachmentUrl: String,
         val attachmentImageUrl: String,
+        val searchResults: Int,
     )
 }
