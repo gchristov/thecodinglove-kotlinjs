@@ -16,6 +16,9 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class SlackSelfDestructInteractivityPubSubHandlerTest {
     @Test
@@ -25,7 +28,20 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
         assertTrue { result.isRight() }
         ensureAuthUseCase.assertInvokedOnce()
         sendUseCase.assertInvokedOnce()
-        sendUseCase.assertSelfDestructMinutes(5)
+        sendUseCase.assertSelfDestructDelay(5.minutes)
+    }
+
+    @Test
+    fun handleSelfDestruct30SecInvokesSendUseCaseWith30Seconds(): TestResult = runBlockingTest(
+        actionName = SlackActionName.SELF_DESTRUCT_30_SEC,
+        selfDestructDelay = 30.seconds,
+    ) { handler, ensureAuthUseCase, sendUseCase, _ ->
+        val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_30_SEC).payload as SlackInteractivityPayload
+        val result = handler.handle(payload)
+        assertTrue { result.isRight() }
+        ensureAuthUseCase.assertInvokedOnce()
+        sendUseCase.assertInvokedOnce()
+        sendUseCase.assertSelfDestructDelay(30.seconds)
     }
 
     @Test
@@ -89,6 +105,8 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
     }
 
     private fun runBlockingTest(
+        actionName: SlackActionName = SlackActionName.SELF_DESTRUCT_5_MIN,
+        selfDestructDelay: Duration = 5.minutes,
         ensureAuthResult: Either<Throwable, SlackEnsureAuthenticatedUseCase.Result> =
             Either.Right(SlackEnsureAuthenticatedUseCase.Result.Authenticated),
         sendResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.futureMessage()),
@@ -104,6 +122,8 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
         val pubSubPublisher = FakePubSubPublisher()
         val handler = SlackSelfDestructInteractivityPubSubHandler(
             jsonSerializer = JsonSerializer.Default,
+            actionName = actionName,
+            selfDestructDelay = selfDestructDelay,
             slackEnsureAuthenticatedUseCase = ensureAuthUseCase,
             slackSendSearchUseCase = sendUseCase,
             pubSubPublisher = pubSubPublisher,

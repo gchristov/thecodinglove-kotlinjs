@@ -7,6 +7,7 @@ import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import io.ktor.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.minutes
 
 class RealSlackAuthStateSerializerTest {
     private val serializer = RealSlackAuthStateSerializer(JsonSerializer.Default)
@@ -20,8 +21,8 @@ class RealSlackAuthStateSerializerTest {
     }
 
     @Test
-    fun selfDestructMinutesNullPreserved() {
-        val state = TestAuthState.copy(selfDestructMinutes = null)
+    fun selfDestructDelayNullPreserved() {
+        val state = TestAuthState.copy(selfDestructDelay = null)
         val result = serializer.serialize(state)
         val decoded = result.decodeBase64String()
         val parsed = JsonSerializer.Default.json.decodeFromString<ApiSlackAuthState>(decoded).toAuthState()
@@ -29,8 +30,8 @@ class RealSlackAuthStateSerializerTest {
     }
 
     @Test
-    fun selfDestructMinutesValuePreserved() {
-        val state = TestAuthState.copy(selfDestructMinutes = 5)
+    fun selfDestructDelayValuePreserved() {
+        val state = TestAuthState.copy(selfDestructDelay = 5.minutes)
         val result = serializer.serialize(state)
         val decoded = result.decodeBase64String()
         val parsed = JsonSerializer.Default.json.decodeFromString<ApiSlackAuthState>(decoded).toAuthState()
@@ -44,5 +45,5 @@ private val TestAuthState = SlackAuthState(
     teamId = "team_xyz",
     userId = "user_456",
     responseUrl = "https://response.url",
-    selfDestructMinutes = null,
+    selfDestructDelay = null,
 )

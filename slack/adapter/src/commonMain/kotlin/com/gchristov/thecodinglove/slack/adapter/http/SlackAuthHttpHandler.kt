@@ -116,7 +116,7 @@ class SlackAuthHttpHandler(
                 channelId = authState.channelId,
                 responseUrl = authState.responseUrl,
                 searchSessionId = authState.searchSessionId,
-                selfDestructMinutes = authState.selfDestructMinutes,
+                selfDestructDelay = authState.selfDestructDelay,
             )
         )
     } catch (error: Throwable) {

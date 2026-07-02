@@ -10,6 +10,7 @@ import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration
 
 interface SlackEnsureAuthenticatedUseCase {
     suspend operator fun invoke(dto: Dto): Either<Throwable, Result>
@@ -25,7 +26,7 @@ interface SlackEnsureAuthenticatedUseCase {
         val channelId: String,
         val responseUrl: String,
         val searchSessionId: String,
-        val selfDestructMinutes: Int? = null,
+        val selfDestructDelay: Duration? = null,
     )
 }
 
@@ -47,7 +48,7 @@ internal class RealSlackEnsureAuthenticatedUseCase(
                 teamId = dto.teamId,
                 userId = dto.userId,
                 responseUrl = dto.responseUrl,
-                selfDestructMinutes = dto.selfDestructMinutes,
+                selfDestructDelay = dto.selfDestructDelay,
             )
             slackRepository.getAuthToken(tokenId = dto.userId).getOrElse { error ->
                 log.debug(tag, error) { "Error fetching user token${error.message?.let { ": $it" } ?: ""}" }

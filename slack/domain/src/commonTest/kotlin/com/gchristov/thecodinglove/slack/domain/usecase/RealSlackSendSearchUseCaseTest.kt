@@ -22,6 +22,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 
 @OptIn(ExperimentalTime::class)
 class RealSlackSendSearchUseCaseTest {
@@ -92,7 +93,7 @@ class RealSlackSendSearchUseCaseTest {
     fun sendSuccessWithSelfDestructSavesSelfDestructStateAndReturnsIt(): TestResult = runBlockingTest(
         getAuthTokenResult = Either.Right(SlackAuthTokenCreator.token()),
     ) { useCase, repository, _ ->
-        val actual = useCase.invoke(TestDto.copy(selfDestructMinutes = 5))
+        val actual = useCase.invoke(TestDto.copy(selfDestructDelay = 5.minutes))
         assertTrue { actual.isRight() }
         val message = actual.getOrElse { null }
         assertNotNull(message)
@@ -138,7 +139,7 @@ private val TestDto = SlackSendSearchUseCase.Dto(
     channelId = "channel_id",
     responseUrl = "https://response.url",
     searchSessionId = "session_123",
-    selfDestructMinutes = null,
+    selfDestructDelay = null,
 )
 @OptIn(ExperimentalTime::class)
 private val TestClock = object : Clock {

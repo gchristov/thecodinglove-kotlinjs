@@ -135,6 +135,6 @@ class SlackAuthHttpHandlerTest {
 
 private const val TestSelfDestructTopic = "self_destruct_topic"
 
-// Base64 of: {"search_session_id":"session_1","channel_id":"ch_1","team_id":"team_1","user_id":"user_1","response_url":"https://response.com","self_destruct_minutes":5}
+// Base64 of: {"search_session_id":"session_1","channel_id":"ch_1","team_id":"team_1","user_id":"user_1","response_url":"https://response.com","self_destruct_delay_seconds":300}
 private const val TestEncodedState =
-    "eyJzZWFyY2hfc2Vzc2lvbl9pZCI6InNlc3Npb25fMSIsImNoYW5uZWxfaWQiOiJjaF8xIiwidGVhbV9pZCI6InRlYW1fMSIsInVzZXJfaWQiOiJ1c2VyXzEiLCJyZXNwb25zZV91cmwiOiJodHRwczovL3Jlc3BvbnNlLmNvbSIsInNlbGZfZGVzdHJ1Y3RfbWludXRlcyI6NX0="
+    "eyJzZWFyY2hfc2Vzc2lvbl9pZCI6InNlc3Npb25fMSIsImNoYW5uZWxfaWQiOiJjaF8xIiwidGVhbV9pZCI6InRlYW1fMSIsInVzZXJfaWQiOiJ1c2VyXzEiLCJyZXNwb25zZV91cmwiOiJodHRwczovL3Jlc3BvbnNlLmNvbSIsInNlbGZfZGVzdHJ1Y3RfZGVsYXlfc2Vjb25kcyI6MzAwfQ=="

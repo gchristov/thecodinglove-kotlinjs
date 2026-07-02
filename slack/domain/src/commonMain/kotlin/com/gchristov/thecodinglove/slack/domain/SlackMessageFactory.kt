@@ -6,6 +6,8 @@ import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessageResponseType
 import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 interface SlackMessageFactory {
     fun message(
@@ -30,6 +32,15 @@ interface SlackMessageFactory {
         attachmentImageUrl: String,
     ): SlackMessage
 
+    fun searchResultDelayMenuMessage(
+        searchQuery: String,
+        searchResults: Int,
+        searchSessionId: String,
+        attachmentTitle: String,
+        attachmentUrl: String,
+        attachmentImageUrl: String,
+    ): SlackMessage
+
     fun authMessage(
         clientId: String,
         authState: SlackAuthState
@@ -41,7 +52,7 @@ interface SlackMessageFactory {
         attachmentUrl: String,
         attachmentImageUrl: String,
         channelId: String,
-        selfDestructMinutes: Int?,
+        selfDestructDelay: Duration?,
     ): SlackMessage
 
     fun searchGenericErrorMessage(): SlackMessage
@@ -89,6 +100,93 @@ internal class RealSlackMessageFactory(
         attachmentTitle: String,
         attachmentUrl: String,
         attachmentImageUrl: String,
+    ) = searchResultMessageWithActions(
+        searchQuery = searchQuery,
+        searchResults = searchResults,
+        attachmentTitle = attachmentTitle,
+        attachmentUrl = attachmentUrl,
+        attachmentImageUrl = attachmentImageUrl,
+        actions = listOf(
+            SlackMessage.Attachment.Action(
+                name = SlackActionName.SEND.apiValue,
+                text = SlackActionName.SEND.text,
+                type = ActionTypeButton,
+                value = searchSessionId,
+                style = ActionStylePrimary,
+            ),
+            SlackMessage.Attachment.Action(
+                name = SlackActionName.SELF_DESTRUCT_MENU.apiValue,
+                text = SlackActionName.SELF_DESTRUCT_MENU.text,
+                type = ActionTypeButton,
+                value = searchSessionId,
+                style = ActionStylePrimary,
+            ),
+            SlackMessage.Attachment.Action(
+                name = SlackActionName.SHUFFLE.apiValue,
+                text = SlackActionName.SHUFFLE.text,
+                type = ActionTypeButton,
+                value = searchSessionId,
+            ),
+            SlackMessage.Attachment.Action(
+                name = SlackActionName.CANCEL.apiValue,
+                text = SlackActionName.CANCEL.text,
+                type = ActionTypeButton,
+                value = searchSessionId,
+            )
+        ),
+    )
+
+    override fun searchResultDelayMenuMessage(
+        searchQuery: String,
+        searchResults: Int,
+        searchSessionId: String,
+        attachmentTitle: String,
+        attachmentUrl: String,
+        attachmentImageUrl: String,
+    ) = searchResultMessageWithActions(
+        searchQuery = searchQuery,
+        searchResults = searchResults,
+        attachmentTitle = attachmentTitle,
+        attachmentUrl = attachmentUrl,
+        attachmentImageUrl = attachmentImageUrl,
+        actions = listOf(
+            SlackMessage.Attachment.Action(
+                name = SlackActionName.SELF_DESTRUCT_30_SEC.apiValue,
+                text = SlackActionName.SELF_DESTRUCT_30_SEC.text,
+                type = ActionTypeButton,
+                value = searchSessionId,
+                style = ActionStylePrimary,
+            ),
+            SlackMessage.Attachment.Action(
+                name = SlackActionName.SELF_DESTRUCT_1_MIN.apiValue,
+                text = SlackActionName.SELF_DESTRUCT_1_MIN.text,
+                type = ActionTypeButton,
+                value = searchSessionId,
+                style = ActionStylePrimary,
+            ),
+            SlackMessage.Attachment.Action(
+                name = SlackActionName.SELF_DESTRUCT_5_MIN.apiValue,
+                text = SlackActionName.SELF_DESTRUCT_5_MIN.text,
+                type = ActionTypeButton,
+                value = searchSessionId,
+                style = ActionStylePrimary,
+            ),
+            SlackMessage.Attachment.Action(
+                name = SlackActionName.SELF_DESTRUCT_MENU_BACK.apiValue,
+                text = SlackActionName.SELF_DESTRUCT_MENU_BACK.text,
+                type = ActionTypeButton,
+                value = searchSessionId,
+            )
+        ),
+    )
+
+    private fun searchResultMessageWithActions(
+        searchQuery: String,
+        searchResults: Int,
+        attachmentTitle: String,
+        attachmentUrl: String,
+        attachmentImageUrl: String,
+        actions: List<SlackMessage.Attachment.Action>,
     ) = message(
         text = "$searchQuery - ($searchResults result${if (searchResults == 1) "" else "s"} found)",
         attachments = listOf(
@@ -97,34 +195,7 @@ internal class RealSlackMessageFactory(
                 url = attachmentUrl,
                 imageUrl = attachmentImageUrl,
                 footer = PostedUsingFooter,
-                actions = listOf(
-                    SlackMessage.Attachment.Action(
-                        name = SlackActionName.SEND.apiValue,
-                        text = SlackActionName.SEND.text,
-                        type = ActionTypeButton,
-                        value = searchSessionId,
-                        style = ActionStylePrimary,
-                    ),
-                    SlackMessage.Attachment.Action(
-                        name = SlackActionName.SELF_DESTRUCT_5_MIN.apiValue,
-                        text = SlackActionName.SELF_DESTRUCT_5_MIN.text,
-                        type = ActionTypeButton,
-                        value = searchSessionId,
-                        style = ActionStylePrimary,
-                    ),
-                    SlackMessage.Attachment.Action(
-                        name = SlackActionName.SHUFFLE.apiValue,
-                        text = SlackActionName.SHUFFLE.text,
-                        type = ActionTypeButton,
-                        value = searchSessionId,
-                    ),
-                    SlackMessage.Attachment.Action(
-                        name = SlackActionName.CANCEL.apiValue,
-                        text = SlackActionName.CANCEL.text,
-                        type = ActionTypeButton,
-                        value = searchSessionId,
-                    )
-                ),
+                actions = actions,
             )
         ),
     )
@@ -167,7 +238,7 @@ internal class RealSlackMessageFactory(
         attachmentUrl: String,
         attachmentImageUrl: String,
         channelId: String,
-        selfDestructMinutes: Int?,
+        selfDestructDelay: Duration?,
     ) = message(
         text = searchQuery,
         channelId = channelId,
@@ -179,7 +250,7 @@ internal class RealSlackMessageFactory(
                 url = attachmentUrl,
                 imageUrl = attachmentImageUrl,
                 actions = emptyList(),
-                footer = selfDestructMinutes?.let { "Self-destructing in ~$selfDestructMinutes minutes • $PostedUsingFooter" }
+                footer = selfDestructDelay?.let { "Self-destructing in ~${it.toFooterText()} • $PostedUsingFooter" }
                     ?: PostedUsingFooter,
             )
         ),
@@ -217,6 +288,12 @@ internal class RealSlackMessageFactory(
         private const val ActionStylePrimary = "primary"
 
         private const val PostedUsingFooter = "Posted using /codinglove"
+
+        private fun Duration.toFooterText() = if (this < 1.minutes) {
+            "$inWholeSeconds second${if (inWholeSeconds == 1L) "" else "s"}"
+        } else {
+            "$inWholeMinutes minute${if (inWholeMinutes == 1L) "" else "s"}"
+        }
 
         private fun randomSearchingMessage() = listOf(
             "\uD83D\uDD75\uFE0F\u200D♀\uFE0F Hang tight, we're finding your GIF...",

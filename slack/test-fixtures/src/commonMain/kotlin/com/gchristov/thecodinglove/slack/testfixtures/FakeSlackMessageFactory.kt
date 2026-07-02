@@ -4,6 +4,7 @@ import com.gchristov.thecodinglove.common.slack.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessageResponseType
+import kotlin.time.Duration
 
 class FakeSlackMessageFactory : SlackMessageFactory {
     override fun message(
@@ -27,6 +28,15 @@ class FakeSlackMessageFactory : SlackMessageFactory {
         attachmentImageUrl: String,
     ) = dummyMessage()
 
+    override fun searchResultDelayMenuMessage(
+        searchQuery: String,
+        searchResults: Int,
+        searchSessionId: String,
+        attachmentTitle: String,
+        attachmentUrl: String,
+        attachmentImageUrl: String,
+    ) = dummyMessage()
+
     override fun authMessage(clientId: String, authState: SlackAuthState) = dummyMessage()
 
     override fun searchPostMessage(
@@ -35,7 +45,7 @@ class FakeSlackMessageFactory : SlackMessageFactory {
         attachmentUrl: String,
         attachmentImageUrl: String,
         channelId: String,
-        selfDestructMinutes: Int?,
+        selfDestructDelay: Duration?,
     ) = dummyMessage()
 
     override fun searchGenericErrorMessage() = dummyMessage()

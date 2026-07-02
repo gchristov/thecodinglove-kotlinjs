@@ -14,6 +14,9 @@ import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackCancelSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackEnsureAuthenticatedUseCase
+import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackMessageFactory
+import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackRepository
+import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSearchRepository
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSendSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackShuffleSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.SlackConfigCreator
@@ -24,10 +27,12 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class SlackInteractivityPubSubHandlerTest {
     @Test
-    fun httpConfig(): TestResult = runBlockingTest { handler, _, _ ->
+    fun httpConfig(): TestResult = runBlockingTest { handler, _, _, _ ->
         val config = handler.httpConfig()
         assertEquals(HttpMethod.Post, config.method)
         assertEquals("/api/pubsub/slack/interactivity", config.path)
@@ -35,28 +40,56 @@ class SlackInteractivityPubSubHandlerTest {
     }
 
     @Test
-    fun sendActionRoutesToSendHandler(): TestResult = runBlockingTest { handler, sendUseCase, _ ->
+    fun sendActionRoutesToSendHandler(): TestResult = runBlockingTest { handler, sendUseCase, _, _ ->
         val result = handler.handle(interactivityMessage(action = SlackActionName.SEND))
         assertTrue { result.isRight() }
         sendUseCase.assertInvokedOnce()
     }
 
     @Test
-    fun shuffleActionRoutesToShuffleHandler(): TestResult = runBlockingTest { handler, _, shuffleUseCase ->
+    fun shuffleActionRoutesToShuffleHandler(): TestResult = runBlockingTest { handler, _, shuffleUseCase, _ ->
         val result = handler.handle(interactivityMessage(action = SlackActionName.SHUFFLE))
         assertTrue { result.isRight() }
         shuffleUseCase.assertInvokedOnce()
     }
 
     @Test
-    fun selfDestructActionRoutesToSelfDestructHandler(): TestResult = runBlockingTest { handler, sendUseCase, _ ->
+    fun selfDestructActionRoutesToSelfDestructHandler(): TestResult = runBlockingTest { handler, sendUseCase, _, _ ->
         val result = handler.handle(interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN))
         assertTrue { result.isRight() }
         sendUseCase.assertInvokedOnce()
     }
 
     @Test
-    fun cancelActionRoutesToCancelHandler(): TestResult = runBlockingTest { handler, _, _ ->
+    fun selfDestruct30SecActionRoutesToSelfDestructHandler(): TestResult = runBlockingTest { handler, sendUseCase, _, _ ->
+        val result = handler.handle(interactivityMessage(action = SlackActionName.SELF_DESTRUCT_30_SEC))
+        assertTrue { result.isRight() }
+        sendUseCase.assertInvokedOnce()
+    }
+
+    @Test
+    fun selfDestruct1MinActionRoutesToSelfDestructHandler(): TestResult = runBlockingTest { handler, sendUseCase, _, _ ->
+        val result = handler.handle(interactivityMessage(action = SlackActionName.SELF_DESTRUCT_1_MIN))
+        assertTrue { result.isRight() }
+        sendUseCase.assertInvokedOnce()
+    }
+
+    @Test
+    fun selfDestructMenuActionRoutesToSelfDestructMenuHandler(): TestResult = runBlockingTest { handler, _, _, searchRepository ->
+        val result = handler.handle(interactivityMessage(action = SlackActionName.SELF_DESTRUCT_MENU))
+        assertTrue { result.isRight() }
+        searchRepository.assertGetSessionPostInvokedOnce()
+    }
+
+    @Test
+    fun selfDestructMenuBackActionRoutesToSelfDestructMenuBackHandler(): TestResult = runBlockingTest { handler, _, _, searchRepository ->
+        val result = handler.handle(interactivityMessage(action = SlackActionName.SELF_DESTRUCT_MENU_BACK))
+        assertTrue { result.isRight() }
+        searchRepository.assertGetSessionPostInvokedOnce()
+    }
+
+    @Test
+    fun cancelActionRoutesToCancelHandler(): TestResult = runBlockingTest { handler, _, _, _ ->
         val result = handler.handle(interactivityMessage(action = SlackActionName.CANCEL))
         assertTrue { result.isRight() }
     }
@@ -64,13 +97,13 @@ class SlackInteractivityPubSubHandlerTest {
     @Test
     fun handleErrorSwallows(): TestResult = runBlockingTest(
         sendResult = Either.Left(Throwable("send failed"))
-    ) { handler, _, _ ->
+    ) { handler, _, _, _ ->
         val result = handler.handle(interactivityMessage(action = SlackActionName.SEND))
         assertTrue { result.isRight() }
     }
 
     @Test
-    fun handleParseErrorSendsEmpty(): TestResult = runBlockingTest { handler, _, _ ->
+    fun handleParseErrorSendsEmpty(): TestResult = runBlockingTest { handler, _, _, _ ->
         val response = FakeHttpResponse()
         val result = handler.handleError(Throwable("parse error"), response)
         assertTrue { result.isRight() }
@@ -85,12 +118,20 @@ class SlackInteractivityPubSubHandlerTest {
 
     private fun runBlockingTest(
         sendResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.futureMessage()),
-        testBlock: suspend (SlackInteractivityPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase) -> Unit,
+        testBlock: suspend (
+            SlackInteractivityPubSubHandler,
+            FakeSlackSendSearchUseCase,
+            FakeSlackShuffleSearchUseCase,
+            FakeSlackSearchRepository,
+        ) -> Unit,
     ): TestResult = runTest {
         val ensureAuthUseCase = FakeSlackEnsureAuthenticatedUseCase()
         val sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)
         val shuffleUseCase = FakeSlackShuffleSearchUseCase()
         val cancelUseCase = FakeSlackCancelSearchUseCase()
+        val searchRepository = FakeSlackSearchRepository()
+        val repository = FakeSlackRepository()
+        val messageFactory = FakeSlackMessageFactory()
         val analytics = FakeAnalytics()
         val handler = SlackInteractivityPubSubHandler(
             dispatcher = FakeCoroutineDispatcher,
@@ -102,8 +143,42 @@ class SlackInteractivityPubSubHandlerTest {
                     slackSendSearchUseCase = sendUseCase,
                     analytics = analytics,
                 ),
+                SlackSelfDestructMenuInteractivityPubSubHandler(
+                    slackSearchRepository = searchRepository,
+                    slackRepository = repository,
+                    slackMessageFactory = messageFactory,
+                    analytics = analytics,
+                ),
+                SlackSelfDestructMenuBackInteractivityPubSubHandler(
+                    slackSearchRepository = searchRepository,
+                    slackRepository = repository,
+                    slackMessageFactory = messageFactory,
+                    analytics = analytics,
+                ),
                 SlackSelfDestructInteractivityPubSubHandler(
                     jsonSerializer = JsonSerializer.Default,
+                    actionName = SlackActionName.SELF_DESTRUCT_30_SEC,
+                    selfDestructDelay = 30.seconds,
+                    slackEnsureAuthenticatedUseCase = ensureAuthUseCase,
+                    slackSendSearchUseCase = sendUseCase,
+                    pubSubPublisher = FakePubSubPublisher(),
+                    slackConfig = SlackConfigCreator.slackConfig(),
+                    analytics = analytics,
+                ),
+                SlackSelfDestructInteractivityPubSubHandler(
+                    jsonSerializer = JsonSerializer.Default,
+                    actionName = SlackActionName.SELF_DESTRUCT_1_MIN,
+                    selfDestructDelay = 1.minutes,
+                    slackEnsureAuthenticatedUseCase = ensureAuthUseCase,
+                    slackSendSearchUseCase = sendUseCase,
+                    pubSubPublisher = FakePubSubPublisher(),
+                    slackConfig = SlackConfigCreator.slackConfig(),
+                    analytics = analytics,
+                ),
+                SlackSelfDestructInteractivityPubSubHandler(
+                    jsonSerializer = JsonSerializer.Default,
+                    actionName = SlackActionName.SELF_DESTRUCT_5_MIN,
+                    selfDestructDelay = 5.minutes,
                     slackEnsureAuthenticatedUseCase = ensureAuthUseCase,
                     slackSendSearchUseCase = sendUseCase,
                     pubSubPublisher = FakePubSubPublisher(),
@@ -115,7 +190,7 @@ class SlackInteractivityPubSubHandlerTest {
             ),
             pubSubDecoder = FakePubSubDecoder(FakePubSubRequest(null, SlackInteractivityReceivedEvent.serializer())),
         )
-        testBlock(handler, sendUseCase, shuffleUseCase)
+        testBlock(handler, sendUseCase, shuffleUseCase, searchRepository)
     }
 }
 

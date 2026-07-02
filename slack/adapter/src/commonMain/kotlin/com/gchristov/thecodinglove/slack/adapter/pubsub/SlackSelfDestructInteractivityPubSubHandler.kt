@@ -18,11 +18,14 @@ import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.DeserializationStrategy
 import kotlin.time.Clock
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 internal class SlackSelfDestructInteractivityPubSubHandler(
     override val jsonSerializer: JsonSerializer,
+    private val actionName: SlackActionName,
+    private val selfDestructDelay: Duration,
     private val slackEnsureAuthenticatedUseCase: SlackEnsureAuthenticatedUseCase,
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
     private val pubSubPublisher: PubSubPublisher,
@@ -37,12 +40,16 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
 
     @OptIn(ExperimentalTime::class)
     override suspend fun handle(event: SlackInteractivityReceivedEvent.InteractivityPayload.InteractiveMessage): Either<Throwable, Unit> {
-        val action = event.actions.firstOrNull { it.name == SlackActionName.SELF_DESTRUCT_5_MIN.apiValue }
+        val action = event.actions.firstOrNull { it.name == actionName.apiValue }
             ?: return Either.Right(Unit)
         analytics.sendEvent(
             clientId = event.user.id,
             name = "slack_interactivity_self_destruct",
-            params = mapOf("user_id" to event.user.id, "team_id" to event.team.id),
+            params = mapOf(
+                "user_id" to event.user.id,
+                "team_id" to event.team.id,
+                "self_destruct_seconds" to selfDestructDelay.inWholeSeconds.toString(),
+            ),
         )
         // Check auth before sending - if the user isn't authenticated, a prompt is sent instead and
         // there's nothing left to do here.
@@ -53,7 +60,7 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
                 channelId = event.channel.id,
                 responseUrl = event.responseUrl,
                 searchSessionId = action.value,
-                selfDestructMinutes = 5,
+                selfDestructDelay = selfDestructDelay,
             )
         ).getOrElse { return Either.Left(it) }
         if (authResult == SlackEnsureAuthenticatedUseCase.Result.AuthenticationPromptSent) {
@@ -67,7 +74,7 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
                 channelId = event.channel.id,
                 responseUrl = event.responseUrl,
                 searchSessionId = action.value,
-                selfDestructMinutes = 5,
+                selfDestructDelay = selfDestructDelay,
             )
         ).getOrElse { return Either.Left(it) }
         if (!sentMessage.isSelfDestruct) {
