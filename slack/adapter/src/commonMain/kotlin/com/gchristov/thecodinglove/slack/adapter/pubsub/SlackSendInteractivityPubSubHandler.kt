@@ -34,6 +34,8 @@ internal class SlackSendInteractivityPubSubHandler(
             name = "slack_interactivity_send",
             params = mapOf("user_id" to event.user.id, "team_id" to event.team.id),
         )
+        // Check auth before sending - if the user isn't authenticated, a prompt is sent instead and
+        // there's nothing left to do here.
         val authResult = slackEnsureAuthenticatedUseCase(
             SlackEnsureAuthenticatedUseCase.Dto(
                 userId = event.user.id,
@@ -44,7 +46,10 @@ internal class SlackSendInteractivityPubSubHandler(
                 selfDestructMinutes = null,
             )
         ).getOrElse { return Either.Left(it) }
-        if (authResult == SlackEnsureAuthenticatedUseCase.Result.AuthenticationPromptSent) return Either.Right(Unit)
+        if (authResult == SlackEnsureAuthenticatedUseCase.Result.AuthenticationPromptSent) {
+            return Either.Right(Unit)
+        }
+
         // This flow never self-destructs (selfDestructMinutes = null), so there's never a message to
         // schedule - discard the returned SlackSelfDestructMessage? to satisfy PubSubHandler's Unit contract.
         return slackSendSearchUseCase(

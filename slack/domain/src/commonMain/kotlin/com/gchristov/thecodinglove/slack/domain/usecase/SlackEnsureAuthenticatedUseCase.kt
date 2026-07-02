@@ -52,13 +52,12 @@ internal class RealSlackEnsureAuthenticatedUseCase(
             slackRepository.getAuthToken(tokenId = dto.userId).getOrElse { error ->
                 log.debug(tag, error) { "Error fetching user token${error.message?.let { ": $it" } ?: ""}" }
                 return@withContext sendAuthenticationPrompt(authState = authState)
+                    .map { SlackEnsureAuthenticatedUseCase.Result.AuthenticationPromptSent }
             }
             Either.Right(SlackEnsureAuthenticatedUseCase.Result.Authenticated)
         }
 
-    private suspend fun sendAuthenticationPrompt(
-        authState: SlackAuthState,
-    ): Either<Throwable, SlackEnsureAuthenticatedUseCase.Result> {
+    private suspend fun sendAuthenticationPrompt(authState: SlackAuthState): Either<Throwable, Unit> {
         log.debug(tag, "Asking user to authenticate: userId=${authState.userId}")
         return slackRepository.postMessageToUrl(
             url = authState.responseUrl,
@@ -66,6 +65,6 @@ internal class RealSlackEnsureAuthenticatedUseCase(
                 clientId = slackConfig.clientId,
                 authState = authState,
             )
-        ).map { SlackEnsureAuthenticatedUseCase.Result.AuthenticationPromptSent }
+        )
     }
 }
