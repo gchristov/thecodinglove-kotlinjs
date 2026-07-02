@@ -16,13 +16,13 @@ private fun ApiSlackSearchResult.ApiError.toSearchError() = when (this) {
 private fun ApiSlackSearchResult.ApiSearchSession.toSearchSession() = SlackSearchRepository.SearchResultDto.SearchSession(
     searchSessionId = searchSessionId,
     searchResults = totalPosts,
-    post = post.toPost(query = query, searchResults = totalPosts)
+    post = post.toPost(query = query, totalPosts = totalPosts)
 )
 
-private fun ApiSlackSearchResult.ApiPost.toPost(query: String, searchResults: Int) = SlackSearchRepository.SearchSessionPostDto(
+private fun ApiSlackSearchResult.ApiPost.toPost(query: String, totalPosts: Int) = SlackSearchRepository.SearchSessionPostDto(
     searchQuery = query,
     attachmentTitle = title,
     attachmentUrl = url,
     attachmentImageUrl = imageUrl,
-    searchResults = searchResults,
+    totalPosts = totalPosts,
 )

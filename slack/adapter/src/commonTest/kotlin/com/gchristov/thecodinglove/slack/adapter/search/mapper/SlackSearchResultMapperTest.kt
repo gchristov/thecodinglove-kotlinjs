@@ -20,7 +20,7 @@ class SlackSearchResultMapperTest {
                         attachmentTitle = "Post title",
                         attachmentUrl = "https://post.url",
                         attachmentImageUrl = "https://image.url",
-                        searchResults = 42,
+                        totalPosts = 42,
                     ),
                 ),
             ),

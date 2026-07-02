@@ -41,7 +41,7 @@ internal class SlackSelfDestructMenuInteractivityPubSubHandler(
             url = event.responseUrl,
             message = slackMessageFactory.searchResultDelayMenuMessage(
                 searchQuery = post.searchQuery,
-                searchResults = post.searchResults,
+                searchResults = post.totalPosts,
                 searchSessionId = action.value,
                 attachmentTitle = post.attachmentTitle,
                 attachmentUrl = post.attachmentUrl,

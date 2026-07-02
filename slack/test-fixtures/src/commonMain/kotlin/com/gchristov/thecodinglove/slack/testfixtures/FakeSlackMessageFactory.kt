@@ -4,7 +4,6 @@ import com.gchristov.thecodinglove.common.slack.model.SlackMessage
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessageResponseType
-import kotlin.time.Duration
 
 class FakeSlackMessageFactory : SlackMessageFactory {
     override fun message(
@@ -45,7 +44,7 @@ class FakeSlackMessageFactory : SlackMessageFactory {
         attachmentUrl: String,
         attachmentImageUrl: String,
         channelId: String,
-        selfDestructDelay: Duration?,
+        selfDestructSeconds: Long?,
     ) = dummyMessage()
 
     override fun searchGenericErrorMessage() = dummyMessage()

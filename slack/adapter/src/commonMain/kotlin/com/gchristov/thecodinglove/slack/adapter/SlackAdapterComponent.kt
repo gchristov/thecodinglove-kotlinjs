@@ -24,8 +24,6 @@ import com.gchristov.thecodinglove.slack.domain.usecase.*
 import kotlinx.coroutines.Dispatchers
 import me.tatarka.inject.annotations.Component
 import me.tatarka.inject.annotations.Provides
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 @Component
 interface SlackAdapterComponent {
@@ -196,7 +194,7 @@ interface SlackAdapterComponent {
             SlackSelfDestructInteractivityPubSubHandler(
                 jsonSerializer = jsonSerializer,
                 actionName = SlackActionName.SELF_DESTRUCT_30_SEC,
-                selfDestructDelay = 30.seconds,
+                selfDestructSeconds = 30L,
                 slackEnsureAuthenticatedUseCase = slackEnsureAuthenticatedUseCase,
                 slackSendSearchUseCase = slackSendSearchUseCase,
                 pubSubPublisher = pubSubPublisher,
@@ -206,7 +204,7 @@ interface SlackAdapterComponent {
             SlackSelfDestructInteractivityPubSubHandler(
                 jsonSerializer = jsonSerializer,
                 actionName = SlackActionName.SELF_DESTRUCT_1_MIN,
-                selfDestructDelay = 1.minutes,
+                selfDestructSeconds = 60L,
                 slackEnsureAuthenticatedUseCase = slackEnsureAuthenticatedUseCase,
                 slackSendSearchUseCase = slackSendSearchUseCase,
                 pubSubPublisher = pubSubPublisher,
@@ -216,7 +214,7 @@ interface SlackAdapterComponent {
             SlackSelfDestructInteractivityPubSubHandler(
                 jsonSerializer = jsonSerializer,
                 actionName = SlackActionName.SELF_DESTRUCT_5_MIN,
-                selfDestructDelay = 5.minutes,
+                selfDestructSeconds = 300L,
                 slackEnsureAuthenticatedUseCase = slackEnsureAuthenticatedUseCase,
                 slackSendSearchUseCase = slackSendSearchUseCase,
                 pubSubPublisher = pubSubPublisher,

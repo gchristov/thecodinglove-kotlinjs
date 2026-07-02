@@ -8,5 +8,5 @@ internal fun SearchSession.toSearchSessionPost() = ApiSearchSessionPost(
     attachmentTitle = currentPost!!.title,
     attachmentUrl = currentPost!!.url,
     attachmentImageUrl = currentPost!!.imageUrl,
-    searchResults = totalPosts ?: 0,
+    totalPosts = totalPosts!!,
 )

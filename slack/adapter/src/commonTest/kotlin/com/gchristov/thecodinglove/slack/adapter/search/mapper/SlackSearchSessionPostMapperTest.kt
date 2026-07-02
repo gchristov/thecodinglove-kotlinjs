@@ -14,14 +14,14 @@ class SlackSearchSessionPostMapperTest {
                 attachmentTitle = "Post title",
                 attachmentUrl = "https://post.url",
                 attachmentImageUrl = "https://image.url",
-                searchResults = 5,
+                totalPosts = 5,
             ),
             actual = ApiSlackSearchSessionPost(
                 searchQuery = "kotlin",
                 attachmentTitle = "Post title",
                 attachmentUrl = "https://post.url",
                 attachmentImageUrl = "https://image.url",
-                searchResults = 5,
+                totalPosts = 5,
             ).toSearchSessionPost(),
         )
     }

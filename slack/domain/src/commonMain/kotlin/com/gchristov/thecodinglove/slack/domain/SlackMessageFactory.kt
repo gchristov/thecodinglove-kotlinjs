@@ -6,8 +6,6 @@ import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
 import com.gchristov.thecodinglove.slack.domain.model.SlackMessageResponseType
 import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 
 interface SlackMessageFactory {
     fun message(
@@ -52,7 +50,7 @@ interface SlackMessageFactory {
         attachmentUrl: String,
         attachmentImageUrl: String,
         channelId: String,
-        selfDestructDelay: Duration?,
+        selfDestructSeconds: Long?,
     ): SlackMessage
 
     fun searchGenericErrorMessage(): SlackMessage
@@ -238,7 +236,7 @@ internal class RealSlackMessageFactory(
         attachmentUrl: String,
         attachmentImageUrl: String,
         channelId: String,
-        selfDestructDelay: Duration?,
+        selfDestructSeconds: Long?,
     ) = message(
         text = searchQuery,
         channelId = channelId,
@@ -250,7 +248,7 @@ internal class RealSlackMessageFactory(
                 url = attachmentUrl,
                 imageUrl = attachmentImageUrl,
                 actions = emptyList(),
-                footer = selfDestructDelay?.let { "Self-destructing in ~${it.toFooterText()} • $PostedUsingFooter" }
+                footer = selfDestructSeconds?.let { "Self-destructing in ~${it.toFooterText()} • $PostedUsingFooter" }
                     ?: PostedUsingFooter,
             )
         ),
@@ -289,10 +287,11 @@ internal class RealSlackMessageFactory(
 
         private const val PostedUsingFooter = "Posted using /codinglove"
 
-        private fun Duration.toFooterText() = if (this < 1.minutes) {
-            "$inWholeSeconds second${if (inWholeSeconds == 1L) "" else "s"}"
+        private fun Long.toFooterText() = if (this < 60) {
+            "$this second${if (this == 1L) "" else "s"}"
         } else {
-            "$inWholeMinutes minute${if (inWholeMinutes == 1L) "" else "s"}"
+            val minutes = this / 60
+            "$minutes minute${if (minutes == 1L) "" else "s"}"
         }
 
         private fun randomSearchingMessage() = listOf(

@@ -22,7 +22,7 @@ class SlackSendInteractivityPubSubHandlerTest {
         assertTrue { result.isRight() }
         ensureAuthUseCase.assertInvokedOnce()
         sendUseCase.assertInvokedOnce()
-        sendUseCase.assertSelfDestructDelay(null)
+        sendUseCase.assertSelfDestructSeconds(null)
     }
 
     @Test

@@ -8,8 +8,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 class RealSlackMessageFactoryTest {
     private val factory = RealSlackMessageFactory(FakeSlackAuthStateSerializer())
@@ -129,14 +127,14 @@ class RealSlackMessageFactoryTest {
     }
 
     @Test
-    fun searchPostMessageWithMinuteSelfDestructDelayIncludesMinutesInFooter() {
+    fun searchPostMessageWithMinuteSelfDestructSecondsIncludesMinutesInFooter() {
         val message = factory.searchPostMessage(
             searchQuery = "test",
             attachmentTitle = "title",
             attachmentUrl = "url",
             attachmentImageUrl = "imageUrl",
             channelId = "channel_1",
-            selfDestructDelay = 5.minutes,
+            selfDestructSeconds = 300L,
         )
         val footer = message.attachments?.firstOrNull()?.footer
         assertNotNull(footer)
@@ -144,14 +142,14 @@ class RealSlackMessageFactoryTest {
     }
 
     @Test
-    fun searchPostMessageWithSecondSelfDestructDelayIncludesSecondsInFooter() {
+    fun searchPostMessageWithSecondSelfDestructSecondsIncludesSecondsInFooter() {
         val message = factory.searchPostMessage(
             searchQuery = "test",
             attachmentTitle = "title",
             attachmentUrl = "url",
             attachmentImageUrl = "imageUrl",
             channelId = "channel_1",
-            selfDestructDelay = 30.seconds,
+            selfDestructSeconds = 30L,
         )
         val footer = message.attachments?.firstOrNull()?.footer
         assertNotNull(footer)
@@ -159,14 +157,14 @@ class RealSlackMessageFactoryTest {
     }
 
     @Test
-    fun searchPostMessageWithoutSelfDestructDelayUsesDefaultFooter() {
+    fun searchPostMessageWithoutSelfDestructSecondsUsesDefaultFooter() {
         val message = factory.searchPostMessage(
             searchQuery = "test",
             attachmentTitle = "title",
             attachmentUrl = "url",
             attachmentImageUrl = "imageUrl",
             channelId = "channel_1",
-            selfDestructDelay = null,
+            selfDestructSeconds = null,
         )
         val footer = message.attachments?.firstOrNull()?.footer
         assertEquals(expected = "Posted using /codinglove", actual = footer)
@@ -180,7 +178,7 @@ class RealSlackMessageFactoryTest {
             teamId = "team_1",
             userId = "user_1",
             responseUrl = "https://response.url",
-            selfDestructDelay = null,
+            selfDestructSeconds = null,
         )
         val message = factory.authMessage(clientId = "client_1", authState = authState)
         val authUrl = message.attachments?.firstOrNull()?.actions?.firstOrNull()?.url

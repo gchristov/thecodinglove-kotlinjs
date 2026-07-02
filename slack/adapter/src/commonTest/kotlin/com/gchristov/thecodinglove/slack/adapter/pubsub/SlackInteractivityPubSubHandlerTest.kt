@@ -27,8 +27,6 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 class SlackInteractivityPubSubHandlerTest {
     @Test
@@ -158,7 +156,7 @@ class SlackInteractivityPubSubHandlerTest {
                 SlackSelfDestructInteractivityPubSubHandler(
                     jsonSerializer = JsonSerializer.Default,
                     actionName = SlackActionName.SELF_DESTRUCT_30_SEC,
-                    selfDestructDelay = 30.seconds,
+                    selfDestructSeconds = 30L,
                     slackEnsureAuthenticatedUseCase = ensureAuthUseCase,
                     slackSendSearchUseCase = sendUseCase,
                     pubSubPublisher = FakePubSubPublisher(),
@@ -168,7 +166,7 @@ class SlackInteractivityPubSubHandlerTest {
                 SlackSelfDestructInteractivityPubSubHandler(
                     jsonSerializer = JsonSerializer.Default,
                     actionName = SlackActionName.SELF_DESTRUCT_1_MIN,
-                    selfDestructDelay = 1.minutes,
+                    selfDestructSeconds = 60L,
                     slackEnsureAuthenticatedUseCase = ensureAuthUseCase,
                     slackSendSearchUseCase = sendUseCase,
                     pubSubPublisher = FakePubSubPublisher(),
@@ -178,7 +176,7 @@ class SlackInteractivityPubSubHandlerTest {
                 SlackSelfDestructInteractivityPubSubHandler(
                     jsonSerializer = JsonSerializer.Default,
                     actionName = SlackActionName.SELF_DESTRUCT_5_MIN,
-                    selfDestructDelay = 5.minutes,
+                    selfDestructSeconds = 300L,
                     slackEnsureAuthenticatedUseCase = ensureAuthUseCase,
                     slackSendSearchUseCase = sendUseCase,
                     pubSubPublisher = FakePubSubPublisher(),

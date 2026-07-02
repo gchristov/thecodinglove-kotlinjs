@@ -18,14 +18,13 @@ import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.DeserializationStrategy
 import kotlin.time.Clock
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 internal class SlackSelfDestructInteractivityPubSubHandler(
     override val jsonSerializer: JsonSerializer,
     private val actionName: SlackActionName,
-    private val selfDestructDelay: Duration,
+    private val selfDestructSeconds: Long,
     private val slackEnsureAuthenticatedUseCase: SlackEnsureAuthenticatedUseCase,
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
     private val pubSubPublisher: PubSubPublisher,
@@ -48,7 +47,7 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
             params = mapOf(
                 "user_id" to event.user.id,
                 "team_id" to event.team.id,
-                "self_destruct_seconds" to selfDestructDelay.inWholeSeconds.toString(),
+                "self_destruct_seconds" to selfDestructSeconds.toString(),
             ),
         )
         // Check auth before sending - if the user isn't authenticated, a prompt is sent instead and
@@ -60,7 +59,7 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
                 channelId = event.channel.id,
                 responseUrl = event.responseUrl,
                 searchSessionId = action.value,
-                selfDestructDelay = selfDestructDelay,
+                selfDestructSeconds = selfDestructSeconds,
             )
         ).getOrElse { return Either.Left(it) }
         if (authResult == SlackEnsureAuthenticatedUseCase.Result.AuthenticationPromptSent) {
@@ -74,7 +73,7 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
                 channelId = event.channel.id,
                 responseUrl = event.responseUrl,
                 searchSessionId = action.value,
-                selfDestructDelay = selfDestructDelay,
+                selfDestructSeconds = selfDestructSeconds,
             )
         ).getOrElse { return Either.Left(it) }
         if (!sentMessage.isSelfDestruct) {
