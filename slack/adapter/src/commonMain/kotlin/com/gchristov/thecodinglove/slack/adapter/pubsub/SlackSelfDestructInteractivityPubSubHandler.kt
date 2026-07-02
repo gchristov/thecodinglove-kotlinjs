@@ -70,7 +70,9 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
                 selfDestructMinutes = 5,
             )
         ).getOrElse { return Either.Left(it) }
-        if (!sentMessage.isSelfDestruct) return Either.Right(Unit)
+        if (!sentMessage.isSelfDestruct) {
+            return Either.Left(Throwable("Expected a self-destructing message, but got a non-self-destructing one"))
+        }
 
         val scheduleResult = pubSubPublisher.publishJson(
             topic = slackConfig.selfDestructMessagePubSubTopic,

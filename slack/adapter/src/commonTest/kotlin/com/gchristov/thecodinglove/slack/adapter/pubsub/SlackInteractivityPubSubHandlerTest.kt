@@ -84,7 +84,7 @@ class SlackInteractivityPubSubHandlerTest {
     }
 
     private fun runBlockingTest(
-        sendResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.message()),
+        sendResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.pastMessage()),
         testBlock: suspend (SlackInteractivityPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase) -> Unit,
     ): TestResult = runTest {
         val ensureAuthUseCase = FakeSlackEnsureAuthenticatedUseCase()

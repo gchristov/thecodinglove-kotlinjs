@@ -57,12 +57,12 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
     }
 
     @Test
-    fun handleNoSelfDestructMessageDoesNotSchedule(): TestResult = runBlockingTest(
+    fun handleNonSelfDestructMessageReturnsLeft(): TestResult = runBlockingTest(
         sendResult = Either.Right(SlackSentMessageCreator.message()),
     ) { handler, _, _, pubSubPublisher ->
         val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
         val result = handler.handle(payload)
-        assertTrue { result.isRight() }
+        assertFalse { result.isRight() }
         pubSubPublisher.assertNotInvoked()
     }
 
@@ -91,7 +91,7 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
     private fun runBlockingTest(
         ensureAuthResult: Either<Throwable, SlackEnsureAuthenticatedUseCase.Result> =
             Either.Right(SlackEnsureAuthenticatedUseCase.Result.Authenticated),
-        sendResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.message()),
+        sendResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.pastMessage()),
         testBlock: suspend (
             SlackSelfDestructInteractivityPubSubHandler,
             FakeSlackEnsureAuthenticatedUseCase,
