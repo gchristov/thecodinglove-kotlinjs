@@ -5,6 +5,7 @@ import arrow.core.getOrElse
 import com.gchristov.thecodinglove.common.slack.model.SlackAuthToken
 import com.gchristov.thecodinglove.common.test.FakeCoroutineDispatcher
 import com.gchristov.thecodinglove.common.test.FakeLogger
+import com.gchristov.thecodinglove.slack.domain.model.isSelfDestruct
 import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackMessageFactory
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackRepository
@@ -18,8 +19,8 @@ import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTime::class)
@@ -77,7 +78,9 @@ class RealSlackSendSearchUseCaseTest {
     ) { useCase, repository, searchRepository ->
         val actual = useCase.invoke(TestDto)
         assertTrue { actual.isRight() }
-        assertNull(actual.getOrElse { null })
+        val message = actual.getOrElse { null }
+        assertNotNull(message)
+        assertFalse { message.isSelfDestruct }
         repository.assertPostMessageToUrlCalledTimes(1)
         repository.assertPostMessageCalled()
         searchRepository.assertGetSessionPostInvokedOnce()
@@ -91,7 +94,9 @@ class RealSlackSendSearchUseCaseTest {
     ) { useCase, repository, _ ->
         val actual = useCase.invoke(TestDto.copy(selfDestructMinutes = 5))
         assertTrue { actual.isRight() }
-        assertNotNull(actual.getOrElse { null })
+        val message = actual.getOrElse { null }
+        assertNotNull(message)
+        assertTrue { message.isSelfDestruct }
         repository.assertSelfDestructMessageSaved()
     }
 

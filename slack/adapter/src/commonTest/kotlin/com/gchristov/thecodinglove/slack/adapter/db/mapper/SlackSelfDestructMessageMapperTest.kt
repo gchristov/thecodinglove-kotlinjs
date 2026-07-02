@@ -1,7 +1,7 @@
 package com.gchristov.thecodinglove.slack.adapter.db.mapper
 
 import com.gchristov.thecodinglove.slack.adapter.db.DbSlackSelfDestructMessage
-import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
+import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -31,7 +31,7 @@ class SlackSelfDestructMessageMapperTest {
     }
 }
 
-private val TestDomainMessage = SlackSelfDestructMessage(
+private val TestDomainMessage = SlackSentMessage(
     id = "msg_123",
     userId = "user_456",
     searchSessionId = "session_789",

@@ -11,7 +11,7 @@ import com.gchristov.thecodinglove.slack.adapter.db.DbSlackAuthToken
 import com.gchristov.thecodinglove.slack.adapter.db.DbSlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.adapter.db.mapper.toAuthToken
 import com.gchristov.thecodinglove.slack.adapter.db.mapper.toSelfDestructMessage
-import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
+import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
 
 internal class RealSlackRepository(
@@ -98,7 +98,7 @@ internal class RealSlackRepository(
         messageTs = messageTs,
     )
 
-    override suspend fun saveSelfDestructMessage(message: SlackSelfDestructMessage): Either<Throwable, Unit> =
+    override suspend fun saveSelfDestructMessage(message: SlackSentMessage): Either<Throwable, Unit> =
         firebaseAdmin
             .firestore()
             .collection(SelfDestructCollection)
@@ -116,7 +116,7 @@ internal class RealSlackRepository(
         .document(messageId)
         .delete()
 
-    override suspend fun getSelfDestructMessages(): Either<Throwable, List<SlackSelfDestructMessage>> = either {
+    override suspend fun getSelfDestructMessages(): Either<Throwable, List<SlackSentMessage>> = either {
         val result = firebaseAdmin.firestore().collection(SelfDestructCollection).get().bind()
         result.docs.map { document ->
             val dbSelfDestructMessage = document.decodeDataFromJson(

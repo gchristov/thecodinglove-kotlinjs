@@ -3,7 +3,7 @@ package com.gchristov.thecodinglove.slack.domain.port
 import arrow.core.Either
 import com.gchristov.thecodinglove.common.slack.model.SlackAuthToken
 import com.gchristov.thecodinglove.common.slack.model.SlackMessage
-import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
+import com.gchristov.thecodinglove.slack.domain.model.SlackSentMessage
 
 interface SlackRepository {
     suspend fun authUser(
@@ -36,9 +36,9 @@ interface SlackRepository {
         messageTs: String,
     ): Either<Throwable, Unit>
 
-    suspend fun saveSelfDestructMessage(message: SlackSelfDestructMessage): Either<Throwable, Unit>
+    suspend fun saveSelfDestructMessage(message: SlackSentMessage): Either<Throwable, Unit>
 
     suspend fun deleteSelfDestructMessage(messageId: String): Either<Throwable, Unit>
 
-    suspend fun getSelfDestructMessages(): Either<Throwable, List<SlackSelfDestructMessage>>
+    suspend fun getSelfDestructMessages(): Either<Throwable, List<SlackSentMessage>>
 }
