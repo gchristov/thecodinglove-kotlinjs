@@ -157,6 +157,7 @@ interface SlackAdapterComponent {
     fun provideSlackInteractivityPubSubHandler(
         jsonSerializer: JsonSerializer.Default,
         log: Logger,
+        slackEnsureAuthenticatedUseCase: SlackEnsureAuthenticatedUseCase,
         slackSendSearchUseCase: SlackSendSearchUseCase,
         slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
         slackCancelSearchUseCase: SlackCancelSearchUseCase,
@@ -169,9 +170,14 @@ interface SlackAdapterComponent {
         jsonSerializer = jsonSerializer,
         log = log,
         eventHandlers = listOf(
-            SlackSendInteractivityPubSubHandler(slackSendSearchUseCase, analytics),
+            SlackSendInteractivityPubSubHandler(
+                slackEnsureAuthenticatedUseCase = slackEnsureAuthenticatedUseCase,
+                slackSendSearchUseCase = slackSendSearchUseCase,
+                analytics = analytics,
+            ),
             SlackSelfDestructInteractivityPubSubHandler(
                 jsonSerializer = jsonSerializer,
+                slackEnsureAuthenticatedUseCase = slackEnsureAuthenticatedUseCase,
                 slackSendSearchUseCase = slackSendSearchUseCase,
                 pubSubPublisher = pubSubPublisher,
                 slackConfig = slackConfig,

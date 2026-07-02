@@ -6,7 +6,6 @@ import co.touchlab.kermit.Logger
 import com.gchristov.thecodinglove.common.kotlin.debug
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.SlackAuthState
-import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.domain.port.SlackSearchRepository
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
@@ -20,9 +19,13 @@ import kotlinx.datetime.plus
 interface SlackSendSearchUseCase {
     /**
      * @return the [SlackSelfDestructMessage] to schedule for deletion if the sent message should
-     * self-destruct, or `null` if no message was sent (yet) or it isn't self-destructing.
+     * self-destruct, or `null` if it isn't self-destructing.
      */
     suspend operator fun invoke(dto: Dto): Either<Throwable, SlackSelfDestructMessage?>
+
+    sealed class Error(message: String? = null) : Throwable(message) {
+        data object NotAuthenticated : Error("User is not authenticated")
+    }
 
     data class Dto(
         val userId: String,
@@ -41,7 +44,6 @@ internal class RealSlackSendSearchUseCase(
     private val slackSearchRepository: SlackSearchRepository,
     private val slackRepository: SlackRepository,
     private val slackMessageFactory: SlackMessageFactory,
-    private val slackConfig: SlackConfig,
     private val clock: Clock,
 ) : SlackSendSearchUseCase {
     private val tag = this::class.simpleName
@@ -59,25 +61,10 @@ internal class RealSlackSendSearchUseCase(
             )
             val token = slackRepository.getAuthToken(tokenId = dto.userId).getOrElse { error ->
                 log.debug(tag, error) { "Error fetching user token${error.message?.let { ": $it" } ?: ""}" }
-                return@withContext authenticate(clientId = slackConfig.clientId, authState = authState)
+                return@withContext Either.Left(SlackSendSearchUseCase.Error.NotAuthenticated)
             }
             sendResult(authState = authState, authToken = token.token)
         }
-
-    private suspend fun authenticate(
-        clientId: String,
-        authState: SlackAuthState,
-    ): Either<Throwable, SlackSelfDestructMessage?> {
-        log.debug(tag, "Asking user to authenticate: userId=${authState.userId}")
-        // No message was sent - the user still needs to authenticate - so there's nothing to self-destruct yet.
-        return slackRepository.postMessageToUrl(
-            url = authState.responseUrl,
-            message = slackMessageFactory.authMessage(
-                clientId = clientId,
-                authState = authState,
-            )
-        ).map { null }
-    }
 
     private suspend fun sendResult(
         authState: SlackAuthState,
