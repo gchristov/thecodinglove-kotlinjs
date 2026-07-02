@@ -44,13 +44,30 @@ class SearchSessionPostHttpHandlerTest {
         searchSession = SearchSessionCreator.searchSession(
             id = TestSessionId,
             query = "kotlin",
-        ).copy(currentPost = SearchPostCreator.defaultPost()),
+        ).copy(currentPost = SearchPostCreator.defaultPost(), totalPosts = 5),
     ) { handler, response ->
         handler.handleHttpRequest(FakeSearchHttpRequest(fakeSearchSessionId = TestSessionId), response)
         response.assertEquals(
             header = "Content-Type",
             headerValue = ContentType.Application.Json.toString(),
-            data = """{"search_query":"kotlin","attachment_title":"post","attachment_url":"url","attachment_image_url":"imageUrl"}""",
+            data = """{"search_query":"kotlin","attachment_title":"post","attachment_url":"url","attachment_image_url":"imageUrl","search_results":5}""",
+            status = 200,
+            filePath = null,
+        )
+    }
+
+    @Test
+    fun sessionFoundWithNoTotalPostsDefaultsSearchResultsToZero(): TestResult = runBlockingTest(
+        searchSession = SearchSessionCreator.searchSession(
+            id = TestSessionId,
+            query = "kotlin",
+        ).copy(currentPost = SearchPostCreator.defaultPost(), totalPosts = null),
+    ) { handler, response ->
+        handler.handleHttpRequest(FakeSearchHttpRequest(fakeSearchSessionId = TestSessionId), response)
+        response.assertEquals(
+            header = "Content-Type",
+            headerValue = ContentType.Application.Json.toString(),
+            data = """{"search_query":"kotlin","attachment_title":"post","attachment_url":"url","attachment_image_url":"imageUrl","search_results":0}""",
             status = 200,
             filePath = null,
         )
