@@ -91,7 +91,7 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
     private fun runBlockingTest(
         ensureAuthResult: Either<Throwable, SlackEnsureAuthenticatedUseCase.Result> =
             Either.Right(SlackEnsureAuthenticatedUseCase.Result.Authenticated),
-        sendResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.pastMessage()),
+        sendResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.futureMessage()),
         testBlock: suspend (
             SlackSelfDestructInteractivityPubSubHandler,
             FakeSlackEnsureAuthenticatedUseCase,
