@@ -25,7 +25,20 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
         assertTrue { result.isRight() }
         ensureAuthUseCase.assertInvokedOnce()
         sendUseCase.assertInvokedOnce()
-        sendUseCase.assertSelfDestructMinutes(5)
+        sendUseCase.assertSelfDestructSeconds(300L)
+    }
+
+    @Test
+    fun handleSelfDestruct30SecInvokesSendUseCaseWith30Seconds(): TestResult = runBlockingTest(
+        actionName = SlackActionName.SELF_DESTRUCT_30_SEC,
+        selfDestructSeconds = 30L,
+    ) { handler, ensureAuthUseCase, sendUseCase, _ ->
+        val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_30_SEC).payload as SlackInteractivityPayload
+        val result = handler.handle(payload)
+        assertTrue { result.isRight() }
+        ensureAuthUseCase.assertInvokedOnce()
+        sendUseCase.assertInvokedOnce()
+        sendUseCase.assertSelfDestructSeconds(30L)
     }
 
     @Test
@@ -89,6 +102,8 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
     }
 
     private fun runBlockingTest(
+        actionName: SlackActionName = SlackActionName.SELF_DESTRUCT_5_MIN,
+        selfDestructSeconds: Long = 300L,
         ensureAuthResult: Either<Throwable, SlackEnsureAuthenticatedUseCase.Result> =
             Either.Right(SlackEnsureAuthenticatedUseCase.Result.Authenticated),
         sendResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.futureMessage()),
@@ -104,6 +119,8 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
         val pubSubPublisher = FakePubSubPublisher()
         val handler = SlackSelfDestructInteractivityPubSubHandler(
             jsonSerializer = JsonSerializer.Default,
+            actionName = actionName,
+            selfDestructSeconds = selfDestructSeconds,
             slackEnsureAuthenticatedUseCase = ensureAuthUseCase,
             slackSendSearchUseCase = sendUseCase,
             pubSubPublisher = pubSubPublisher,

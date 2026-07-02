@@ -27,6 +27,15 @@ class FakeSlackMessageFactory : SlackMessageFactory {
         attachmentImageUrl: String,
     ) = dummyMessage()
 
+    override fun searchResultDelayMenuMessage(
+        searchQuery: String,
+        searchResults: Int,
+        searchSessionId: String,
+        attachmentTitle: String,
+        attachmentUrl: String,
+        attachmentImageUrl: String,
+    ) = dummyMessage()
+
     override fun authMessage(clientId: String, authState: SlackAuthState) = dummyMessage()
 
     override fun searchPostMessage(
@@ -35,7 +44,7 @@ class FakeSlackMessageFactory : SlackMessageFactory {
         attachmentUrl: String,
         attachmentImageUrl: String,
         channelId: String,
-        selfDestructMinutes: Int?,
+        selfDestructSeconds: Long?,
     ) = dummyMessage()
 
     override fun searchGenericErrorMessage() = dummyMessage()

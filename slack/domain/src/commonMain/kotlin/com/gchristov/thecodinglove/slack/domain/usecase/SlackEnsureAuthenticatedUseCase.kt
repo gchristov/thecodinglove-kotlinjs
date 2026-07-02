@@ -25,7 +25,7 @@ interface SlackEnsureAuthenticatedUseCase {
         val channelId: String,
         val responseUrl: String,
         val searchSessionId: String,
-        val selfDestructMinutes: Int? = null,
+        val selfDestructSeconds: Long? = null,
     )
 }
 
@@ -47,7 +47,7 @@ internal class RealSlackEnsureAuthenticatedUseCase(
                 teamId = dto.teamId,
                 userId = dto.userId,
                 responseUrl = dto.responseUrl,
-                selfDestructMinutes = dto.selfDestructMinutes,
+                selfDestructSeconds = dto.selfDestructSeconds,
             )
             slackRepository.getAuthToken(tokenId = dto.userId).getOrElse { error ->
                 log.debug(tag, error) { "Error fetching user token${error.message?.let { ": $it" } ?: ""}" }

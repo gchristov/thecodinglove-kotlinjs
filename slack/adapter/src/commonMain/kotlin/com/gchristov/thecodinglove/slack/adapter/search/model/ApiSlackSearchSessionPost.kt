@@ -9,4 +9,5 @@ internal data class ApiSlackSearchSessionPost(
     @SerialName("attachment_title") val attachmentTitle: String,
     @SerialName("attachment_url") val attachmentUrl: String,
     @SerialName("attachment_image_url") val attachmentImageUrl: String,
+    @SerialName("total_posts") val totalPosts: Int,
 )

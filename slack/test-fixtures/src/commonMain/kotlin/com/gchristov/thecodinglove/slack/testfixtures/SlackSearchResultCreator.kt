@@ -27,10 +27,11 @@ object SlackSearchResultCreator {
 }
 
 object SlackSearchSessionPostCreator {
-    fun post() = SlackSearchRepository.SearchSessionPostDto(
+    fun post(totalPosts: Int = 10) = SlackSearchRepository.SearchSessionPostDto(
         searchQuery = "test",
         attachmentTitle = "title",
         attachmentUrl = "url",
         attachmentImageUrl = "imageUrl",
+        totalPosts = totalPosts,
     )
 }

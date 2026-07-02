@@ -6,5 +6,5 @@ data class SlackAuthState(
     val teamId: String,
     val userId: String,
     val responseUrl: String,
-    val selfDestructMinutes: Int?,
+    val selfDestructSeconds: Long?,
 )

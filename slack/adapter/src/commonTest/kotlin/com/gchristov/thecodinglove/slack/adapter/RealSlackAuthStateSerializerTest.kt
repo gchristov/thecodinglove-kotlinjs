@@ -20,8 +20,8 @@ class RealSlackAuthStateSerializerTest {
     }
 
     @Test
-    fun selfDestructMinutesNullPreserved() {
-        val state = TestAuthState.copy(selfDestructMinutes = null)
+    fun selfDestructSecondsNullPreserved() {
+        val state = TestAuthState.copy(selfDestructSeconds = null)
         val result = serializer.serialize(state)
         val decoded = result.decodeBase64String()
         val parsed = JsonSerializer.Default.json.decodeFromString<ApiSlackAuthState>(decoded).toAuthState()
@@ -29,12 +29,29 @@ class RealSlackAuthStateSerializerTest {
     }
 
     @Test
-    fun selfDestructMinutesValuePreserved() {
-        val state = TestAuthState.copy(selfDestructMinutes = 5)
+    fun selfDestructSecondsValuePreserved() {
+        val state = TestAuthState.copy(selfDestructSeconds = 300L)
         val result = serializer.serialize(state)
         val decoded = result.decodeBase64String()
         val parsed = JsonSerializer.Default.json.decodeFromString<ApiSlackAuthState>(decoded).toAuthState()
         assertEquals(expected = state, actual = parsed)
+    }
+
+    @Test
+    fun legacySelfDestructMinutesFallsBackToSelfDestructSeconds() {
+        // Simulates decoding an already-encoded (pre-deploy) state URL that only has the legacy
+        // self_destruct_minutes field, to confirm it still resolves to a usable delay.
+        val legacyApiState = ApiSlackAuthState(
+            searchSessionId = TestAuthState.searchSessionId,
+            channelId = TestAuthState.channelId,
+            teamId = TestAuthState.teamId,
+            userId = TestAuthState.userId,
+            responseUrl = TestAuthState.responseUrl,
+            selfDestructMinutes = 5,
+            selfDestructSeconds = null,
+        )
+        val parsed = legacyApiState.toAuthState()
+        assertEquals(expected = 300L, actual = parsed.selfDestructSeconds)
     }
 }
 
@@ -44,5 +61,5 @@ private val TestAuthState = SlackAuthState(
     teamId = "team_xyz",
     userId = "user_456",
     responseUrl = "https://response.url",
-    selfDestructMinutes = null,
+    selfDestructSeconds = null,
 )

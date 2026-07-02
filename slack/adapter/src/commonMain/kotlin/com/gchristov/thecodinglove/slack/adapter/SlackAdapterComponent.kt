@@ -15,6 +15,7 @@ import com.gchristov.thecodinglove.slack.adapter.search.RealSlackSearchRepositor
 import com.gchristov.thecodinglove.slack.adapter.search.SlackSearchServiceApi
 import com.gchristov.thecodinglove.slack.domain.SlackMessageFactory
 import com.gchristov.thecodinglove.slack.domain.model.Environment
+import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
 import com.gchristov.thecodinglove.slack.domain.port.SlackAuthStateSerializer
 import com.gchristov.thecodinglove.slack.domain.port.SlackRepository
@@ -161,6 +162,9 @@ interface SlackAdapterComponent {
         slackSendSearchUseCase: SlackSendSearchUseCase,
         slackShuffleSearchUseCase: SlackShuffleSearchUseCase,
         slackCancelSearchUseCase: SlackCancelSearchUseCase,
+        slackSearchRepository: SlackSearchRepository,
+        slackRepository: SlackRepository,
+        slackMessageFactory: SlackMessageFactory,
         pubSubDecoder: PubSubDecoder,
         pubSubPublisher: PubSubPublisher,
         slackConfig: SlackConfig,
@@ -175,8 +179,42 @@ interface SlackAdapterComponent {
                 slackSendSearchUseCase = slackSendSearchUseCase,
                 analytics = analytics,
             ),
+            SlackSelfDestructMenuInteractivityPubSubHandler(
+                slackSearchRepository = slackSearchRepository,
+                slackRepository = slackRepository,
+                slackMessageFactory = slackMessageFactory,
+                analytics = analytics,
+            ),
+            SlackSelfDestructMenuBackInteractivityPubSubHandler(
+                slackSearchRepository = slackSearchRepository,
+                slackRepository = slackRepository,
+                slackMessageFactory = slackMessageFactory,
+                analytics = analytics,
+            ),
             SlackSelfDestructInteractivityPubSubHandler(
                 jsonSerializer = jsonSerializer,
+                actionName = SlackActionName.SELF_DESTRUCT_30_SEC,
+                selfDestructSeconds = 30L,
+                slackEnsureAuthenticatedUseCase = slackEnsureAuthenticatedUseCase,
+                slackSendSearchUseCase = slackSendSearchUseCase,
+                pubSubPublisher = pubSubPublisher,
+                slackConfig = slackConfig,
+                analytics = analytics,
+            ),
+            SlackSelfDestructInteractivityPubSubHandler(
+                jsonSerializer = jsonSerializer,
+                actionName = SlackActionName.SELF_DESTRUCT_1_MIN,
+                selfDestructSeconds = 60L,
+                slackEnsureAuthenticatedUseCase = slackEnsureAuthenticatedUseCase,
+                slackSendSearchUseCase = slackSendSearchUseCase,
+                pubSubPublisher = pubSubPublisher,
+                slackConfig = slackConfig,
+                analytics = analytics,
+            ),
+            SlackSelfDestructInteractivityPubSubHandler(
+                jsonSerializer = jsonSerializer,
+                actionName = SlackActionName.SELF_DESTRUCT_5_MIN,
+                selfDestructSeconds = 300L,
                 slackEnsureAuthenticatedUseCase = slackEnsureAuthenticatedUseCase,
                 slackSendSearchUseCase = slackSendSearchUseCase,
                 pubSubPublisher = pubSubPublisher,

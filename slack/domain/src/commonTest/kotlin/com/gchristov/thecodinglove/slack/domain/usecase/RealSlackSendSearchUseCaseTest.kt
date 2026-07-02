@@ -92,7 +92,7 @@ class RealSlackSendSearchUseCaseTest {
     fun sendSuccessWithSelfDestructSavesSelfDestructStateAndReturnsIt(): TestResult = runBlockingTest(
         getAuthTokenResult = Either.Right(SlackAuthTokenCreator.token()),
     ) { useCase, repository, _ ->
-        val actual = useCase.invoke(TestDto.copy(selfDestructMinutes = 5))
+        val actual = useCase.invoke(TestDto.copy(selfDestructSeconds = 300L))
         assertTrue { actual.isRight() }
         val message = actual.getOrElse { null }
         assertNotNull(message)
@@ -138,7 +138,7 @@ private val TestDto = SlackSendSearchUseCase.Dto(
     channelId = "channel_id",
     responseUrl = "https://response.url",
     searchSessionId = "session_123",
-    selfDestructMinutes = null,
+    selfDestructSeconds = null,
 )
 @OptIn(ExperimentalTime::class)
 private val TestClock = object : Clock {

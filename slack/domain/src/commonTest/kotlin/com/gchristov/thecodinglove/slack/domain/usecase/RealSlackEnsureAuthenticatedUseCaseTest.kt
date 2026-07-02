@@ -73,5 +73,5 @@ private val TestDto = SlackEnsureAuthenticatedUseCase.Dto(
     channelId = "channel_id",
     responseUrl = "https://response.url",
     searchSessionId = "session_123",
-    selfDestructMinutes = null,
+    selfDestructSeconds = null,
 )

@@ -43,14 +43,14 @@ internal class SlackSendInteractivityPubSubHandler(
                 channelId = event.channel.id,
                 responseUrl = event.responseUrl,
                 searchSessionId = action.value,
-                selfDestructMinutes = null,
+                selfDestructSeconds = null,
             )
         ).getOrElse { return Either.Left(it) }
         if (authResult == SlackEnsureAuthenticatedUseCase.Result.AuthenticationPromptSent) {
             return Either.Right(Unit)
         }
 
-        // This flow never self-destructs (selfDestructMinutes = null), so there's never anything to
+        // This flow never self-destructs (selfDestructSeconds = null), so there's never anything to
         // schedule - discard the returned SlackSentMessage to satisfy PubSubHandler's Unit contract.
         return slackSendSearchUseCase(
             SlackSendSearchUseCase.Dto(
@@ -59,7 +59,7 @@ internal class SlackSendInteractivityPubSubHandler(
                 channelId = event.channel.id,
                 responseUrl = event.responseUrl,
                 searchSessionId = action.value,
-                selfDestructMinutes = null,
+                selfDestructSeconds = null,
             )
         ).map { }
     }

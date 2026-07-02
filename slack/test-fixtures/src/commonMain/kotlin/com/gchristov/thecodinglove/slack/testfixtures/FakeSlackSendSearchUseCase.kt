@@ -9,15 +9,15 @@ class FakeSlackSendSearchUseCase(
     private val invocationResult: Either<Throwable, SlackSentMessage> = Either.Right(SlackSentMessageCreator.message()),
 ) : SlackSendSearchUseCase {
     private var invocations = 0
-    private var lastSelfDestructMinutes: Int? = null
+    private var lastSelfDestructSeconds: Long? = null
 
     override suspend fun invoke(dto: SlackSendSearchUseCase.Dto): Either<Throwable, SlackSentMessage> {
-        lastSelfDestructMinutes = dto.selfDestructMinutes
+        lastSelfDestructSeconds = dto.selfDestructSeconds
         invocations++
         return invocationResult
     }
 
     fun assertInvokedOnce() = assertEquals(expected = 1, actual = invocations)
     fun assertNotInvoked() = assertEquals(expected = 0, actual = invocations)
-    fun assertSelfDestructMinutes(minutes: Int?) = assertEquals(expected = minutes, actual = lastSelfDestructMinutes)
+    fun assertSelfDestructSeconds(seconds: Long?) = assertEquals(expected = seconds, actual = lastSelfDestructSeconds)
 }
