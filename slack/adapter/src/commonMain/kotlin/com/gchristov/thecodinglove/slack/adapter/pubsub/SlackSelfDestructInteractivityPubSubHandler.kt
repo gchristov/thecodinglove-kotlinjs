@@ -12,6 +12,7 @@ import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivity
 import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackSelfDestructMessageEvent
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.model.SlackConfig
+import com.gchristov.thecodinglove.slack.domain.usecase.SlackEnsureAuthenticatedUseCase
 import com.gchristov.thecodinglove.slack.domain.usecase.SlackSendSearchUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.DeserializationStrategy
@@ -21,6 +22,7 @@ import kotlin.time.Instant
 
 internal class SlackSelfDestructInteractivityPubSubHandler(
     override val jsonSerializer: JsonSerializer,
+    private val slackEnsureAuthenticatedUseCase: SlackEnsureAuthenticatedUseCase,
     private val slackSendSearchUseCase: SlackSendSearchUseCase,
     private val pubSubPublisher: PubSubPublisher,
     private val slackConfig: SlackConfig,
@@ -41,6 +43,17 @@ internal class SlackSelfDestructInteractivityPubSubHandler(
             name = "slack_interactivity_self_destruct",
             params = mapOf("user_id" to event.user.id, "team_id" to event.team.id),
         )
+        val authResult = slackEnsureAuthenticatedUseCase(
+            SlackEnsureAuthenticatedUseCase.Dto(
+                userId = event.user.id,
+                teamId = event.team.id,
+                channelId = event.channel.id,
+                responseUrl = event.responseUrl,
+                searchSessionId = action.value,
+                selfDestructMinutes = 5,
+            )
+        ).getOrElse { return Either.Left(it) }
+        if (authResult == SlackEnsureAuthenticatedUseCase.Result.AuthenticationPromptSent) return Either.Right(Unit)
         val selfDestructMessage = slackSendSearchUseCase(
             SlackSendSearchUseCase.Dto(
                 userId = event.user.id,

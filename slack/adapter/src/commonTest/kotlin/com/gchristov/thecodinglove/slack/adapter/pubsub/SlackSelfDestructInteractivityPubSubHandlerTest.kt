@@ -6,6 +6,8 @@ import com.gchristov.thecodinglove.common.kotlin.JsonSerializer
 import com.gchristov.thecodinglove.common.pubsubtestfixtures.FakePubSubPublisher
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
+import com.gchristov.thecodinglove.slack.domain.usecase.SlackEnsureAuthenticatedUseCase
+import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackEnsureAuthenticatedUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSendSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.SlackConfigCreator
 import com.gchristov.thecodinglove.slack.testfixtures.SlackSelfDestructMessageCreator
@@ -17,26 +19,28 @@ import kotlin.test.assertTrue
 
 class SlackSelfDestructInteractivityPubSubHandlerTest {
     @Test
-    fun handleSelfDestruct5MinInvokesSendUseCaseWith5Minutes(): TestResult = runBlockingTest { handler, sendUseCase, _ ->
+    fun handleSelfDestruct5MinInvokesSendUseCaseWith5Minutes(): TestResult = runBlockingTest { handler, ensureAuthUseCase, sendUseCase, _ ->
         val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
         val result = handler.handle(payload)
         assertTrue { result.isRight() }
+        ensureAuthUseCase.assertInvokedOnce()
         sendUseCase.assertInvokedOnce()
         sendUseCase.assertSelfDestructMinutes(5)
     }
 
     @Test
-    fun handleOtherActionSkips(): TestResult = runBlockingTest { handler, sendUseCase, _ ->
+    fun handleOtherActionSkips(): TestResult = runBlockingTest { handler, ensureAuthUseCase, sendUseCase, _ ->
         val payload = interactivityMessage(action = SlackActionName.SHUFFLE).payload as SlackInteractivityPayload
         val result = handler.handle(payload)
         assertTrue { result.isRight() }
+        ensureAuthUseCase.assertNotInvoked()
         sendUseCase.assertNotInvoked()
     }
 
     @Test
     fun handleSelfDestructErrorReturnsLeft(): TestResult = runBlockingTest(
         sendResult = Either.Left(Throwable("Send failed"))
-    ) { handler, _, _ ->
+    ) { handler, _, _, _ ->
         val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
         val result = handler.handle(payload)
         assertFalse { result.isRight() }
@@ -45,7 +49,7 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
     @Test
     fun handleSelfDestructMessageSentSchedulesSelfDestruct(): TestResult = runBlockingTest(
         sendResult = Either.Right(SlackSelfDestructMessageCreator.pastMessage()),
-    ) { handler, _, pubSubPublisher ->
+    ) { handler, _, _, pubSubPublisher ->
         val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
         val result = handler.handle(payload)
         assertTrue { result.isRight() }
@@ -55,27 +59,58 @@ class SlackSelfDestructInteractivityPubSubHandlerTest {
     @Test
     fun handleNoSelfDestructMessageDoesNotSchedule(): TestResult = runBlockingTest(
         sendResult = Either.Right(null),
-    ) { handler, _, pubSubPublisher ->
+    ) { handler, _, _, pubSubPublisher ->
         val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
         val result = handler.handle(payload)
         assertTrue { result.isRight() }
         pubSubPublisher.assertNotInvoked()
     }
 
+    @Test
+    fun handleAuthenticationPromptSentSkipsSendUseCaseAndDoesNotSchedule(): TestResult = runBlockingTest(
+        ensureAuthResult = Either.Right(SlackEnsureAuthenticatedUseCase.Result.AuthenticationPromptSent),
+    ) { handler, _, sendUseCase, pubSubPublisher ->
+        val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
+        val result = handler.handle(payload)
+        assertTrue { result.isRight() }
+        sendUseCase.assertNotInvoked()
+        pubSubPublisher.assertNotInvoked()
+    }
+
+    @Test
+    fun handleEnsureAuthenticatedErrorReturnsLeft(): TestResult = runBlockingTest(
+        ensureAuthResult = Either.Left(Throwable("Ensure auth failed")),
+    ) { handler, _, sendUseCase, pubSubPublisher ->
+        val payload = interactivityMessage(action = SlackActionName.SELF_DESTRUCT_5_MIN).payload as SlackInteractivityPayload
+        val result = handler.handle(payload)
+        assertFalse { result.isRight() }
+        sendUseCase.assertNotInvoked()
+        pubSubPublisher.assertNotInvoked()
+    }
+
     private fun runBlockingTest(
+        ensureAuthResult: Either<Throwable, SlackEnsureAuthenticatedUseCase.Result> =
+            Either.Right(SlackEnsureAuthenticatedUseCase.Result.Authenticated),
         sendResult: Either<Throwable, SlackSelfDestructMessage?> = Either.Right(null),
-        testBlock: suspend (SlackSelfDestructInteractivityPubSubHandler, FakeSlackSendSearchUseCase, FakePubSubPublisher) -> Unit,
+        testBlock: suspend (
+            SlackSelfDestructInteractivityPubSubHandler,
+            FakeSlackEnsureAuthenticatedUseCase,
+            FakeSlackSendSearchUseCase,
+            FakePubSubPublisher,
+        ) -> Unit,
     ): TestResult = runTest {
+        val ensureAuthUseCase = FakeSlackEnsureAuthenticatedUseCase(invocationResult = ensureAuthResult)
         val sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)
         val pubSubPublisher = FakePubSubPublisher()
         val handler = SlackSelfDestructInteractivityPubSubHandler(
             jsonSerializer = JsonSerializer.Default,
+            slackEnsureAuthenticatedUseCase = ensureAuthUseCase,
             slackSendSearchUseCase = sendUseCase,
             pubSubPublisher = pubSubPublisher,
             slackConfig = SlackConfigCreator.slackConfig(selfDestructMessagePubSubTopic = TestSelfDestructTopic),
             analytics = FakeAnalytics(),
         )
-        testBlock(handler, sendUseCase, pubSubPublisher)
+        testBlock(handler, ensureAuthUseCase, sendUseCase, pubSubPublisher)
     }
 }
 

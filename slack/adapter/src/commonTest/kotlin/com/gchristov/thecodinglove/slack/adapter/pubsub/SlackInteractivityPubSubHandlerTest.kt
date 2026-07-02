@@ -13,6 +13,7 @@ import com.gchristov.thecodinglove.slack.adapter.pubsub.model.SlackInteractivity
 import com.gchristov.thecodinglove.slack.domain.model.SlackActionName
 import com.gchristov.thecodinglove.slack.domain.model.SlackSelfDestructMessage
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackCancelSearchUseCase
+import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackEnsureAuthenticatedUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackSendSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.FakeSlackShuffleSearchUseCase
 import com.gchristov.thecodinglove.slack.testfixtures.SlackConfigCreator
@@ -85,6 +86,7 @@ class SlackInteractivityPubSubHandlerTest {
         sendResult: Either<Throwable, SlackSelfDestructMessage?> = Either.Right(null),
         testBlock: suspend (SlackInteractivityPubSubHandler, FakeSlackSendSearchUseCase, FakeSlackShuffleSearchUseCase) -> Unit,
     ): TestResult = runTest {
+        val ensureAuthUseCase = FakeSlackEnsureAuthenticatedUseCase()
         val sendUseCase = FakeSlackSendSearchUseCase(invocationResult = sendResult)
         val shuffleUseCase = FakeSlackShuffleSearchUseCase()
         val cancelUseCase = FakeSlackCancelSearchUseCase()
@@ -94,9 +96,14 @@ class SlackInteractivityPubSubHandlerTest {
             jsonSerializer = JsonSerializer.Default,
             log = FakeLogger,
             eventHandlers = listOf(
-                SlackSendInteractivityPubSubHandler(sendUseCase, analytics),
+                SlackSendInteractivityPubSubHandler(
+                    slackEnsureAuthenticatedUseCase = ensureAuthUseCase,
+                    slackSendSearchUseCase = sendUseCase,
+                    analytics = analytics,
+                ),
                 SlackSelfDestructInteractivityPubSubHandler(
                     jsonSerializer = JsonSerializer.Default,
+                    slackEnsureAuthenticatedUseCase = ensureAuthUseCase,
                     slackSendSearchUseCase = sendUseCase,
                     pubSubPublisher = FakePubSubPublisher(),
                     slackConfig = SlackConfigCreator.slackConfig(),
