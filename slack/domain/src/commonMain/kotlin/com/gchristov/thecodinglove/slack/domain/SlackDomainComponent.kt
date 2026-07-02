@@ -94,6 +94,20 @@ interface SlackDomainComponent {
         slackMessageFactory = slackMessageFactory,
     )
 
+    @Provides
+    fun provideSlackEnsureAuthenticatedUseCase(
+        log: Logger,
+        slackRepository: SlackRepository,
+        slackMessageFactory: SlackMessageFactory,
+        slackConfig: SlackConfig,
+    ): SlackEnsureAuthenticatedUseCase = RealSlackEnsureAuthenticatedUseCase(
+        dispatcher = Dispatchers.Default,
+        log = log,
+        slackRepository = slackRepository,
+        slackMessageFactory = slackMessageFactory,
+        slackConfig = slackConfig,
+    )
+
     @OptIn(ExperimentalTime::class)
     @Provides
     fun provideSlackSendSearchUseCase(
